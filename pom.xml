@@ -23,6 +23,7 @@
         <module>yonchain-ai-api</module>
         <module>yonchain-ai-console</module>
         <module>yonchain-ai-retry</module>
+        <module>yonchain-ai-idm</module>
     </modules>
 
     <properties>

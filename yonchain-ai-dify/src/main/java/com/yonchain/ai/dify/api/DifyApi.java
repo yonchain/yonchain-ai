@@ -16,6 +16,7 @@
 
 package com.yonchain.ai.dify.api;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,6 +34,7 @@ import com.yonchain.ai.app.AppOptionsUtils;
 import com.yonchain.ai.app.NoopApiKey;
 import com.yonchain.ai.app.SimpleApiKey;
 import com.yonchain.ai.retry.RetryUtils;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -120,13 +122,13 @@ public class DifyApi {
     }
 
 
-
     /**
      * Creates a chat message with the given request in blocking mode.
+     *
      * @param request The chat message request. Must have responseMode set to BLOCKING.
      * @return ResponseEntity with ChatCompletion.
      */
-    public ResponseEntity<ChatCompletion> createChatMessageEntity(ChatCompletionRequest request) {
+    public ResponseEntity<ChatCompletionResponse> createChatMessageEntity(ChatCompletionRequest request) {
         Assert.notNull(request, "Request must not be null");
         Assert.isTrue(request.responseMode() == ResponseMode.BLOCKING,
                 "Request must have responseMode set to BLOCKING");
@@ -136,15 +138,16 @@ public class DifyApi {
                 .headers(this::addDefaultHeadersIfMissing)
                 .body(request)
                 .retrieve()
-                .toEntity(ChatCompletion.class);
+                .toEntity(ChatCompletionResponse.class);
     }
 
     /**
      * Creates a streaming chat message with the given request.
+     *
      * @param request The chat message request. Must have responseMode set to STREAMING.
      * @return Flux stream of ChunkChatCompletion.
      */
-    public Flux<ChunkChatCompletion> createChatMessageStream(ChatCompletionRequest request) {
+    public Flux<ChatCompletionResponse> createChatMessageStream(ChatCompletionRequest request) {
         Assert.notNull(request, "Request must not be null");
         Assert.isTrue(request.responseMode() == ResponseMode.STREAMING,
                 "Request must have responseMode set to STREAMING");
@@ -159,7 +162,7 @@ public class DifyApi {
                 .bodyToFlux(String.class)
                 .takeUntil(SSE_DONE_PREDICATE)
                 .filter(SSE_DONE_PREDICATE.negate())
-                .map(content -> AppOptionsUtils.jsonToObject(content, ChunkChatCompletion.class))
+                .map(content -> AppOptionsUtils.jsonToObject(content, ChatCompletionResponse.class))
                 /*// 可选：添加与OpenAiApi类似的工具调用处理逻辑
                 .map(chunk -> {
                     if (this.chunkMerger.isStreamingToolFunctionCall(chunk)) {
@@ -175,9 +178,10 @@ public class DifyApi {
                     return !isInsideTool.get();
                 })*/
                 .concatMapIterable(window -> {
-                    Mono<ChunkChatCompletion> monoChunk = window.reduce(
+                    Mono<ChatCompletionResponse> monoChunk = null;
+                   /*   window.reduce(
                             new ChunkChatCompletion(null, null, null, null, null, null, null, null, null, null, null, null, null, null),
-                            (previous, current) -> this.chunkMerger.merge(previous, current));
+                            (previous, current) -> this.chunkMerger.merge(previous, current));*/
                     return List.of(monoChunk);
                 })
                 .flatMap(mono -> mono);
@@ -186,6 +190,7 @@ public class DifyApi {
 
     /**
      * Uploads a file for use in chat messages.
+     *
      * @param file The file to upload.
      * @param user The user identifier.
      * @return ResponseEntity with FileUploadResponse.
@@ -208,8 +213,9 @@ public class DifyApi {
 
     /**
      * Stops a streaming response.
+     *
      * @param taskId The task ID to stop.
-     * @param user The user identifier.
+     * @param user   The user identifier.
      * @return ResponseEntity with the stop result.
      */
     public ResponseEntity<Map<String, String>> stopResponse(String taskId, String user) {
@@ -221,13 +227,15 @@ public class DifyApi {
                 .headers(this::addDefaultHeadersIfMissing)
                 .body(new StopResponseRequest(user))
                 .retrieve()
-                .toEntity(new ParameterizedTypeReference<>() {});
+                .toEntity(new ParameterizedTypeReference<>() {
+                });
     }
 
     /**
      * Submits feedback for a message.
+     *
      * @param messageId The message ID to provide feedback for.
-     * @param request The feedback request.
+     * @param request   The feedback request.
      * @return ResponseEntity with FeedbackResponse.
      */
     public ResponseEntity<FeedbackResponse> submitFeedback(String messageId, FeedbackRequest request) {
@@ -244,10 +252,11 @@ public class DifyApi {
 
     /**
      * Gets conversation messages.
+     *
      * @param conversationId The conversation ID.
-     * @param user The user identifier.
-     * @param firstId The first message ID for pagination.
-     * @param limit The maximum number of messages to return.
+     * @param user           The user identifier.
+     * @param firstId        The first message ID for pagination.
+     * @param limit          The maximum number of messages to return.
      * @return ResponseEntity with the list of messages.
      */
     public ResponseEntity<Map<String, Object>> getMessages(String conversationId, String user,
@@ -267,8 +276,100 @@ public class DifyApi {
                         .build())
                 .headers(this::addDefaultHeadersIfMissing)
                 .retrieve()
-                .toEntity(new ParameterizedTypeReference<>() {});
+                .toEntity(new ParameterizedTypeReference<>() {
+                });
     }
+
+    // 获取建议问题列表
+    public ResponseEntity<SuggestedQuestionsResponse> getSuggestedQuestions(String messageId, String user) {
+        Assert.hasText(messageId, "Message ID must not be empty");
+        Assert.hasText(user, "User must not be empty");
+
+        return this.restClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/messages/{message_id}/suggested")
+                        .queryParam("user", user)
+                        .build(messageId))
+                .headers(this::addDefaultHeadersIfMissing)
+                .retrieve()
+                .toEntity(SuggestedQuestionsResponse.class);
+    }
+
+
+    // 获取会话列表
+    public ResponseEntity<ConversationsResponse> getConversations(String user, String lastId,
+                                                                  Integer limit, String sortBy) {
+        Assert.hasText(user, "User must not be empty");
+
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        queryParams.add("user", user);
+        if (lastId != null) queryParams.add("last_id", lastId);
+        if (limit != null) queryParams.add("limit", limit.toString());
+        if (sortBy != null) queryParams.add("sort_by", sortBy);
+
+        return this.restClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/conversations")
+                        .queryParams(queryParams)
+                        .build())
+                .headers(this::addDefaultHeadersIfMissing)
+                .retrieve()
+                .toEntity(ConversationsResponse.class);
+    }
+
+    // 删除会话 - 修改为使用body方法而不是bodyValue
+    public ResponseEntity<Void> deleteConversation(String conversationId, String user) {
+        Assert.hasText(conversationId, "Conversation ID must not be empty");
+        Assert.hasText(user, "User must not be empty");
+
+        Map<String, String> requestBody = Map.of("user", user);
+
+        return this.restClient.method(HttpMethod.DELETE)
+                .uri("/conversations/{conversation_id}", conversationId)
+                .headers(this::addDefaultHeadersIfMissing)
+                .body(requestBody)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    // 会话重命名 - 修改为使用body方法而不是bodyValue
+    public ResponseEntity<ConversationsResponse.Conversation> renameConversation(
+            String conversationId, String name, Boolean autoGenerate, String user) {
+        Assert.hasText(conversationId, "Conversation ID must not be empty");
+        Assert.hasText(user, "User must not be empty");
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("user", user);
+        if (name != null) requestBody.put("name", name);
+        if (autoGenerate != null) requestBody.put("auto_generate", autoGenerate);
+
+        return this.restClient.post()
+                .uri(uriBuilder -> uriBuilder.path("/conversations/{conversation_id}/name")
+                        .build(conversationId))
+                .headers(this::addDefaultHeadersIfMissing)
+                .body(requestBody)  // 使用body方法而不是bodyValue
+                .retrieve()
+                .toEntity(ConversationsResponse.Conversation.class);
+    }
+
+    // 获取对话变量
+    public ResponseEntity<VariablesResponse> getConversationVariables(
+            String conversationId, String user, String lastId, Integer limit) {
+        Assert.hasText(conversationId, "Conversation ID must not be empty");
+        Assert.hasText(user, "User must not be empty");
+
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        queryParams.add("user", user);
+        if (lastId != null) queryParams.add("last_id", lastId);
+        if (limit != null) queryParams.add("limit", limit.toString());
+
+        return this.restClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/conversations/{conversation_id}/variables")
+                        .queryParams(queryParams)
+                        .build(conversationId))
+                .headers(this::addDefaultHeadersIfMissing)
+                .retrieve()
+                .toEntity(VariablesResponse.class);
+    }
+
 
     // Builder class
     public static class Builder {
@@ -282,7 +383,8 @@ public class DifyApi {
         private WebClient.Builder webClientBuilder = WebClient.builder();
         private ResponseErrorHandler responseErrorHandler = RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER;
 
-        public Builder() {}
+        public Builder() {
+        }
 
         // Copy constructor for mutate()
         public Builder(DifyApi api) {
@@ -408,14 +510,15 @@ public class DifyApi {
             @JsonProperty("transfer_method") TransferMethod transferMethod,
             @JsonProperty("url") String url,
             @JsonProperty("upload_file_id") String uploadFileId
-    ) {}
+    ) {
+    }
 
     /**
      * Chat completion response for blocking mode.
      */
     @JsonInclude(Include.NON_NULL)
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record ChatCompletion(
+    public record ChatCompletionResponse(
             @JsonProperty("event") String event,
             @JsonProperty("task_id") String taskId,
             @JsonProperty("id") String id,
@@ -425,14 +528,15 @@ public class DifyApi {
             @JsonProperty("answer") String answer,
             @JsonProperty("metadata") Metadata metadata,
             @JsonProperty("created_at") Long createdAt
-    ) {}
+    ) {
+    }
 
     /**
      * Chunk chat completion response for streaming mode.
      */
     @JsonInclude(Include.NON_NULL)
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record ChunkChatCompletion(
+    public record ChunkChatCompletionResponse(
             @JsonProperty("event") String event,
             @JsonProperty("task_id") String taskId,
             @JsonProperty("message_id") String messageId,
@@ -451,7 +555,8 @@ public class DifyApi {
             @JsonProperty("status") Integer status,
             @JsonProperty("code") String code,
             @JsonProperty("message") String errorMessage
-    ) {}
+    ) {
+    }
 
     /**
      * Metadata for chat responses.
@@ -461,7 +566,8 @@ public class DifyApi {
     public record Metadata(
             @JsonProperty("usage") Usage usage,
             @JsonProperty("retriever_resources") List<RetrieverResource> retrieverResources
-    ) {}
+    ) {
+    }
 
     /**
      * Usage information.
@@ -481,7 +587,8 @@ public class DifyApi {
             @JsonProperty("total_price") String totalPrice,
             @JsonProperty("currency") String currency,
             @JsonProperty("latency") Double latency
-    ) {}
+    ) {
+    }
 
     /**
      * Retriever resource information.
@@ -497,7 +604,8 @@ public class DifyApi {
             @JsonProperty("segment_id") String segmentId,
             @JsonProperty("score") Double score,
             @JsonProperty("content") String content
-    ) {}
+    ) {
+    }
 
     /**
      * File upload response.
@@ -512,7 +620,8 @@ public class DifyApi {
             @JsonProperty("mime_type") String mimeType,
             @JsonProperty("created_by") String createdBy,
             @JsonProperty("created_at") Long createdAt
-    ) {}
+    ) {
+    }
 
     /**
      * Stop response request.
@@ -520,7 +629,8 @@ public class DifyApi {
     @JsonInclude(Include.NON_NULL)
     public record StopResponseRequest(
             @JsonProperty("user") String user
-    ) {}
+    ) {
+    }
 
     /**
      * Feedback request.
@@ -530,7 +640,8 @@ public class DifyApi {
             @JsonProperty("rating") String rating,
             @JsonProperty("user") String user,
             @JsonProperty("content") String content
-    ) {}
+    ) {
+    }
 
     /**
      * Feedback response.
@@ -539,5 +650,144 @@ public class DifyApi {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record FeedbackResponse(
             @JsonProperty("result") String result
-    ) {}
+    ) {
+    }
+
+    /**
+     * 建议问题列表响应
+     */
+    @JsonInclude(Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record SuggestedQuestionsResponse(
+            @JsonProperty("result") String result,
+            @JsonProperty("data") List<String> data
+    ) {
+    }
+
+    /**
+     * 消息列表响应
+     */
+    @JsonInclude(Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record MessagesResponse(
+            @JsonProperty("limit") Integer limit,
+            @JsonProperty("has_more") Boolean hasMore,
+            @JsonProperty("data") List<Message> data
+    ) {
+        /**
+         * 消息详情
+         */
+        @JsonInclude(Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record Message(
+                @JsonProperty("id") String id,
+                @JsonProperty("conversation_id") String conversationId,
+                @JsonProperty("inputs") Map<String, Object> inputs,
+                @JsonProperty("query") String query,
+                @JsonProperty("answer") String answer,
+                @JsonProperty("message_files") List<MessageFile> messageFiles,
+                @JsonProperty("feedback") Feedback feedback,
+                @JsonProperty("retriever_resources") List<RetrieverResource> retrieverResources,
+                @JsonProperty("agent_thoughts") List<AgentThought> agentThoughts,
+                @JsonProperty("created_at") Long createdAt
+        ) {
+        }
+
+        /**
+         * 消息文件
+         */
+        @JsonInclude(Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record MessageFile(
+                @JsonProperty("id") String id,
+                @JsonProperty("type") String type,
+                @JsonProperty("url") String url,
+                @JsonProperty("belongs_to") String belongsTo
+        ) {
+        }
+
+        /**
+         * 反馈信息
+         */
+        @JsonInclude(Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record Feedback(
+                @JsonProperty("rating") String rating
+        ) {
+        }
+
+        /**
+         * Agent思考内容
+         */
+        @JsonInclude(Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record AgentThought(
+                @JsonProperty("id") String id,
+                @JsonProperty("message_id") String messageId,
+                @JsonProperty("position") Integer position,
+                @JsonProperty("thought") String thought,
+                @JsonProperty("observation") String observation,
+                @JsonProperty("tool") String tool,
+                @JsonProperty("tool_input") String toolInput,
+                @JsonProperty("created_at") Long createdAt,
+                @JsonProperty("files") List<String> files
+        ) {
+        }
+    }
+
+    /**
+     * 会话列表响应
+     */
+    @JsonInclude(Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record ConversationsResponse(
+            @JsonProperty("limit") Integer limit,
+            @JsonProperty("has_more") Boolean hasMore,
+            @JsonProperty("data") List<Conversation> data
+    ) {
+        /**
+         * 会话详情
+         */
+        @JsonInclude(Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record Conversation(
+                @JsonProperty("id") String id,
+                @JsonProperty("name") String name,
+                @JsonProperty("inputs") Map<String, Object> inputs,
+                @JsonProperty("status") String status,
+                @JsonProperty("introduction") String introduction,
+                @JsonProperty("created_at") Long createdAt,
+                @JsonProperty("updated_at") Long updatedAt
+        ) {
+        }
+    }
+
+    /**
+     * 变量列表响应
+     */
+    @JsonInclude(Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record VariablesResponse(
+            @JsonProperty("limit") Integer limit,
+            @JsonProperty("has_more") Boolean hasMore,
+            @JsonProperty("data") List<Variable> data
+    ) {
+        /**
+         * 变量详情
+         */
+        @JsonInclude(Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record Variable(
+                @JsonProperty("id") String id,
+                @JsonProperty("name") String name,
+                @JsonProperty("value_type") String valueType,
+                @JsonProperty("value") String value,
+                @JsonProperty("description") String description,
+                @JsonProperty("created_at") Long createdAt,
+                @JsonProperty("updated_at") Long updatedAt
+        ) {
+        }
+    }
+
+
 }
