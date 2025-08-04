@@ -1,6 +1,5 @@
 package com.yonchain.ai.chat;
 
-import com.yonchain.ai.app.AppOptions;
 import com.yonchain.ai.app.AppRequest;
 import io.micrometer.common.lang.Nullable;
 
