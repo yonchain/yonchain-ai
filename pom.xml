@@ -21,6 +21,8 @@
         <module>yonchain-ai-coze</module>
         <module>yonchain-ai-security</module>
         <module>yonchain-ai-api</module>
+        <module>yonchain-ai-console</module>
+        <module>yonchain-ai-retry</module>
     </modules>
 
     <properties>
@@ -36,6 +38,8 @@
 
         <!-- plugin versions -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+
+        <jsonschema.version>4.37.0</jsonschema.version>
 
     </properties>
 
