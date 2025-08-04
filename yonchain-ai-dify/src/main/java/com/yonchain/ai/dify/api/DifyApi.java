@@ -77,6 +77,12 @@ public class DifyApi {
     private final String chatMessagesPath;
     private final String filesUploadPath;
     private final String stopResponsePath;
+    private final String messagesPath;
+    private final String messagesFeedbackPath;
+    private final String messagesSuggestedPath;
+    private final String conversationsPath;
+    private final String conversationVariablesPath;
+    private final String conversationNamePath;
     private final ResponseErrorHandler responseErrorHandler;
     private final RestClient restClient;
     private final WebClient webClient;
@@ -88,6 +94,8 @@ public class DifyApi {
      */
     public DifyApi(String baseUrl, ApiKey apiKey, MultiValueMap<String, String> headers,
                    String chatMessagesPath, String filesUploadPath, String stopResponsePath,
+                   String messagesPath,String messagesFeedbackPath,String messagesSuggestedPath,
+                   String conversationsPath,String conversationVariablesPath,String conversationNamePath,
                    RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder,
                    ResponseErrorHandler responseErrorHandler) {
         this.baseUrl = baseUrl;
@@ -96,6 +104,12 @@ public class DifyApi {
         this.chatMessagesPath = chatMessagesPath;
         this.filesUploadPath = filesUploadPath;
         this.stopResponsePath = stopResponsePath;
+        this.messagesPath = messagesPath;
+        this.messagesFeedbackPath = messagesFeedbackPath;
+        this.messagesSuggestedPath = messagesSuggestedPath;
+        this.conversationsPath = conversationsPath;
+        this.conversationVariablesPath = conversationVariablesPath;
+        this.conversationNamePath = conversationNamePath;
         this.responseErrorHandler = responseErrorHandler;
 
         Assert.hasText(chatMessagesPath, "Chat Messages Path must not be null");
@@ -141,12 +155,12 @@ public class DifyApi {
                 .toEntity(ChatCompletionResponse.class);
     }
 
-    /**
+ /*   *//**
      * Creates a streaming chat message with the given request.
      *
      * @param request The chat message request. Must have responseMode set to STREAMING.
      * @return Flux stream of ChunkChatCompletion.
-     */
+     *//*
     public Flux<ChatCompletionResponse> createChatMessageStream(ChatCompletionRequest request) {
         Assert.notNull(request, "Request must not be null");
         Assert.isTrue(request.responseMode() == ResponseMode.STREAMING,
@@ -163,7 +177,7 @@ public class DifyApi {
                 .takeUntil(SSE_DONE_PREDICATE)
                 .filter(SSE_DONE_PREDICATE.negate())
                 .map(content -> AppOptionsUtils.jsonToObject(content, ChatCompletionResponse.class))
-                /*// 可选：添加与OpenAiApi类似的工具调用处理逻辑
+                // 可选：添加与OpenAiApi类似的工具调用处理逻辑
                 .map(chunk -> {
                     if (this.chunkMerger.isStreamingToolFunctionCall(chunk)) {
                         isInsideTool.set(true);
@@ -176,17 +190,17 @@ public class DifyApi {
                         return true;
                     }
                     return !isInsideTool.get();
-                })*/
+                })*//*
                 .concatMapIterable(window -> {
                     Mono<ChatCompletionResponse> monoChunk = null;
-                   /*   window.reduce(
+                   *//*   window.reduce(
                             new ChunkChatCompletion(null, null, null, null, null, null, null, null, null, null, null, null, null, null),
-                            (previous, current) -> this.chunkMerger.merge(previous, current));*/
+                            (previous, current) -> this.chunkMerger.merge(previous, current));*//*
                     return List.of(monoChunk);
                 })
                 .flatMap(mono -> mono);
     }
-
+*/
 
     /**
      * Uploads a file for use in chat messages.
@@ -232,18 +246,18 @@ public class DifyApi {
     }
 
     /**
-     * Submits feedback for a message.
-     *
-     * @param messageId The message ID to provide feedback for.
-     * @param request   The feedback request.
-     * @return ResponseEntity with FeedbackResponse.
+     * Submits feedback for a specific message.
+     * @param messageId The ID of the message to provide feedback on
+     * @param request The feedback content and rating
+     * @return ResponseEntity with feedback submission result
+     * @throws IllegalArgumentException if messageId is empty or request is null
      */
     public ResponseEntity<FeedbackResponse> submitFeedback(String messageId, FeedbackRequest request) {
         Assert.hasText(messageId, "Message ID must not be empty");
         Assert.notNull(request, "Request must not be null");
 
         return this.restClient.post()
-                .uri("/messages/{message_id}/feedbacks", messageId)
+                .uri(this.messagesFeedbackPath, messageId)
                 .headers(this::addDefaultHeadersIfMissing)
                 .body(request)
                 .retrieve()
@@ -251,13 +265,13 @@ public class DifyApi {
     }
 
     /**
-     * Gets conversation messages.
-     *
-     * @param conversationId The conversation ID.
-     * @param user           The user identifier.
-     * @param firstId        The first message ID for pagination.
-     * @param limit          The maximum number of messages to return.
-     * @return ResponseEntity with the list of messages.
+     * Retrieves conversation messages with pagination support.
+     * @param conversationId The conversation to get messages from
+     * @param user The user identifier
+     * @param firstId Optional ID for pagination (get messages after this ID)
+     * @param limit Optional maximum number of messages to return
+     * @return ResponseEntity containing message list and pagination info
+     * @throws IllegalArgumentException if conversationId or user is empty
      */
     public ResponseEntity<Map<String, Object>> getMessages(String conversationId, String user,
                                                            String firstId, Integer limit) {
@@ -271,22 +285,27 @@ public class DifyApi {
         if (limit != null) queryParams.add("limit", limit.toString());
 
         return this.restClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/messages")
+                .uri(uriBuilder -> uriBuilder.path(this.messagesPath)
                         .queryParams(queryParams)
                         .build())
                 .headers(this::addDefaultHeadersIfMissing)
                 .retrieve()
-                .toEntity(new ParameterizedTypeReference<>() {
-                });
+                .toEntity(new ParameterizedTypeReference<>() {});
     }
 
-    // 获取建议问题列表
+    /**
+     * Gets suggested follow-up questions for a message.
+     * @param messageId The message to get suggestions for
+     * @param user The user identifier
+     * @return ResponseEntity containing list of suggested questions
+     * @throws IllegalArgumentException if messageId or user is empty
+     */
     public ResponseEntity<SuggestedQuestionsResponse> getSuggestedQuestions(String messageId, String user) {
         Assert.hasText(messageId, "Message ID must not be empty");
         Assert.hasText(user, "User must not be empty");
 
         return this.restClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/messages/{message_id}/suggested")
+                .uri(uriBuilder -> uriBuilder.path(this.messagesSuggestedPath)
                         .queryParam("user", user)
                         .build(messageId))
                 .headers(this::addDefaultHeadersIfMissing)
@@ -294,8 +313,15 @@ public class DifyApi {
                 .toEntity(SuggestedQuestionsResponse.class);
     }
 
-
-    // 获取会话列表
+    /**
+     * Lists conversations for a user with pagination support.
+     * @param user The user identifier
+     * @param lastId Optional ID for pagination (get conversations before this ID)
+     * @param limit Optional maximum number of conversations to return
+     * @param sortBy Optional sorting criteria
+     * @return ResponseEntity containing conversation list and pagination info
+     * @throws IllegalArgumentException if user is empty
+     */
     public ResponseEntity<ConversationsResponse> getConversations(String user, String lastId,
                                                                   Integer limit, String sortBy) {
         Assert.hasText(user, "User must not be empty");
@@ -307,7 +333,7 @@ public class DifyApi {
         if (sortBy != null) queryParams.add("sort_by", sortBy);
 
         return this.restClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/conversations")
+                .uri(uriBuilder -> uriBuilder.path(this.conversationsPath)
                         .queryParams(queryParams)
                         .build())
                 .headers(this::addDefaultHeadersIfMissing)
@@ -315,7 +341,13 @@ public class DifyApi {
                 .toEntity(ConversationsResponse.class);
     }
 
-    // 删除会话 - 修改为使用body方法而不是bodyValue
+    /**
+     * Deletes a conversation.
+     * @param conversationId The conversation to delete
+     * @param user The user identifier who owns the conversation
+     * @return ResponseEntity with empty body on success
+     * @throws IllegalArgumentException if conversationId or user is empty
+     */
     public ResponseEntity<Void> deleteConversation(String conversationId, String user) {
         Assert.hasText(conversationId, "Conversation ID must not be empty");
         Assert.hasText(user, "User must not be empty");
@@ -323,14 +355,22 @@ public class DifyApi {
         Map<String, String> requestBody = Map.of("user", user);
 
         return this.restClient.method(HttpMethod.DELETE)
-                .uri("/conversations/{conversation_id}", conversationId)
+                .uri(this.conversationsPath, conversationId)
                 .headers(this::addDefaultHeadersIfMissing)
                 .body(requestBody)
                 .retrieve()
                 .toBodilessEntity();
     }
 
-    // 会话重命名 - 修改为使用body方法而不是bodyValue
+    /**
+     * Renames a conversation.
+     * @param conversationId The conversation to rename
+     * @param name Optional new name (if not provided, will auto-generate)
+     * @param autoGenerate Whether to auto-generate the name
+     * @param user The user identifier who owns the conversation
+     * @return ResponseEntity containing updated conversation info
+     * @throws IllegalArgumentException if conversationId or user is empty
+     */
     public ResponseEntity<ConversationsResponse.Conversation> renameConversation(
             String conversationId, String name, Boolean autoGenerate, String user) {
         Assert.hasText(conversationId, "Conversation ID must not be empty");
@@ -342,15 +382,23 @@ public class DifyApi {
         if (autoGenerate != null) requestBody.put("auto_generate", autoGenerate);
 
         return this.restClient.post()
-                .uri(uriBuilder -> uriBuilder.path("/conversations/{conversation_id}/name")
+                .uri(uriBuilder -> uriBuilder.path(this.conversationNamePath)
                         .build(conversationId))
                 .headers(this::addDefaultHeadersIfMissing)
-                .body(requestBody)  // 使用body方法而不是bodyValue
+                .body(requestBody)
                 .retrieve()
                 .toEntity(ConversationsResponse.Conversation.class);
     }
 
-    // 获取对话变量
+    /**
+     * Gets variables stored in a conversation.
+     * @param conversationId The conversation containing variables
+     * @param user The user identifier
+     * @param lastId Optional ID for pagination
+     * @param limit Optional maximum number of variables to return
+     * @return ResponseEntity containing variable list and pagination info
+     * @throws IllegalArgumentException if conversationId or user is empty
+     */
     public ResponseEntity<VariablesResponse> getConversationVariables(
             String conversationId, String user, String lastId, Integer limit) {
         Assert.hasText(conversationId, "Conversation ID must not be empty");
@@ -362,13 +410,14 @@ public class DifyApi {
         if (limit != null) queryParams.add("limit", limit.toString());
 
         return this.restClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/conversations/{conversation_id}/variables")
+                .uri(uriBuilder -> uriBuilder.path(this.conversationVariablesPath)
                         .queryParams(queryParams)
                         .build(conversationId))
                 .headers(this::addDefaultHeadersIfMissing)
                 .retrieve()
                 .toEntity(VariablesResponse.class);
     }
+
 
 
     // Builder class
@@ -379,6 +428,12 @@ public class DifyApi {
         private String chatMessagesPath = "/chat-messages";
         private String filesUploadPath = "/files/upload";
         private String stopResponsePath = "/chat-messages/{task_id}/stop";
+        private String messagesPath = "/messages";
+        private String messagesFeedbackPath = "/messages/{message_id}/feedbacks";
+        private String messagesSuggestedPath = "/messages/{message_id}/suggested";
+        private String conversationsPath = "/conversations";
+        private String conversationVariablesPath = "/conversations/{conversation_id}/variables";
+        private String conversationNamePath = "/conversations/{conversation_id}/name";
         private RestClient.Builder restClientBuilder = RestClient.builder();
         private WebClient.Builder webClientBuilder = WebClient.builder();
         private ResponseErrorHandler responseErrorHandler = RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER;
@@ -394,6 +449,12 @@ public class DifyApi {
             this.chatMessagesPath = api.chatMessagesPath;
             this.filesUploadPath = api.filesUploadPath;
             this.stopResponsePath = api.stopResponsePath;
+            this.messagesPath = api.messagesPath;
+            this.messagesFeedbackPath = api.messagesFeedbackPath;
+            this.messagesSuggestedPath = api.messagesSuggestedPath;
+            this.conversationsPath = api.conversationsPath;
+            this.conversationVariablesPath = api.conversationVariablesPath;
+            this.conversationNamePath = api.conversationNamePath;
             this.restClientBuilder = api.restClient != null ? api.restClient.mutate() : RestClient.builder();
             this.webClientBuilder = api.webClient != null ? api.webClient.mutate() : WebClient.builder();
             this.responseErrorHandler = api.responseErrorHandler;
@@ -435,6 +496,36 @@ public class DifyApi {
             return this;
         }
 
+        public Builder messagesPath(String messagesPath) {
+            this.messagesPath = messagesPath;
+            return this;
+        }
+
+        public Builder messagesFeedbackPath(String messagesFeedbackPath) {
+            this.messagesFeedbackPath = messagesFeedbackPath;
+            return this;
+        }
+
+        public Builder messagesSuggestedPath(String messagesSuggestedPath) {
+            this.messagesSuggestedPath = messagesSuggestedPath;
+            return this;
+        }
+
+        public Builder conversationsPath(String conversationsPath) {
+            this.conversationsPath = conversationsPath;
+            return this;
+        }
+
+        public Builder conversationVariablesPath(String conversationVariablesPath) {
+            this.conversationVariablesPath = conversationVariablesPath;
+            return this;
+        }
+
+        public Builder conversationNamePath(String conversationNamePath) {
+            this.conversationNamePath = conversationNamePath;
+            return this;
+        }
+
         public Builder restClientBuilder(RestClient.Builder restClientBuilder) {
             this.restClientBuilder = restClientBuilder;
             return this;
@@ -455,6 +546,8 @@ public class DifyApi {
             return new DifyApi(
                     this.baseUrl, this.apiKey, this.headers,
                     this.chatMessagesPath, this.filesUploadPath, this.stopResponsePath,
+                    this.messagesPath,this.messagesFeedbackPath,this.messagesSuggestedPath,
+                    this.conversationsPath,this.conversationVariablesPath,this.conversationNamePath,
                     this.restClientBuilder, this.webClientBuilder, this.responseErrorHandler
             );
         }
