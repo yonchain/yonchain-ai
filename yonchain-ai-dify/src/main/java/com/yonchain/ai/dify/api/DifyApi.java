@@ -42,7 +42,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResponseErrorHandler;
@@ -80,6 +79,8 @@ public class DifyApi {
     private final RestClient restClient;
     private final WebClient webClient;
 
+    private DifyStreamFunctionCallingHelper chunkMerger = new DifyStreamFunctionCallingHelper();
+
     /**
      * Create a new Dify API client.
      */
@@ -116,6 +117,70 @@ public class DifyApi {
                 .baseUrl(baseUrl)
                 .defaultHeaders(finalHeaders)
                 .build();
+    }
+
+
+
+    /**
+     * Creates a chat message with the given request in blocking mode.
+     * @param request The chat message request. Must have responseMode set to BLOCKING.
+     * @return ResponseEntity with ChatCompletion.
+     */
+    public ResponseEntity<ChatCompletion> createChatMessageEntity(ChatCompletionRequest request) {
+        Assert.notNull(request, "Request must not be null");
+        Assert.isTrue(request.responseMode() == ResponseMode.BLOCKING,
+                "Request must have responseMode set to BLOCKING");
+
+        return this.restClient.post()
+                .uri(this.chatMessagesPath)
+                .headers(this::addDefaultHeadersIfMissing)
+                .body(request)
+                .retrieve()
+                .toEntity(ChatCompletion.class);
+    }
+
+    /**
+     * Creates a streaming chat message with the given request.
+     * @param request The chat message request. Must have responseMode set to STREAMING.
+     * @return Flux stream of ChunkChatCompletion.
+     */
+    public Flux<ChunkChatCompletion> createChatMessageStream(ChatCompletionRequest request) {
+        Assert.notNull(request, "Request must not be null");
+        Assert.isTrue(request.responseMode() == ResponseMode.STREAMING,
+                "Request must have responseMode set to STREAMING");
+
+        AtomicBoolean isInsideTool = new AtomicBoolean(false);
+
+        return this.webClient.post()
+                .uri(this.chatMessagesPath)
+                .headers(this::addDefaultHeadersIfMissing)
+                .body(Mono.just(request), ChatCompletionRequest.class)
+                .retrieve()
+                .bodyToFlux(String.class)
+                .takeUntil(SSE_DONE_PREDICATE)
+                .filter(SSE_DONE_PREDICATE.negate())
+                .map(content -> AppOptionsUtils.jsonToObject(content, ChunkChatCompletion.class))
+                /*// 可选：添加与OpenAiApi类似的工具调用处理逻辑
+                .map(chunk -> {
+                    if (this.chunkMerger.isStreamingToolFunctionCall(chunk)) {
+                        isInsideTool.set(true);
+                    }
+                    return chunk;
+                })
+                .windowUntil(chunk -> {
+                    if (isInsideTool.get() && this.chunkMerger.isStreamingToolFunctionCallFinish(chunk)) {
+                        isInsideTool.set(false);
+                        return true;
+                    }
+                    return !isInsideTool.get();
+                })*/
+                .concatMapIterable(window -> {
+                    Mono<ChunkChatCompletion> monoChunk = window.reduce(
+                            new ChunkChatCompletion(null, null, null, null, null, null, null, null, null, null, null, null, null, null),
+                            (previous, current) -> this.chunkMerger.merge(previous, current));
+                    return List.of(monoChunk);
+                })
+                .flatMap(mono -> mono);
     }
 
 
@@ -293,34 +358,6 @@ public class DifyApi {
         }
     }
 
-    // API Methods will be implemented here...
-
-    /**
-     * Creates a chat message with the given request.
-     * @param request The chat message request.
-     * @return ResponseEntity with ChatCompletionResponse for blocking mode or Flux for streaming mode.
-     */
-    public Object createChatMessage(ChatCompletionRequest request) {
-        if (request.responseMode() == ResponseMode.BLOCKING) {
-            return this.restClient.post()
-                    .uri(this.chatMessagesPath)
-                    .headers(this::addDefaultHeadersIfMissing)
-                    .body(request)
-                    .retrieve()
-                    .toEntity(ChatCompletionResponse.class);
-        } else {
-            return this.webClient.post()
-                    .uri(this.chatMessagesPath)
-                    .headers(this::addDefaultHeadersIfMissing)
-                    .body(Mono.just(request), ChatCompletionRequest.class)
-                    .retrieve()
-                    .bodyToFlux(String.class)
-                    .takeUntil(SSE_DONE_PREDICATE)
-                    .filter(SSE_DONE_PREDICATE.negate())
-                    .map(content -> AppOptionsUtils.jsonToObject(content, ChunkChatCompletionResponse.class));
-        }
-    }
-
     private void addDefaultHeadersIfMissing(HttpHeaders headers) {
         if (!headers.containsKey(HttpHeaders.AUTHORIZATION) && !(this.apiKey instanceof NoopApiKey)) {
             headers.setBearerAuth(this.apiKey.getValue());
@@ -378,7 +415,7 @@ public class DifyApi {
      */
     @JsonInclude(Include.NON_NULL)
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record ChatCompletionResponse(
+    public record ChatCompletion(
             @JsonProperty("event") String event,
             @JsonProperty("task_id") String taskId,
             @JsonProperty("id") String id,
@@ -395,7 +432,7 @@ public class DifyApi {
      */
     @JsonInclude(Include.NON_NULL)
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record ChunkChatCompletionResponse(
+    public record ChunkChatCompletion(
             @JsonProperty("event") String event,
             @JsonProperty("task_id") String taskId,
             @JsonProperty("message_id") String messageId,

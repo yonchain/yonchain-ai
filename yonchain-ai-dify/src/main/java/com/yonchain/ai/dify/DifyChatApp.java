@@ -30,6 +30,7 @@ public class DifyChatApp implements ChatApp {
     @Override
     public ChatResponse call(InputMessage input) {
         //TODO: implement your chat app
+        //return difyApi.createChatMessageEntity(difyCharOptions.toRequest(input));
         return null;
     }
 
