@@ -23,6 +23,12 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!--通用模块-->
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-commons</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>

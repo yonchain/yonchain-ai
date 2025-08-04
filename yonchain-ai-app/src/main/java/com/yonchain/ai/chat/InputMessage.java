@@ -1,4 +1,21 @@
 package com.yonchain.ai.chat;
 
-public class InputMessage {
+import com.yonchain.ai.app.AppOptions;
+import com.yonchain.ai.app.AppRequest;
+import io.micrometer.common.lang.Nullable;
+
+public class InputMessage implements AppRequest<String> {
+
+    @Nullable
+    private ChatOptions chatOptions;
+
+    @Override
+    public String getInstructions() {
+        return null;
+    }
+
+    @Override
+    public ChatOptions getOptions() {
+        return chatOptions;
+    }
 }

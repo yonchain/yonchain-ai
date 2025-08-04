@@ -1,4 +1,6 @@
 package com.yonchain.ai.app;
 
-public class AppOptions {
+public interface AppOptions {
+
+
 }

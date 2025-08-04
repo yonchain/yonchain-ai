@@ -9,21 +9,12 @@
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>yonchain-ai-app</artifactId>
-    <description>应用模块</description>
+    <artifactId>yonchain-ai-n8n</artifactId>
 
-    <dependencies>
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-        <dependency>
-            <groupId>com.yonchain.ai</groupId>
-            <artifactId>yonchain-ai-commons</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
-        </dependency>
-
-    </dependencies>
 </project>
