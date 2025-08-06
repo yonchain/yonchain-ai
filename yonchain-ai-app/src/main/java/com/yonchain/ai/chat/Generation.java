@@ -5,6 +5,15 @@ import com.yonchain.ai.app.ResultMetadata;
 
 public class Generation implements AppResult<String> {
 
+    private final String output;
+
+    private final ResultMetadata metadata;
+
+    public Generation(String output, ResultMetadata metadata) {
+        this.output = output;
+        this.metadata = metadata;
+    }
+
     @Override
     public String getOutput() {
         return "";

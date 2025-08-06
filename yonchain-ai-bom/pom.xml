@@ -30,9 +30,22 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!--API 模块-->
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.yonchain.ai</groupId>
                 <artifactId>yonchain-ai-retry</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-starter-mybatis</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

@@ -14,6 +14,11 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-api</artifactId>
+        </dependency>
+
         <!-- Spring Framework -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -44,6 +49,37 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+
+        <!-- Spring Framework 6.2 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Jakarta Servlet API -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-starter-mybatis</artifactId>
+            <optional>true</optional>
         </dependency>
 
     </dependencies>
