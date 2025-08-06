@@ -1,9 +1,9 @@
 package com.yonchain.ai.console.idm.controller;
 
 import com.yonchain.ai.api.common.Page;
-import com.yonchain.ai.api.exception.Dify4jException;
-import com.yonchain.ai.api.exception.Dify4jForbiddenException;
-import com.yonchain.ai.api.exception.Dify4jResourceNotFoundException;
+import com.yonchain.ai.api.exception.YonchainException;
+import com.yonchain.ai.api.exception.YonchainForbiddenException;
+import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.api.idm.DefaultOAuth2RegisteredClient;
 import com.yonchain.ai.api.idm.OAuth2ClientService;
 import com.yonchain.ai.api.idm.OAuth2RegisteredClient;
@@ -53,7 +53,7 @@ public class OAuth2ClientController extends BaseController {
             @Parameter(description = "客户端ID") @PathVariable String id) {
         OAuth2RegisteredClient client = oauth2ClientService.getById(id);
         if (client == null) {
-            throw new Dify4jResourceNotFoundException("客户端不存在");
+            throw new YonchainResourceNotFoundException("客户端不存在");
         }
         return responseFactory.createOAuth2RegisteredClientResponse(client);
     }
@@ -79,7 +79,7 @@ public class OAuth2ClientController extends BaseController {
 
         OAuth2RegisteredClient auth2RegisteredClient = oauth2ClientService.getByClientId(request.getClientId());
         if (auth2RegisteredClient != null) {
-            throw new Dify4jException("客户端Id已存在");
+            throw new YonchainException("客户端Id已存在");
         }
 
         DefaultOAuth2RegisteredClient client = new DefaultOAuth2RegisteredClient();
@@ -110,7 +110,7 @@ public class OAuth2ClientController extends BaseController {
         try {
             client.setTokenSettings(objectMapper.writeValueAsString(finalMap));
         } catch (JsonProcessingException e) {
-            throw new Dify4jException("无效的token设置: " + e.getMessage());
+            throw new YonchainException("无效的token设置: " + e.getMessage());
         }
         client.setClientSettings("{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.client.require-proof-key\":false,\"settings.client.require-authorization-consent\":false}");
 
@@ -127,18 +127,18 @@ public class OAuth2ClientController extends BaseController {
 
         //判断是否存在
         if (client == null) {
-            throw new Dify4jResourceNotFoundException("客户端不存在");
+            throw new YonchainResourceNotFoundException("客户端不存在");
         }
 
         //判断是否修改了系统默认的客户端名称
         if ("dify4j".equals(client.getClientId()) && !request.getClientId().equals("dify4j")) {
-            throw new Dify4jForbiddenException("系统默认客户端名称不允许修改");
+            throw new YonchainForbiddenException("系统默认客户端名称不允许修改");
         }
 
         //客户端Id是否已存在
         OAuth2RegisteredClient auth2RegisteredClient = oauth2ClientService.getByClientId(request.getClientId());
         if (auth2RegisteredClient != null && !client.getId().equals(auth2RegisteredClient.getId())) {
-            throw new Dify4jForbiddenException("客户端Id已存在");
+            throw new YonchainForbiddenException("客户端Id已存在");
         }
 
         client.setClientId(request.getClientId());
@@ -166,7 +166,7 @@ public class OAuth2ClientController extends BaseController {
         try {
             client.setTokenSettings(objectMapper.writeValueAsString(finalMap));
         } catch (JsonProcessingException e) {
-            throw new Dify4jException("无效的token设置: " + e.getMessage());
+            throw new YonchainException("无效的token设置: " + e.getMessage());
         }
         client.setClientSettings("{\"@class\":\"java.util.Collections$UnmodifiableMap\",\"settings.client.require-proof-key\":false,\"settings.client.require-authorization-consent\":false}");
 
@@ -180,7 +180,7 @@ public class OAuth2ClientController extends BaseController {
         //如果是系统默认的客户端，不允许删除
         OAuth2RegisteredClient difyClient = oauth2ClientService.getByClientId("dify4j");
         if (difyClient != null && ids.contains(difyClient.getId())) {
-            throw new Dify4jForbiddenException("系统默认客户端不允许删除");
+            throw new YonchainForbiddenException("系统默认客户端不允许删除");
         }
 
         oauth2ClientService.deleteOAuth2RegisteredClientByIds(ids);

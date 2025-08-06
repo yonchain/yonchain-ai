@@ -29,7 +29,7 @@ public class ConsoleConfig {
 
     @Bean
     public Dify4jService dify4jService(UserService userService, TenantService tenantService, KnowledgeService knowledgeService) {
-        return new Dify4jServiceImpl(userService, tenantService, knowledgeService);
+        return new YonchainServiceImpl(userService, tenantService, knowledgeService);
     }
 
     @Bean

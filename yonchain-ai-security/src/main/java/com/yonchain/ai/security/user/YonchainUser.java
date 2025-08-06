@@ -11,7 +11,7 @@ import java.util.Collection;
  * @author Cgy
  * @since 1.0.0
  */
-public class Dify4jUser extends User implements Dify4jUserDetails {
+public class YonchainUser extends User implements YonchainUserDetails {
 
     private final String userId;
 
@@ -19,9 +19,9 @@ public class Dify4jUser extends User implements Dify4jUserDetails {
 
     private final String passwordSalt;
 
-    public Dify4jUser(String username, String password, String userId, String email,
-                      String passwordSalt,
-                      Collection<? extends GrantedAuthority> authorities) {
+    public YonchainUser(String username, String password, String userId, String email,
+                        String passwordSalt,
+                        Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.userId = userId;
         this.email = email;

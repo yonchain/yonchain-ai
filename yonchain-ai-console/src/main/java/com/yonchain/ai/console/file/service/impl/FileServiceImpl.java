@@ -1,13 +1,13 @@
 package com.yonchain.ai.console.file.service.impl;
 
 import com.yonchain.ai.api.common.Page;
-import com.yonchain.ai.api.exception.Dify4jException;
-import com.yonchain.ai.api.exception.Dify4jIllegalStateException;
+import com.yonchain.ai.api.exception.YonchainException;
+import com.yonchain.ai.api.exception.YonchainIllegalStateException;
 import com.yonchain.ai.api.storage.StorageService;
 import com.yonchain.ai.console.file.entity.FileEntity;
 import com.yonchain.ai.console.file.mapper.FileMapper;
 import com.yonchain.ai.console.file.service.FileService;
-import com.yonchain.ai.utils.PageUtil;
+import com.yonchain.ai.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -84,7 +84,7 @@ public class FileServiceImpl implements FileService {
 
         // 检查文件大小
         if (content.length > maxFileSize) {
-            throw new Dify4jIllegalStateException("文件大小超过限制");
+            throw new YonchainIllegalStateException("文件大小超过限制");
         }
 
         // 获取文件扩展名
@@ -92,7 +92,7 @@ public class FileServiceImpl implements FileService {
 
         // 检查文件类型
         if (!SUPPORTED_EXTENSIONS.contains(extension.toLowerCase())) {
-            throw new Dify4jIllegalStateException("文件类型不支持");
+            throw new YonchainIllegalStateException("文件类型不支持");
         }
 
         // 生成文件键
@@ -214,7 +214,7 @@ public class FileServiceImpl implements FileService {
             byte[] result = hmac.doFinal(message.getBytes(StandardCharsets.UTF_8));
             return HexFormat.of().formatHex(result);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new Dify4jException("文件上传生成HMAC签名失败", e);
+            throw new YonchainException("文件上传生成HMAC签名失败", e);
         }
     }
 }

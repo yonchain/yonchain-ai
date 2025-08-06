@@ -1,7 +1,7 @@
 package com.yonchain.ai.console.idm.controller;
 
 import com.yonchain.ai.api.common.Page;
-import com.yonchain.ai.api.exception.Dify4jResourceNotFoundException;
+import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.api.idm.DefaultMenu;
 import com.yonchain.ai.api.idm.Menu;
 import com.yonchain.ai.api.idm.MenuService;
@@ -10,7 +10,7 @@ import com.yonchain.ai.console.idm.request.MenuQueryRequest;
 import com.yonchain.ai.console.idm.request.MenuRequest;
 import com.yonchain.ai.console.idm.response.MenuResponse;
 import com.yonchain.ai.console.idm.response.MenuTreeResponse;
-import com.yonchain.ai.utils.IdUtil;
+import com.yonchain.ai.util.IdUtil;
 import com.yonchain.ai.web.response.ApiResponse;
 import com.yonchain.ai.web.response.ListResponse;
 import com.yonchain.ai.web.response.PageResponse;
@@ -152,7 +152,7 @@ public class MenuController extends BaseController {
     private Menu getMenuFromRequest(String id) {
         Menu menu = menuService.getMenuById(id);
         if (menu == null) {
-            throw new Dify4jResourceNotFoundException("菜单不存在");
+            throw new YonchainResourceNotFoundException("菜单不存在");
         }
         return menu;
     }

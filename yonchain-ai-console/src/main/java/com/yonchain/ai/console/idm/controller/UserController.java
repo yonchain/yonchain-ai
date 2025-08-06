@@ -17,9 +17,9 @@
 package com.yonchain.ai.console.idm.controller;
 
 import com.yonchain.ai.api.common.Page;
-import com.yonchain.ai.api.exception.Dify4jForbiddenException;
-import com.yonchain.ai.api.exception.Dify4jIllegalStateException;
-import com.yonchain.ai.api.exception.Dify4jResourceNotFoundException;
+import com.yonchain.ai.api.exception.YonchainForbiddenException;
+import com.yonchain.ai.api.exception.YonchainIllegalStateException;
+import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.api.idm.*;
 import com.yonchain.ai.api.idm.enums.MenuType;
 import com.yonchain.ai.api.idm.enums.RoleType;
@@ -32,7 +32,7 @@ import com.yonchain.ai.console.idm.request.UserQueryRequest;
 import com.yonchain.ai.console.idm.request.UserUpdateRequest;
 import com.yonchain.ai.console.idm.response.MenuTreeResponse;
 import com.yonchain.ai.console.idm.response.UserResponse;
-import com.yonchain.ai.utils.Assert;
+import com.yonchain.ai.util.Assert;
 import com.yonchain.ai.web.response.ApiResponse;
 import com.yonchain.ai.web.response.ListResponse;
 import com.yonchain.ai.web.response.PageResponse;
@@ -153,7 +153,7 @@ public class UserController extends BaseController {
     public UserResponse createUser(@Valid @RequestBody UserCreateRequest request) {
         // 检查邮箱是否已存在
         if (userService.getUserByEmail(request.getEmail()) != null) {
-            throw new Dify4jForbiddenException("邮箱已存在");
+            throw new YonchainForbiddenException("邮箱已存在");
         }
 
         //检查是否存在系统角色,而且只能存在一个系统角色(dify规范同个租户同个账号只有一个角色)
@@ -220,14 +220,14 @@ public class UserController extends BaseController {
         CurrentUser currentUser = this.getCurrentUser();
         //不能删除自己
         if (currentUser.getUserId().equals(userId)) {
-            throw new Dify4jForbiddenException("不能删除自己");
+            throw new YonchainForbiddenException("不能删除自己");
         }
 
         //超级管理员不能删除
         if (userService.getUserRoles(this.getCurrentTenantId(), user.getId())
                 .stream()
                 .anyMatch(role -> RoleType.OWNER.getValue().equals(role.getCode()))) {
-            throw new Dify4jForbiddenException("禁止删除超级管理员");
+            throw new YonchainForbiddenException("禁止删除超级管理员");
         }
 
         //删除用户
@@ -247,7 +247,7 @@ public class UserController extends BaseController {
     public ApiResponse<Boolean> resetCurrentUserPassword(@Valid @RequestBody UserPasswordRestRequest request) {
 
         if (!request.getNewPassword().equals(request.getRepeatNewPassword())) {
-            throw new Dify4jIllegalStateException("两次新密码不一致");
+            throw new YonchainIllegalStateException("两次新密码不一致");
         }
 
         userService.resetPassword(this.getCurrentUserId(), request.getPassword(), request.getNewPassword());
@@ -267,7 +267,7 @@ public class UserController extends BaseController {
         // 检查账户是否存在
         User user = userService.getUserById(id);
         if (user == null) {
-            throw new Dify4jResourceNotFoundException("用户不存在");
+            throw new YonchainResourceNotFoundException("用户不存在");
         }
 
         // 更新最后活跃时间
@@ -361,7 +361,7 @@ public class UserController extends BaseController {
     private User getUserFromRequest(String id) {
         User user = userService.getUserById(id);
         if (user == null) {
-            throw new Dify4jResourceNotFoundException("用户不存在");
+            throw new YonchainResourceNotFoundException("用户不存在");
         }
         return user;
     }
@@ -408,10 +408,10 @@ public class UserController extends BaseController {
     private void checkSystemRole(String tenantId, List<String> roleIds) {
         int systemRoleCount = roleService.getSystemRoleCount(tenantId, roleIds);
         if (systemRoleCount == 0) {
-            throw new Dify4jForbiddenException("角色必须包含默认角色");
+            throw new YonchainForbiddenException("角色必须包含默认角色");
         }
         if (systemRoleCount > 1) {
-            throw new Dify4jForbiddenException("角色不能包含多个默认角色");
+            throw new YonchainForbiddenException("角色不能包含多个默认角色");
         }
     }
 }

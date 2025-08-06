@@ -3,7 +3,7 @@ package com.yonchain.ai.console;
 import com.yonchain.ai.api.app.AiApp;
 import com.yonchain.ai.api.app.InstalledApp;
 import com.yonchain.ai.api.common.Page;
-import com.yonchain.ai.api.exception.Dify4jException;
+import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.idm.*;
 import com.yonchain.ai.api.knowledge.Knowledge;
 import com.yonchain.ai.api.model.Model;
@@ -730,7 +730,7 @@ public class ResponseFactory {
                     }
                 }
             } catch (JsonProcessingException e) {
-                throw new Dify4jException("无效的token设置: " + e.getMessage());
+                throw new YonchainException("无效的token设置: " + e.getMessage());
             }
         }
         return response;

@@ -1,7 +1,7 @@
 package com.yonchain.ai.console.file.service;
 
-import com.yonchain.ai.api.exception.Dify4jException;
-import com.yonchain.ai.api.exception.Dify4jResourceNotFoundException;
+import com.yonchain.ai.api.exception.YonchainException;
+import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.api.storage.StorageService;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +32,7 @@ public class StorageServiceImpl implements StorageService {
             // 返回文件路径
             return filePath.toString();
         } catch (IOException e) {
-            throw new Dify4jException("文件上传失败", e);
+            throw new YonchainException("文件上传失败", e);
         }
     }
 
@@ -88,7 +88,7 @@ public class StorageServiceImpl implements StorageService {
             // 返回文件路径
             return filePath.toString();
         } catch (IOException e) {
-            throw new Dify4jException("文件上传失败", e);
+            throw new YonchainException("文件上传失败", e);
         }
     }
 
@@ -111,13 +111,13 @@ public class StorageServiceImpl implements StorageService {
             
             // 检查文件是否存在
             if (!Files.exists(filePath)) {
-                throw new Dify4jResourceNotFoundException("文件不存在: " + filePath);
+                throw new YonchainResourceNotFoundException("文件不存在: " + filePath);
             }
             
             // 创建并返回文件输入流
             return Files.newInputStream(filePath);
         } catch (IOException e) {
-            throw new Dify4jException("文件下载失败: " + key, e);
+            throw new YonchainException("文件下载失败: " + key, e);
         }
     }
 }

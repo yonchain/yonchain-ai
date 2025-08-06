@@ -25,14 +25,14 @@ import java.util.ArrayList;
  * @author Cgy
  * @since 1.0.0
  */
-public class Dify4jUserDetailsService implements UserDetailsService {
+public class YonchainUserDetailsService implements UserDetailsService {
 
     //邮箱正则表达式
     private static final String EMAIL_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
 
     private final UserService userService;
 
-    public Dify4jUserDetailsService(UserService userService) {
+    public YonchainUserDetailsService(UserService userService) {
         this.userService = userService;
     }
 
@@ -62,7 +62,7 @@ public class Dify4jUserDetailsService implements UserDetailsService {
                     String.format("user (%s) could not be found", username));*/
             return null;
         }
-        return new Dify4jUser(
+        return new YonchainUser(
                 user.getName(),
                 user.getPassword(),
                 user.getId(),
@@ -78,7 +78,7 @@ public class Dify4jUserDetailsService implements UserDetailsService {
         if (user == null) {
             return null;
         }
-        return new Dify4jUser(
+        return new YonchainUser(
                 user.getName(),
                 user.getPassword(),
                 user.getId(),

@@ -1,9 +1,9 @@
 package com.yonchain.ai.console.file.controller;
 
 import com.yonchain.ai.api.common.Page;
-import com.yonchain.ai.api.exception.Dify4jException;
-import com.yonchain.ai.api.exception.Dify4jIllegalStateException;
-import com.yonchain.ai.api.exception.Dify4jResourceNotFoundException;
+import com.yonchain.ai.api.exception.YonchainException;
+import com.yonchain.ai.api.exception.YonchainIllegalStateException;
+import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.api.storage.StorageService;
 import com.yonchain.ai.console.BaseController;
 import com.yonchain.ai.console.file.entity.FileEntity;
@@ -65,7 +65,7 @@ public class FileController extends BaseController {
     public FileResponse getFileById(@Parameter(description = "文件ID") @PathVariable String id) {
         FileEntity file = fileService.getFileById(id);
         if (file == null) {
-            throw new Dify4jResourceNotFoundException("文件不存在");
+            throw new YonchainResourceNotFoundException("文件不存在");
         }
         return responseFactory.createFileResponse(file);
     }
@@ -105,12 +105,12 @@ public class FileController extends BaseController {
 
         // 检查是否有文件上传
         if (file.isEmpty()) {
-            throw new Dify4jIllegalStateException("文件不能为空");
+            throw new YonchainIllegalStateException("文件不能为空");
         }
 
         // 检查文件名是否存在
         if (file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) {
-            throw new Dify4jIllegalStateException("文件名不能为空");
+            throw new YonchainIllegalStateException("文件名不能为空");
         }
 
         try {
@@ -124,7 +124,7 @@ public class FileController extends BaseController {
             );
             return responseFactory.createFileResponse(uploadFile);
         } catch (IOException e) {
-            throw new Dify4jException("文件上传失败");
+            throw new YonchainException("文件上传失败");
         }
     }
 
@@ -144,18 +144,18 @@ public class FileController extends BaseController {
         try {
             // Validate request parameters
             if (timestamp == null || nonce == null || sign == null) {
-                throw new Dify4jIllegalStateException("无效的请求参数");
+                throw new YonchainIllegalStateException("无效的请求参数");
             }
 
             // Verify signature and get file
             if (!fileService.validateSignedUrl(fileId, Long.parseLong(timestamp), nonce, sign)) {
-                throw new Dify4jIllegalStateException("无效的签名");
+                throw new YonchainIllegalStateException("无效的签名");
             }
 
             // Get file
             FileEntity uploadFile = fileService.getFileById(fileId);
             if (uploadFile == null) {
-                throw new Dify4jResourceNotFoundException("文件不存在");
+                throw new YonchainResourceNotFoundException("文件不存在");
             }
 
             InputStream inputStream = storageService.downloadFile(uploadFile.getKey());
@@ -195,7 +195,7 @@ public class FileController extends BaseController {
         } catch (Dify4jException e) {
             throw e;
         } catch (Exception e) {
-            throw new Dify4jException("预览文件失败", e);
+            throw new YonchainException("预览文件失败", e);
         }
     }
 

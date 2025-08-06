@@ -16,7 +16,7 @@ import com.yonchain.ai.security.oauth2.jwt.OAuth2JWKSource;
 import com.yonchain.ai.security.oauth2.jwt.OAuth2JwtDecoder;
 import com.yonchain.ai.security.oauth2.jwt.OAuth2JwtEncoder;
 import com.yonchain.ai.security.service.SecurityServiceImpl;
-import com.yonchain.ai.security.user.Dify4jUserDetailsService;
+import com.yonchain.ai.security.user.YonchainUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
@@ -203,7 +203,7 @@ public class SecurityConfiguration {
         accessDeniedHandler = new YonchainAccessDeniedHandler(objectMapper);
 
         if (userDetailsService == null) {
-            userDetailsService = new Dify4jUserDetailsService(userService);
+            userDetailsService = new YonchainUserDetailsService(userService);
         }
 
         // 初始化授权服务器

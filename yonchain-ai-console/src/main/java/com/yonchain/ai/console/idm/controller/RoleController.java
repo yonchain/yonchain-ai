@@ -17,8 +17,8 @@
 package com.yonchain.ai.console.idm.controller;
 
 import com.yonchain.ai.api.common.Page;
-import com.yonchain.ai.api.exception.Dify4jForbiddenException;
-import com.yonchain.ai.api.exception.Dify4jResourceNotFoundException;
+import com.yonchain.ai.api.exception.YonchainForbiddenException;
+import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.api.idm.*;
 import com.yonchain.ai.api.idm.RoleCategory;
 import com.yonchain.ai.api.idm.enums.RoleType;
@@ -67,7 +67,7 @@ public class RoleController extends BaseController {
     public ApiResponse<RoleResponse> getById(@PathVariable String roleId) {
         Role role = roleService.getRoleById(roleId);
         if (role == null) {
-            throw new Dify4jResourceNotFoundException("角色不存在");
+            throw new YonchainResourceNotFoundException("角色不存在");
         }
         return ApiResponse.success(responseFactory.createRoleResponse(role));
     }
@@ -158,7 +158,7 @@ public class RoleController extends BaseController {
     public ApiResponse<Void> deleteRole(@RequestBody List<String> ids) {
         //系统角色不能删除
         if (roleService.getSystemRoleCount(this.getCurrentTenantId(), ids) > 0) {
-            throw new Dify4jForbiddenException("系统角色不能删除");
+            throw new YonchainForbiddenException("系统角色不能删除");
         }
 
         roleService.deleteRoleByIds(ids);

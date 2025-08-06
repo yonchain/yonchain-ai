@@ -3,7 +3,7 @@ package com.yonchain.ai.security.oauth2.authorization;
 import com.yonchain.ai.api.security.SecurityEventPublisher;
 import com.yonchain.ai.security.crypto.PasswordEncoderType;
 import com.yonchain.ai.security.crypto.PasswordUtil;
-import com.yonchain.ai.security.user.Dify4jUser;
+import com.yonchain.ai.security.user.YonchainUser;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -101,7 +101,7 @@ public class OAuth2PasswordAuthenticationProvider implements AuthenticationProvi
         String password = passwordAuthenticationToken.getPassword();
 
         // 验证用户凭据
-        Dify4jUser userDetails = (Dify4jUser) userDetailsService.loadUserByUsername(username);
+        YonchainUser userDetails = (YonchainUser) userDetailsService.loadUserByUsername(username);
         if (userDetails == null) {
             throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_GRANT, "用户名或密码错误", ERROR_URI));
         }
@@ -212,7 +212,7 @@ public class OAuth2PasswordAuthenticationProvider implements AuthenticationProvi
      * @param userDetails 用户详情对象
      * @return 处理后的密码字符串
      */
-    private String getUserPassword(Dify4jUser userDetails) {
+    private String getUserPassword(YonchainUser userDetails) {
         String password = userDetails.getPassword();
         //判断是否使用dify规范的密码加密器
         if (PasswordEncoderType.DIFY_PBKDF2.equals(passwordEncoderType)) {

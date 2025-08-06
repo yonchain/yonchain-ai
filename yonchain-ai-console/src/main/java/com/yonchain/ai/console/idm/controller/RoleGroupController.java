@@ -16,7 +16,7 @@
 
 package com.yonchain.ai.console.idm.controller;
 
-import com.yonchain.ai.api.exception.Dify4jResourceNotFoundException;
+import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.api.idm.DefaultRoleGroup;
 import com.yonchain.ai.api.idm.RoleGroup;
 import com.yonchain.ai.api.idm.RoleService;
@@ -105,7 +105,7 @@ public class RoleGroupController extends BaseController {
             @Valid @RequestBody RoleGroupRequest request) {
         RoleGroup roleGroup = roleService.getRoleGroupById(id);
         if (roleGroup == null) {
-            throw new Dify4jResourceNotFoundException("角色组不存在");
+            throw new YonchainResourceNotFoundException("角色组不存在");
         }
         roleGroup.setName(request.getName());
         roleGroup.setUpdatedBy(getCurrentUserId());
@@ -124,7 +124,7 @@ public class RoleGroupController extends BaseController {
     public ApiResponse<Void> deleteRoleGroupById(@Parameter(description = "角色组ID") @PathVariable String id) {
         RoleGroup roleGroup = roleService.getRoleGroupById(id);
         if (roleGroup == null) {
-            throw new Dify4jResourceNotFoundException("角色组不存在");
+            throw new YonchainResourceNotFoundException("角色组不存在");
         }
         roleService.deleteRoleGroupById(id);
         return ApiResponse.success();

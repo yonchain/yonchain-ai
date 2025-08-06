@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author Cgy
  * @since 1.0.0
  */
-public interface Dify4jUserDetails extends UserDetails {
+public interface YonchainUserDetails extends UserDetails {
 
     /**
      * 获取用户id

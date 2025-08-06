@@ -2,15 +2,15 @@ package com.yonchain.ai.console.idm.controller;
 
 
 import com.yonchain.ai.api.common.Page;
-import com.yonchain.ai.api.exception.Dify4jForbiddenException;
-import com.yonchain.ai.api.exception.Dify4jIllegalStateException;
-import com.yonchain.ai.api.exception.Dify4jResourceNotFoundException;
+import com.yonchain.ai.api.exception.YonchainForbiddenException;
+import com.yonchain.ai.api.exception.YonchainIllegalStateException;
+import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.api.idm.*;
 import com.yonchain.ai.console.BaseController;
 import com.yonchain.ai.console.idm.request.TenantQueryRequest;
 import com.yonchain.ai.console.idm.request.TenantRequest;
 import com.yonchain.ai.console.idm.response.TenantResponse;
-import com.yonchain.ai.utils.Assert;
+import com.yonchain.ai.util.Assert;
 import com.yonchain.ai.web.response.ApiResponse;
 import com.yonchain.ai.web.response.ListResponse;
 import com.yonchain.ai.web.response.PageResponse;
@@ -36,7 +36,7 @@ import java.util.UUID;
 @Tag(name = "租户(工作空间)管理", description = "租户相关接口")
 @RestController
 @RequestMapping("/workspaces")
-public class WorkspaceController extends BaseController {
+public class TenantController extends BaseController {
 
     @Autowired
     private TenantService tenantService;
@@ -176,20 +176,20 @@ public class WorkspaceController extends BaseController {
         CurrentUser currentUser = this.getCurrentUser();
         //不是超级管理员，禁止删除
         if (!currentUser.isSuperAdmin()){
-            throw new Dify4jForbiddenException("删除权限不足");
+            throw new YonchainForbiddenException("删除权限不足");
         }
         //如果是当前租户，不允许删除
         if (currentUser.getTenantId().equals(id)){
-            throw new Dify4jForbiddenException("当前租户不允许删除");
+            throw new YonchainForbiddenException("当前租户不允许删除");
         }
 
         //检查租户下是否有用户，如果有，不允许删除,如果只有自己，可删除
         List<User> users = userService.getUsers(id,new HashMap<>());
         if (users.size() > 1){
-            throw new Dify4jIllegalStateException("租户下有用户，不允许删除");
+            throw new YonchainIllegalStateException("租户下有用户，不允许删除");
         }
         if (users.size() == 1 && !users.get(0).getId().equals(currentUser.getUserId())){
-            throw new Dify4jIllegalStateException("租户下有用户，不允许删除");
+            throw new YonchainIllegalStateException("租户下有用户，不允许删除");
         }
 
         Tenant tenant = getTenantFromRequest(id);
@@ -208,7 +208,7 @@ public class WorkspaceController extends BaseController {
     private Tenant getTenantFromRequest(String id) {
         Tenant tenant = tenantService.getTenantById(id);
         if (tenant == null) {
-            throw new Dify4jResourceNotFoundException("租户不存在");
+            throw new YonchainResourceNotFoundException("租户不存在");
         }
         return tenant;
     }
@@ -224,11 +224,11 @@ public class WorkspaceController extends BaseController {
         // 租户名称用于标识和显示租户，支持中文、英文、数字等
         if (StringUtils.isNotBlank(request.getName())) {
             if (request.getName().length() < 2 || request.getName().length() > 50) {
-                throw new Dify4jIllegalStateException("租户名称长度必须在2-50个字符之间");
+                throw new YonchainIllegalStateException("租户名称长度必须在2-50个字符之间");
             }
             tenant.setName(request.getName());
         } else {
-            throw new Dify4jResourceNotFoundException("租户名称不能为空");
+            throw new YonchainResourceNotFoundException("租户名称不能为空");
         }
 
         // 更新计划类型（可选字段）

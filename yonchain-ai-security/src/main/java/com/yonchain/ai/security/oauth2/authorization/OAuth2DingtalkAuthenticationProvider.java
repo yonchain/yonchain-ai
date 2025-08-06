@@ -10,7 +10,7 @@ import com.aliyun.teaopenapi.models.Config;
 import com.aliyun.teautil.models.RuntimeOptions;
 import com.yonchain.ai.api.idm.*;
 import com.yonchain.ai.api.idm.enums.RoleType;
-import com.yonchain.ai.security.user.Dify4jUser;
+import com.yonchain.ai.security.user.YonchainUser;
 import com.yonchain.ai.util.IdUtil;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -102,10 +102,10 @@ public class OAuth2DingtalkAuthenticationProvider implements AuthenticationProvi
 
         //判断用户是否存在，如果不存在，创建用户。根据邮箱查找用户，如果邮箱为空，则使用格式为openId@dingtalk.com作为邮箱查找用户
         String email = dingtalkUser.getEmail();
-        Dify4jUser userDetails = (Dify4jUser) userDetailsService.loadUserByUsername(email);
+        YonchainUser userDetails = (YonchainUser) userDetailsService.loadUserByUsername(email);
         if (userDetails == null) {
             this.createUser(dingtalkUser);
-            userDetails = (Dify4jUser) userDetailsService.loadUserByUsername(email);
+            userDetails = (YonchainUser) userDetailsService.loadUserByUsername(email);
         }
 
         // 创建用户认证令牌
