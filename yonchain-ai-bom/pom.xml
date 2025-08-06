@@ -45,9 +45,28 @@
 
             <dependency>
                 <groupId>com.yonchain.ai</groupId>
-                <artifactId>yonchain-starter-mybatis</artifactId>
+                <artifactId>yonchain-ai-starter-mybatis</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-starter-mybatis</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-starter-redis</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-starter-swagger</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

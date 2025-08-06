@@ -24,8 +24,7 @@
         <module>yonchain-ai-console</module>
         <module>yonchain-ai-retry</module>
         <module>yonchain-ai-idm</module>
-        <module>yonchain-spring-boot-starters</module>
-        <module>yonchain-spring-boot-starters/yonchain-starter-mybatis</module>
+        <module>yonchain-ai-spring-boot-starters</module>
     </modules>
 
     <properties>
@@ -51,6 +50,7 @@
         <!--数据库-->
         <postgresql.version>42.7.5</postgresql.version>
         <mybatis-plus.version>3.5.12</mybatis-plus.version>
+
 
     </properties>
 
@@ -83,7 +83,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
 
         </dependencies>
     </dependencyManagement>

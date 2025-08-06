@@ -78,7 +78,7 @@
 
         <dependency>
             <groupId>com.yonchain.ai</groupId>
-            <artifactId>yonchain-starter-mybatis</artifactId>
+            <artifactId>yonchain-ai-starter-mybatis</artifactId>
             <optional>true</optional>
         </dependency>
 

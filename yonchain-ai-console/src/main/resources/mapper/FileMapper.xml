@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yonchain.ai.console.file.mapper.FileMapper">
+
+    <resultMap id="fileResultMap" type="com.yonchain.ai.console.file.entity.FileEntity">
+        <id property="id" column="id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="storageType" column="storage_type"/>
+        <result property="key" column="key"/>
+        <result property="name" column="name"/>
+        <result property="size" column="size"/>
+        <result property="extension" column="extension"/>
+        <result property="mimeType" column="mime_type"/>
+        <result property="createdBy" column="created_by"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="used" column="used"/>
+        <result property="usedBy" column="used_by"/>
+        <result property="usedAt" column="used_at"/>
+        <result property="hash" column="hash"/>
+        <result property="createdByRole" column="created_by_role"/>
+        <result property="sourceUrl" column="source_url"/>
+    </resultMap>
+
+    <select id="selectById" resultMap="fileResultMap">
+        SELECT * FROM upload_files WHERE id = #{id}::uuid
+    </select>
+
+    <select id="countByTenantIdAndParams" resultType="long">
+        SELECT COUNT(*) FROM upload_files
+        WHERE tenant_id = #{tenantId}::uuid
+        <if test="params.storageType != null">
+            AND storage_type = #{params.storageType}
+        </if>
+        <if test="params.used != null">
+            AND used = #{params.used}
+        </if>
+    </select>
+
+    <select id="selectPageByTenantIdAndParams" resultMap="fileResultMap">
+        SELECT * FROM upload_files
+        WHERE tenant_id = #{tenantId}
+        <if test="params.storageType != null">
+            AND storage_type = #{params.storageType}
+        </if>
+        <if test="params.used != null">
+            AND used = #{params.used}
+        </if>
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <insert id="insert" parameterType="com.yonchain.ai.console.file.entity.FileEntity">
+        INSERT INTO upload_files (
+            id, tenant_id, storage_type, key, name, size, extension,
+            mime_type, created_by, created_at, used, used_by, used_at,
+            hash, created_by_role, source_url
+        ) VALUES (
+            #{id}::uuid, #{tenantId}::uuid, #{storageType}, #{key}, #{name}, #{size}, #{extension},
+            #{mimeType}, #{createdBy}::uuid, #{createdAt}, #{used}, #{usedBy}, #{usedAt},
+            #{hash}, #{createdByRole}, #{sourceUrl}
+        )
+    </insert>
+
+    <update id="updateById" parameterType="com.yonchain.ai.console.file.entity.FileEntity">
+        UPDATE upload_files
+        SET
+            storage_type = #{storageType},
+            key = #{key},
+            name = #{name},
+            size = #{size},
+            extension = #{extension},
+            mime_type = #{mimeType},
+            used = #{used},
+            used_by = #{usedBy},
+            used_at = #{usedAt},
+            hash = #{hash},
+            source_url = #{sourceUrl}
+        WHERE id = #{id}::uuid
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM upload_files WHERE id = #{id}::uuid
+    </delete>
+
+    <delete id="deleteBatchIds">
+        DELETE FROM upload_files WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}::uuid
+        </foreach>
+    </delete>
+
+</mapper>

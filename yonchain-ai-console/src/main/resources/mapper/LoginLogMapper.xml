@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yonchain.ai.console.sys.mapper.LoginLogMapper">
+    <resultMap id="BaseResultMap" type="com.yonchain.ai.console.sys.entity.LoginLogEntity">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="VARCHAR"/>
+        <result column="ip_address" property="ipAddress" jdbcType="VARCHAR"/>
+        <result column="ip_region" property="ipRegion" jdbcType="VARCHAR"/>
+        <result column="login_time" property="loginTime" jdbcType="TIMESTAMP"/>
+        <result column="device_type" property="deviceType" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, ip_address, ip_region, login_time, device_type
+    </sql>
+
+    <insert id="insert" parameterType="com.yonchain.ai.console.sys.entity.LoginLogEntity" >
+        INSERT INTO dify4j_sys_login_log (id,user_id, ip_address, ip_region, login_time, device_type)
+        VALUES (#{id}::uuid,#{userId}::uuid, #{ipAddress}, #{ipRegion}, #{loginTime}, #{deviceType})
+    </insert>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM dify4j_sys_login_log
+        WHERE user_id = #{userId}::uuid
+        ORDER BY login_time DESC
+    </select>
+
+    <select id="selectRecentLogs" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM dify4j_sys_login_log
+        ORDER BY login_time DESC
+        LIMIT #{limit}
+    </select>
+</mapper>

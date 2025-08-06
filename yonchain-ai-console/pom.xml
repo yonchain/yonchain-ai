@@ -10,11 +10,61 @@
     </parent>
 
     <artifactId>yonchain-ai-console</artifactId>
+    <description>控制台模块</description>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!--dify4j API模块-->
+        <dependency>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-commons</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>${fastjson2.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-starter-swagger</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-starter-mybatis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-starter-redis</artifactId>
+        </dependency>
+
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
