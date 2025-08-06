@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
  * @author Cgy
  * @since 1.0.0
  */
-public interface AiApp {
+public interface Application {
 
     /**
      * 获取主键ID

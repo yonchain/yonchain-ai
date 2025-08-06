@@ -1,6 +1,6 @@
 package com.yonchain.ai.console;
 
-import com.yonchain.ai.api.app.AiApp;
+import com.yonchain.ai.api.app.Application;
 import com.yonchain.ai.api.app.InstalledApp;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.exception.YonchainException;
@@ -396,7 +396,7 @@ public class ResponseFactory {
      * @return 标准化后的应用响应对象，如果输入为null则返回null
      * @throws NumberFormatException 如果状态转换失败
      */
-    public AppResponse createAppResponse(AiApp app) {
+    public AppResponse createAppResponse(Application app) {
         AppResponse response = new AppResponse();
         // 设置应用ID
         response.setId(app.getId());
@@ -454,11 +454,11 @@ public class ResponseFactory {
      *
      * @param apps 应用分页数据对象，包含分页信息和应用数据列表，不能为null
      * @return 标准化后的应用分页响应对象，包含分页元数据和转换后的应用列表
-     * @see AiApp
+     * @see Application
      * @see AppResponse
      * @see PageResponse
      */
-    public PageResponse<AppResponse> createAppPageResponse(Page<AiApp> apps) {
+    public PageResponse<AppResponse> createAppPageResponse(Page<Application> apps) {
         PageResponse<AppResponse> response = new PageResponse<>();
         // 设置当前页码
         response.setPage(apps.getCurrent());

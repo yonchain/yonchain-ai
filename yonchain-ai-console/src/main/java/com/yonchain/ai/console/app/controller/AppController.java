@@ -1,8 +1,8 @@
 package com.yonchain.ai.console.app.controller;
 
-import com.yonchain.ai.api.app.AiApp;
+import com.yonchain.ai.api.app.Application;
 import com.yonchain.ai.api.app.AppService;
-import com.yonchain.ai.api.app.DefaultAiApp;
+import com.yonchain.ai.api.app.DefaultApplication;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.api.idm.CurrentUser;
@@ -51,7 +51,7 @@ public class AppController extends BaseController {
     @GetMapping("/{id}")
     @Operation(summary = "获取应用详情", description = "根据应用ID获取应用的详细信息")
     public AppResponse getAppById(@Parameter(description = "应用ID") @PathVariable String id) {
-        AiApp app = appService.getAppById(id);
+        Application app = appService.getAppById(id);
         if (app == null) {
             throw new YonchainResourceNotFoundException("APP_NOT_FOUND", "应用未找到");
         }
@@ -86,7 +86,7 @@ public class AppController extends BaseController {
         }
 
         //分页查询应用
-        Page<AiApp> apps = appService.getAppsByPage(currentUser.getTenantId(), queryParam, request.getPage(), request.getLimit());
+        Page<Application> apps = appService.getAppsByPage(currentUser.getTenantId(), queryParam, request.getPage(), request.getLimit());
 
         return buildResponse(apps);
     }
@@ -100,7 +100,7 @@ public class AppController extends BaseController {
     @PostMapping
     @Operation(summary = "创建应用", description = "创建新的应用")
     public AppResponse createApp(@Valid @RequestBody AppCreateRequest request) {
-        AiApp app = new DefaultAiApp();
+        Application app = new DefaultApplication();
         app.setId(UUID.randomUUID().toString());
         app.setTenantId(this.getCurrentTenantId());
 
@@ -136,7 +136,7 @@ public class AppController extends BaseController {
     public AppResponse updateApp(@Parameter(description = "应用ID") @PathVariable String id,
                                  @Valid @RequestBody AppUpdateRequest request) {
         // 检查应用是否存在
-        AiApp app = appService.getAppById(id);
+        Application app = appService.getAppById(id);
         if (app == null) {
             throw new YonchainResourceNotFoundException("APP_NOT_FOUND", "应用未找到");
         }
@@ -258,14 +258,14 @@ public class AppController extends BaseController {
         }
     }
 */
-    private AppResponse buildResponse(AiApp app) {
+    private AppResponse buildResponse(Application app) {
         AppResponse response = responseFactory.createAppResponse(app);
         List<Role> roles = appService.getAppRoles(app.getId());
         response.setRoleIds(roles.stream().map(Role::getId).collect(Collectors.toList()));
         return response;
     }
 
-    private PageResponse<AppResponse> buildResponse(Page<AiApp> apps) {
+    private PageResponse<AppResponse> buildResponse(Page<Application> apps) {
         PageResponse<AppResponse> response = responseFactory.createAppPageResponse(apps);
         response.getData().forEach(appResponse -> {
             List<Role> roles = appService.getAppRoles(appResponse.getId());

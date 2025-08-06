@@ -37,7 +37,7 @@ public interface AppService {
      * @param id 应用ID
      * @return 应用信息
      */
-    AiApp getAppById(String id);
+    Application getAppById(String id);
 
     /**
      * 分页查询应用列表
@@ -48,14 +48,14 @@ public interface AppService {
      * @param pageSize   每页大小
      * @return 分页应用列表
      */
-    Page<AiApp> getAppsByPage(String tenantId, Map<String, Object> queryParam, int pageNum, int pageSize);
+    Page<Application> getAppsByPage(String tenantId, Map<String, Object> queryParam, int pageNum, int pageSize);
 
     /**
      * 新增应用
      *
      * @param app 应用信息
      */
-    void createApp(AiApp app);
+    void createApp(Application app);
 
     /**
      * 新增应用
@@ -63,14 +63,14 @@ public interface AppService {
      * @param app     应用信息
      * @param roleIds 角色ID列表
      */
-    void createApp(AiApp app, List<String> roleIds);
+    void createApp(Application app, List<String> roleIds);
 
     /**
      * 修改应用
      *
      * @param app 应用信息
      */
-    void updateApp(AiApp app);
+    void updateApp(Application app);
 
     /**
      * 修改应用
@@ -78,7 +78,7 @@ public interface AppService {
      * @param app     应用信息
      * @param roleIds 角色ID列表
      */
-    void updateApp(AiApp app, List<String> roleIds);
+    void updateApp(Application app, List<String> roleIds);
 
     /**
      * 通过ID删除应用

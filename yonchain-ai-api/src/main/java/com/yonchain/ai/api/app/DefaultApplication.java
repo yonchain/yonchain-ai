@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
  * @author Cgy
  * @since 2024-01-20
  */
-public class DefaultAiApp implements AiApp {
+public class DefaultApplication implements Application {
 
     /**
      * 主键ID
