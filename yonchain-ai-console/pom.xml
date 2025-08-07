@@ -17,7 +17,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <!--dify4j API模块-->
+        <!--yonchain API模块-->
         <dependency>
             <groupId>com.yonchain.ai</groupId>
             <artifactId>yonchain-ai-api</artifactId>

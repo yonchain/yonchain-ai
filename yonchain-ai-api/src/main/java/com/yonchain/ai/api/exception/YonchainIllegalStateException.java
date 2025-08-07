@@ -17,7 +17,7 @@
 package com.yonchain.ai.api.exception;
 
 /**
- * Dify4j 非法状态异常类
+ * yonchain 非法状态异常类
  * 当操作在非法或不适当的状态下被调用时抛出
  */
 public class YonchainIllegalStateException extends YonchainException {

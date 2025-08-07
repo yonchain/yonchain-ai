@@ -16,7 +16,7 @@
 package com.yonchain.ai.api.exception;
 
 /**
- * Dify4j 禁止访问异常类
+ * yonchain 禁止访问异常类
  * 当API请求因权限不足被拒绝时抛出此异常
  *
  * @author Cgy

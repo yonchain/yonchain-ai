@@ -19,7 +19,7 @@ package com.yonchain.ai.api.exception;
 /**
  * 资源未找到异常
  *
- * @author dify4j
+ * @author yonchain
  */
 public class YonchainResourceNotFoundException extends YonchainException {
 

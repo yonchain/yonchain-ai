@@ -16,6 +16,7 @@
         <module>yonchain-ai-starter-mybatis</module>
         <module>yonchain-ai-starter-swagger</module>
         <module>yonchain-ai-starter-redis</module>
+        <module>yonchain-ai-security-spring-boot-starter</module>
     </modules>
 
 </project>

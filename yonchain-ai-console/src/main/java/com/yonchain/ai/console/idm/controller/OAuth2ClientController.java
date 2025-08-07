@@ -131,7 +131,7 @@ public class OAuth2ClientController extends BaseController {
         }
 
         //判断是否修改了系统默认的客户端名称
-        if ("dify4j".equals(client.getClientId()) && !request.getClientId().equals("dify4j")) {
+        if ("yonchain".equals(client.getClientId()) && !request.getClientId().equals("yonchain")) {
             throw new YonchainForbiddenException("系统默认客户端名称不允许修改");
         }
 
@@ -178,7 +178,7 @@ public class OAuth2ClientController extends BaseController {
     @DeleteMapping()
     public ApiResponse<Void> deleteOAuth2RegisteredClientByIds(@RequestBody List<String> ids) {
         //如果是系统默认的客户端，不允许删除
-        OAuth2RegisteredClient difyClient = oauth2ClientService.getByClientId("dify4j");
+        OAuth2RegisteredClient difyClient = oauth2ClientService.getByClientId("yonchain");
         if (difyClient != null && ids.contains(difyClient.getId())) {
             throw new YonchainForbiddenException("系统默认客户端不允许删除");
         }

@@ -118,12 +118,12 @@ public class OAuth2PasswordAuthenticationProvider implements AuthenticationProvi
         }
 
         // 创建用户认证令牌
-        YonchainOAuth2AuthorizationToken dify4jAuthorization = YonchainOAuth2AuthorizationToken.authenticated(userDetails.getUserId(), userDetails.getAuthorities());
+        YonchainOAuth2AuthorizationToken yonchainAuthorization = YonchainOAuth2AuthorizationToken.authenticated(userDetails.getUserId(), userDetails.getAuthorities());
 
         // 准备令牌上下文
         DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder()
                 .registeredClient(registeredClient)
-                .principal(dify4jAuthorization)
+                .principal(yonchainAuthorization)
                 .authorizationServerContext(AuthorizationServerContextHolder.getContext())
                 .authorizedScopes(passwordAuthenticationToken.getScopes())
                 .authorizationGrantType(OAuth2AuthorizationGrantTypes.PASSWORD)
@@ -158,7 +158,7 @@ public class OAuth2PasswordAuthenticationProvider implements AuthenticationProvi
                 .principalName(userDetails.getUsername())
                 .authorizationGrantType(OAuth2AuthorizationGrantTypes.PASSWORD)
                 .authorizedScopes(tokenContext.getAuthorizedScopes())
-                .attribute(Principal.class.getName(), dify4jAuthorization);
+                .attribute(Principal.class.getName(), yonchainAuthorization);
         if (generatedAccessToken instanceof ClaimAccessor) {
             authorizationBuilder.token(accessToken, (metadata) ->
                     metadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME, ((ClaimAccessor) generatedAccessToken).getClaims()));

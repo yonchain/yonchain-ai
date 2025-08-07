@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SysVersionController {
 
 
-    @Value("${dify4j.version}")
+    @Value("${yonchain.version}")
     private String version;
 
 

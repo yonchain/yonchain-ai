@@ -120,7 +120,7 @@ public class YonchainJdbcOAuth2AuthorizationService implements OAuth2Authorizati
             + "device_code_metadata";
     // @formatter:on
 
-    private static final String TABLE_NAME = "dify4j_oauth2_authorization";
+    private static final String TABLE_NAME = "yonchain_oauth2_authorization";
 
     private static final String PK_FILTER = "id = ?";
 

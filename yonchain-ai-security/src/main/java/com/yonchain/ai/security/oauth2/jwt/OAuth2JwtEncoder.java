@@ -9,7 +9,7 @@ import org.springframework.security.oauth2.jwt.*;
 import java.util.Map;
 
 /**
- * Dify4j JWT编码器实现
+ * yonchain JWT编码器实现
  * <p>
  * 提供JwtEncoder接口的实现，用于生成JWT令牌。
  * 使用RSA算法对JWT进行签名。

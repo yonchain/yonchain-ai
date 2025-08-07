@@ -16,7 +16,7 @@
 package com.yonchain.ai.api.exception;
 
 /**
- * Dify4j 根异常类
+ * yonchain 根异常类
  *
  * @author Cgy
  * @since 1.0.0

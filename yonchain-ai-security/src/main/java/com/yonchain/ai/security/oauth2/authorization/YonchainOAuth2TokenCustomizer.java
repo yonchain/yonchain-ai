@@ -91,7 +91,7 @@ public class YonchainOAuth2TokenCustomizer implements OAuth2TokenCustomizer<JwtE
         if (principal instanceof YonchainOAuth2AuthorizationToken token){
             claims.claim("user_id", token.getPrincipal());
         }else {
-            logger.debug("认证主体不是Dify4jOAuth2AuthorizationToken类型，跳过用户信息添加");
+            logger.debug("认证主体不是yonchainOAuth2AuthorizationToken类型，跳过用户信息添加");
             throw new OAuth2AuthenticationException(new OAuth2Error(
                     OAuth2ErrorCodes.SERVER_ERROR,
                     "生成Token失败,未知的认证主体无法获取用户信息",

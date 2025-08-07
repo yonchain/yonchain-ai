@@ -32,9 +32,9 @@ public class OpenApiAutoConfiguration {
         final String appVersion = "@springdoc.version@";
         return new OpenAPI()
                 .info(new Info()
-                        .title("Dify4j API")
+                        .title("yonchain API")
                         .version(appVersion)
-                        .description("Dify4j开发平台API文档")
+                        .description("yonchain开发平台API文档")
                         .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()

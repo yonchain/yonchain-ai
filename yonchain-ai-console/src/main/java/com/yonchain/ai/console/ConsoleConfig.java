@@ -1,8 +1,8 @@
 package com.yonchain.ai.console;
 
 
-import com.yonchain.ai.api.Dify4jService;
-import com.yonchain.ai.api.Dify4jServiceImpl;
+import com.yonchain.ai.api.yonchainService;
+import com.yonchain.ai.api.yonchainServiceImpl;
 import com.yonchain.ai.api.idm.TenantService;
 import com.yonchain.ai.api.idm.UserService;
 import com.yonchain.ai.api.knowledge.KnowledgeService;
@@ -28,7 +28,7 @@ public class ConsoleConfig {
 
 
     @Bean
-    public Dify4jService dify4jService(UserService userService, TenantService tenantService, KnowledgeService knowledgeService) {
+    public yonchainService yonchainService(UserService userService, TenantService tenantService, KnowledgeService knowledgeService) {
         return new YonchainServiceImpl(userService, tenantService, knowledgeService);
     }
 

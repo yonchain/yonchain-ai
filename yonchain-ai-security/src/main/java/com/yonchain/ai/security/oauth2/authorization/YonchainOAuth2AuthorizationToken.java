@@ -9,7 +9,7 @@ import org.springframework.util.Assert;
 import java.util.Collection;
 
 /**
- * Dify4j OAuth2 授权认证类
+ * yonchain OAuth2 授权认证类
  * <p>
  * 该类继承自 AbstractAuthenticationToken，实现了 OAuth2 授权认证的核心逻辑
  * 提供了两种构造方式：

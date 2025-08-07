@@ -48,7 +48,7 @@ import java.util.function.Function;
  * 使用JDBC操作数据库来存储和检索OAuth2客户端注册信息
  * <p>
  *  该类复制JdbcRegisteredClientRepository的代码，主要做了以下改动：</br>
- *      1.表名由oauth2_registered_client改为dify4j_oauth2_registered_client</br>
+ *      1.表名由oauth2_registered_client改为yonchain_oauth2_registered_client</br>
  *      2.取消更新保存，因为如果客户端密钥的算法如果是{noop}，密码编码器DelegatingPasswordEncoder会重新将密钥重新编码，
  *      导致客户端信息显示到页面是加密的无法查看
  * </P>
@@ -75,7 +75,7 @@ public class YonchainJdbcRegisteredClientRepository implements RegisteredClientR
             + "token_settings";
     // @formatter:on
 
-    private static final String TABLE_NAME = "dify4j_oauth2_registered_client";
+    private static final String TABLE_NAME = "yonchain_oauth2_registered_client";
 
     private static final String PK_FILTER = "id = ?";
 

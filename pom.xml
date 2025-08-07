@@ -24,7 +24,11 @@
         <module>yonchain-ai-console</module>
         <module>yonchain-ai-retry</module>
         <module>yonchain-ai-idm</module>
+        <module>yonchain-ai-core</module>
+        <module>yonchain-ai-bootstart</module>
+        <module>yonchain-ai-spring-boot-autoconfigure</module>
         <module>yonchain-ai-spring-boot-starters</module>
+        <module>yonchain-ai-spring-boot-starters/yonchain-ai-idm-spring-boot-starter</module>
     </modules>
 
     <properties>
@@ -75,7 +79,7 @@
                 <scope>import</scope>
             </dependency>-->
 
-            <!--Dify4j-->
+            <!--yonchain-->
             <dependency>
                 <groupId>com.yonchain.ai</groupId>
                 <artifactId>yonchain-ai-bom</artifactId>

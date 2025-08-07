@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Dify4j 委托密码编码器实现
+ * yonchain 委托密码编码器实现
  *
  * <p>
  * 提供了多种密码编码方式的委托支持，默认包含 Spring Security 支持的所有编码器，

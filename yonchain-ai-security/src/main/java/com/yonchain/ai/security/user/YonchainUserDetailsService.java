@@ -10,7 +10,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 
 /**
- * Dify4j用户详情服务类，实现Spring Security的UserDetailsService接口
+ * yonchain用户详情服务类，实现Spring Security的UserDetailsService接口
  * 用于根据用户名或邮箱加载用户详情信息
  * <p>
  * 主要功能：

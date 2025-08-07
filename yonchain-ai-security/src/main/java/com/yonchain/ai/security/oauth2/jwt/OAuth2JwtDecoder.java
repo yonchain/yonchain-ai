@@ -11,7 +11,7 @@ import org.springframework.security.oauth2.server.authorization.config.annotatio
 import java.util.Map;
 
 /**
- * Dify4j JWT解码器实现
+ * yonchain JWT解码器实现
  * <p>
  * 提供JwtDecoder接口的实现，用于验证和解码JWT令牌。
  * 使用RSA算法验证JWT签名。

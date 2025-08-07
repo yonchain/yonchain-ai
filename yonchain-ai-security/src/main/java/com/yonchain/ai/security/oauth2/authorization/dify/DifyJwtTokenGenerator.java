@@ -84,7 +84,7 @@ public class DifyJwtTokenGenerator {
     }
 
     public OAuth2RefreshToken generateRefreshToken(String userId) {
-        // Dify4jUser user = (Dify4jUser) userDetails;
+        // yonchainUser user = (yonchainUser) userDetails;
         Instant issuedAt = Instant.now();
         Instant expiresAt = issuedAt.plus(accessTokenExpireMinutes, ChronoUnit.MINUTES);
 

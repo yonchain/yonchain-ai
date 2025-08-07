@@ -51,12 +51,6 @@
 
             <dependency>
                 <groupId>com.yonchain.ai</groupId>
-                <artifactId>yonchain-ai-starter-mybatis</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.yonchain.ai</groupId>
                 <artifactId>yonchain-ai-starter-redis</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -64,6 +58,42 @@
             <dependency>
                 <groupId>com.yonchain.ai</groupId>
                 <artifactId>yonchain-ai-starter-swagger</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-spring-boot-autoconfigure</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-console</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-security</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-idm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-security-spring-boot-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-idm-spring-boot-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
