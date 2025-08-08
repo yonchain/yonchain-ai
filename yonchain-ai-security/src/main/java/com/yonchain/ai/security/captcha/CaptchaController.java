@@ -24,8 +24,8 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class CaptchaController {
 
-    private final DefaultKaptcha defaultKaptcha;
-    private final StringRedisTemplate redisTemplate;
+    /*private final DefaultKaptcha defaultKaptcha;
+    private final StringRedisTemplate redisTemplate;*/
 
     public static final String CAPTCHA_KEY_PREFIX = "captcha:";
 
