@@ -1,14 +1,14 @@
 package com.yonchain.ai.idm.service;
 
 import com.yonchain.ai.api.common.Page;
-import com.yonchain.ai.api.exception.yonchainForbiddenException;
+import com.yonchain.ai.api.exception.YonchainForbiddenException;
 import com.yonchain.ai.api.idm.DefaultMenuTree;
 import com.yonchain.ai.api.idm.Menu;
 import com.yonchain.ai.api.idm.MenuService;
 import com.yonchain.ai.api.idm.MenuTree;
 import com.yonchain.ai.idm.mapper.MenuMapper;
 import com.yonchain.ai.idm.mapper.RoleMenuMapper;
-import com.yonchain.ai.utils.PageUtil;
+import com.yonchain.ai.util.PageUtil;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,7 +82,7 @@ public class MenuServiceImpl implements MenuService {
         queryParam.put("menuType", 0);
         List<Menu> menuList = menuMapper.selectList(queryParam);
         if (menuList != null && !menuList.isEmpty()) {
-            throw new yonchainForbiddenException("存在子节点，不允许删除");
+            throw new YonchainForbiddenException("存在子节点，不允许删除");
         }
 
         menuMapper.deleteById(id);

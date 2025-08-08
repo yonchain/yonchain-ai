@@ -19,25 +19,19 @@ package com.yonchain.ai.dify.api;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.yonchain.ai.app.ApiKey;
-import com.yonchain.ai.app.AppOptionsUtils;
 import com.yonchain.ai.app.NoopApiKey;
 import com.yonchain.ai.app.SimpleApiKey;
 import com.yonchain.ai.retry.RetryUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -90,7 +84,7 @@ public class DifyApi {
     private DifyStreamFunctionCallingHelper chunkMerger = new DifyStreamFunctionCallingHelper();
 
     /**
-     * Create a new Dify API client.
+     * Create a new Yonchain API client.
      */
     public DifyApi(String baseUrl, ApiKey apiKey, MultiValueMap<String, String> headers,
                    String chatMessagesPath, String filesUploadPath, String stopResponsePath,

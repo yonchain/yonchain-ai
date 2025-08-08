@@ -1,4 +1,4 @@
-package com.dify4j.autoconfigure.security;
+package com.yonchain.ai.autoconfigure.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

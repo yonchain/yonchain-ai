@@ -22,7 +22,7 @@ import com.yonchain.ai.api.idm.RoleGroup;
 import com.yonchain.ai.api.idm.RoleService;
 import com.yonchain.ai.idm.mapper.RoleGroupMapper;
 import com.yonchain.ai.idm.mapper.RoleMapper;
-import com.yonchain.ai.utils.PageUtil;
+import com.yonchain.ai.util.PageUtil;
 import com.github.pagehelper.PageHelper;
 import org.springframework.transaction.annotation.Transactional;
 

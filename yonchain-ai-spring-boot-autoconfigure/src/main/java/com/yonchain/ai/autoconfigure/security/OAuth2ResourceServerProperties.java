@@ -1,4 +1,4 @@
-package com.dify4j.autoconfigure.security;
+package com.yonchain.ai.autoconfigure.security;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -13,7 +13,7 @@ import java.util.stream.Stream;
  *
  * @author Cgy
  */
-@ConfigurationProperties("dify4j.security.oauth2.resourceserver")
+@ConfigurationProperties("yonchain.security.oauth2.resourceserver")
 public class OAuth2ResourceServerProperties {
 
     /**

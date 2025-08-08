@@ -1,14 +1,15 @@
 package com.dify4j.autoconfigure.console;
 
 
-import com.dify4j.api.idm.TenantService;
-import com.dify4j.api.idm.UserService;
-import com.dify4j.api.security.SecurityService;
-import com.dify4j.autoconfigure.idm.IdmAutoConfiguration;
-import com.dify4j.autoconfigure.security.SecurityAutoConfiguration;
-import com.dify4j.console.context.ConsoleContextFilter;
-import com.dify4j.idm.service.RedisCacheService;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yonchain.ai.api.idm.TenantService;
+import com.yonchain.ai.api.idm.UserService;
+import com.yonchain.ai.api.security.SecurityService;
+import com.yonchain.ai.autoconfigure.idm.IdmAutoConfiguration;
+import com.yonchain.ai.autoconfigure.security.SecurityAutoConfiguration;
+import com.yonchain.ai.console.context.ConsoleContextFilter;
+import com.yonchain.ai.idm.service.RedisCacheService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

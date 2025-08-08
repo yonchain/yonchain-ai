@@ -1,10 +1,10 @@
-package com.dify4j.autoconfigure.security;
+package com.yonchain.ai.autoconfigure.security;
 
-import com.dify4j.security.SecurityConfiguration;
-import com.dify4j.security.oauth2.authorization.dify.DifyCodeAuthenticationConverter;
-import com.dify4j.security.oauth2.authorization.dify.DifyCodeAuthenticationProvider;
-import com.dify4j.security.oauth2.exception.Dify4jOAuth2ClientAuthenticationFailureHandler;
-import com.dify4j.security.oauth2.exception.Dify4jOAuth2ErrorAuthenticationFailureHandler;
+import com.yonchain.ai.security.SecurityConfiguration;
+import com.yonchain.ai.security.oauth2.authorization.dify.DifyCodeAuthenticationConverter;
+import com.yonchain.ai.security.oauth2.authorization.dify.DifyCodeAuthenticationProvider;
+import com.yonchain.ai.security.oauth2.exception.YonchainOAuth2ClientAuthenticationFailureHandler;
+import com.yonchain.ai.security.oauth2.exception.YonchainOAuth2ErrorAuthenticationFailureHandler;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2ErrorAuthenticationFailureHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -79,11 +80,11 @@ public class OAuth2AuthorizationServerConfiguration {
                         .tokenGenerator(securityConfiguration.getTokenGenerator())
                         // 配置客户端认证错误处理
                         .clientAuthentication(clientAuth ->
-                                clientAuth.errorResponseHandler(new Dify4jOAuth2ClientAuthenticationFailureHandler())
+                                clientAuth.errorResponseHandler(new YonchainOAuth2ClientAuthenticationFailureHandler())
                         )
                         // 配置授权端点错误处理
                         .authorizationEndpoint(endpoint ->
-                                endpoint.errorResponseHandler(new Dify4jOAuth2ErrorAuthenticationFailureHandler())
+                                endpoint.errorResponseHandler(new OAuth2ErrorAuthenticationFailureHandler())
                         )
                 );
     }
@@ -109,7 +110,7 @@ public class OAuth2AuthorizationServerConfiguration {
             endpoint.accessTokenRequestConverter(securityConfiguration.difyAuthenticationConverter());
 
             // 添加自定义错误处理器
-            endpoint.errorResponseHandler(new Dify4jOAuth2ErrorAuthenticationFailureHandler());
+            endpoint.errorResponseHandler(new YonchainOAuth2ErrorAuthenticationFailureHandler());
 
             // 添加自定义code认证方式
             endpoint.accessTokenRequestConverter(new DifyCodeAuthenticationConverter());

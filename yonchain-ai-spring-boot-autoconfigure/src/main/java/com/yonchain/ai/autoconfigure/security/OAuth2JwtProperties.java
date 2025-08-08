@@ -1,6 +1,5 @@
-package com.dify4j.autoconfigure.security;
+package com.yonchain.ai.autoconfigure.security;
 
-import com.dify4j.security.oauth2.jwt.JwtConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**

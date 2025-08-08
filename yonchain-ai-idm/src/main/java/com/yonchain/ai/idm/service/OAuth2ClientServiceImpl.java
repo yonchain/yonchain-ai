@@ -4,7 +4,7 @@ import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.idm.OAuth2ClientService;
 import com.yonchain.ai.api.idm.OAuth2RegisteredClient;
 import com.yonchain.ai.idm.mapper.OAuth2RegisteredClientMapper;
-import com.yonchain.ai.utils.PageUtil;
+import com.yonchain.ai.util.PageUtil;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,15 +1,15 @@
-package com.dify4j.autoconfigure.security;
+package com.yonchain.ai.autoconfigure.security;
 
-import com.dify4j.api.app.AppService;
-import com.dify4j.api.idm.IdmService;
-import com.dify4j.api.idm.UserService;
-import com.dify4j.api.security.SecurityService;
-import com.dify4j.security.SecurityConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import com.yonchain.ai.api.app.AppService;
+import com.yonchain.ai.api.idm.IdmService;
+import com.yonchain.ai.api.idm.UserService;
+import com.yonchain.ai.api.security.SecurityService;
+import com.yonchain.ai.security.SecurityConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -56,7 +56,7 @@ public class SecurityAutoConfiguration {
                 .passwordEncoderType(securityProperties.getPasswordEncoderType())
                 .enabledPasswordEncoderPrefix(securityProperties.isEnablePasswordEncoderPrefix())
                 .idmService(idmService)
-                .appService(appService)
+               // .appService(appService)
                 .difySecretKey(securityProperties.getDifySecretKey())
                 .build();
     }

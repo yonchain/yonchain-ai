@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import static com.yonchain.ai.security.captcha.CaptchaController.CAPTCHA_KEY_PREFIX;
 
+
 /**
  * 验证码认证过滤器，用于在登录请求时校验验证码
  * 主要功能：

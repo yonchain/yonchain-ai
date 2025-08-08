@@ -1,8 +1,7 @@
-package com.dify4j.autoconfigure.security;
+package com.yonchain.ai.autoconfigure.security;
 
-import com.dify4j.security.crypto.PasswordEncoderType;
+import com.yonchain.ai.security.crypto.PasswordEncoderType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * Dify4j安全配置属性类

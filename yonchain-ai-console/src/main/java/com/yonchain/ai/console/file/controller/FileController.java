@@ -192,7 +192,7 @@ public class FileController extends BaseController {
                     .headers(headers)
                     .body(resource);
 
-        } catch (yonchainException e) {
+        } catch (YonchainException e) {
             throw e;
         } catch (Exception e) {
             throw new YonchainException("预览文件失败", e);

@@ -2,7 +2,7 @@ package com.yonchain.ai.console.idm.request;
 
 import com.yonchain.ai.api.idm.DefaultUser;
 import com.yonchain.ai.api.idm.User;
-import com.yonchain.ai.constants.UserStatusConstant;
+import com.yonchain.ai.api.idm.UserStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -86,7 +86,7 @@ public class UserCreateRequest {
         user.setInterfaceLanguage(this.interfaceLanguage);
         user.setInterfaceTheme(this.interfaceTheme);
         user.setTimezone(this.timezone);
-        user.setStatus(UserStatusConstant.ACTIVE);
+        user.setStatus(UserStatus.ACTIVE);
         return user;
     }
 }

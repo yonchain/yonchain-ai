@@ -1,9 +1,9 @@
-package com.dify4j.autoconfigure.idm;
+package com.yonchain.ai.autoconfigure.idm;
 
-import com.dify4j.api.idm.*;
-import com.dify4j.api.security.SecurityService;
-import com.dify4j.idm.IdmConfiguration;
-import com.dify4j.idm.mapper.*;
+import com.yonchain.ai.api.idm.*;
+import com.yonchain.ai.api.security.SecurityService;
+import com.yonchain.ai.idm.IdmConfiguration;
+import com.yonchain.ai.idm.mapper.*;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

@@ -1,10 +1,10 @@
-package com.dify4j.autoconfigure.security;
+package com.yonchain.ai.autoconfigure.security;
 
-import com.dify4j.security.oauth2.jwt.OAuth2JWKSource;
-import com.dify4j.security.oauth2.jwt.OAuth2JwtDecoder;
-import com.dify4j.security.oauth2.jwt.OAuth2JwtEncoder;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import com.yonchain.ai.security.oauth2.jwt.OAuth2JWKSource;
+import com.yonchain.ai.security.oauth2.jwt.OAuth2JwtDecoder;
+import com.yonchain.ai.security.oauth2.jwt.OAuth2JwtEncoder;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

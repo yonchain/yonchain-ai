@@ -17,24 +17,20 @@
 package com.yonchain.ai.idm.service;
 
 import com.yonchain.ai.api.common.Page;
-import com.yonchain.ai.api.exception.yonchainForbiddenException;
-import com.yonchain.ai.api.exception.yonchainIllegalStateException;
-import com.yonchain.ai.api.exception.yonchainResourceNotFoundException;
-import com.yonchain.ai.api.idm.Menu;
-import com.yonchain.ai.api.idm.Role;
-import com.yonchain.ai.api.idm.User;
-import com.yonchain.ai.api.idm.UserService;
+import com.yonchain.ai.api.exception.YonchainForbiddenException;
+import com.yonchain.ai.api.exception.YonchainIllegalStateException;
+import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
+import com.yonchain.ai.api.idm.*;
 import com.yonchain.ai.api.idm.enums.MenuType;
 import com.yonchain.ai.api.security.Password;
 import com.yonchain.ai.api.security.SecurityService;
-import com.yonchain.ai.constants.UserStatusConstant;
 import com.yonchain.ai.idm.entity.TenantAccountJoinEntity;
 import com.yonchain.ai.idm.mapper.MenuMapper;
 import com.yonchain.ai.idm.mapper.RoleMapper;
 import com.yonchain.ai.idm.mapper.TenantAccountJoinMapper;
 import com.yonchain.ai.idm.mapper.UserMapper;
-import com.yonchain.ai.utils.IdUtil;
-import com.yonchain.ai.utils.PageUtil;
+import com.yonchain.ai.util.IdUtil;
+import com.yonchain.ai.util.PageUtil;
 import com.github.pagehelper.PageHelper;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -136,7 +132,7 @@ public class UserServiceImpl implements UserService {
 
         //如果状态为空，则设置状态为正常
         if (!StringUtils.hasText(user.getStatus())) {
-            user.setStatus(UserStatusConstant.ACTIVE);
+            user.setStatus(UserStatus.ACTIVE);
         }
 
         user.setCreatedAt(new Date());
@@ -163,10 +159,10 @@ public class UserServiceImpl implements UserService {
         roleQueryParam.put("category", "0");
         List<Role> roles = roleMapper.selectList(tenantId, roleQueryParam);
         if (roles.isEmpty()) {
-            throw new yonchainForbiddenException("角色必须包含默认角色");
+            throw new YonchainForbiddenException("角色必须包含默认角色");
         }
         if (roles.size() > 1) {
-            throw new yonchainForbiddenException("角色不能包含多个默认角色");
+            throw new YonchainForbiddenException("角色不能包含多个默认角色");
         }
         Role systemRole = roles.get(0);
 
@@ -216,12 +212,12 @@ public class UserServiceImpl implements UserService {
         // 获取账户
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new yonchainResourceNotFoundException("账户不存在");
+            throw new YonchainResourceNotFoundException("账户不存在");
         }
 
         // 验证旧密码
         if (!securityService.matchesPassword(oldPassword, user.getPasswordSalt(), user.getPassword())) {
-            throw new yonchainIllegalStateException("旧密码不正确");
+            throw new YonchainIllegalStateException("旧密码不正确");
         }
 
         // 加密新密码
@@ -243,7 +239,7 @@ public class UserServiceImpl implements UserService {
         // 获取账户
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new yonchainResourceNotFoundException("账户不存在");
+            throw new YonchainResourceNotFoundException("账户不存在");
         }
 
         // 更新最后登录信息
@@ -263,7 +259,7 @@ public class UserServiceImpl implements UserService {
         // 获取账户
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new yonchainResourceNotFoundException("账户不存在");
+            throw new YonchainResourceNotFoundException("账户不存在");
         }
         // 更新最后活跃时间
         user.setLastActiveAt(new Date());

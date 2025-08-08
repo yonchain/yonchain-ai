@@ -1,0 +1,77 @@
+spring:
+  application:
+    name: dify4j
+  datasource:
+    url: jdbc:postgresql://42.194.189.63:35432/postgres
+    username: dify4j
+    password: dify4j
+    driver-class-name: org.postgresql.Driver
+  data:
+    redis:
+      host: 42.194.189.63
+      password: 123456
+      port: 26739
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+server:
+  port: 8080
+  security:
+    debug: true
+
+dify4j:
+  version: 0.1.0
+  security:
+    password-encoder-type: dify@pbkdf2
+    enable-password-encoder-prefix: ${DIFY4J_PASSWORD_ENCODER_PREFIX:true}
+    oauth2:
+      jwt:
+        private-key: ${JWT_PRIVATE_KEY:MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCbE9KvE2zcOnDNSm1xTYewJei+nxzbN6PiVIg8CP99S5C7Bs/Syi3w2DTMlb/jCKlp4u+DNlSbIOzwb6rjqLZOPDVyaX1jdR0nX7tvmMpb+JQRbSGl6QbOpSUodNIb3D6jfrQ4imqK/jPCNPTQCDisApQ810/bfP8dUduHFZw6T5DoeHbVy7DAgG/fILDriFKdA0Ut5hETl03jtGwxNfaCXZjtA8dEYwT2rt7EnMcS6GZSFRDBxIpRUr6Tm1s6PZi1+kNqgnvho7NdKctLA6OURsHHxyvUt6hZnzeS7I9pQleN/SZsaKLV/z8b0DDFom2m5T6TIbWNQ0NdCPcJ2qv3AgMBAAECggEALO2aTWS4VjmMMr3MZVYL6Kmi+48Hgi9liI3rBlGpC3jYDodTsIMoui05Zsg/1pvM0UORFpen/WWVn7cKcHiRkKr65RHQ5P6qGp0upY9DmU+0PjQ62mFfuoC3+jeWI8I0V5O+zN61LV2mSy6iep7XJGZ+4f2TQki9dJYhnspQ/8dX6P9q4dXOtCPu+Emq1+CGNNUHkhM7lEMAgK4S5TO7KT48QcB+TT7ezt1YtyIjQeCzh6ElvuPPwDkFTCOYtP/1SVlOz0tJQaytxA6O4kbiE1o2YupbWEPFnakCJO63YZ8Jhvgi5YdhCucbbOm0KfuEqIkJ5YoWjUMhn5+s8nE3AQKBgQDQMsrpmhaW5nnNjC9/+DxkzotupJT77Hdxenqc5iqKmI0obiw6RZ37wxy9g9O0uqxaZzgPrXtmF800J18KXpaKh4K2AZb5Fb07itmZBUonntHYFLGuljnm5ftn+M9hT79r2414ojQuKnDiWzKuC++t6wVj+fcUrVtWY1kxXWfPgQKBgQC+rsG8uujM+Qqfn9qC3X1iFAzb9IIttkc1EMG1r3T1+oqJjAEy4QK0v4ICjzshve/LkpFtbWno6bS13NG/vzVIYhJSED3X9/MmR8yJXFapyLdtd18hHthjr4ytSe7ZO9HccqBMz9LU7y8yDUAZmnZuZ30uHfyjEU/FyKihy0S3dwKBgCkyY8RloSKq6F8r5hpEXG72D9EM8A4JdHkX6zswsCpMlWHyqv282M4AhadadoHEjmY1FnrDsS86dnhjcgLzRIaU2eB54A3Zp2Ao0XXd/hZo7sz7C02onDx8NYsVSLPQu+fzwcKlFf4sl7myogyegAbCAocN5z5IL1Kgxf1mpiwBAoGAbLuEWFWQyMk+aJWj6bnZdKMQTiDYVq65XiYm/66EmHt8okCGsneirmUCAumgA3amlcQHT4nzudACry2zIY8sGBFsdwUx7sRCD9MjbDSOapS9HBvU0DMhm36QToR5QcCdxAJNLF/Zznhxxi3OHot4+y3iMPkChg4qGhN5LYGWtrMCgYAHCmuXjVyaYTkuspOvbRTpQKjEBzRl6SmDJkzwOGYL91hbXSZlz9l3rdo4+XmdrWxjU2a/SHEk6tMM9EAiJcqNmMyJl2vIJWSONuFSXA7Zg8z5QSEvEhezUcaBbrVsVakdtt28yyZXhhpqpb12gioOcMBpxD47bo9nwj4tdtGHag==}  # 从环境变量读取
+        public-key: ${JWT_PUBLIC_KEY:MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmxPSrxNs3DpwzUptcU2HsCXovp8c2zej4lSIPAj/fUuQuwbP0sot8Ng0zJW/4wipaeLvgzZUmyDs8G+q46i2Tjw1cml9Y3UdJ1+7b5jKW/iUEW0hpekGzqUlKHTSG9w+o360OIpqiv4zwjT00Ag4rAKUPNdP23z/HVHbhxWcOk+Q6Hh21cuwwIBv3yCw64hSnQNFLeYRE5dN47RsMTX2gl2Y7QPHRGME9q7exJzHEuhmUhUQwcSKUVK+k5tbOj2YtfpDaoJ74aOzXSnLSwOjlEbBx8cr1LeoWZ83kuyPaUJXjf0mbGii1f8/G9AwxaJtpuU+kyG1jUNDXQj3Cdqr9wIDAQAB}    # 从环境变量读取
+        kid: ${JWT_KEY_ID:8e5fe8b4-eb6c-4e36-9602-883b88888888}                # Key ID 也可通过环境变量配置
+      authorizationserver:
+        captcha-enabled: true
+      resourceserver:
+        permit-paths:
+          - ${DIFY4J_RESOURCESERVER_PERMIT_PATHS:/api/**}  # 从环境变量读取
+          - ${DIFY4J_RESOURCESERVER_PERMIT_PATHS2:/token/check_token}  # 从环境变量读取
+    dify-secret-key: sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U
+
+
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+
+logging:
+  level:
+    org.mybatis: INFO
+    # 或者针对特定的mapper文件进行设置
+    com.dify4j.**.mapper: DEBUG
+    org.springframework.security: TRACE
+    org.springframework.security.web: TRACE
+    org.springframework.security.authentication: TRACE
+
+springdoc:
+  version: '@springdoc.version@'
+  swagger-ui:
+    display-request-duration: true
+    groups-order: DESC
+    operationsSorter: method
+    disable-swagger-default-url: true
+    use-root-path: true
+    oauth:
+      use-pkce-with-authorization-code-grant: true
+    doc-expansion: none
+    tags-sorter: alpha
+    try-it-out-enabled: true
+  show-actuator: true
+  group-configs:
+    - group: Dify4j开发平台
+      paths-to-match: /**
+  cache:
+    disabled: true
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
