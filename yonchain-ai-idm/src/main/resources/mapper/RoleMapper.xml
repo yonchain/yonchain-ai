@@ -38,7 +38,7 @@
     <select id="selectById" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List" />
-        FROM dify4j_role
+        FROM role
         WHERE id = #{id}::uuid
     </select>
 
@@ -46,7 +46,7 @@
     <select id="selectList" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List" />
-        FROM dify4j_role
+        FROM role
         <where>
             tenant_id = #{tenantId}::uuid
             <if test="params.name != null and params.name != ''">
@@ -88,7 +88,7 @@
         SELECT
             role_.*
         FROM
-            dify4j_role role_,
+            role role_,
             tenant_account_joins tenant_account
         <where>
             role_.code = tenant_account."role" AND
@@ -104,7 +104,7 @@
 
     <!-- 插入角色记录 -->
     <insert id="insert" parameterType="com.yonchain.ai.idm.entity.RoleEntity">
-        INSERT INTO dify4j_role (
+        INSERT INTO role (
             id, name, code, status, created_by, created_at, updated_by, updated_at,tenant_id,description,category,group_id
         )
         VALUES (
@@ -116,7 +116,7 @@
 
     <!-- 根据ID更新角色信息 -->
     <update id="updateById" parameterType="com.yonchain.ai.idm.entity.RoleEntity">
-        UPDATE dify4j_role
+        UPDATE role
         SET name = #{name},
             code = #{code},
             status = #{status},
@@ -129,13 +129,13 @@
 
     <!-- 根据ID删除角色 -->
     <delete id="deleteById">
-        DELETE FROM dify4j_role
+        DELETE FROM role
         WHERE id = #{id}::uuid
     </delete>
 
     <!-- 根据ID批量删除角色 -->
     <delete id="deleteByIds">
-        DELETE FROM dify4j_role
+        DELETE FROM role
         WHERE id IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}::uuid
@@ -147,7 +147,7 @@
         SELECT
             role_.*
         FROM
-            dify4j_role role_,
+            role role_,
             tenant_account_joins tenant_account
         <where>
             role_.code = tenant_account."role" AND
@@ -159,7 +159,7 @@
 
     <!-- 批量插入角色记录 -->
     <insert id="batchInsert" parameterType="java.util.List">
-        INSERT INTO dify4j_role (
+        INSERT INTO role (
         id, name, code, status, created_by, created_at, updated_by, updated_at, tenant_id, description, category
         )
         VALUES

@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  * @author Cgy
  */
-@ConfigurationProperties("dify4j.security.oauth2.authorizationserver")
+@ConfigurationProperties("yonchain.security.oauth2.authorizationserver")
 public class OAuth2AuthorizationServerProperties {
 
     /**

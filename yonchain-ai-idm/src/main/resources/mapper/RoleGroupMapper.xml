@@ -20,14 +20,14 @@
     <select id="selectById" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List" />
-        FROM dify4j_role_group
+        FROM role_group
         WHERE id = #{id}::uuid
     </select>
 
     <select id="selectList" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List" />
-        FROM dify4j_role_group
+        FROM role_group
         <where>
             <if test="params.name != null and params.name != ''">
                 AND name LIKE CONCAT('%', #{params.name}, '%')
@@ -37,7 +37,7 @@
     </select>
 
     <insert id="insert" >
-        INSERT INTO dify4j_role_group (
+        INSERT INTO role_group (
             id, tenant_id,name, created_by, created_at
         ) VALUES (
             #{id}::uuid,
@@ -49,7 +49,7 @@
     </insert>
 
     <update id="update" >
-        UPDATE dify4j_role_group
+        UPDATE role_group
         SET
             name = #{name},
             updated_by = #{updatedBy}::uuid,
@@ -58,7 +58,7 @@
     </update>
 
     <delete id="deleteById">
-        DELETE FROM dify4j_role_group
+        DELETE FROM role_group
         WHERE id = #{id}::uuid
     </delete>
 </mapper>

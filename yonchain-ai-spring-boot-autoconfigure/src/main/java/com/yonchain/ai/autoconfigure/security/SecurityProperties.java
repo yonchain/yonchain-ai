@@ -9,8 +9,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Cgy
  * @since 1.0.0
  */
-@ConfigurationProperties("dify4j.security")
+@ConfigurationProperties("yonchain.security")
 public class SecurityProperties {
+
+    /**
+     * 默认的dify密钥
+     */
+    private static final String DEFAULT_DIFY_SECRET_KEY = "sk-9f73s3ljTXVcMT3Blb3ljTqtsKiGHXVcMT3BlbkFJLK7U";
 
     /**
      * 密码编码器类型
@@ -36,7 +41,7 @@ public class SecurityProperties {
     /**
      * dify密钥
      */
-    private String difySecretKey;
+    private String difySecretKey = DEFAULT_DIFY_SECRET_KEY;
 
     /**
      * 获取密码编码器类型

@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Cgy
  * @since 1.0.0
  */
-@ConfigurationProperties("dify4j.security.oauth2.jwt")
+@ConfigurationProperties("yonchain.security.oauth2.jwt")
 public class OAuth2JwtProperties {
 
     //默认私钥

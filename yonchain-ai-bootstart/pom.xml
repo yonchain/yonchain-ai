@@ -25,18 +25,18 @@
             <groupId>com.yonchain.ai</groupId>
             <artifactId>yonchain-ai-idm-spring-boot-starter</artifactId>
         </dependency>
-       <!-- <dependency>
+        <dependency>
             <groupId>com.yonchain.ai</groupId>
             <artifactId>yonchain-ai-console</artifactId>
-        </dependency>-->
-       <!-- <dependency>
+        </dependency>
+        <dependency>
             <groupId>com.yonchain.ai</groupId>
             <artifactId>yonchain-ai-app</artifactId>
-        </dependency>-->
+        </dependency>
     </dependencies>
 
     <build>
-        <finalName>dify4j</finalName>
+        <finalName>yonchain</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

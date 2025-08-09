@@ -99,8 +99,8 @@
         FROM
             accounts
                 A JOIN tenant_account_joins taj ON A.ID = taj.account_id
-                  JOIN dify4j_role r ON taj.ROLE = r.code and taj.tenant_id = r.tenant_id
-                  JOIN dify4j_role_menu mr ON r.ID = mr.role_id
+                  JOIN role r ON taj.ROLE = r.code and taj.tenant_id = r.tenant_id
+                  JOIN role_menu mr ON r.ID = mr.role_id
                   JOIN menu M ON mr.menu_id = M.ID
         WHERE
             M.menu_type = #{menuType}

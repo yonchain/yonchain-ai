@@ -15,13 +15,13 @@
 
     <select id="selectById" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
-        FROM dify4j_role_menu
+        FROM role_menu
         WHERE id = #{id}::uuid
     </select>
 
     <select id="selectList" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
-        FROM dify4j_role_menu
+        FROM role_menu
         <where>
             <if test="params.menuId != null">
                 AND menu_id = #{params.menuId}::uuid
@@ -33,32 +33,32 @@
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO dify4j_role_menu(id,menu_id, role_id)
+        INSERT INTO role_menu(id,menu_id, role_id)
         VALUES(#{id}::uuid,#{menuId}::uuid, #{roleId}::uuid)
     </insert>
 
     <delete id="deleteById">
-        DELETE FROM dify4j_role_menu WHERE id = #{id}::uuid
+        DELETE FROM role_menu WHERE id = #{id}::uuid
     </delete>
 
     <delete id="deleteByMenuId">
-        DELETE FROM dify4j_role_menu WHERE menu_id = #{menuId}::uuid
+        DELETE FROM role_menu WHERE menu_id = #{menuId}::uuid
     </delete>
 
     <delete id="deleteByRoleId">
-        DELETE FROM dify4j_role_menu WHERE role_id = #{roleId}::uuid
+        DELETE FROM role_menu WHERE role_id = #{roleId}::uuid
     </delete>
 
     <select id="selectMenuIdsByRoleId" resultType="java.lang.String">
-        SELECT menu_id FROM dify4j_role_menu WHERE role_id = #{roleId}::uuid
+        SELECT menu_id FROM role_menu WHERE role_id = #{roleId}::uuid
     </select>
 
     <select id="selectRoleIdsByMenuId" resultType="java.lang.String">
-        SELECT role_id FROM dify4j_role_menu WHERE menu_id = #{menuId}::uuid
+        SELECT role_id FROM role_menu WHERE menu_id = #{menuId}::uuid
     </select>
 
     <insert id="batchInsert">
-        INSERT INTO dify4j_role_menu(id, menu_id, role_id, created_at)
+        INSERT INTO role_menu(id, menu_id, role_id, created_at)
         VALUES
         <foreach collection="menuIds" item="menuId" separator=",">
             (gen_random_uuid()::uuid, #{menuId}::uuid, #{roleId}::uuid, now())

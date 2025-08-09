@@ -82,7 +82,7 @@
         <if test="params.status != null and params.status != ''">and status = #{params.status}</if>
         <if test="params.roleIds != null and params.roleIds.size() > 0">
             AND EXISTS (
-            SELECT 1 FROM dify4j_app_role
+            SELECT 1 FROM app_role
             WHERE app_id = apps.id
             AND role_id IN
             <foreach collection="params.roleIds" item="roleId" open="(" separator="," close=")">

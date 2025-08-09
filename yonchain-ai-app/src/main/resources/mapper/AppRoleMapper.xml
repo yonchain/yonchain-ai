@@ -17,7 +17,7 @@
     <select id="selectById" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM dify4j_app_role
+        FROM app_role
         WHERE id = #{id}::uuid
     </select>
 
@@ -25,7 +25,7 @@
     <select id="selectByAppId" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM dify4j_app_role
+        FROM app_role
         WHERE app_id = #{appId}::uuid
     </select>
 
@@ -33,13 +33,13 @@
     <select id="selectByRoleId" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM dify4j_app_role
+        FROM app_role
         WHERE role_id = #{roleId}::uuid
     </select>
 
     <!-- 新增应用角色关联 -->
     <insert id="insert" >
-        INSERT INTO dify4j_app_role
+        INSERT INTO app_role
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="appId != null">app_id,</if>
@@ -56,7 +56,7 @@
 
     <!-- 修改应用角色关联 -->
     <update id="update" >
-        UPDATE dify4j_app_role
+        UPDATE app_role
         <set>
             <if test="appId != null">app_id = #{appId}::uuid,</if>
             <if test="roleId != null">role_id = #{roleId}::uuid,</if>
@@ -66,25 +66,25 @@
 
     <!-- 通过ID删除应用角色关联 -->
     <delete id="deleteById">
-        DELETE FROM dify4j_app_role
+        DELETE FROM app_role
         WHERE id = #{id}::uuid
     </delete>
 
     <!-- 通过应用ID删除所有关联角色 -->
     <delete id="deleteByAppId">
-        DELETE FROM dify4j_app_role
+        DELETE FROM app_role
         WHERE app_id = #{appId}::uuid
     </delete>
 
     <!-- 通过角色ID删除所有关联应用 -->
     <delete id="deleteByRoleId">
-        DELETE FROM dify4j_app_role
+        DELETE FROM app_role
         WHERE role_id = #{roleId}::uuid
     </delete>
 
     <!-- 批量插入应用角色关联 -->
     <insert id="batchInsert">
-        INSERT INTO dify4j_app_role
+        INSERT INTO app_role
         (id, app_id, role_id, created_at)
         VALUES
         <foreach collection="roleIds" item="roleId" separator=",">
@@ -103,8 +103,8 @@
             role_.*
         FROM
             apps,
-            dify4j_role role_,
-            dify4j_app_role app_role
+            role role_,
+            app_role app_role
         WHERE
             apps.ID = app_role.app_id
           AND role_.ID = app_role.role_id
