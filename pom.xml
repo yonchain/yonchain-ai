@@ -23,12 +23,12 @@
         <module>yonchain-ai-api</module>
         <module>yonchain-ai-console</module>
         <module>yonchain-ai-retry</module>
-        <module>yonchain-ai-idm</module>
+        <module>yonchain-ai-sys</module>
         <module>yonchain-ai-core</module>
         <module>yonchain-ai-bootstart</module>
         <module>yonchain-ai-spring-boot-autoconfigure</module>
         <module>yonchain-ai-spring-boot-starters</module>
-        <module>yonchain-ai-spring-boot-starters/yonchain-ai-idm-spring-boot-starter</module>
+        <module>yonchain-ai-spring-boot-starters/yonchain-ai-sys-spring-boot-starter</module>
     </modules>
 
     <properties>

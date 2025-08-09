@@ -1,7 +1,7 @@
 package com.yonchain.ai.security.user;
 
-import com.yonchain.ai.api.idm.User;
-import com.yonchain.ai.api.idm.UserService;
+import com.yonchain.ai.api.sys.User;
+import com.yonchain.ai.api.sys.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

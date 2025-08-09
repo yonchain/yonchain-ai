@@ -17,7 +17,7 @@
 package com.yonchain.ai.api.app;
 
 import com.yonchain.ai.api.common.Page;
-import com.yonchain.ai.api.idm.Role;
+import com.yonchain.ai.api.sys.Role;
 
 import java.util.List;
 import java.util.Map;

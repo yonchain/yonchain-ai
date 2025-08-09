@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yonchain.ai.sys.mapper.UserTenantMapper">
+
+    <!-- 基本结果映射 -->
+    <resultMap id="BaseResultMap" type="com.yonchain.ai.sys.entity.UserTenantEntity">
+        <id column="id" property="id" jdbcType="OTHER" />
+        <result column="tenant_id" property="tenantId" jdbcType="OTHER" />
+        <result column="account_id" property="accountId" jdbcType="OTHER" />
+        <result column="role" property="role" jdbcType="VARCHAR"/>
+        <result column="invited_by" property="invitedBy" jdbcType="OTHER" />
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+        <result column="current" property="current" jdbcType="BOOLEAN"/>
+    </resultMap>
+
+    <!-- 插入单条记录 -->
+    <insert id="insert" parameterType="com.yonchain.ai.sys.entity.UserTenantEntity">
+        INSERT INTO sys_user_tenant (
+            id, tenant_id, account_id, role,
+            invited_by, created_at, updated_at, current
+        ) VALUES (
+            #{id}::uuid,
+            #{tenantId}::uuid,
+            #{accountId}::uuid,
+            #{role,jdbcType=VARCHAR},
+            #{invitedBy},
+            #{createdAt,jdbcType=TIMESTAMP},
+            #{updatedAt,jdbcType=TIMESTAMP},
+            #{current,jdbcType=BOOLEAN}
+        )
+    </insert>
+
+    <!-- 更新记录 -->
+    <update id="update" parameterType="com.yonchain.ai.sys.entity.UserTenantEntity">
+        UPDATE sys_user_tenant
+        <set>
+            <if test="tenantId != null">
+                tenant_id = #{tenantId}::uuid,
+            </if>
+            <if test="accountId != null">
+                account_id = #{accountId}::uuid,
+            </if>
+            <if test="role != null">
+                role = #{role,jdbcType=VARCHAR},
+            </if>
+            <if test="invitedBy != null">
+                invited_by = #{invitedBy},
+            </if>
+            <if test="current != null">
+                current = #{current,jdbcType=BOOLEAN},
+            </if>
+            updated_at = CURRENT_TIMESTAMP
+        </set>
+        WHERE id = #{id}::uuid
+    </update>
+
+    <!-- 根据ID删除 -->
+    <delete id="deleteById">
+        DELETE FROM sys_user_tenant
+        WHERE id = #{id}::uuid
+    </delete>
+
+    <!-- 根据租户ID删除 -->
+    <delete id="deleteByTenantId">
+        DELETE FROM sys_user_tenant
+        WHERE tenant_id = #{tenantId}::uuid
+    </delete>
+
+    <!-- 根据账户ID删除 -->
+    <delete id="deleteByAccountId">
+        DELETE FROM sys_user_tenant
+        WHERE account_id = #{accountId}::uuid
+    </delete>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM sys_user_tenant
+        WHERE id = #{id}::uuid
+    </select>
+
+    <!-- 根据租户ID查询 -->
+    <select id="selectByTenantId" resultMap="BaseResultMap">
+        SELECT * FROM sys_user_tenant
+        WHERE tenant_id = #{tenantId}::uuid
+    </select>
+
+    <!-- 根据账户ID查询 -->
+    <select id="selectByAccountId" resultMap="BaseResultMap">
+        SELECT * FROM sys_user_tenant
+        WHERE account_id = #{accountId}::uuid
+    </select>
+
+    <!-- 更新当前状态 -->
+    <update id="updateCurrentStatus">
+        UPDATE sys_user_tenant
+        SET current = true
+        WHERE tenant_id = #{tenantId}::uuid AND
+             account_id = #{accountId}::uuid
+    </update>
+
+    <!-- 更新当前状态为false -->
+    <update id="updateOtherTenantsCurrentStatus">
+        UPDATE sys_user_tenant SET current = false, updated_at = NOW()
+            WHERE account_id = #{accountId}::uuid AND
+                  tenant_id != #{tenantId}::uuid AND
+                  current = true
+    </update>
+
+</mapper>

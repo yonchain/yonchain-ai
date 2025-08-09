@@ -2,13 +2,13 @@ package com.yonchain.ai.autoconfigure.console;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yonchain.ai.api.idm.TenantService;
-import com.yonchain.ai.api.idm.UserService;
+import com.yonchain.ai.api.sys.TenantService;
+import com.yonchain.ai.api.sys.UserService;
 import com.yonchain.ai.api.security.SecurityService;
-import com.yonchain.ai.autoconfigure.idm.IdmAutoConfiguration;
+import com.yonchain.ai.autoconfigure.sys.SysAutoConfiguration;
 import com.yonchain.ai.autoconfigure.security.SecurityAutoConfiguration;
 import com.yonchain.ai.console.context.ConsoleContextFilter;
-import com.yonchain.ai.idm.service.RedisCacheService;
+import com.yonchain.ai.sys.service.RedisCacheService;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Bean;
  *
  * @author Cgy
  */
-@AutoConfiguration(after = {SecurityAutoConfiguration.class, IdmAutoConfiguration.class})
+@AutoConfiguration(after = {SecurityAutoConfiguration.class, SysAutoConfiguration.class})
 public class ConsoleAutoConfiguration {
 
     @Bean

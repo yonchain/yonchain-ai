@@ -22,11 +22,11 @@
     </resultMap>
 
     <select id="selectById" resultMap="fileResultMap">
-        SELECT * FROM upload_files WHERE id = #{id}::uuid
+        SELECT * FROM sys_file WHERE id = #{id}::uuid
     </select>
 
     <select id="countByTenantIdAndParams" resultType="long">
-        SELECT COUNT(*) FROM upload_files
+        SELECT COUNT(*) FROM sys_file
         WHERE tenant_id = #{tenantId}::uuid
         <if test="params.storageType != null">
             AND storage_type = #{params.storageType}
@@ -37,7 +37,7 @@
     </select>
 
     <select id="selectPageByTenantIdAndParams" resultMap="fileResultMap">
-        SELECT * FROM upload_files
+        SELECT * FROM sys_file
         WHERE tenant_id = #{tenantId}
         <if test="params.storageType != null">
             AND storage_type = #{params.storageType}
@@ -50,7 +50,7 @@
     </select>
 
     <insert id="insert" parameterType="com.yonchain.ai.console.file.entity.FileEntity">
-        INSERT INTO upload_files (
+        INSERT INTO sys_file (
             id, tenant_id, storage_type, key, name, size, extension,
             mime_type, created_by, created_at, used, used_by, used_at,
             hash, created_by_role, source_url
@@ -62,7 +62,7 @@
     </insert>
 
     <update id="updateById" parameterType="com.yonchain.ai.console.file.entity.FileEntity">
-        UPDATE upload_files
+        UPDATE sys_file
         SET
             storage_type = #{storageType},
             key = #{key},
@@ -79,11 +79,11 @@
     </update>
 
     <delete id="deleteById">
-        DELETE FROM upload_files WHERE id = #{id}::uuid
+        DELETE FROM sys_file WHERE id = #{id}::uuid
     </delete>
 
     <delete id="deleteBatchIds">
-        DELETE FROM upload_files WHERE id IN
+        DELETE FROM sys_file WHERE id IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}::uuid
         </foreach>

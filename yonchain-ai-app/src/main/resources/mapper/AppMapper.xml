@@ -67,7 +67,7 @@
     <select id="selectById" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from apps
+        from app
         where id = #{id}::uuid
     </select>
 
@@ -75,7 +75,7 @@
     <select id="selectList" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from apps
+        from app
         where tenant_id = #{tenantId}::uuid
         <if test="params.name != null and params.name != ''">and name like concat('%', #{params.name}, '%')</if>
         <if test="params.mode != null and params.mode != ''">and mode = #{params.mode}</if>
@@ -95,7 +95,7 @@
 
     <!-- 新增应用 -->
     <insert id="insert" >
-        insert into apps
+        insert into app
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
             <if test="tenantId != null">tenant_id,</if>
@@ -154,7 +154,7 @@
 
     <!-- 修改应用 -->
     <update id="update" >
-        update apps
+        update app
         <set>
             <if test="tenantId != null">tenant_id = #{tenantId}::uuid,</if>
             <if test="name != null">name = #{name},</if>
@@ -184,13 +184,13 @@
 
     <!-- 通过ID删除应用 -->
     <delete id="deleteById">
-        delete from apps where id = #{id}::uuid
+        delete from app where id = #{id}::uuid
     </delete>
 
     <!-- 通过ID批量删除应用 -->
     <delete id="deleteByIds">
 
-        delete from apps where id in
+        delete from app where id in
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}::uuid
         </foreach>

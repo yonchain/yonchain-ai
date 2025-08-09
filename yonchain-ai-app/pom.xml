@@ -59,7 +59,7 @@
         </dependency>
         <dependency>
             <groupId>com.yonchain.ai</groupId>
-            <artifactId>yonchain-ai-idm-spring-boot-starter</artifactId>
+            <artifactId>yonchain-ai-sys-spring-boot-starter</artifactId>
         </dependency>
         <dependency>
             <groupId>com.yonchain.ai</groupId>

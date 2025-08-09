@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yonchain.ai.sys.mapper.OAuth2RegisteredClientMapper">
+
+    <resultMap id="BaseResultMap" type="com.yonchain.ai.sys.entity.OAuth2RegisteredClientEntity">
+        <id column="id" property="id"/>
+        <result column="client_id" property="clientId"/>
+        <result column="client_id_issued_at" property="clientIdIssuedAt"/>
+        <result column="client_secret" property="clientSecret"/>
+        <result column="client_secret_expires_at" property="clientSecretExpiresAt"/>
+        <result column="client_name" property="clientName"/>
+        <result column="client_authentication_methods" property="clientAuthenticationMethods"/>
+        <result column="authorization_grant_types" property="authorizationGrantTypes"/>
+        <result column="redirect_uris" property="redirectUris"/>
+        <result column="post_logout_redirect_uris" property="postLogoutRedirectUris"/>
+        <result column="scopes" property="scopes"/>
+        <result column="client_settings" property="clientSettings"/>
+        <result column="token_settings" property="tokenSettings"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, client_id, client_id_issued_at, client_secret, client_secret_expires_at, client_name,
+        client_authentication_methods, authorization_grant_types, redirect_uris, post_logout_redirect_uris,
+        scopes, client_settings, token_settings
+    </sql>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM oauth2_registered_client
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByClientId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM oauth2_registered_client
+        WHERE client_id = #{clientId}
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM oauth2_registered_client
+        <where>
+            <if test="params.clientId != null and params.clientId != ''">
+                AND client_id LIKE CONCAT('%', #{params.clientId}, '%')
+            </if>
+            <if test="params.clientName != null and params.clientName != ''">
+                AND client_name LIKE CONCAT('%', #{params.clientName}, '%')
+            </if>
+        </where>
+        ORDER BY client_id_issued_at
+    </select>
+
+    <insert id="insert">
+        INSERT INTO oauth2_registered_client (
+            id, client_id, client_id_issued_at, client_secret, client_secret_expires_at, client_name,
+            client_authentication_methods, authorization_grant_types, redirect_uris, post_logout_redirect_uris,
+            scopes, client_settings, token_settings
+        ) VALUES (
+            #{id}, #{clientId}, #{clientIdIssuedAt}, #{clientSecret}, #{clientSecretExpiresAt}, #{clientName},
+            #{clientAuthenticationMethods}, #{authorizationGrantTypes}, #{redirectUris}, #{postLogoutRedirectUris},
+            #{scopes}, #{clientSettings}, #{tokenSettings}
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE oauth2_registered_client
+        SET
+            client_id = #{clientId},
+            client_secret = #{clientSecret},
+            client_secret_expires_at = #{clientSecretExpiresAt},
+            client_name = #{clientName},
+            client_authentication_methods = #{clientAuthenticationMethods},
+            authorization_grant_types = #{authorizationGrantTypes},
+            redirect_uris = #{redirectUris},
+            post_logout_redirect_uris = #{postLogoutRedirectUris},
+            scopes = #{scopes},
+            client_settings = #{clientSettings},
+            token_settings = #{tokenSettings}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM oauth2_registered_client
+        WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteBatchIds">
+        DELETE FROM oauth2_registered_client
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

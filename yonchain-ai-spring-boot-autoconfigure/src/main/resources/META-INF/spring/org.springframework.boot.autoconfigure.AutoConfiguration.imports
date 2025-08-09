@@ -18,4 +18,4 @@ com.yonchain.ai.autoconfigure.security.OAuth2AuthorizationServerAutoConfiguratio
 com.yonchain.ai.autoconfigure.security.Oauth2ResourceServerAutoConfiguration
 com.yonchain.ai.autoconfigure.security.OAuth2JwtAutoConfiguration
 com.yonchain.ai.autoconfigure.console.ConsoleAutoConfiguration
-com.yonchain.ai.autoconfigure.idm.IdmAutoConfiguration
+com.yonchain.ai.autoconfigure.sys.SysAutoConfiguration

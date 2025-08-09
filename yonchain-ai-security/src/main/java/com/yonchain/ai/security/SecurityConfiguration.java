@@ -1,8 +1,8 @@
 package com.yonchain.ai.security;
 
 import com.yonchain.ai.api.exception.YonchainException;
-import com.yonchain.ai.api.idm.IdmService;
-import com.yonchain.ai.api.idm.UserService;
+import com.yonchain.ai.api.sys.IdmService;
+import com.yonchain.ai.api.sys.UserService;
 import com.yonchain.ai.api.security.SecurityService;
 import com.yonchain.ai.security.captcha.CaptchaAuthenticationFilter;
 import com.yonchain.ai.security.crypto.YonchainDelegatingPasswordEncoder;

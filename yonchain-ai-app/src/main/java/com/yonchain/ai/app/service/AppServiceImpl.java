@@ -17,7 +17,7 @@ package com.yonchain.ai.app.service;
 
 import com.yonchain.ai.api.app.*;
 import com.yonchain.ai.api.common.Page;
-import com.yonchain.ai.api.idm.*;
+import com.yonchain.ai.api.sys.*;
 import com.yonchain.ai.app.mapper.AppMapper;
 import com.yonchain.ai.app.mapper.AppRoleMapper;
 import com.yonchain.ai.util.Assert;

@@ -29,7 +29,7 @@
         </dependency>
         <dependency>
             <groupId>com.yonchain.ai</groupId>
-            <artifactId>yonchain-ai-idm</artifactId>
+            <artifactId>yonchain-ai-sys</artifactId>
             <optional>true</optional>
         </dependency>
 

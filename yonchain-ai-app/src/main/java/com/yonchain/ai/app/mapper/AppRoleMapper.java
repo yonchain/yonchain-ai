@@ -15,7 +15,7 @@
  */
 package com.yonchain.ai.app.mapper;
 
-import com.yonchain.ai.api.idm.Role;
+import com.yonchain.ai.api.sys.Role;
 import com.yonchain.ai.app.entity.AppRoleEntiy;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

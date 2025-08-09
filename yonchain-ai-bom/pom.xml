@@ -88,7 +88,7 @@
 
             <dependency>
                 <groupId>com.yonchain.ai</groupId>
-                <artifactId>yonchain-ai-idm</artifactId>
+                <artifactId>yonchain-ai-sys</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -100,7 +100,7 @@
 
             <dependency>
                 <groupId>com.yonchain.ai</groupId>
-                <artifactId>yonchain-ai-idm-spring-boot-starter</artifactId>
+                <artifactId>yonchain-ai-sys-spring-boot-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

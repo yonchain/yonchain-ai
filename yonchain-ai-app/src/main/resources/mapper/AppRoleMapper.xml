@@ -98,15 +98,15 @@
     </insert>
 
     <!-- 通过应用ID查询关联角色列表 -->
-    <select id="selectRoleByAppId" resultType="com.yonchain.ai.idm.entity.RoleEntity">
+    <select id="selectRoleByAppId" resultType="com.yonchain.ai.sys.entity.RoleEntity">
         SELECT
             role_.*
         FROM
-            apps,
-            role role_,
+            app,
+            sys_role role_,
             app_role app_role
         WHERE
-            apps.ID = app_role.app_id
+            app.ID = app_role.app_id
           AND role_.ID = app_role.role_id
           AND app_id = #{ appId }:: UUID
     </select>

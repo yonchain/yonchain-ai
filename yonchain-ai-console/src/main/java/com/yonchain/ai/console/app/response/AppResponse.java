@@ -1,6 +1,6 @@
 package com.yonchain.ai.console.app.response;
 
-import com.yonchain.ai.console.idm.response.RoleResponse;
+import com.yonchain.ai.console.sys.response.RoleResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

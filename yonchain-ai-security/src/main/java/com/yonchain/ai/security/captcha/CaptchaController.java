@@ -24,8 +24,8 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class CaptchaController {
 
-    /*private final DefaultKaptcha defaultKaptcha;
-    private final StringRedisTemplate redisTemplate;*/
+    private final DefaultKaptcha defaultKaptcha;
+    private final StringRedisTemplate redisTemplate;
 
     public static final String CAPTCHA_KEY_PREFIX = "captcha:";
 
@@ -34,7 +34,7 @@ public class CaptchaController {
         // 如果没有提供key，则生成一个
         captchaKey = captchaKey != null ? captchaKey : UUID.randomUUID().toString();
 
-      /*  // 生成验证码文本
+        // 生成验证码文本
         String captchaText = defaultKaptcha.createText();
         log.debug("Generated captcha: {} for id: {}", captchaText, captchaKey);
 
@@ -56,7 +56,7 @@ public class CaptchaController {
         // 输出图片
         ServletOutputStream outputStream = response.getOutputStream();
         ImageIO.write(captchaImage, "png", outputStream);
-        outputStream.flush();*/
+        outputStream.flush();
 
     }
 }

@@ -1,6 +1,6 @@
 package com.yonchain.ai.console;
 
-import com.yonchain.ai.api.idm.CurrentUser;
+import com.yonchain.ai.api.sys.CurrentUser;
 import com.yonchain.ai.console.context.ConsoleContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 

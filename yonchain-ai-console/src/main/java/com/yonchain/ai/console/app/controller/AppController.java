@@ -5,8 +5,8 @@ import com.yonchain.ai.api.app.AppService;
 import com.yonchain.ai.api.app.DefaultApplication;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
-import com.yonchain.ai.api.idm.CurrentUser;
-import com.yonchain.ai.api.idm.Role;
+import com.yonchain.ai.api.sys.CurrentUser;
+import com.yonchain.ai.api.sys.Role;
 import com.yonchain.ai.console.BaseController;
 import com.yonchain.ai.console.app.request.AppCreateRequest;
 import com.yonchain.ai.console.app.request.AppQueryRequest;
@@ -174,90 +174,6 @@ public class AppController extends BaseController {
     }
 
 
-    /**
-     * 从请求对象填充应用数据
-     * <p>
-     * 该方法将AppRequest对象中的非空字段值设置到App对象中，
-     * 用于应用创建和更新时的数据填充。
-     * </p>
-     *//*
-
-    private void populateAppFromRequest(App app, AppCreateRequest request) {
-        // 基本信息
-        if (StringUtils.isNotBlank(request.getName())) {
-            // 设置应用名称，用于前端展示和系统标识
-            app.setName(request.getName());
-        }
-        if (StringUtils.isNotBlank(request.getMode())) {
-            // 设置应用模式，决定应用的基本行为和工作流程
-            app.setMode(request.getMode());
-        }
-        if (StringUtils.isNotBlank(request.getIcon())) {
-            // 设置应用图标URL，用于前端展示
-            app.setIcon(request.getIcon());
-        }
-        if (StringUtils.isNotBlank(request.getIconBackground())) {
-            // 设置图标背景色，格式为十六进制颜色代码
-            app.setIconBackground(request.getIconBackground());
-        }
-        if (StringUtils.isNotBlank(request.getDescription())) {
-            // 设置应用描述，用于说明应用的功能和用途
-            app.setDescription(request.getDescription());
-        }
-
-        // 状态设置
-        if (request.getEnableSite() != null) {
-            // 启用/禁用应用站点，true表示用户可以访问应用的前端页面
-            app.setEnableSite(request.getEnableSite());
-        }
-        if (request.getEnableApi() != null) {
-            // 启用/禁用应用API，true表示可以通过API访问应用功能
-            app.setEnableApi(request.getEnableApi());
-        }
-        if (request.getIsDemo() != null) {
-            // 标记是否为演示应用，演示应用可能有功能限制
-            app.setIsDemo(request.getIsDemo());
-        }
-        if (request.getIsPublic() != null) {
-            // 设置应用是否公开，公开应用可以被所有用户访问
-            app.setIsPublic(request.getIsPublic());
-        }
-        if (request.getUseIconAsAnswerIcon() != null) {
-            // 是否使用应用图标作为回答消息的图标
-            app.setUseIconAsAnswerIcon(request.getUseIconAsAnswerIcon());
-        }
-
-        // API限制设置
-        if (request.getApiRpm() != null) {
-            // 设置API每分钟最大请求数，用于限流
-            app.setApiRpm(request.getApiRpm());
-        }
-        if (request.getApiRph() != null) {
-            // 设置API每小时最大请求数，用于限流
-            app.setApiRph(request.getApiRph());
-        }
-        if (request.getMaxActiveRequests() != null) {
-            // 设置最大并发请求数，防止系统过载
-            app.setMaxActiveRequests(request.getMaxActiveRequests());
-        }
-
-        // 工作流和模型配置
-        if (StringUtils.isNotBlank(request.getWorkflowId())) {
-            // 设置关联的工作流ID，决定应用的处理流程
-            app.setWorkflowId(request.getWorkflowId());
-        }
-        if (StringUtils.isNotBlank(request.getAppModelConfigId())) {
-            // 设置应用模型配置ID，决定使用的AI模型和参数
-            app.setAppModelConfigId(request.getAppModelConfigId());
-        }
-
-        // 追踪配置
-        if (StringUtils.isNotBlank(request.getTracing())) {
-            // 设置追踪配置，用于日志记录和调试
-            app.setTracing(request.getTracing());
-        }
-    }
-*/
     private AppResponse buildResponse(Application app) {
         AppResponse response = responseFactory.createAppResponse(app);
         List<Role> roles = appService.getAppRoles(app.getId());

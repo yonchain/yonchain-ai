@@ -1,6 +1,6 @@
 package com.yonchain.ai.console.context;
 
-import com.yonchain.ai.api.idm.CurrentUser;
+import com.yonchain.ai.api.sys.CurrentUser;
 
 public class ConsoleContext {
 

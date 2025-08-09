@@ -15,20 +15,20 @@
     </sql>
 
     <insert id="insert" parameterType="com.yonchain.ai.console.sys.entity.LoginLogEntity" >
-        INSERT INTO yonchain_sys_login_log (id,user_id, ip_address, ip_region, login_time, device_type)
+        INSERT INTO sys_login_log (id,user_id, ip_address, ip_region, login_time, device_type)
         VALUES (#{id}::uuid,#{userId}::uuid, #{ipAddress}, #{ipRegion}, #{loginTime}, #{deviceType})
     </insert>
 
     <select id="selectByUserId" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
-        FROM yonchain_sys_login_log
+        FROM sys_login_log
         WHERE user_id = #{userId}::uuid
         ORDER BY login_time DESC
     </select>
 
     <select id="selectRecentLogs" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
-        FROM yonchain_sys_login_log
+        FROM sys_login_log
         ORDER BY login_time DESC
         LIMIT #{limit}
     </select>

@@ -3,13 +3,11 @@ package com.yonchain.ai.console;
 import com.yonchain.ai.api.app.Application;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.exception.YonchainException;
-import com.yonchain.ai.api.idm.*;
+import com.yonchain.ai.api.sys.*;
 import com.yonchain.ai.console.app.response.AppResponse;
 import com.yonchain.ai.console.file.entity.FileEntity;
 import com.yonchain.ai.console.file.response.FileResponse;
-import com.yonchain.ai.console.idm.response.*;
-import com.yonchain.ai.console.idm.response.MenuResponse;
-import com.yonchain.ai.console.idm.response.MenuTreeResponse;
+import com.yonchain.ai.console.sys.response.*;
 import com.yonchain.ai.web.response.ListResponse;
 import com.yonchain.ai.web.response.PageResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -248,15 +246,15 @@ public class ResponseFactory {
      * 包含租户数据列表但不包含分页信息
      * </p>
      *
-     * @param tenants 租户列表，包含租户数据，不能为null
+     * @param tenant 租户列表，包含租户数据，不能为null
      * @return 标准化后的租户列表响应对象，包含租户数据列表
      * @see Tenant
      * @see TenantResponse
      * @see ListResponse
      */
-    public ListResponse<TenantResponse> createTenantListResponse(List<Tenant> tenants) {
+    public ListResponse<TenantResponse> createTenantListResponse(List<Tenant> tenant) {
         ListResponse<TenantResponse> response = new ListResponse<>("workspaces");
-        response.setData(tenants.stream()
+        response.setData(tenant.stream()
                 .map(this::createTenantResponse)
                 .toList());
         return response;
