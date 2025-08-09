@@ -2,7 +2,7 @@ spring:
   application:
     name: yonchain
   datasource:
-    url: jdbc:postgresql://42.194.189.63:35432/postgres
+    url: jdbc:postgresql://42.194.189.63:35432/yonchain
     username: yonchain
     password: yonchain
     driver-class-name: org.postgresql.Driver
@@ -30,16 +30,16 @@ yonchain:
     enable-password-encoder-prefix: ${DIFY4J_PASSWORD_ENCODER_PREFIX:true}
     oauth2:
       jwt:
-        private-key: ${JWT_PRIVATE_KEY}  # 从环境变量读取
-        public-key: ${JWT_PUBLIC_KEY}    # 从环境变量读取
-        kid: ${JWT_KEY_ID}                # Key ID 也可通过环境变量配置
+      #private-key: ${JWT_PRIVATE_KEY}  # 从环境变量读取
+        # public-key: ${JWT_PUBLIC_KEY}    # 从环境变量读取
+      #  kid: ${JWT_KEY_ID}                # Key ID 也可通过环境变量配置
       authorizationserver:
         captcha-enabled: true
       resourceserver:
         permit-paths:
           - ${DIFY4J_RESOURCESERVER_PERMIT_PATHS:/api/**}  # 从环境变量读取
           - ${DIFY4J_RESOURCESERVER_PERMIT_PATHS2:/token/check_token}  # 从环境变量读取
-    dify-secret-key: ${DIFY_SECRET_KEY}  # 从环境变量读取
+    # dify-secret-key: ${DIFY_SECRET_KEY}  # 从环境变量读取
 
 
 mybatis:
