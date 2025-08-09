@@ -7,7 +7,7 @@ import com.yonchain.ai.security.oauth2.exception.YonchainOAuth2ClientAuthenticat
 import com.yonchain.ai.security.oauth2.exception.YonchainOAuth2ErrorAuthenticationFailureHandler;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,9 +23,9 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
  *
  * @author Cgy
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration(after = SecurityAutoConfiguration.class)
 @EnableConfigurationProperties(OAuth2AuthorizationServerProperties.class)
-public class OAuth2AuthorizationServerConfiguration {
+public class OAuth2AuthorizationServerAutoConfiguration {
 
     /**
      * 配置OAuth2授权服务器安全过滤器链

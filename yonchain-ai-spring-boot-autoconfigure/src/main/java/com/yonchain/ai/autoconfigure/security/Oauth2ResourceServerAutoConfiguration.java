@@ -3,7 +3,7 @@ package com.yonchain.ai.autoconfigure.security;
 import com.yonchain.ai.security.SecurityConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -17,9 +17,9 @@ import org.springframework.security.web.SecurityFilterChain;
  *
  * @author Cgy
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration(after = SecurityAutoConfiguration.class)
 @EnableConfigurationProperties(OAuth2ResourceServerProperties.class)
-public class Oauth2ResourceServerConfiguration {
+public class Oauth2ResourceServerAutoConfiguration {
 
     /**
      * 配置资源服务器安全过滤器链

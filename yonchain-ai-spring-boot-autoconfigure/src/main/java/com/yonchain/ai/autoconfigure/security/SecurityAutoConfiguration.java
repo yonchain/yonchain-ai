@@ -31,7 +31,6 @@ import java.util.Properties;
 @AutoConfiguration(after = OAuth2JwtAutoConfiguration.class)
 @ConditionalOnClass(SecurityService.class)
 @EnableConfigurationProperties(SecurityProperties.class)
-@Import({OAuth2AuthorizationServerConfiguration.class, Oauth2ResourceServerConfiguration.class})
 public class SecurityAutoConfiguration {
 
     @Bean
