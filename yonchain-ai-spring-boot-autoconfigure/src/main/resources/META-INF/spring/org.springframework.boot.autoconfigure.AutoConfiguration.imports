@@ -19,3 +19,4 @@ com.yonchain.ai.autoconfigure.security.Oauth2ResourceServerAutoConfiguration
 com.yonchain.ai.autoconfigure.security.OAuth2JwtAutoConfiguration
 com.yonchain.ai.autoconfigure.console.ConsoleAutoConfiguration
 com.yonchain.ai.autoconfigure.sys.SysAutoConfiguration
+com.yonchain.ai.autoconfigure.dify.DifyAutoConfiguration

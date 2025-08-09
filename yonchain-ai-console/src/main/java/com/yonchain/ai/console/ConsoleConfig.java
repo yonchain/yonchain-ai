@@ -2,6 +2,7 @@ package com.yonchain.ai.console;
 
 
 import com.yonchain.ai.api.security.SecurityEventPublisher;
+import com.yonchain.ai.console.dify.DifyResponseFactory;
 import com.yonchain.ai.console.sys.event.UserLoginLogger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,13 @@ public class ConsoleConfig {
         return new ResponseFactory();
     }
 
+
+/*
+    @Bean
+    public DifyResponseFactory difyResponseFactory() {
+        return new DifyResponseFactory();
+    }
+*/
 
 
     @Bean

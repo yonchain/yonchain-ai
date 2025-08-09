@@ -33,6 +33,10 @@
             <groupId>com.yonchain.ai</groupId>
             <artifactId>yonchain-ai-app</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-dify</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

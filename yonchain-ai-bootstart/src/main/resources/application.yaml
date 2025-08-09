@@ -3,14 +3,15 @@ spring:
     name: yonchain
   datasource:
     url: jdbc:postgresql://42.194.189.63:35432/yonchain
-    username: yonchain
-    password: yonchain
+    username: dify4j
+    password: dify4j
     driver-class-name: org.postgresql.Driver
   data:
     redis:
       host: 42.194.189.63
       password: 123456
       port: 26739
+      database: 8
   jackson:
     property-naming-strategy: SNAKE_CASE
   servlet:

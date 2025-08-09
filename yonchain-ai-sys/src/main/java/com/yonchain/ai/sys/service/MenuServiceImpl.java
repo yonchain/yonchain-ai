@@ -85,6 +85,8 @@ public class MenuServiceImpl implements MenuService {
             throw new YonchainForbiddenException("存在子节点，不允许删除");
         }
 
+        roleMenuMapper.deleteByMenuId(id);
+
         menuMapper.deleteById(id);
     }
 
