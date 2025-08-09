@@ -30,7 +30,7 @@ import java.util.*;
 @RestController
 public class DifyAuthorizationCodeController {
 
-    private final OAuth2AuthorizationService authorizationService;
+ /*   private final OAuth2AuthorizationService authorizationService;
     private final RegisteredClientRepository registeredClientRepository;
     private final SecureRandom secureRandom;
     private final SecurityService securityService;
@@ -44,10 +44,10 @@ public class DifyAuthorizationCodeController {
         this.securityService = securityService;
     }
 
-    /**
+    *//**
      * 自定义授权码生成端点
      * 支持GET和POST请求，符合OAuth2标准
-     */
+     *//*
     @GetMapping("/oauth/authorize")
     public ResponseEntity<?> authorizeGet(
             @RequestParam("client_id") String clientId,
@@ -180,11 +180,11 @@ public class DifyAuthorizationCodeController {
         }
     }
 
-    /**
+    *//**
      * 验证授权码状态
      * @param code 授权码
      * @return 授权码信息
-     */
+     *//*
     @GetMapping("/verify-code")
     public Map<String, Object> verifyAuthorizationCode(@RequestParam("code") String code) {
         Map<String, Object> result = new HashMap<>();
@@ -209,11 +209,11 @@ public class DifyAuthorizationCodeController {
         return result;
     }
 
-    /**
+    *//**
      * 验证访问令牌状态
      * @param token 访问令牌
      * @return 令牌信息
-     */
+     *//*
     @GetMapping("/verify-token")
     public Map<String, Object> verifyAccessToken(@RequestParam("token") String token) {
         Map<String, Object> result = new HashMap<>();
@@ -268,5 +268,5 @@ public class DifyAuthorizationCodeController {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleException(Exception ex) {
         return errorResponse("server_error", ex.getMessage());
-    }
+    }*/
 }

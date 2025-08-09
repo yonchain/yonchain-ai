@@ -19,7 +19,7 @@ public class SecurityProperties {
      * 可选值包括：
      * </p>
      *
-     * @see com.dify4j.security.crypto.PasswordEncoderType
+     * @see com.yonchain.ai.security.crypto.PasswordEncoderType
      */
     private String passwordEncoderType = PasswordEncoderType.DIFY_PBKDF2;
 
@@ -51,7 +51,7 @@ public class SecurityProperties {
      * 设置密码编码器类型
      *
      * @param passwordEncoderType 要使用的密码编码器类型
-     * @see com.dify4j.security.crypto.PasswordEncoderType
+     * @see com.yonchain.ai.security.crypto.PasswordEncoderType
      */
     public void setPasswordEncoderType(String passwordEncoderType) {
         this.passwordEncoderType = passwordEncoderType;

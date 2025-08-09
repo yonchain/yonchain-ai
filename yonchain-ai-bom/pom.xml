@@ -16,6 +16,13 @@
     <dependencyManagement>
         <dependencies>
 
+            <!--Core 模块-->
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!--应用模块-->
             <dependency>
                 <groupId>com.yonchain.ai</groupId>
@@ -97,6 +104,11 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-dify</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

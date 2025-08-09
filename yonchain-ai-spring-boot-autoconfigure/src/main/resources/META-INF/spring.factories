@@ -1,0 +1,8 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.yonchain.ai.autoconfigure.security.SecurityAutoConfiguration,\
+com.yonchain.ai.autoconfigure.security.OAuth2AuthorizationServerConfiguration,\
+com.yonchain.ai.autoconfigure.security.Oauth2ResourceServerConfiguration,\
+com.yonchain.ai.autoconfigure.security.OAuth2JwtAutoConfiguration,\
+com.yonchain.ai.autoconfigure.console.ConsoleAutoConfiguration,\
+com.yonchain.ai.autoconfigure.idm.IdmAutoConfiguration

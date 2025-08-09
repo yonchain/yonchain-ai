@@ -43,8 +43,9 @@ public class SecurityAutoConfiguration {
                                                        JwtEncoder jwtEncoder,
                                                        JwtDecoder jwtDecoder,
                                                        SecurityProperties securityProperties,
-                                                       IdmService idmService,
-                                                       AppService appService) {
+                                                       IdmService idmService
+                                                       //AppService appService
+    ) {
         return SecurityConfiguration.builder()
                 .jdbcTemplate(jdbcTemplate)
                 .redisTemplate(redisTemplate)

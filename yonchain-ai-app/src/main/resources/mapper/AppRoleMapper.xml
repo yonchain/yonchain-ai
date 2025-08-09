@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yonchain.ai.app.mapper.AppRoleMapper">
+
+    <resultMap id="BaseResultMap" type="com.yonchain.ai.app.entity.AppRoleEntiy">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="app_id" property="appId" jdbcType="VARCHAR"/>
+        <result column="role_id" property="roleId" jdbcType="VARCHAR"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, app_id, role_id, created_at
+    </sql>
+
+    <!-- 通过ID查询单个应用角色关联 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM dify4j_app_role
+        WHERE id = #{id}::uuid
+    </select>
+
+    <!-- 查询应用角色关联列表 -->
+    <select id="selectByAppId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM dify4j_app_role
+        WHERE app_id = #{appId}::uuid
+    </select>
+
+    <!-- 查询角色关联的应用列表 -->
+    <select id="selectByRoleId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM dify4j_app_role
+        WHERE role_id = #{roleId}::uuid
+    </select>
+
+    <!-- 新增应用角色关联 -->
+    <insert id="insert" >
+        INSERT INTO dify4j_app_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="appId != null">app_id,</if>
+            <if test="roleId != null">role_id,</if>
+            created_at,
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id}::uuid,</if>
+            <if test="appId != null">#{appId}::uuid,</if>
+            <if test="roleId != null">#{roleId}::uuid,</if>
+            CURRENT_TIMESTAMP,
+        </trim>
+    </insert>
+
+    <!-- 修改应用角色关联 -->
+    <update id="update" >
+        UPDATE dify4j_app_role
+        <set>
+            <if test="appId != null">app_id = #{appId}::uuid,</if>
+            <if test="roleId != null">role_id = #{roleId}::uuid,</if>
+        </set>
+        WHERE id = #{id}::uuid
+    </update>
+
+    <!-- 通过ID删除应用角色关联 -->
+    <delete id="deleteById">
+        DELETE FROM dify4j_app_role
+        WHERE id = #{id}::uuid
+    </delete>
+
+    <!-- 通过应用ID删除所有关联角色 -->
+    <delete id="deleteByAppId">
+        DELETE FROM dify4j_app_role
+        WHERE app_id = #{appId}::uuid
+    </delete>
+
+    <!-- 通过角色ID删除所有关联应用 -->
+    <delete id="deleteByRoleId">
+        DELETE FROM dify4j_app_role
+        WHERE role_id = #{roleId}::uuid
+    </delete>
+
+    <!-- 批量插入应用角色关联 -->
+    <insert id="batchInsert">
+        INSERT INTO dify4j_app_role
+        (id, app_id, role_id, created_at)
+        VALUES
+        <foreach collection="roleIds" item="roleId" separator=",">
+            (
+            gen_random_uuid()::uuid,
+            #{appId}::uuid,
+            #{roleId}::uuid,
+            CURRENT_TIMESTAMP
+            )
+        </foreach>
+    </insert>
+
+    <!-- 通过应用ID查询关联角色列表 -->
+    <select id="selectRoleByAppId" resultType="com.yonchain.ai.idm.entity.RoleEntity">
+        SELECT
+            role_.*
+        FROM
+            apps,
+            dify4j_role role_,
+            dify4j_app_role app_role
+        WHERE
+            apps.ID = app_role.app_id
+          AND role_.ID = app_role.role_id
+          AND app_id = #{ appId }:: UUID
+    </select>
+
+</mapper>

@@ -14,62 +14,56 @@
 
     <dependencies>
 
-        <!-- Spring Framework -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-core</artifactId>
+        </dependency>
+
+        <!--API 模块-->
+        <dependency>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-dify</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.yonchain.ai</groupId>
             <artifactId>yonchain-ai-commons</artifactId>
-            <version>${project.parent.version}</version>
         </dependency>
-
+        <!--dify4j API模块-->
         <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-core</artifactId>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-api</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-starter-mybatis</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
         </dependency>
-
         <dependency>
-            <groupId>com.github.victools</groupId>
-            <artifactId>jsonschema-generator</artifactId>
-            <version>${jsonschema.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-json</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>com.github.victools</groupId>
-            <artifactId>jsonschema-module-jackson</artifactId>
-            <version>${jsonschema.version}</version>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-idm-spring-boot-starter</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>com.github.victools</groupId>
-            <artifactId>jsonschema-module-swagger-2</artifactId>
-            <version>${jsonschema.version}</version>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-security-spring-boot-starter</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-            <optional>true</optional>
-        </dependency>
-
     </dependencies>
 </project>

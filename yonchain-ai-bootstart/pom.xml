@@ -16,10 +16,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.yonchain.ai</groupId>
-            <artifactId>yonchain-ai-spring-boot-autoconfigure</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>com.yonchain.ai</groupId>
             <artifactId>yonchain-ai-security-spring-boot-starter</artifactId>
@@ -28,14 +25,14 @@
             <groupId>com.yonchain.ai</groupId>
             <artifactId>yonchain-ai-idm-spring-boot-starter</artifactId>
         </dependency>
-        <dependency>
+       <!-- <dependency>
             <groupId>com.yonchain.ai</groupId>
             <artifactId>yonchain-ai-console</artifactId>
-        </dependency>
-        <dependency>
+        </dependency>-->
+       <!-- <dependency>
             <groupId>com.yonchain.ai</groupId>
             <artifactId>yonchain-ai-app</artifactId>
-        </dependency>
+        </dependency>-->
     </dependencies>
 
     <build>
@@ -46,7 +43,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.dify4j.Dify4jApplication</mainClass>
+                    <mainClass>com.yonchain.ai.Dify4jApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>

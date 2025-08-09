@@ -3,8 +3,6 @@ package com.yonchain.ai.chat;
 import com.yonchain.ai.app.StreamingApp;
 import reactor.core.publisher.Flux;
 
-import java.util.Arrays;
-
 @FunctionalInterface
 public interface StreamingChatApp extends StreamingApp<InputMessage, ChatResponse> {
 
