@@ -51,10 +51,10 @@ public class AppResponse {
     private String iconBackground;
 
     /**
-     * 应用模型配置ID
+     * 应用提供商
      */
-    @Schema(description = "应用模型配置ID")
-    private String appModelConfigId;
+    @Schema(description = "应用提供商")
+    private String provider;
 
     /**
      * 应用状态
@@ -63,40 +63,17 @@ public class AppResponse {
     private String status;
 
     /**
-     * 是否启用站点
+     * 应用秘钥
+     * 必填字段，不能为空
      */
-    @Schema(description = "是否启用站点")
-    private Boolean enableSite;
+    @Schema(description = "应用秘钥", required = true)
+    private String apiKey;
 
     /**
-     * 是否启用API
+     * 基础URL
      */
-    @Schema(description = "是否启用API")
-    private Boolean enableApi;
-
-    /**
-     * API每分钟请求限制
-     */
-    @Schema(description = "API每分钟请求限制")
-    private Integer apiRpm;
-
-    /**
-     * API每小时请求限制
-     */
-    @Schema(description = "API每小时请求限制")
-    private Integer apiRph;
-
-    /**
-     * 是否是演示应用
-     */
-    @Schema(description = "是否是演示应用")
-    private Boolean isDemo;
-
-    /**
-     * 是否是公开应用
-     */
-    @Schema(description = "是否是公开应用")
-    private Boolean isPublic;
+    @Schema(description = "基础URL", required = true)
+    private String baseUrl;
 
     /**
      * 创建时间
@@ -111,34 +88,10 @@ public class AppResponse {
     private LocalDateTime updatedAt;
 
     /**
-     * 是否是通用应用
-     */
-    @Schema(description = "是否是通用应用")
-    private Boolean isUniversal;
-
-    /**
-     * 工作流ID
-     */
-    @Schema(description = "工作流ID")
-    private String workflowId;
-
-    /**
      * 应用描述
      */
     @Schema(description = "应用描述")
     private String description;
-
-    /**
-     * 追踪配置
-     */
-    @Schema(description = "追踪配置")
-    private String tracing;
-
-    /**
-     * 最大活跃请求数
-     */
-    @Schema(description = "最大活跃请求数")
-    private Integer maxActiveRequests;
 
     /**
      * 图标类型
@@ -157,12 +110,6 @@ public class AppResponse {
      */
     @Schema(description = "更新人ID")
     private String updatedBy;
-
-    /**
-     * 是否使用图标作为回答图标
-     */
-    @Schema(description = "是否使用图标作为回答图标")
-    private Boolean useIconAsAnswerIcon;
 
     /**
      * 角色列表

@@ -22,6 +22,19 @@ public class AppUpdateRequest {
     private String name;
 
     /**
+     * 应用秘钥
+     * 必填字段，不能为空
+     */
+    @Schema(description = "应用秘钥", required = true)
+    private String apiKey;
+
+    /**
+     * 基础URL
+     */
+    @Schema(description = "基础URL", required = true)
+    private String baseUrl;
+
+    /**
      * 应用图标URL
      * 可选字段
      */

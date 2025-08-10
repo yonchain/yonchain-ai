@@ -282,6 +282,12 @@ public class ResponseFactory {
         response.setName(app.getName());
         // 设置应用模式
         response.setMode(app.getMode());
+        //设置应用供应商
+        response.setProvider(app.getProvider());
+        //设置api key
+        response.setApiKey(app.getApiKey());
+        //设置基础URL
+        response.setBaseUrl(app.getBaseUrl());
         // 设置应用图标URL
         response.setIcon(app.getIcon());
         // 设置图标背景色
@@ -290,30 +296,6 @@ public class ResponseFactory {
         response.setDescription(app.getDescription());
         // 设置应用状态
         response.setStatus(app.getStatus());
-        // 设置站点启用状态
-        response.setEnableSite(app.getEnableSite());
-        // 设置API启用状态
-        response.setEnableApi(app.getEnableApi());
-        // 设置是否为演示应用
-        response.setIsDemo(app.getIsDemo());
-        // 设置是否公开
-        response.setIsPublic(app.getIsPublic());
-        // 设置是否通用应用
-        response.setIsUniversal(app.getIsUniversal());
-        // 设置是否使用应用图标作为回答图标
-        response.setUseIconAsAnswerIcon(app.getUseIconAsAnswerIcon());
-        // 设置API每分钟请求限制
-        response.setApiRpm(app.getApiRpm());
-        // 设置API每小时请求限制
-        response.setApiRph(app.getApiRph());
-        // 设置最大并发请求数
-        response.setMaxActiveRequests(app.getMaxActiveRequests());
-        // 设置工作流ID
-        response.setWorkflowId(app.getWorkflowId());
-        // 设置应用模型配置ID
-        response.setAppModelConfigId(app.getAppModelConfigId());
-        // 设置追踪配置
-        response.setTracing(app.getTracing());
         // 设置创建时间
         response.setCreatedAt(app.getCreatedAt());
         // 设置更新时间

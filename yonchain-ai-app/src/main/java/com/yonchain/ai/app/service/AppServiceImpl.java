@@ -69,12 +69,6 @@ public class AppServiceImpl implements AppService {
     @Transactional(rollbackFor = Exception.class)
     public void createApp(Application app) {
 
-        //默认默认值
-        app.setApiRph(0);
-        app.setApiRpm(0);
-        app.setEnableSite(true);
-        app.setEnableApi(true);
-
         //如果为空则设置默认值
         if (StringUtils.isBlank(app.getIconType())) {
             app.setIconType("emoji");

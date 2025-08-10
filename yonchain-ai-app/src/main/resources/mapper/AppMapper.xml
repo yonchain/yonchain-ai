@@ -11,56 +11,36 @@
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <!-- 应用模式：completion/chat -->
         <result column="mode" property="mode" jdbcType="VARCHAR"/>
+        <!-- 应用提供商 -->
+        <result column="provider" property="provider" jdbcType="VARCHAR"/>
+        <!-- API密钥 -->
+        <result column="api_key" property="apiKey" jdbcType="VARCHAR"/>
+        <!-- 应用基础URL -->
+        <result column="base_url" property="baseUrl" jdbcType="VARCHAR"/>
         <!-- 应用图标URL -->
         <result column="icon" property="icon" jdbcType="VARCHAR"/>
         <!-- 图标背景色 -->
         <result column="icon_background" property="iconBackground" jdbcType="VARCHAR"/>
-        <!-- 应用模型配置ID -->
-        <result column="app_model_config_id" property="appModelConfigId" jdbcType="OTHER"/>
         <!-- 应用状态：running/stopped -->
         <result column="status" property="status" jdbcType="VARCHAR"/>
-        <!-- 是否启用网站访问 -->
-        <result column="enable_site" property="enableSite" jdbcType="BOOLEAN"/>
-        <!-- 是否启用API访问 -->
-        <result column="enable_api" property="enableApi" jdbcType="BOOLEAN"/>
-        <!-- API每分钟请求限制 -->
-        <result column="api_rpm" property="apiRpm" jdbcType="INTEGER"/>
-        <!-- API每小时请求限制 -->
-        <result column="api_rph" property="apiRph" jdbcType="INTEGER"/>
-        <!-- 是否为演示应用 -->
-        <result column="is_demo" property="isDemo" jdbcType="BOOLEAN"/>
-        <!-- 是否公开可访问 -->
-        <result column="is_public" property="isPublic" jdbcType="BOOLEAN"/>
         <!-- 创建时间 -->
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
         <!-- 更新时间 -->
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
-        <!-- 是否为通用应用 -->
-        <result column="is_universal" property="isUniversal" jdbcType="BOOLEAN"/>
-        <!-- 工作流ID -->
-        <result column="workflow_id" property="workflowId" jdbcType="OTHER"/>
         <!-- 应用描述 -->
         <result column="description" property="description" jdbcType="VARCHAR"/>
-        <!-- 追踪配置 -->
-        <result column="tracing" property="tracing" jdbcType="VARCHAR"/>
-        <!-- 最大并发请求数 -->
-        <result column="max_active_requests" property="maxActiveRequests" jdbcType="INTEGER"/>
         <!-- 图标类型：emoji/custom -->
         <result column="icon_type" property="iconType" jdbcType="VARCHAR"/>
         <!-- 创建者ID -->
         <result column="created_by" property="createdBy" jdbcType="OTHER"/>
         <!-- 更新者ID -->
         <result column="updated_by" property="updatedBy" jdbcType="OTHER"/>
-        <!-- 是否使用应用图标作为回答图标 -->
-        <result column="use_icon_as_answer_icon" property="useIconAsAnswerIcon" jdbcType="BOOLEAN"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, tenant_id, name, mode, icon, icon_background, app_model_config_id, status, enable_site,
-        enable_api, api_rpm, api_rph, is_demo, is_public, created_at, updated_at, is_universal,
-        workflow_id, description, tracing, max_active_requests, icon_type, created_by, updated_by,
-        use_icon_as_answer_icon
+        id, tenant_id, name, mode, icon, icon_background, provider, status,
+        description, icon_type, created_by, updated_by,base_url,api_key
     </sql>
 
     <!-- 通过ID查询单个应用 -->
@@ -101,54 +81,36 @@
             <if test="tenantId != null">tenant_id,</if>
             <if test="name != null">name,</if>
             <if test="mode != null">mode,</if>
+            <if test="baseUrl != null">base_url,</if>
+            <if test="apiKey != null">api_key,</if>
             <if test="icon != null">icon,</if>
             <if test="iconBackground != null">icon_background,</if>
-            <if test="appModelConfigId != null">app_model_config_id,</if>
+            <if test="provider != null">provider,</if>
             <if test="status != null">status,</if>
-            <if test="enableSite != null">enable_site,</if>
-            <if test="enableApi != null">enable_api,</if>
-            <if test="apiRpm != null">api_rpm,</if>
-            <if test="apiRph != null">api_rph,</if>
-            <if test="isDemo != null">is_demo,</if>
-            <if test="isPublic != null">is_public,</if>
             <if test="createdAt != null">created_at,</if>
             <if test="updatedAt != null">updated_at,</if>
-            <if test="isUniversal != null">is_universal,</if>
-            <if test="workflowId != null">workflow_id,</if>
             <if test="description != null">description,</if>
-            <if test="tracing != null">tracing,</if>
-            <if test="maxActiveRequests != null">max_active_requests,</if>
             <if test="iconType != null">icon_type,</if>
             <if test="createdBy != null">created_by,</if>
             <if test="updatedBy != null">updated_by,</if>
-            <if test="useIconAsAnswerIcon != null">use_icon_as_answer_icon,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id}::uuid,</if>
             <if test="tenantId != null">#{tenantId}::uuid,</if>
             <if test="name != null">#{name},</if>
             <if test="mode != null">#{mode},</if>
+            <if test="baseUrl != null">#{baseUrl},</if>
+            <if test="apiKey != null">#{apiKey},</if>
             <if test="icon != null">#{icon},</if>
             <if test="iconBackground != null">#{iconBackground},</if>
-            <if test="appModelConfigId != null">#{appModelConfigId}::uuid,</if>
+            <if test="provider != null">#{provider},</if>
             <if test="status != null">#{status},</if>
-            <if test="enableSite != null">#{enableSite},</if>
-            <if test="enableApi != null">#{enableApi},</if>
-            <if test="apiRpm != null">#{apiRpm},</if>
-            <if test="apiRph != null">#{apiRph},</if>
-            <if test="isDemo != null">#{isDemo},</if>
-            <if test="isPublic != null">#{isPublic},</if>
             <if test="createdAt != null">#{createdAt},</if>
             <if test="updatedAt != null">#{updatedAt},</if>
-            <if test="isUniversal != null">#{isUniversal},</if>
-            <if test="workflowId != null">#{workflowId}::uuid,</if>
             <if test="description != null">#{description},</if>
-            <if test="tracing != null">#{tracing},</if>
-            <if test="maxActiveRequests != null">#{maxActiveRequests},</if>
             <if test="iconType != null">#{iconType},</if>
             <if test="createdBy != null">#{createdBy}::uuid,</if>
             <if test="updatedBy != null">#{updatedBy}::uuid,</if>
-            <if test="useIconAsAnswerIcon != null">#{useIconAsAnswerIcon},</if>
         </trim>
     </insert>
 
@@ -160,24 +122,15 @@
             <if test="name != null">name = #{name},</if>
             <if test="mode != null">mode = #{mode},</if>
             <if test="icon != null">icon = #{icon},</if>
+            <if test="baseUrl != null">base_url = #{baseUrl},</if>
+            <if test="apiKey != null">api_key = #{apiKey},</if>
             <if test="iconBackground != null">icon_background = #{iconBackground},</if>
-            <if test="appModelConfigId != null">app_model_config_id = #{appModelConfigId}::uuid,</if>
+            <if test="provider != null">provider = #{provider},</if>
             <if test="status != null">status = #{status},</if>
-            <if test="enableSite != null">enable_site = #{enableSite},</if>
-            <if test="enableApi != null">enable_api = #{enableApi},</if>
-            <if test="apiRpm != null">api_rpm = #{apiRpm},</if>
-            <if test="apiRph != null">api_rph = #{apiRph},</if>
-            <if test="isDemo != null">is_demo = #{isDemo},</if>
-            <if test="isPublic != null">is_public = #{isPublic},</if>
             <if test="updatedAt != null">updated_at = #{updatedAt},</if>
-            <if test="isUniversal != null">is_universal = #{isUniversal},</if>
-            <if test="workflowId != null">workflow_id = #{workflowId}::uuid,</if>
             <if test="description != null">description = #{description},</if>
-            <if test="tracing != null">tracing = #{tracing},</if>
-            <if test="maxActiveRequests != null">max_active_requests = #{maxActiveRequests},</if>
             <if test="iconType != null">icon_type = #{iconType},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy}::uuid,</if>
-            <if test="useIconAsAnswerIcon != null">use_icon_as_answer_icon = #{useIconAsAnswerIcon},</if>
         </set>
         where id = #{id}::uuid
     </update>

@@ -52,6 +52,21 @@ public class AppEntity implements Application {
     private String mode;
 
     /**
+     * 应用提供商
+     */
+    private String provider;
+
+    /**
+     * 应用秘钥
+     */
+    private String apiKey;
+
+    /**
+     * 基础URL
+     */
+    private String baseUrl;
+
+    /**
      * 图标
      */
     private String icon;
@@ -62,44 +77,9 @@ public class AppEntity implements Application {
     private String iconBackground;
 
     /**
-     * 应用模型配置ID
-     */
-    private String appModelConfigId;
-
-    /**
      * 状态
      */
     private String status;
-
-    /**
-     * 是否启用站点
-     */
-    private Boolean enableSite;
-
-    /**
-     * 是否启用API
-     */
-    private Boolean enableApi;
-
-    /**
-     * API每分钟请求限制
-     */
-    private Integer apiRpm;
-
-    /**
-     * API每小时请求限制
-     */
-    private Integer apiRph;
-
-    /**
-     * 是否为演示应用
-     */
-    private Boolean isDemo;
-
-    /**
-     * 是否公开
-     */
-    private Boolean isPublic;
 
     /**
      * 创建时间
@@ -112,29 +92,9 @@ public class AppEntity implements Application {
     private LocalDateTime updatedAt;
 
     /**
-     * 是否为通用应用
-     */
-    private Boolean isUniversal;
-
-    /**
-     * 工作流ID
-     */
-    private String workflowId;
-
-    /**
      * 应用描述
      */
     private String description;
-
-    /**
-     * 追踪信息
-     */
-    private String tracing;
-
-    /**
-     * 最大活跃请求数
-     */
-    private Integer maxActiveRequests;
 
     /**
      * 图标类型
@@ -151,8 +111,4 @@ public class AppEntity implements Application {
      */
     private String updatedBy;
 
-    /**
-     * 是否使用图标作为回答图标
-     */
-    private Boolean useIconAsAnswerIcon;
 }

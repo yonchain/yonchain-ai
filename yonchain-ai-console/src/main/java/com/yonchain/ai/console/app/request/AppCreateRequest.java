@@ -31,6 +31,29 @@ public class AppCreateRequest {
     private String mode;
 
     /**
+     * 应用供应商
+     * 必填字段，不能为空
+     */
+    @NotBlank(message = "应用供应商不能为空")
+    @Schema(description = "应用供应商", required = true)
+    private String provider;
+
+    /**
+     * api秘钥
+     * 必填字段，不能为空
+     */
+    @NotBlank(message = "api秘钥不能为空")
+    @Schema(description = "api秘钥", required = true)
+    private String apiKey;
+
+    /**
+     * 基础URL
+     */
+    @NotBlank(message = "基础URL不能为空")
+    @Schema(description = "基础URL", required = true)
+    private String baseUrl;
+
+    /**
      * 应用图标URL
      * 可选字段
      */
@@ -64,4 +87,5 @@ public class AppCreateRequest {
      */
     @Schema(description = "角色ID列表")
     private List<String> roleIds;
+
 }

@@ -107,15 +107,15 @@ public class AppController extends BaseController {
         //从请求获取数据填充
         app.setName(request.getName());
         app.setMode(request.getMode());
+        app.setProvider(request.getProvider());
+        app.setApiKey(request.getApiKey());
+        app.setBaseUrl(request.getBaseUrl());
         app.setIcon(request.getIcon());
         app.setIconBackground(request.getIconBackground());
         app.setDescription(request.getDescription());
 
         app.setCreatedBy(this.getCurrentUserId());
         app.setUpdatedBy(this.getCurrentUserId());
-
-        //从请求获取数据填充
-        //populateAppFromRequest(app, request);
 
         //创建应用
         appService.createApp(app, request.getRoleIds());
@@ -147,12 +147,10 @@ public class AppController extends BaseController {
         app.setIconType(request.getIconType());
         app.setIconBackground(request.getIconBackground());
         app.setDescription(request.getDescription());
-        app.setUseIconAsAnswerIcon(request.getUseIconAsAnswerIcon());
+        app.setApiKey(request.getApiKey());
+        app.setBaseUrl(request.getBaseUrl());
 
         app.setUpdatedBy(this.getCurrentUserId());
-
-        //从请求获取数据填充
-        // populateAppFromRequest(app, request);
 
         //更新用户
         appService.updateApp(app, request.getRoleIds());
