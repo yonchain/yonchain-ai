@@ -271,17 +271,104 @@ public class DifyAppApi {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record AppParametersResponse(
+            @JsonProperty("opening_statement") String openingStatement,
+            @JsonProperty("suggested_questions") List<String> suggestedQuestions,
+            @JsonProperty("suggested_questions_after_answer") SuggestedQuestionsAfterAnswer suggestedQuestionsAfterAnswer,
+            @JsonProperty("speech_to_text") SpeechToText speechToText,
+            @JsonProperty("text_to_speech") TextToSpeech textToSpeech,
+            @JsonProperty("retriever_resource") RetrieverResource retrieverResource,
+            @JsonProperty("annotation_reply") AnnotationReply annotationReply,
+            @JsonProperty("more_like_this") MoreLikeThis moreLikeThis,
             @JsonProperty("user_input_form") List<Map<String, Object>> userInputForm,
+            @JsonProperty("sensitive_word_avoidance") SensitiveWordAvoidance sensitiveWordAvoidance,
             @JsonProperty("file_upload") FileUpload fileUpload,
             @JsonProperty("system_parameters") SystemParameters systemParameters
     ) {
+        /**
+         * Suggested questions after answer configuration.
+         */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record SuggestedQuestionsAfterAnswer(
+                @JsonProperty("enabled") Boolean enabled
+        ) {
+        }
+
+        /**
+         * Speech to text configuration.
+         */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record SpeechToText(
+                @JsonProperty("enabled") Boolean enabled
+        ) {
+        }
+
+        /**
+         * Text to speech configuration.
+         */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record TextToSpeech(
+                @JsonProperty("enabled") Boolean enabled,
+                @JsonProperty("language") String language,
+                @JsonProperty("voice") String voice
+        ) {
+        }
+
+        /**
+         * Retriever resource configuration.
+         */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record RetrieverResource(
+                @JsonProperty("enabled") Boolean enabled
+        ) {
+        }
+
+        /**
+         * Annotation reply configuration.
+         */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record AnnotationReply(
+                @JsonProperty("enabled") Boolean enabled
+        ) {
+        }
+
+        /**
+         * More like this configuration.
+         */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record MoreLikeThis(
+                @JsonProperty("enabled") Boolean enabled
+        ) {
+        }
+
+        /**
+         * Sensitive word avoidance configuration.
+         */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record SensitiveWordAvoidance(
+                @JsonProperty("enabled") Boolean enabled
+        ) {
+        }
+
         /**
          * File upload configuration.
          */
         @JsonInclude(JsonInclude.Include.NON_NULL)
         @JsonIgnoreProperties(ignoreUnknown = true)
         public record FileUpload(
-                @JsonProperty("image") ImageUpload image
+                @JsonProperty("image") ImageUpload image,
+                @JsonProperty("enabled") Boolean enabled,
+                @JsonProperty("allowed_file_types") List<String> allowedFileTypes,
+                @JsonProperty("allowed_file_extensions") List<String> allowedFileExtensions,
+                @JsonProperty("allowed_file_upload_methods") List<String> allowedFileUploadMethods,
+                @JsonProperty("number_limits") Integer numberLimits,
+                @JsonProperty("fileUploadConfig") FileUploadConfig fileUploadConfig
         ) {
         }
 
@@ -299,6 +386,21 @@ public class DifyAppApi {
         }
 
         /**
+         * File upload config.
+         */
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        public record FileUploadConfig(
+                @JsonProperty("file_size_limit") Integer fileSizeLimit,
+                @JsonProperty("batch_count_limit") Integer batchCountLimit,
+                @JsonProperty("image_file_size_limit") Integer imageFileSizeLimit,
+                @JsonProperty("video_file_size_limit") Integer videoFileSizeLimit,
+                @JsonProperty("audio_file_size_limit") Integer audioFileSizeLimit,
+                @JsonProperty("workflow_file_upload_limit") Integer workflowFileUploadLimit
+        ) {
+        }
+
+        /**
          * System parameters.
          */
         @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -307,7 +409,8 @@ public class DifyAppApi {
                 @JsonProperty("file_size_limit") Integer fileSizeLimit,
                 @JsonProperty("image_file_size_limit") Integer imageFileSizeLimit,
                 @JsonProperty("audio_file_size_limit") Integer audioFileSizeLimit,
-                @JsonProperty("video_file_size_limit") Integer videoFileSizeLimit
+                @JsonProperty("video_file_size_limit") Integer videoFileSizeLimit,
+                @JsonProperty("workflow_file_upload_limit") Integer workflowFileUploadLimit
         ) {
         }
     }

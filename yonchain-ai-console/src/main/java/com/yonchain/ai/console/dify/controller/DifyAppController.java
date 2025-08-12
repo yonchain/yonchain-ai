@@ -7,15 +7,13 @@ import com.yonchain.ai.console.dify.DifyResponseFactory;
 import com.yonchain.ai.console.dify.response.DifyAppResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 /**
  * dify 应用控制器
@@ -34,21 +32,37 @@ public class DifyAppController extends BaseController {
     private DifyResponseFactory difyResponseFactory;
 
 
-
+    /**
+     * 获取Dify应用
+     *
+     * @param apiKey  API密钥
+     * @param baseUrl 基础URL
+     * @return Dify应用响应
+     */
     @Operation(summary = "获取Dify应用", description = "根据API密钥和基础URL获取Dify应用信息")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "成功获取应用信息", 
-                     content = @Content(mediaType = "application/json", 
-                     schema = @Schema(implementation = DifyAppResponse.class))),
-        @ApiResponse(responseCode = "400", description = "无效的请求参数"),
-        @ApiResponse(responseCode = "404", description = "应用未找到")
-    })
     @RequestMapping
     public DifyAppResponse getAppByApiKey(
-            @Parameter(description = "Dify API密钥", required = true) @RequestParam("apiKey") String apiKey,
-            @Parameter(description = "Dify基础URL", required = true) @RequestParam("baseUrl") String baseUrl) {
+            @Parameter(description = "API密钥", required = true) @RequestParam("apiKey") String apiKey,
+            @Parameter(description = "基础URL", required = true) @RequestParam("baseUrl") String baseUrl) {
         DifyApp difyApp = difyAppService.getAppByApiKey(apiKey, baseUrl);
         return difyResponseFactory.createAppResponse(difyApp);
+    }
+
+
+    /**
+     * 获取应用参数
+     *
+     * @param apiKey  API密钥
+     * @param baseUrl 基础URL
+     * @return 应用参数
+     */
+    @Operation(summary = "获取应用参数", description = "根据API密钥和基础URL获取Dify应用参数")
+    @RequestMapping("/parameters")
+    public Map<String, Object> getAppParameters(
+            @Parameter(description = "Dify API密钥", required = true) @RequestParam("apiKey") String apiKey,
+            @Parameter(description = "Dify基础URL", required = true) @RequestParam("baseUrl") String baseUrl) {
+        Map<String, Object> result = difyAppService.getAppParameters(apiKey, baseUrl);
+        return result;
     }
 
 

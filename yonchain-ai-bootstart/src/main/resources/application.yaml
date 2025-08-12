@@ -35,7 +35,7 @@ yonchain:
         # public-key: ${JWT_PUBLIC_KEY}    # 从环境变量读取
       #  kid: ${JWT_KEY_ID}                # Key ID 也可通过环境变量配置
       authorizationserver:
-        captcha-enabled: true
+        captcha-enabled: false
       resourceserver:
         permit-paths:
           - ${DIFY4J_RESOURCESERVER_PERMIT_PATHS:/api/**}  # 从环境变量读取
