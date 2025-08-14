@@ -9,7 +9,7 @@
         <result column="weight" property="weight"/>
         <result column="name" property="name"/>
         <result column="path" property="path"/>
-        <result column="sort_order" property="sortOrder"/>
+        <result column="sort" property="sort"/>
         <result column="menu_type" property="menuType"/>
         <result column="is_link" property="isLink"/>
         <result column="is_iframe" property="isIframe"/>
@@ -26,7 +26,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, parent_id, weight, name, path, is_link, is_iframe, is_keep_alive, icon, en_name, is_affix, title, is_hide, sort_order, menu_type, permission, created_at, updated_at
+        id, parent_id, weight, name, path, is_link, is_iframe, is_keep_alive, icon, en_name, is_affix, title, is_hide, sort, menu_type, permission, created_at, updated_at
     </sql>
 
     <!-- 插入菜单 -->
@@ -34,11 +34,11 @@
         INSERT INTO sys_menu (
             id, parent_id, weight, name, path,
             is_link, is_iframe, is_keep_alive, icon, en_name, is_affix, title, is_hide,
-            sort_order, menu_type, permission, created_at, updated_at
+            sort, menu_type, permission, created_at, updated_at
         ) VALUES (
             #{id}::uuid, #{parentId}::uuid, #{weight}, #{name}, #{path},
             #{isLink}, #{isIframe}, #{isKeepAlive}, #{icon}, #{enName}, #{isAffix}, #{title}, #{isHide},
-            #{sortOrder}, #{menuType}, #{permission}, #{createdAt}, #{updatedAt}
+            #{sort}, #{menuType}, #{permission}, #{createdAt}, #{updatedAt}
         )
     </insert>
 
@@ -58,7 +58,7 @@
             <if test="isAffix != null">is_affix = #{isAffix},</if>
             <if test="title != null">title = #{title},</if>
             <if test="isHide != null">is_hide = #{isHide},</if>
-            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="sort != null">sort = #{sort},</if>
             <if test="menuType != null">menu_type = #{menuType},</if>
             <if test="permission != null">permission = #{permission},</if>
             <if test="updatedAt != null">updated_at = #{updatedAt},</if>
@@ -90,7 +90,7 @@
                 AND parent_id = #{params.parentId}::uuid
             </if>
         </where>
-        ORDER BY sort_order ASC, weight ASC
+        ORDER BY sort ASC, weight ASC
     </select>
 
     <!-- 查询用户关联的菜单列表 -->

@@ -17,7 +17,7 @@ public class ApiResponse<T> {
     /**
      * 消息
      */
-    private String msg;
+    private String message;
 
     /**
      * 数据
@@ -45,7 +45,7 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> success(T data) {
         ApiResponse<T> response = new ApiResponse<>();
         response.setCode("200");
-        response.setMsg("操作成功");
+        response.setMessage("操作成功");
         response.setData(data);
         return response;
     }
@@ -61,7 +61,7 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> success(String message, T data) {
         ApiResponse<T> response = new ApiResponse<>();
         response.setCode("200");
-        response.setMsg(message);
+        response.setMessage(message);
         response.setData(data);
         return response;
     }
@@ -76,7 +76,7 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> fail(String code, String message) {
         ApiResponse<T> response = new ApiResponse<>();
         response.setCode(code);
-        response.setMsg(message);
+        response.setMessage(message);
         return response;
     }
 
@@ -120,7 +120,7 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> fail(String code, String msg, T data) {
         ApiResponse<T> response = new ApiResponse<>();
         response.setCode(code);
-        response.setMsg(msg);
+        response.setMessage(msg);
         response.setData(data);
         return response;
     }
@@ -134,11 +134,11 @@ public class ApiResponse<T> {
     }
 
     public String getMsg() {
-        return msg;
+        return message;
     }
 
-    public void setMsg(String msg) {
-        this.msg = msg;
+    public void setMessage(String msg) {
+        this.message = message;
     }
 
     public T getData() {

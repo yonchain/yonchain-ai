@@ -30,13 +30,17 @@ public class AppCreateRequest {
     @Schema(description = "应用模式", required = true)
     private String mode;
 
-    /**
+/*
+    */
+/**
      * 应用供应商
      * 必填字段，不能为空
-     */
+     *//*
+
     @NotBlank(message = "应用供应商不能为空")
     @Schema(description = "应用供应商", required = true)
     private String provider;
+*/
 
     /**
      * api秘钥

@@ -25,12 +25,6 @@ public class MenuResponse {
     private String parentId;
 
     /**
-     * 权重
-     */
-    @Schema(description = "权重")
-    private Integer weight;
-
-    /**
      * 菜单名称
      */
     @Schema(description = "菜单名称")
@@ -46,7 +40,7 @@ public class MenuResponse {
      * 排序顺序
      */
     @Schema(description = "排序顺序")
-    private Integer sortOrder;
+    private Integer sort;
 
     /**
      * 菜单类型
@@ -79,18 +73,6 @@ public class MenuResponse {
     private Boolean isLink;
 
     /**
-     * 是否为iframe
-     */
-    @Schema(description = "是否为iframe")
-    private Boolean isIframe;
-
-    /**
-     * 是否保持活跃状态
-     */
-    @Schema(description = "是否保持活跃状态")
-    private Boolean isKeepAlive;
-
-    /**
      * 图标
      */
     @Schema(description = "图标")
@@ -101,18 +83,6 @@ public class MenuResponse {
      */
     @Schema(description = "英文名称")
     private String enName;
-
-    /**
-     * 是否固定
-     */
-    @Schema(description = "是否固定")
-    private Boolean isAffix;
-
-    /**
-     * 标题
-     */
-    @Schema(description = "标题")
-    private String title;
 
     /**
      * 是否隐藏

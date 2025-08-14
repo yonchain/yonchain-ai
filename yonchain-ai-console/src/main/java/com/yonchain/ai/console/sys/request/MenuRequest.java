@@ -43,7 +43,7 @@ public class MenuRequest {
      * 排序顺序
      */
     @Schema(description = "排序顺序")
-    private Integer sortOrder;
+    private Integer sort;
 
     /**
      * 菜单类型

@@ -4,10 +4,12 @@ import com.yonchain.ai.api.app.Application;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.sys.*;
+import com.yonchain.ai.api.tag.Tag;
 import com.yonchain.ai.console.app.response.AppResponse;
 import com.yonchain.ai.console.file.entity.FileEntity;
 import com.yonchain.ai.console.file.response.FileResponse;
 import com.yonchain.ai.console.sys.response.*;
+import com.yonchain.ai.console.tag.response.TagResponse;
 import com.yonchain.ai.web.response.ListResponse;
 import com.yonchain.ai.web.response.PageResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -454,30 +456,20 @@ public class ResponseFactory {
         response.setId(menu.getId());
         // 设置父菜单ID
         response.setParentId(menu.getParentId());
-        // 设置权重
-        response.setWeight(menu.getWeight());
         // 设置菜单名称
         response.setName(menu.getName());
         // 设置菜单路径
         response.setPath(menu.getPath());
-        // 设置是否固定标签
-        response.setIsAffix(menu.getIsAffix());
         // 设置是否隐藏
         response.setIsHide(menu.getIsHide());
         // 设置菜单图标
         response.setIcon(menu.getIcon());
         // 设置英文名称
         response.setEnName(menu.getEnName());
-        // 设置菜单标题
-        response.setTitle(menu.getTitle());
         // 设置是否外链
         response.setIsLink(menu.getIsLink());
-        // 设置是否内嵌
-        response.setIsIframe(menu.getIsIframe());
-        // 设置是否缓存
-        response.setIsKeepAlive(menu.getIsKeepAlive());
         // 设置排序顺序
-        response.setSortOrder(menu.getSortOrder());
+        response.setSort(menu.getSort());
         // 设置菜单类型
         response.setMenuType(menu.getMenuType());
         // 设置权限标识
@@ -548,7 +540,7 @@ public class ResponseFactory {
             // 复制基本属性
             BeanUtils.copyProperties(createMenuResponse(menu), menuTree);
 
-            // 设置菜单元数据
+            /*// 设置菜单元数据
             MenuTreeResponse.MenuMetaResponse metaResponse = new MenuTreeResponse.MenuMetaResponse();
             metaResponse.setIsLink(menu.getIsLink());
             metaResponse.setIsIframe(menu.getIsIframe());
@@ -558,7 +550,7 @@ public class ResponseFactory {
             metaResponse.setIsAffix(menu.getIsAffix());
             metaResponse.setTitle(menu.getTitle());
             metaResponse.setIsHide(menu.getIsHide());
-            menuTree.setMeta(metaResponse);
+            menuTree.setMeta(metaResponse);*/
 
             menuMap.put(menu.getId(), menuTree);
         }
@@ -584,8 +576,7 @@ public class ResponseFactory {
 
         // 递归排序整个树
         Comparator<MenuTreeResponse> menuComparator = Comparator
-                .comparing(MenuTreeResponse::getSortOrder, Comparator.nullsFirst(Comparator.naturalOrder()))
-                .thenComparing(MenuTreeResponse::getWeight, Comparator.nullsFirst(Comparator.naturalOrder()));
+                .comparing(MenuTreeResponse::getSort, Comparator.nullsFirst(Comparator.naturalOrder()));
 
         rootMenus.sort(menuComparator);
         for (MenuTreeResponse menu : rootMenus) {
@@ -744,4 +735,74 @@ public class ResponseFactory {
         return response;
     }
 
+    /**
+     * 创建标签响应对象
+     * <p>
+     * 将Tag实体对象转换为标准化的API响应格式
+     * 包含标签的基本信息和关联租户ID
+     * </p>
+     *
+     * @param tag 标签实体对象，包含标签基本信息，不能为null
+     * @return 标准化后的标签响应对象，包含标签ID、名称、创建时间和租户ID
+     * @see Tag
+     * @see TagResponse
+     */
+    public TagResponse createTagResponse(Tag tag) {
+        TagResponse response = new TagResponse();
+        // 设置标签ID
+        response.setId(tag.getId());
+        // 设置标签名称
+        response.setName(tag.getName());
+        // 设置创建时间
+        response.setCreatedAt(tag.getCreatedAt());
+        // 设置租户ID
+        response.setTenantId(tag.getTenantId());
+        return response;
+    }
+
+    /**
+     * 创建标签分页响应对象
+     * <p>
+     * 将标签分页数据转换为标准化的API分页响应格式
+     * 包含分页元数据和转换后的标签数据列表
+     * </p>
+     *
+     * @param tags 标签分页数据对象，包含分页信息和标签数据列表，不能为null
+     * @return 标准化后的标签分页响应对象，包含分页元数据和标签列表
+     * @see Tag
+     * @see TagResponse
+     * @see PageResponse
+     */
+    public PageResponse<TagResponse> createTagPageResponse(Page<Tag> tags) {
+        PageResponse<TagResponse> response = new PageResponse<>();
+        // 设置当前页码
+        response.setPage(tags.getCurrent());
+        // 设置每页记录数
+        response.setLimit(tags.getSize());
+        // 设置总记录数
+        response.setTotal(tags.getTotal());
+        // 设置标签数据列表
+        response.setData(tags.getRecords().stream()
+                .map(this::createTagResponse)
+                .toList());
+        return response;
+    }
+
+    /**
+     * 创建标签响应对象列表
+     * <p>
+     * 将标签列表转换为标准化的API响应格式
+     * 包含标签基本信息
+     * </p>
+     *
+     * @param tags 标签列表
+     * @return 标准化后的标签响应对象列表，包含标签ID、名称、创建时间和租户ID
+     * @see Tag
+     * @see TagResponse
+     */
+    public ListResponse<TagResponse> createTagResponseList(List<Tag> tags) {
+        ListResponse<TagResponse> response = new ListResponse<>();
+        response.setData(tags.stream().map(this::createTagResponse).toList());
+        return response;
+    }
 }

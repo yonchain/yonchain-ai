@@ -335,30 +335,20 @@ public class DifyResponseFactory {
         response.setId(menu.getId());
         // 设置父菜单ID
         response.setParentId(menu.getParentId());
-        // 设置权重
-        response.setWeight(menu.getWeight());
         // 设置菜单名称
         response.setName(menu.getName());
         // 设置菜单路径
         response.setPath(menu.getPath());
-        // 设置是否固定标签
-        response.setIsAffix(menu.getIsAffix());
         // 设置是否隐藏
         response.setIsHide(menu.getIsHide());
         // 设置菜单图标
         response.setIcon(menu.getIcon());
         // 设置英文名称
         response.setEnName(menu.getEnName());
-        // 设置菜单标题
-        response.setTitle(menu.getTitle());
         // 设置是否外链
         response.setIsLink(menu.getIsLink());
-        // 设置是否内嵌
-        response.setIsIframe(menu.getIsIframe());
-        // 设置是否缓存
-        response.setIsKeepAlive(menu.getIsKeepAlive());
         // 设置排序顺序
-        response.setSortOrder(menu.getSortOrder());
+        response.setSort(menu.getSort());
         // 设置菜单类型
         response.setMenuType(menu.getMenuType());
         // 设置权限标识
@@ -429,7 +419,7 @@ public class DifyResponseFactory {
             // 复制基本属性
             BeanUtils.copyProperties(createMenuResponse(menu), menuTree);
 
-            // 设置菜单元数据
+           /* // 设置菜单元数据
             MenuTreeResponse.MenuMetaResponse metaResponse = new MenuTreeResponse.MenuMetaResponse();
             metaResponse.setIsLink(menu.getIsLink());
             metaResponse.setIsIframe(menu.getIsIframe());
@@ -439,7 +429,7 @@ public class DifyResponseFactory {
             metaResponse.setIsAffix(menu.getIsAffix());
             metaResponse.setTitle(menu.getTitle());
             metaResponse.setIsHide(menu.getIsHide());
-            menuTree.setMeta(metaResponse);
+            menuTree.setMeta(metaResponse);*/
 
             menuMap.put(menu.getId(), menuTree);
         }
@@ -465,8 +455,7 @@ public class DifyResponseFactory {
 
         // 递归排序整个树
         Comparator<MenuTreeResponse> menuComparator = Comparator
-                .comparing(MenuTreeResponse::getSortOrder, Comparator.nullsFirst(Comparator.naturalOrder()))
-                .thenComparing(MenuTreeResponse::getWeight, Comparator.nullsFirst(Comparator.naturalOrder()));
+                .comparing(MenuTreeResponse::getSort, Comparator.nullsFirst(Comparator.naturalOrder()));
 
         rootMenus.sort(menuComparator);
         for (MenuTreeResponse menu : rootMenus) {

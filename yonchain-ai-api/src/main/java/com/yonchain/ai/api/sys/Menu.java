@@ -167,13 +167,13 @@ public interface Menu {
      * 获取排序序号
      * @return 排序序号
      */
-    Integer getSortOrder();
+    Integer getSort();
     
     /**
      * 设置排序序号
-     * @param sortOrder 排序序号
+     * @param sort 排序序号
      */
-    void setSortOrder(Integer sortOrder);
+    void setSort(Integer sort);
     
     /**
      * 获取菜单类型

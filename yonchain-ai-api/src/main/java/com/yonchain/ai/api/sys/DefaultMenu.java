@@ -20,7 +20,7 @@ public class DefaultMenu implements Menu {
     private Boolean isAffix;
     private String title;
     private Boolean isHide;
-    private Integer sortOrder;
+    private Integer sort;
     private String menuType;
     private String permission;
     private LocalDateTime createdAt;
@@ -150,13 +150,13 @@ public class DefaultMenu implements Menu {
     }
 
     @Override
-    public Integer getSortOrder() {
-        return sortOrder;
+    public Integer getSort() {
+        return sort;
     }
 
     @Override
-    public void setSortOrder(Integer sortOrder) {
-        this.sortOrder = sortOrder;
+    public void setSort(Integer sort) {
+        this.sort = sort;
     }
 
     @Override

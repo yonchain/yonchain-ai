@@ -24,7 +24,7 @@ public class MenuEntity implements Menu {
     private Boolean isAffix;
     private String title;
     private Boolean isHide;
-    private Integer sortOrder;
+    private Integer sort;
     private String menuType;
     private String permission;
     private LocalDateTime createdAt;

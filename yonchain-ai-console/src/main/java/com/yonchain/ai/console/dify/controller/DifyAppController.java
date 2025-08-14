@@ -42,8 +42,8 @@ public class DifyAppController extends BaseController {
     @Operation(summary = "获取Dify应用", description = "根据API密钥和基础URL获取Dify应用信息")
     @RequestMapping
     public DifyAppResponse getAppByApiKey(
-            @Parameter(description = "API密钥", required = true) @RequestParam("apiKey") String apiKey,
-            @Parameter(description = "基础URL", required = true) @RequestParam("baseUrl") String baseUrl) {
+            @Parameter(description = "API密钥", required = true) @RequestParam("api_key") String apiKey,
+            @Parameter(description = "基础URL", required = true) @RequestParam("base_url") String baseUrl) {
         DifyApp difyApp = difyAppService.getAppByApiKey(apiKey, baseUrl);
         return difyResponseFactory.createAppResponse(difyApp);
     }

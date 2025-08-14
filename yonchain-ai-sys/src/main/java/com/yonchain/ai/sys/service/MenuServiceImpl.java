@@ -144,7 +144,7 @@ public class MenuServiceImpl implements MenuService {
 
         // 递归排序整个树
         Comparator<Menu> menuComparator = Comparator
-                .comparing(Menu::getSortOrder, Comparator.nullsFirst(Comparator.naturalOrder()))
+                .comparing(Menu::getSort, Comparator.nullsFirst(Comparator.naturalOrder()))
                 .thenComparing(Menu::getWeight, Comparator.nullsFirst(Comparator.naturalOrder()));
 
         rootMenus.sort(menuComparator);

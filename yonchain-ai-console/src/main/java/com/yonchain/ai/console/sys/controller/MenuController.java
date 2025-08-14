@@ -176,7 +176,7 @@ public class MenuController extends BaseController {
         menu.setIsAffix(request.getIsAffix());
         menu.setTitle(request.getName());//使用菜单名称
         menu.setIsHide(request.getIsHide());
-        menu.setSortOrder(request.getSortOrder());
+        menu.setSort(request.getSort());
         menu.setMenuType(request.getMenuType());
         menu.setPermission(request.getPermission());
     }

@@ -107,7 +107,7 @@ public class AppController extends BaseController {
         //从请求获取数据填充
         app.setName(request.getName());
         app.setMode(request.getMode());
-        app.setProvider(request.getProvider());
+       // app.setProvider(request.getProvider());
         app.setApiKey(request.getApiKey());
         app.setBaseUrl(request.getBaseUrl());
         app.setIcon(request.getIcon());

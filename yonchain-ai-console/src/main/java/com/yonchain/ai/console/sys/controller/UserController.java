@@ -16,6 +16,8 @@
 
 package com.yonchain.ai.console.sys.controller;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.exception.YonchainForbiddenException;
 import com.yonchain.ai.api.exception.YonchainIllegalStateException;
@@ -298,62 +300,13 @@ public class UserController extends BaseController {
      */
     @GetMapping("/current/menus")
     @Operation(summary = "获取当前用户菜单", description = "获取当前登录用户的菜单列表")
-    public List<Map<String, Object>> getCurrentUserMenus() {
+    public ListResponse<MenuTreeResponse> getCurrentUserMenus() {
         //查询用户菜单列表
         List<Menu> menus = userService.getUserMenus(getCurrentTenantId(), getCurrentUserId(), MenuType.MENU);
 
-        List<Map<String, Object>> menuList = new ArrayList<>();
-        menus.forEach(menu -> {
-            Map<String, Object> queryParam = new HashMap<>();
-            queryParam.put("parentId", menu.getParentId());
-            queryParam.put("id", menu.getId());
-            queryParam.put("name", menu.getName());
-            queryParam.put("icon", menu.getIcon());
-            queryParam.put("sort", menu.getSortOrder());
-            queryParam.put("type", menu.getMenuType());
-            queryParam.put("path", menu.getPath());
-            queryParam.put("permission", menu.getPermission());
-            queryParam.put("isLink", menu.getIsLink());
-            queryParam.put("isHide", menu.getIsHide());
-            queryParam.put("enName",menu.getEnName());
-            menuList.add(queryParam);
-        });
-
-        // 构建树形菜单结构
-        List<Map<String, Object>> treeMenus = new ArrayList<>();
-        Map<String, Map<String, Object>> menuMap = new HashMap<>();
-
-        // 将所有菜单存入map，以id为key
-        for (Map<String, Object> menu : menuList) {
-            menuMap.put(menu.get("id").toString(), menu);
-        }
-
-        // 遍历菜单，构建父子关系
-        for (Map<String, Object> menu : menuList) {
-            String parentId = menu.get("parentId").toString();
-            if ("b61804f0-e99e-4c15-9f9c-0784b125888b".equals(parentId)) {
-                treeMenus.add(menu);
-            } else {
-                Map<String, Object> parentMenu = menuMap.get(parentId);
-                if (parentMenu != null) {
-                    List<Map<String, Object>> children = (List<Map<String, Object>>) parentMenu.computeIfAbsent("children", k -> new ArrayList<>());
-                    children.add(menu);
-                }
-            }
-        }
-
-        // 按sort字段排序
-        treeMenus.sort(Comparator.comparingInt(m -> Integer.parseInt(m.get("sort").toString())));
-        for (Map<String, Object> menu : menuList) {
-            if (menu.containsKey("children")) {
-                List<Map<String, Object>> children = (List<Map<String, Object>>) menu.get("children");
-                children.sort(Comparator.comparingInt(m -> Integer.parseInt(m.get("sort").toString())));
-            }
-        }
-
-
-        return treeMenus;
+        return responseFactory.createMenuTreeListResponse(menus);
     }
+
 
 
     /**
