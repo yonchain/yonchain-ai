@@ -1,14 +1,8 @@
 package com.yonchain.ai.console.dify;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yonchain.ai.api.app.Application;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.dify.DifyApp;
-import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.sys.*;
-import com.yonchain.ai.console.app.response.AppResponse;
 import com.yonchain.ai.console.dify.response.DifyAppResponse;
 import com.yonchain.ai.console.file.entity.FileEntity;
 import com.yonchain.ai.console.file.response.FileResponse;
@@ -16,9 +10,6 @@ import com.yonchain.ai.console.sys.response.*;
 import com.yonchain.ai.web.response.ListResponse;
 import com.yonchain.ai.web.response.PageResponse;
 import org.springframework.beans.BeanUtils;
-import org.springframework.util.StringUtils;
-
-import java.time.Duration;
 import java.util.*;
 
 /**
@@ -71,9 +62,9 @@ public class DifyResponseFactory {
     public PageResponse<UserResponse> createUserPageResponse(Page<User> users) {
         PageResponse<UserResponse> response = new PageResponse<>();
         // 设置当前页码
-        response.setPage(users.getCurrent());
+        response.setPageNum(users.getCurrent());
         // 设置每页记录数
-        response.setLimit(users.getSize());
+        response.setPageSize(users.getSize());
         // 设置总记录数
         response.setTotal(users.getTotal());
         // 设置用户数据列表
@@ -139,9 +130,9 @@ public class DifyResponseFactory {
     public PageResponse<RoleResponse> createRolePageResponse(Page<Role> page) {
         PageResponse<RoleResponse> response = new PageResponse<>();
         // 设置当前页码
-        response.setPage(page.getCurrent());
+        response.setPageNum(page.getCurrent());
         // 设置每页记录数
-        response.setLimit(page.getSize());
+        response.setPageSize(page.getSize());
         // 设置总记录数
         response.setTotal(page.getTotal());
         // 设置角色数据列表
@@ -219,9 +210,9 @@ public class DifyResponseFactory {
     public PageResponse<TenantResponse> createTenantPageResponse(Page<Tenant> tenantPage) {
         PageResponse<TenantResponse> response = new PageResponse<>();
         // 设置当前页码
-        response.setPage(tenantPage.getCurrent());
+        response.setPageNum(tenantPage.getCurrent());
         // 设置每页记录数
-        response.setLimit(tenantPage.getSize());
+        response.setPageSize(tenantPage.getSize());
         // 设置总记录数
         response.setTotal(tenantPage.getTotal());
         // 设置租户数据列表
@@ -376,9 +367,9 @@ public class DifyResponseFactory {
     public PageResponse<MenuResponse> createMenuPageResponse(Page<Menu> menus) {
         PageResponse<MenuResponse> response = new PageResponse<>();
         // 设置当前页码
-        response.setPage(menus.getCurrent());
+        response.setPageNum(menus.getCurrent());
         // 设置每页记录数
-        response.setLimit(menus.getSize());
+        response.setPageSize(menus.getSize());
         // 设置总记录数
         response.setTotal(menus.getTotal());
         // 设置菜单数据列表
@@ -548,9 +539,9 @@ public class DifyResponseFactory {
     public PageResponse<FileResponse> createFilePageResponse(Page<FileEntity> files) {
         PageResponse<FileResponse> response = new PageResponse<>();
         // 设置当前页码
-        response.setPage(files.getCurrent());
+        response.setPageNum(files.getCurrent());
         // 设置每页记录数
-        response.setLimit(files.getSize());
+        response.setPageSize(files.getSize());
         // 设置总记录数
         response.setTotal(files.getTotal());
         // 设置文件数据列表

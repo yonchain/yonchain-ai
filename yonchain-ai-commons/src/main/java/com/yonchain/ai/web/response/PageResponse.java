@@ -20,12 +20,12 @@ public class PageResponse<T> {
     /**
      * 页码
      */
-    private Long page;
+    private Long pageNum;
 
     /**
      * 每页大小
      */
-    private Long limit;
+    private Long pageSize;
 
     /**
      * 数据列表
@@ -43,16 +43,16 @@ public class PageResponse<T> {
      * @param datas     数据列表
      * @param total     总记录数
      * @param pageNum   页码
-     * @param pageLimit 每页大小
+     * @param pageSize 每页大小
      * @param <T>       数据类型
      * @return 分页响应
      */
-    public static <T> PageResponse<T> of(List<T> datas, Long total, Long pageNum, Long pageLimit) {
+    public static <T> PageResponse<T> of(List<T> datas, Long total, Long pageNum, Long pageSize) {
         PageResponse<T> response = new PageResponse<>();
         response.setData(datas);
         response.setTotal(total);
-        response.setPage(pageNum);
-        response.setLimit(pageLimit);
+        response.setPageNum(pageNum);
+        response.setPageSize(pageSize);
         return response;
     }
 
@@ -64,20 +64,20 @@ public class PageResponse<T> {
         this.total = total;
     }
 
-    public Long getPage() {
-        return page;
+    public Long getPageNum() {
+        return pageNum;
     }
 
-    public void setPage(Long page) {
-        this.page = page;
+    public void setPageNum(Long pageNum) {
+        this.pageNum = pageNum;
     }
 
-    public Long getLimit() {
-        return limit;
+    public Long getPageSize() {
+        return pageSize;
     }
 
-    public void setLimit(Long limit) {
-        this.limit = limit;
+    public void setPageSize(Long pageSize) {
+        this.pageSize = pageSize;
     }
 
     public List<T> getData() {
@@ -102,9 +102,9 @@ public class PageResponse<T> {
      * @return 是否有更多数据
      */
     public boolean calcHasMore() {
-        if (total == null || page == null || limit == null) {
+        if (total == null || pageNum == null || pageSize == null) {
             return false;
         }
-        return total > page * limit;
+        return total > pageNum * pageSize;
     }
 }

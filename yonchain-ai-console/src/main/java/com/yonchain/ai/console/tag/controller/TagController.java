@@ -86,7 +86,7 @@ public class TagController extends BaseController {
         queryParam.put("type", request.getType());
 
         // 分页查询
-        Page<Tag> tags = tagService.pageTags(this.getCurrentTenantId(), queryParam, request.getPage(), request.getLimit());
+        Page<Tag> tags = tagService.pageTags(this.getCurrentTenantId(), queryParam, request.getPageNum(), request.getPageSize());
 
         // 转换为响应对象
         return responseFactory.createTagPageResponse(tags);

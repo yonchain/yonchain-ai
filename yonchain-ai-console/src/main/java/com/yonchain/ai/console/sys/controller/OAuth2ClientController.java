@@ -67,7 +67,7 @@ public class OAuth2ClientController extends BaseController {
         params.put("clientName", request.getClientName());
 
         Page<OAuth2RegisteredClient> page = oauth2ClientService.pageOAuth2RegisteredClients(
-                params, request.getPage(), request.getLimit());
+                params, request.getPageNum(), request.getPageSize());
 
         return responseFactory.createOAuth2RegisteredClientPageResponse(page);
     }

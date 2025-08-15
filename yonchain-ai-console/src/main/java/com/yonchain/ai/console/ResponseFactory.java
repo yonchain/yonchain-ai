@@ -81,9 +81,9 @@ public class ResponseFactory {
     public PageResponse<UserResponse> createUserPageResponse(Page<User> users) {
         PageResponse<UserResponse> response = new PageResponse<>();
         // 设置当前页码
-        response.setPage(users.getCurrent());
+        response.setPageNum(users.getCurrent());
         // 设置每页记录数
-        response.setLimit(users.getSize());
+        response.setPageSize(users.getSize());
         // 设置总记录数
         response.setTotal(users.getTotal());
         // 设置用户数据列表
@@ -149,9 +149,9 @@ public class ResponseFactory {
     public PageResponse<RoleResponse> createRolePageResponse(Page<Role> page) {
         PageResponse<RoleResponse> response = new PageResponse<>();
         // 设置当前页码
-        response.setPage(page.getCurrent());
+        response.setPageNum(page.getCurrent());
         // 设置每页记录数
-        response.setLimit(page.getSize());
+        response.setPageSize(page.getSize());
         // 设置总记录数
         response.setTotal(page.getTotal());
         // 设置角色数据列表
@@ -229,9 +229,9 @@ public class ResponseFactory {
     public PageResponse<TenantResponse> createTenantPageResponse(Page<Tenant> tenantPage) {
         PageResponse<TenantResponse> response = new PageResponse<>();
         // 设置当前页码
-        response.setPage(tenantPage.getCurrent());
+        response.setPageNum(tenantPage.getCurrent());
         // 设置每页记录数
-        response.setLimit(tenantPage.getSize());
+        response.setPageSize(tenantPage.getSize());
         // 设置总记录数
         response.setTotal(tenantPage.getTotal());
         // 设置租户数据列表
@@ -321,9 +321,9 @@ public class ResponseFactory {
     public PageResponse<AppResponse> createAppPageResponse(Page<Application> apps) {
         PageResponse<AppResponse> response = new PageResponse<>();
         // 设置当前页码
-        response.setPage(apps.getCurrent());
+        response.setPageNum(apps.getCurrent());
         // 设置每页记录数
-        response.setLimit(apps.getSize());
+        response.setPageSize(apps.getSize());
         // 设置总记录数
         response.setTotal(apps.getTotal());
         // 转换应用数据列表
@@ -422,9 +422,9 @@ public class ResponseFactory {
     public PageResponse<OAuth2RegisteredClientResponse> createOAuth2RegisteredClientPageResponse(Page<OAuth2RegisteredClient> page) {
         PageResponse<OAuth2RegisteredClientResponse> response = new PageResponse<>();
         // 设置当前页码
-        response.setPage(page.getCurrent());
+        response.setPageNum(page.getCurrent());
         // 设置每页记录数
-        response.setLimit(page.getSize());
+        response.setPageSize(page.getSize());
         // 设置总记录数
         response.setTotal(page.getTotal());
         // 设置OAuth2注册客户端数据列表
@@ -497,9 +497,9 @@ public class ResponseFactory {
     public PageResponse<MenuResponse> createMenuPageResponse(Page<Menu> menus) {
         PageResponse<MenuResponse> response = new PageResponse<>();
         // 设置当前页码
-        response.setPage(menus.getCurrent());
+        response.setPageNum(menus.getCurrent());
         // 设置每页记录数
-        response.setLimit(menus.getSize());
+        response.setPageSize(menus.getSize());
         // 设置总记录数
         response.setTotal(menus.getTotal());
         // 设置菜单数据列表
@@ -669,9 +669,9 @@ public class ResponseFactory {
     public PageResponse<FileResponse> createFilePageResponse(Page<FileEntity> files) {
         PageResponse<FileResponse> response = new PageResponse<>();
         // 设置当前页码
-        response.setPage(files.getCurrent());
+        response.setPageNum(files.getCurrent());
         // 设置每页记录数
-        response.setLimit(files.getSize());
+        response.setPageSize(files.getSize());
         // 设置总记录数
         response.setTotal(files.getTotal());
         // 设置文件数据列表
@@ -776,9 +776,9 @@ public class ResponseFactory {
     public PageResponse<TagResponse> createTagPageResponse(Page<Tag> tags) {
         PageResponse<TagResponse> response = new PageResponse<>();
         // 设置当前页码
-        response.setPage(tags.getCurrent());
+        response.setPageNum(tags.getCurrent());
         // 设置每页记录数
-        response.setLimit(tags.getSize());
+        response.setPageSize(tags.getSize());
         // 设置总记录数
         response.setTotal(tags.getTotal());
         // 设置标签数据列表

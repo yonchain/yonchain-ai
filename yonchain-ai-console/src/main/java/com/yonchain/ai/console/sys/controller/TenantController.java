@@ -86,7 +86,7 @@ public class TenantController extends BaseController {
         queryParam.put("name", request.getName());
 
         //获取当前用户所属租户数据列表
-        Page<Tenant> tenantPage = tenantService.pageTenants(userId, queryParam, request.getPage(), request.getLimit());
+        Page<Tenant> tenantPage = tenantService.pageTenants(userId, queryParam, request.getPageNum(), request.getPageSize());
 
         return responseFactory.createTenantPageResponse(tenantPage);
     }

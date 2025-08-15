@@ -88,7 +88,7 @@ public class RoleController extends BaseController {
         queryParam.put("groupId", groupId);
 
         //分页查询
-        Page<Role> page = roleService.pageRoles(this.getCurrentTenantId(), queryParam, pageRequest.getPage(), pageRequest.getLimit());
+        Page<Role> page = roleService.pageRoles(this.getCurrentTenantId(), queryParam, pageRequest.getPageNum(), pageRequest.getPageSize());
 
         PageResponse<RoleResponse> response = responseFactory.createRolePageResponse(page);
         response.getData().forEach(roleResponse -> {

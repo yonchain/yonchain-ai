@@ -135,7 +135,7 @@ public class UserController extends BaseController {
         queryParam.put("name", request.getName());
         queryParam.put("email", request.getEmail());
 
-        Page<User> users = userService.pageUsers(tenantId, queryParam, request.getPage(), request.getLimit());
+        Page<User> users = userService.pageUsers(tenantId, queryParam, request.getPageNum(), request.getPageSize());
 
         return buildPageResponse(users);
     }

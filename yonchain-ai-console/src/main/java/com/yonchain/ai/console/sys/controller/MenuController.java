@@ -62,7 +62,7 @@ public class MenuController extends BaseController {
         Map<String, Object> queryParam = new HashMap<>();
         queryParam.put("name", request.getMenuName());
 
-        Page<Menu> menus = menuService.pageMenus(queryParam, request.getPage(), request.getLimit());
+        Page<Menu> menus = menuService.pageMenus(queryParam, request.getPageNum(), request.getPageSize());
 
         return this.responseFactory.createMenuPageResponse(menus);
     }

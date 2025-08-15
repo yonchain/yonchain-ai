@@ -86,7 +86,7 @@ public class AppController extends BaseController {
         }
 
         //分页查询应用
-        Page<Application> apps = appService.getAppsByPage(currentUser.getTenantId(), queryParam, request.getPage(), request.getLimit());
+        Page<Application> apps = appService.getAppsByPage(currentUser.getTenantId(), queryParam, request.getPageNum(), request.getPageSize());
 
         return buildResponse(apps);
     }

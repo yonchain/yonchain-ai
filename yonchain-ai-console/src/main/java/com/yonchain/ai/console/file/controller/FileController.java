@@ -86,8 +86,8 @@ public class FileController extends BaseController {
         Page<FileEntity> files = fileService.pageFiles(
                 this.getCurrentTenantId(),
                 queryParam,
-                request.getPage(),
-                request.getLimit()
+                request.getPageNum(),
+                request.getPageSize()
         );
 
         return responseFactory.createFilePageResponse(files);
