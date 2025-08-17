@@ -1,6 +1,7 @@
 package com.yonchain.ai.console.app.response;
 
 import com.yonchain.ai.console.sys.response.RoleResponse;
+import com.yonchain.ai.console.tag.response.TagResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -122,4 +123,10 @@ public class AppResponse {
      */
     @Schema(description = "角色Id列表")
     private List<String> roleIds;
+
+    /**
+     * 标签列表
+     */
+    @Schema(description = "标签列表")
+    private List<TagResponse> tags;
 }

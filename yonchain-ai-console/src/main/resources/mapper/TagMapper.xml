@@ -27,7 +27,7 @@
     <select id="selectById" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List" />
-        FROM tags
+        FROM tag
         WHERE id = #{id}::uuid
     </select>
 
@@ -35,8 +35,8 @@
     <select id="selectList" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List" />
-        FROM tags
-        WHERE tenant_id = #{tenantId}
+        FROM tag
+        WHERE tenant_id = #{tenantId}::uuid
         <if test="params.type != null and params.type != ''">
             AND type = #{params.type}
         </if>
@@ -44,18 +44,18 @@
 
     <!-- 插入标签记录 -->
     <insert id="insert" parameterType="com.yonchain.ai.console.tag.entity.TagEntity">
-        INSERT INTO tags (
+        INSERT INTO tag (
             tenant_id, type, name, created_by
         )
         VALUES (
-            #{tenantId}, #{type}, #{name}, #{createdBy}
+            #{tenantId}::uuid, #{type}, #{name}, #{createdBy}::uuid
         )
     </insert>
 
     <!-- 根据ID更新标签信息 -->
     <update id="updateById" parameterType="com.yonchain.ai.console.tag.entity.TagEntity">
-        UPDATE tags
-        SET tenant_id = #{tenantId},
+        UPDATE tag
+        SET tenant_id = #{tenantId}::uuid,
             type = #{type},
             name = #{name}
         WHERE id = #{id}::uuid
@@ -63,13 +63,13 @@
 
     <!-- 根据ID删除标签 -->
     <delete id="deleteById">
-        DELETE FROM tags
+        DELETE FROM tag
         WHERE id = #{id}::uuid
     </delete>
 
     <!-- 根据ID列表删除标签 -->
     <delete id="deleteByIds">
-        DELETE FROM tags
+        DELETE FROM tag
         WHERE id IN
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}::uuid

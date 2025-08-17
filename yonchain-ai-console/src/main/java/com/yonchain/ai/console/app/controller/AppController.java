@@ -12,6 +12,7 @@ import com.yonchain.ai.console.app.request.AppCreateRequest;
 import com.yonchain.ai.console.app.request.AppQueryRequest;
 import com.yonchain.ai.console.app.request.AppUpdateRequest;
 import com.yonchain.ai.console.app.response.AppResponse;
+import com.yonchain.ai.console.tag.response.TagResponse;
 import com.yonchain.ai.web.response.ApiResponse;
 import com.yonchain.ai.web.response.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,10 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -184,6 +182,17 @@ public class AppController extends BaseController {
         response.getData().forEach(appResponse -> {
             List<Role> roles = appService.getAppRoles(appResponse.getId());
             appResponse.setRoles(responseFactory.createRoleListResponse(roles).getData());
+
+            List<TagResponse> tags = new ArrayList<>();
+            TagResponse tagResponse = new TagResponse();
+            tagResponse.setName("金融");
+            tagResponse.setId(UUID.randomUUID().toString());
+            tags.add(tagResponse);
+            TagResponse tagResponse2 = new TagResponse();
+            tagResponse2.setName("人工智能");
+            tagResponse2.setId(UUID.randomUUID().toString());
+            tags.add(tagResponse2);
+            appResponse.setTags(tags);
         });
         return response;
     }
