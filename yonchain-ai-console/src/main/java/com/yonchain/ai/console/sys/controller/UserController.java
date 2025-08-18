@@ -308,6 +308,46 @@ public class UserController extends BaseController {
     }
 
 
+    /**
+     * 获取当前用户菜单
+     *
+     * @return 当前用户菜单列表
+     */
+    @GetMapping("/menus")
+    @Operation(summary = "获取当前用户菜单", description = "获取当前登录用户的菜单列表")
+    public JSONArray getCurrentUserMenus2() {
+        //查询用户菜单列表
+       // List<Menu> menus = userService.getUserMenus(getCurrentTenantId(), getCurrentUserId(), MenuType.MENU);
+
+        return JSON.parseArray("[\n" +
+                "  \"dashboard:view\",\n" +
+                "  \"apps:view\",\n" +
+                "  \"apps:list\",\n" +
+                "  \"apps:create\",\n" +
+                "  \"apps:import\",\n" +
+                "  \"chat:view\",\n" +
+                "  \"chat:history\",\n" +
+                "  \"chat:create\",\n" +
+                "  \"knowledge:view\",\n" +
+                "  \"knowledge:list\",\n" +
+                "  \"knowledge:create\",\n" +
+                "  \"knowledge:import\",\n" +
+                "  \"workflow:view\",\n" +
+                "  \"workflow:list\",\n" +
+                "  \"workflow:create\",\n" +
+                "  \"system:view\",\n" +
+                "  \"system:users\",\n" +
+                "  \"system:roles\",\n" +
+                "  \"system:settings\",\n" +
+                "  \"system:users:create\",\n" +
+                "  \"system:users:create\",\n" +
+                "  \"plugins:view\",\n" +
+                "  \"model:view\"\n" +
+                "]");
+    }
+
+
+
 
     /**
      * 从请求中填充用户信息，采用选择性更新策略
