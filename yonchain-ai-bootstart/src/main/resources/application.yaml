@@ -48,9 +48,11 @@ mybatis:
 
 logging:
   level:
-    org.mybatis: INFO
+    "com.yonchain.ai.*.mapper": DEBUG
+
     # 或者针对特定的mapper文件进行设置
     com.yonchain.ai.**.mapper: DEBUG
+    com.yonchain.ai.app.mapper: DEBUG
     org.springframework.security: TRACE
     org.springframework.security.web: TRACE
     org.springframework.security.authentication: TRACE
