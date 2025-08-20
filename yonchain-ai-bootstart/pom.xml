@@ -37,6 +37,10 @@
             <groupId>com.yonchain.ai</groupId>
             <artifactId>yonchain-ai-dify</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-model-spring-boot-starter</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,0 +1,265 @@
+# OpenAI模型提供商配置
+provider:
+  # 提供商唯一标识码，用于系统内部识别
+  code: openai
+  # 提供商显示名称
+  name: OpenAI
+  # 提供商简要描述信息
+  description: OpenAI提供的AI模型服务
+  # 提供商图标URL路径
+  iconUrl: /static/images/providers/openai.png
+  # 提供商官方网站URL
+  websiteUrl: https://openai.com
+  # 该提供商支持的模型类型列表
+  supportedModelTypes:
+    - text    # 文本处理模型
+    - image   # 图像生成模型
+    - embedding  # 文本嵌入模型
+    - audio   # 音频处理模型
+  # 提供商配置参数的JSON Schema定义
+  configSchema:
+    type: object
+    properties:
+      # API密钥配置
+      apiKey:
+        type: string
+        title: API密钥
+        description: OpenAI API密钥
+      # API基础URL配置，可自定义API端点
+      baseUrl:
+        type: string
+        title: API基础URL
+        description: OpenAI API基础URL，默认为https://api.openai.com
+        default: https://api.openai.com
+      # 代理URL配置，用于网络访问受限的环境
+      proxyUrl:
+        type: string
+        title: 代理URL
+        description: API请求代理URL（可选）
+    # 必填字段列表
+    required:
+      - apiKey
+
+# OpenAI模型列表
+models:
+  # GPT-4模型配置
+  - code: gpt-4  # 模型唯一标识码
+    name: GPT-4  # 模型显示名称
+    description: OpenAI的GPT-4模型，强大的大语言模型  # 模型描述
+    iconUrl: /static/images/models/gpt4.png  # 模型图标URL
+    modelType: text  # 模型类型：文本处理
+    version: "1.0"  # 模型版本号
+    # 模型支持的能力列表
+    capabilities:
+      - text-generation  # 支持文本生成
+      - chat  # 支持聊天对话
+    # 模型配置参数的JSON Schema定义
+    configSchema:
+      type: object
+      properties:
+        # 温度参数，控制输出随机性
+        temperature:
+          type: number
+          title: 温度
+          description: 控制输出的随机性，值越高输出越随机
+          minimum: 0
+          maximum: 2
+          default: 0.7
+        # 最大令牌数，控制生成文本长度
+        maxTokens:
+          type: integer
+          title: 最大令牌数
+          description: 生成文本的最大令牌数
+          minimum: 1
+          maximum: 8192
+          default: 2048
+
+  # GPT-3.5 Turbo模型配置
+  - code: gpt-3.5-turbo  # 模型唯一标识码
+    name: GPT-3.5 Turbo  # 模型显示名称
+    description: OpenAI的GPT-3.5 Turbo模型，高效的大语言模型  # 模型描述
+    iconUrl: /static/images/models/gpt35.png  # 模型图标URL
+    modelType: text  # 模型类型：文本处理
+    version: "1.0"  # 模型版本号
+    # 模型支持的能力列表
+    capabilities:
+      - text-generation  # 支持文本生成
+      - chat  # 支持聊天对话
+    # 模型配置参数的JSON Schema定义
+    configSchema:
+      type: object
+      properties:
+        # 温度参数，控制输出随机性
+        temperature:
+          type: number
+          title: 温度
+          description: 控制输出的随机性，值越高输出越随机
+          minimum: 0
+          maximum: 2
+          default: 0.7
+        # 最大令牌数，控制生成文本长度
+        maxTokens:
+          type: integer
+          title: 最大令牌数
+          description: 生成文本的最大令牌数
+          minimum: 1
+          maximum: 8192
+          default: 2048
+
+  # DALL-E 3模型配置
+  - code: dall-e-3  # 模型唯一标识码
+    name: DALL-E 3  # 模型显示名称
+    description: OpenAI的DALL-E 3模型，强大的图像生成模型  # 模型描述
+    iconUrl: /static/images/models/dalle3.png  # 模型图标URL
+    modelType: image  # 模型类型：图像生成
+    version: "1.0"  # 模型版本号
+    # 模型支持的能力列表
+    capabilities:
+      - image-generation  # 支持图像生成
+    # 模型配置参数的JSON Schema定义
+    configSchema:
+      type: object
+      properties:
+        # 图像尺寸参数
+        size:
+          type: string
+          title: 图像尺寸
+          description: 生成图像的尺寸
+          enum:
+            - 256x256    # 小尺寸
+            - 512x512    # 中等尺寸
+            - 1024x1024  # 标准尺寸
+            - 1792x1024  # 宽屏尺寸
+            - 1024x1792  # 竖屏尺寸
+          default: 1024x1024
+        # 图像质量参数
+        quality:
+          type: string
+          title: 图像质量
+          description: 生成图像的质量
+          enum:
+            - standard  # 标准质量
+            - hd        # 高清质量
+          default: standard
+
+  # 文本嵌入模型配置
+  - code: text-embedding-ada-002  # 模型唯一标识码
+    name: Text Embedding Ada 002  # 模型显示名称
+    description: OpenAI的文本嵌入模型，用于生成文本的向量表示  # 模型描述
+    iconUrl: /static/images/models/embedding.png  # 模型图标URL
+    modelType: embedding  # 模型类型：文本嵌入
+    version: "1.0"  # 模型版本号
+    # 模型支持的能力列表
+    capabilities:
+      - text-embedding  # 支持文本嵌入
+    # 模型配置参数的JSON Schema定义（嵌入模型无需额外参数）
+    configSchema:
+      type: object
+      properties: {}
+
+# 模型能力配置部分
+capabilities:
+  # 文本生成能力配置
+  text-generation:
+    code: text-generation  # 能力唯一标识码
+    name: 文本生成  # 能力显示名称
+    description: 生成自然语言文本  # 能力描述
+    type: text  # 能力类型
+    icon: text  # 能力图标
+    supportsStreaming: true  # 是否支持流式输出
+    # 能力参数的JSON Schema定义
+    paramSchema:
+      type: object
+      properties:
+        # 提示词参数
+        prompt:
+          type: string
+          title: 提示词
+          description: 用于生成文本的提示词
+      # 必填字段列表
+      required:
+        - prompt
+
+  # 聊天对话能力配置
+  chat:
+    code: chat  # 能力唯一标识码
+    name: 聊天  # 能力显示名称
+    description: 进行多轮对话  # 能力描述
+    type: text  # 能力类型
+    icon: chat  # 能力图标
+    supportsStreaming: true  # 是否支持流式输出
+    # 能力参数的JSON Schema定义
+    paramSchema:
+      type: object
+      properties:
+        # 消息列表参数
+        messages:
+          type: array
+          title: 消息列表
+          description: 对话消息列表
+          items:
+            type: object
+            properties:
+              # 消息角色
+              role:
+                type: string
+                title: 角色
+                description: 消息发送者的角色
+                enum:
+                  - system    # 系统消息
+                  - user      # 用户消息
+                  - assistant # 助手消息
+              # 消息内容
+              content:
+                type: string
+                title: 内容
+                description: 消息内容
+            # 消息对象的必填字段
+            required:
+              - role
+              - content
+      # 必填字段列表
+      required:
+        - messages
+
+  # 图像生成能力配置
+  image-generation:
+    code: image-generation  # 能力唯一标识码
+    name: 图像生成  # 能力显示名称
+    description: 根据文本描述生成图像  # 能力描述
+    type: image  # 能力类型
+    icon: image  # 能力图标
+    supportsStreaming: false  # 是否支持流式输出
+    # 能力参数的JSON Schema定义
+    paramSchema:
+      type: object
+      properties:
+        # 提示词参数
+        prompt:
+          type: string
+          title: 提示词
+          description: 用于生成图像的文本描述
+      # 必填字段列表
+      required:
+        - prompt
+
+  # 文本嵌入能力配置
+  text-embedding:
+    code: text-embedding  # 能力唯一标识码
+    name: 文本嵌入  # 能力显示名称
+    description: 生成文本的向量表示  # 能力描述
+    type: embedding  # 能力类型
+    icon: embedding  # 能力图标
+    supportsStreaming: false  # 是否支持流式输出
+    # 能力参数的JSON Schema定义
+    paramSchema:
+      type: object
+      properties:
+        # 文本参数
+        text:
+          type: string
+          title: 文本
+          description: 需要生成嵌入向量的文本
+      # 必填字段列表
+      required:
+        - text

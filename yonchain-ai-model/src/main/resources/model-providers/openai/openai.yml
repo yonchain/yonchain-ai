@@ -1,0 +1,158 @@
+# OpenAI模型提供商配置文件
+
+# 提供商配置部分
+provider:
+  # 提供商唯一标识码，用于系统内部识别
+  code: openai
+  # 提供商显示名称
+  name: OpenAI
+  # 提供商简要描述信息
+  description: OpenAI提供的AI模型服务
+  # 提供商图标
+  icon: 🤖
+  # 提供商官方网站URL
+  websiteUrl: https://openai.com
+  # 该提供商支持的模型类型列表
+  supportedModelTypes:
+    - text    # 文本处理模型
+    - image   # 图像生成模型
+    - embedding  # 文本嵌入模型
+    - audio   # 音频处理模型
+  # 提供商配置参数的JSON Schema定义
+  configSchema:
+    type: object
+    properties:
+      # API密钥配置
+      apiKey:
+        type: string
+        title: API密钥
+        description: OpenAI API密钥
+      # API基础URL配置，可自定义API端点
+      baseUrl:
+        type: string
+        title: API基础URL
+        description: OpenAI API基础URL，默认为https://api.openai.com
+        default: https://api.openai.com
+      # 代理URL配置，用于网络访问受限的环境
+      proxyUrl:
+        type: string
+        title: 代理URL
+        description: API请求代理URL（可选）
+    # 必填字段列表
+    required:
+      - apiKey
+
+# 模型文件列表
+models:
+  # 模型配置文件列表，系统将加载这些文件中定义的模型
+  - gpt-4.yml           # GPT-4模型配置文件
+  - gpt-3.5-turbo.yml   # GPT-3.5 Turbo模型配置文件
+  - dall-e-3.yml        # DALL-E 3模型配置文件
+  - text-embedding-ada-002.yml  # Text Embedding Ada 002模型配置文件
+
+# 模型能力配置部分，与provider和models同级
+capabilities:
+  # 文本生成能力配置
+  text-generation:
+    code: text-generation  # 能力唯一标识码
+    name: 文本生成  # 能力显示名称
+    description: 生成自然语言文本  # 能力描述
+    type: text  # 能力类型
+    icon: 🤖  # 能力图标
+    supportsStreaming: true  # 是否支持流式输出
+    # 能力参数的JSON Schema定义
+    paramSchema:
+      type: object
+      properties:
+        # 提示词参数
+        prompt:
+          type: string
+          title: 提示词
+          description: 用于生成文本的提示词
+      # 必填字段列表
+      required:
+        - prompt
+
+  # 聊天对话能力配置
+  chat:
+    code: chat  # 能力唯一标识码
+    name: 聊天  # 能力显示名称
+    description: 进行多轮对话  # 能力描述
+    type: text  # 能力类型
+    icon: 💬  # 能力图标
+    supportsStreaming: true  # 是否支持流式输出
+    # 能力参数的JSON Schema定义
+    paramSchema:
+      type: object
+      properties:
+        # 消息列表参数
+        messages:
+          type: array
+          title: 消息列表
+          description: 对话消息列表
+          items:
+            type: object
+            properties:
+              # 消息角色
+              role:
+                type: string
+                title: 角色
+                description: 消息发送者的角色
+                enum:
+                  - system    # 系统消息
+                  - user      # 用户消息
+                  - assistant # 助手消息
+              # 消息内容
+              content:
+                type: string
+                title: 内容
+                description: 消息内容
+            # 消息对象的必填字段
+            required:
+              - role
+              - content
+      # 必填字段列表
+      required:
+        - messages
+
+  # 图像生成能力配置
+  image-generation:
+    code: image-generation  # 能力唯一标识码
+    name: 图像生成  # 能力显示名称
+    description: 根据文本描述生成图像  # 能力描述
+    type: image  # 能力类型
+    icon: 🖼️  # 能力图标
+    supportsStreaming: false  # 是否支持流式输出
+    # 能力参数的JSON Schema定义
+    paramSchema:
+      type: object
+      properties:
+        # 提示词参数
+        prompt:
+          type: string
+          title: 提示词
+          description: 用于生成图像的文本描述
+      # 必填字段列表
+      required:
+        - prompt
+
+  # 文本嵌入能力配置
+  text-embedding:
+    code: text-embedding  # 能力唯一标识码
+    name: 文本嵌入  # 能力显示名称
+    description: 生成文本的向量表示  # 能力描述
+    type: embedding  # 能力类型
+    icon: 📊  # 能力图标
+    supportsStreaming: false  # 是否支持流式输出
+    # 能力参数的JSON Schema定义
+    paramSchema:
+      type: object
+      properties:
+        # 文本参数
+        text:
+          type: string
+          title: 文本
+          description: 需要生成嵌入向量的文本
+      # 必填字段列表
+      required:
+        - text

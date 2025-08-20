@@ -1,0 +1,42 @@
+# DALL-E 3模型配置文件
+model:
+  # 模型唯一标识码
+  code: dall-e-3
+  # 模型显示名称
+  name: DALL-E 3
+  # 模型描述
+  description: OpenAI的DALL-E 3模型，强大的图像生成模型
+  # 模型图标
+  icon: 🎨
+  # 模型类型：图像生成
+  modelType: image
+  # 模型版本号
+  version: "1.0"
+  # 模型支持的能力列表
+  capabilities:
+    - image-generation  # 支持图像生成
+  # 模型配置参数的JSON Schema定义
+  configSchema:
+    type: object
+    properties:
+      # 图像尺寸参数
+      size:
+        type: string
+        title: 图像尺寸
+        description: 生成图像的尺寸
+        enum:
+          - 256x256    # 小尺寸
+          - 512x512    # 中等尺寸
+          - 1024x1024  # 标准尺寸
+          - 1792x1024  # 宽屏尺寸
+          - 1024x1792  # 竖屏尺寸
+        default: 1024x1024
+      # 图像质量参数
+      quality:
+        type: string
+        title: 图像质量
+        description: 生成图像的质量
+        enum:
+          - standard  # 标准质量
+          - hd        # 高清质量
+        default: standard

@@ -1,0 +1,21 @@
+# Text Embedding Ada 002模型配置文件
+model:
+  # 模型唯一标识码
+  code: text-embedding-ada-002
+  # 模型显示名称
+  name: Text Embedding Ada 002
+  # 模型描述
+  description: OpenAI的文本嵌入模型，用于生成文本的向量表示
+  # 模型图标
+  icon: 📊
+  # 模型类型：文本嵌入
+  modelType: embedding
+  # 模型版本号
+  version: "1.0"
+  # 模型支持的能力列表
+  capabilities:
+    - text-embedding  # 支持文本嵌入
+  # 模型配置参数的JSON Schema定义（嵌入模型无需额外参数）
+  configSchema:
+    type: object
+    properties: {}
