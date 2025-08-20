@@ -72,4 +72,17 @@ public interface ModelProviderService {
      * @param config 配置参数
      */
     void initialize(Map<String, Object> config);
+
+    /**
+     * 获取提供商支持的所有模型列表
+     * 通过API获取实时模型列表（如果支持）
+     * @return 模型列表
+     */
+    List<AIModel> getModels();
+
+    /**
+     * 获取提供商支持的能力映射
+     * @return 能力映射，key为能力代码，value为能力详情
+     */
+    Map<String, ModelCapability> getCapabilities();
 }

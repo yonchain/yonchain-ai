@@ -32,21 +32,99 @@ public class ModelProviderConfigLoader {
      */
     public List<ModelProvider> loadAllProviders() {
         List<ModelProvider> providers = new ArrayList<>();
-        try {
-            Resource[] resources = resourceResolver.getResources("classpath:model-providers/*.yml");
-            for (Resource resource : resources) {
-                try {
-                    ProviderConfig config = yamlMapper.readValue(resource.getInputStream(), ProviderConfig.class);
-                    ModelProvider provider = convertToModelProvider(config);
-                    providers.add(provider);
-                } catch (IOException e) {
-                    log.error("Failed to load provider config from {}: {}", resource.getFilename(), e.getMessage());
+        
+        // 定义多个扫描路径，支持从不同模块加载配置，同时支持yml和yaml扩展名
+        String[] scanPaths = {
+            "classpath*:models/*.yml",                    // 新的模型配置路径（yml）
+            "classpath*:models/*.yaml"                   // 新的模型配置路径（yaml）
+        };
+        
+        Set<String> loadedProviders = new HashSet<>(); // 防止重复加载同一提供商
+        
+        for (String scanPath : scanPaths) {
+            try {
+                Resource[] resources = resourceResolver.getResources(scanPath);
+                log.info("Found {} config files in path: {}", resources.length, scanPath);
+                
+                for (Resource resource : resources) {
+                    String filename = resource.getFilename();
+                    if (filename == null) {
+                        continue;
+                    }
+                    
+                    try {
+                        log.debug("Loading config from: {}", resource.getURI());
+                        
+                        // 检查是否是提供商配置文件（包含provider配置）
+                        Map<String, Object> configMap = yamlMapper.readValue(resource.getInputStream(), Map.class);
+                        if (configMap.containsKey("provider")) {
+                            ProviderConfig config = yamlMapper.convertValue(configMap, ProviderConfig.class);
+                            String providerCode = config.getProvider().getCode();
+                            
+                            if (!loadedProviders.contains(providerCode)) {
+                                ModelProvider provider = convertToModelProvider(config);
+                                providers.add(provider);
+                                loadedProviders.add(providerCode);
+                                log.info("Successfully loaded provider: {} from {}", providerCode, filename);
+                            } else {
+                                log.debug("Provider {} already loaded, skipping {}", providerCode, filename);
+                            }
+                        } else if (configMap.containsKey("model")) {
+                            // 这是单个模型配置文件，暂时跳过（可以在后续版本中支持）
+                            log.debug("Skipping individual model config file: {}", filename);
+                        }
+                    } catch (IOException e) {
+                        log.error("Failed to load config from {}: {}", filename, e.getMessage());
+                    }
                 }
+            } catch (IOException e) {
+                log.warn("Failed to scan config files in path {}: {}", scanPath, e.getMessage());
             }
-        } catch (IOException e) {
-            log.error("Failed to scan provider config files: {}", e.getMessage());
         }
+        
+        log.info("Total loaded {} model providers", providers.size());
         return providers;
+    }
+    
+    /**
+     * 根据提供商代码加载特定提供商配置
+     * @param providerCode 提供商代码
+     * @return 模型提供商，如果未找到返回null
+     */
+    public ModelProvider loadProviderByCode(String providerCode) {
+        String[] scanPaths = {
+            "classpath*:model-providers/" + providerCode + ".yml",
+            "classpath*:model-providers/" + providerCode + ".yaml",
+            "classpath*:model-providers/" + providerCode + "/*.yml",
+            "classpath*:model-providers/" + providerCode + "/*.yaml",
+            "classpath*:META-INF/model-providers/" + providerCode + ".yml",
+            "classpath*:META-INF/model-providers/" + providerCode + ".yaml",
+            "classpath*:META-INF/model-providers/" + providerCode + "/*.yml",
+            "classpath*:META-INF/model-providers/" + providerCode + "/*.yaml"
+        };
+        
+        for (String scanPath : scanPaths) {
+            try {
+                Resource[] resources = resourceResolver.getResources(scanPath);
+                for (Resource resource : resources) {
+                    try {
+                        ProviderConfig config = yamlMapper.readValue(resource.getInputStream(), ProviderConfig.class);
+                        ModelProvider provider = convertToModelProvider(config);
+                        if (providerCode.equals(provider.getCode())) {
+                            log.info("Successfully loaded provider: {} from {}", providerCode, resource.getFilename());
+                            return provider;
+                        }
+                    } catch (IOException e) {
+                        log.error("Failed to load provider config from {}: {}", resource.getFilename(), e.getMessage());
+                    }
+                }
+            } catch (IOException e) {
+                log.debug("No provider config found in path: {}", scanPath);
+            }
+        }
+        
+        log.warn("Provider config not found for code: {}", providerCode);
+        return null;
     }
     
     /**

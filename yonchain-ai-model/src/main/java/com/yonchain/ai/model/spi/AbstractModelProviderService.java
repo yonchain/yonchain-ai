@@ -67,4 +67,16 @@ public abstract class AbstractModelProviderService implements ModelProviderServi
         // 默认返回空列表，子类应该覆盖此方法
         return List.of();
     }
+
+    @Override
+    public List<AIModel> getModels() {
+        // 默认返回通过listModels()获取的模型列表
+        return listModels();
+    }
+
+    @Override
+    public Map<String, ModelCapability> getCapabilities() {
+        // 默认返回空的能力映射，子类应该覆盖此方法
+        return Map.of();
+    }
 }

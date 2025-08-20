@@ -1,8 +1,8 @@
 package com.yonchain.ai.model.service.impl;
 
+import com.yonchain.ai.model.config.ModelProviderConfigLoader;
 import com.yonchain.ai.model.entity.AIModel;
 import com.yonchain.ai.model.entity.ModelProvider;
-import com.yonchain.ai.model.enums.ProviderType;
 import com.yonchain.ai.model.mapper.AIModelMapper;
 import com.yonchain.ai.model.mapper.ModelProviderMapper;
 import com.yonchain.ai.model.service.ModelManagerService;
@@ -35,10 +35,18 @@ public class ModelManagerServiceImpl implements ModelManagerService {
     @Autowired
     private ApplicationContext applicationContext;
 
+    @Autowired
+    private ModelProviderConfigLoader configLoader;
+
     /**
      * 缓存已注册的模型提供商服务
      */
     private final Map<String, ModelProviderService> providerServiceMap = new ConcurrentHashMap<>();
+
+    /**
+     * 缓存从配置文件加载的提供商数据
+     */
+    private List<ModelProvider> configProviders;
 
     /**
      * 初始化方法，在服务启动时加载所有已注册的模型提供商
@@ -139,33 +147,56 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         }
     }
 
+    /**
+     * 获取配置文件中的提供商数据（懒加载）
+     */
+    private List<ModelProvider> getConfigProviders() {
+        if (configProviders == null) {
+            configProviders = configLoader.loadAllProviders();
+        }
+        return configProviders;
+    }
+
     @Override
     public List<ModelProvider> listProviders() {
-        return providerMapper.selectAll();
+        // 从配置文件获取数据，而不是数据库
+        return getConfigProviders();
     }
 
     @Override
     public ModelProvider getProvider(String providerCode) {
-        return providerMapper.selectByCode(providerCode);
+        // 从配置文件获取数据，而不是数据库
+        return getConfigProviders().stream()
+                .filter(provider -> providerCode.equals(provider.getCode()))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public List<AIModel> listModelsByProvider(String providerCode) {
-        ModelProvider provider = providerMapper.selectByCode(providerCode);
+        // 从配置文件获取数据，而不是数据库
+        ModelProvider provider = getProvider(providerCode);
         if (provider == null) {
             return Collections.emptyList();
         }
-        return modelMapper.selectByProviderId(provider.getId());
+        return provider.getModels();
     }
 
     @Override
     public List<AIModel> listAllModels() {
-        return modelMapper.selectAll();
+        // 从配置文件获取所有提供商的所有模型
+        return getConfigProviders().stream()
+                .flatMap(provider -> provider.getModels().stream())
+                .collect(Collectors.toList());
     }
 
     @Override
     public AIModel getModel(String modelCode) {
-        return modelMapper.selectByCode(modelCode);
+        // 从配置文件获取数据，而不是数据库
+        return listAllModels().stream()
+                .filter(model -> modelCode.equals(model.getCode()))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
@@ -333,8 +364,8 @@ public class ModelManagerServiceImpl implements ModelManagerService {
 
     @Override
     public List<ModelCapability> getModelCapabilities(String modelCode) {
-        // 获取模型信息
-        AIModel model = modelMapper.selectByCode(modelCode);
+        // 从配置文件获取模型信息
+        AIModel model = getModel(modelCode);
         if (model == null) {
             return Collections.emptyList();
         }
@@ -342,6 +373,18 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         // 获取提供商服务
         ModelProviderService providerService = providerServiceMap.get(model.getProviderCode());
         if (providerService == null) {
+            // 如果没有提供商服务，从配置文件中获取能力信息
+            ModelProvider provider = getProvider(model.getProviderCode());
+            if (provider != null && model.getCapabilities() != null) {
+                List<ModelCapability> capabilities = new ArrayList<>();
+                for (String capabilityCode : model.getCapabilities()) {
+                    ModelCapability capability = provider.getCapabilities().get(capabilityCode);
+                    if (capability != null) {
+                        capabilities.add(capability);
+                    }
+                }
+                return capabilities;
+            }
             return Collections.emptyList();
         }
 
@@ -351,7 +394,10 @@ public class ModelManagerServiceImpl implements ModelManagerService {
 
     @Override
     public List<AIModel> listModelsByType(String modelType) {
-        return modelMapper.selectByModelType(modelType);
+        // 从配置文件获取指定类型的模型
+        return listAllModels().stream()
+                .filter(model -> modelType.equals(model.getModelType()))
+                .collect(Collectors.toList());
     }
 
     @Override
