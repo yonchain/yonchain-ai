@@ -30,6 +30,7 @@
         <module>yonchain-ai-spring-boot-autoconfigure</module>
         <module>yonchain-ai-spring-boot-starters</module>
         <module>yonchain-ai-spring-boot-starters/yonchain-ai-sys-spring-boot-starter</module>
+        <module>yonchain-ai-models</module>
     </modules>
 
     <properties>

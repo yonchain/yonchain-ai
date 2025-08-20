@@ -28,7 +28,7 @@ public class ModelAutoConfiguration {
      */
     @PostConstruct
     public void init() {
-        modelManagerService.init();
+       // modelManagerService.init();
     }
 
     /**

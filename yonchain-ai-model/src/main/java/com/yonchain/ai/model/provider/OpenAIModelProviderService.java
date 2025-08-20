@@ -24,7 +24,6 @@ public class OpenAIModelProviderService extends AbstractModelProviderService {
     private final ModelProviderConfigLoader configLoader;
     private ModelProvider provider;
     private OpenAiApi openAiApi;
-
     
     @Autowired
     public OpenAIModelProviderService(ModelProviderConfigLoader configLoader) {
@@ -100,5 +99,36 @@ public class OpenAIModelProviderService extends AbstractModelProviderService {
     public boolean validateModelConfig(String modelCode, Map<String, Object> config) {
         // 验证模型配置是否有效
         return true; // 简单实现，实际应用中应该根据模型类型进行验证
+    }
+    
+    /**
+     * 获取提供商支持的所有模型列表
+     * 通过OpenAI API获取模型列表
+     * @return 模型列表
+     */
+    public List<AIModel> getModels() {
+        try {
+            // 如果有配置的OpenAI API客户端，可以尝试获取实时模型列表
+            if (openAiApi != null) {
+                // 这里应该调用OpenAI API获取模型列表
+                // 由于Spring AI 1.0.0版本的API限制，我们暂时返回配置中的模型列表
+                // 实际应用中，应该调用api.listModels()或类似方法获取实时模型列表
+            }
+            
+            // 返回配置中的模型列表
+            return provider.getModels();
+        } catch (Exception e) {
+            // 发生异常时返回配置中的模型列表
+            return provider.getModels();
+        }
+    }
+    
+    /**
+     * 获取提供商支持的能力映射
+     * @return 能力映射
+     */
+    public Map<String, ModelCapability> getCapabilities() {
+        // 返回提供商配置中的能力映射
+        return provider.getCapabilities();
     }
 }

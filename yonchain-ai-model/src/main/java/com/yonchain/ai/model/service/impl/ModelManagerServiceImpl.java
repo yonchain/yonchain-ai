@@ -46,27 +46,27 @@ public class ModelManagerServiceImpl implements ModelManagerService {
     public void init() {
         // 获取所有实现了ModelProviderService接口的Bean
         Map<String, ModelProviderService> serviceMap = applicationContext.getBeansOfType(ModelProviderService.class);
-        
+
         // 加载数据库中的所有提供商
-        List<ModelProvider> providers = providerMapper.selectList(null);
+        List<ModelProvider> providers = providerMapper.selectByIds(null);
         Map<String, ModelProvider> providerMap = providers.stream()
                 .collect(Collectors.toMap(ModelProvider::getCode, p -> p));
-        
+
         // 注册系统内置的提供商服务
         for (ModelProviderService service : serviceMap.values()) {
             ModelProvider providerInfo = service.getProviderInfo();
             String providerCode = providerInfo.getCode();
-            
+
             // 检查数据库中是否已存在该提供商
             ModelProvider existingProvider = providerMap.get(providerCode);
             if (existingProvider == null) {
                 // 不存在则添加到数据库
-                providerInfo.setType(ProviderType.SYSTEM.getCode());
+                //   providerInfo.setType(ProviderType.SYSTEM.getCode());
                 providerInfo.setEnabled(true);
                 providerInfo.setCreateTime(LocalDateTime.now());
                 providerInfo.setUpdateTime(LocalDateTime.now());
                 providerMapper.insert(providerInfo);
-                
+
                 // 添加该提供商的所有模型
                 List<AIModel> models = service.listModels();
                 for (AIModel model : models) {
@@ -88,12 +88,12 @@ public class ModelManagerServiceImpl implements ModelManagerService {
                 existingProvider.setConfigSchema(providerInfo.getConfigSchema());
                 existingProvider.setUpdateTime(LocalDateTime.now());
                 providerMapper.updateById(existingProvider);
-                
+
                 // 更新该提供商的所有模型
                 List<AIModel> existingModels = modelMapper.selectByProviderId(existingProvider.getId());
                 Map<String, AIModel> existingModelMap = existingModels.stream()
                         .collect(Collectors.toMap(AIModel::getCode, m -> m));
-                
+
                 List<AIModel> models = service.listModels();
                 for (AIModel model : models) {
                     AIModel existingModel = existingModelMap.get(model.getCode());
@@ -120,28 +120,28 @@ public class ModelManagerServiceImpl implements ModelManagerService {
                     }
                 }
             }
-            
+
             // 初始化提供商服务
             if (existingProvider != null && existingProvider.getConfig() != null) {
                 service.initialize(existingProvider.getConfig());
             }
-            
+
             // 注册提供商服务
             providerServiceMap.put(providerCode, service);
         }
-        
+
         // 加载自定义提供商
         for (ModelProvider provider : providers) {
-            if (ProviderType.CUSTOM.getCode().equals(provider.getType()) && provider.getEnabled()) {
+            /*if (ProviderType.CUSTOM.getCode().equals(provider.getType()) && provider.getEnabled()) {
                 // TODO: 加载自定义提供商的实现
                 // 这里需要根据实际情况实现自定义提供商的加载逻辑
-            }
+            }*/
         }
     }
 
     @Override
     public List<ModelProvider> listProviders() {
-        return providerMapper.selectList(null);
+        return providerMapper.selectAll();
     }
 
     @Override
@@ -160,7 +160,7 @@ public class ModelManagerServiceImpl implements ModelManagerService {
 
     @Override
     public List<AIModel> listAllModels() {
-        return modelMapper.selectList(null);
+        return modelMapper.selectAll();
     }
 
     @Override
@@ -176,19 +176,19 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         if (existingProvider != null) {
             throw new IllegalArgumentException("提供商代码已存在: " + provider.getCode());
         }
-        
+
         // 设置提供商类型为自定义
-        provider.setType(ProviderType.CUSTOM.getCode());
+        //  provider.setType(ProviderType.CUSTOM.getCode());
         provider.setConfig(config);
         provider.setCreateTime(LocalDateTime.now());
         provider.setUpdateTime(LocalDateTime.now());
-        
+
         // 保存到数据库
         providerMapper.insert(provider);
-        
+
         // TODO: 注册自定义提供商服务
         // 这里需要根据实际情况实现自定义提供商的注册逻辑
-        
+
         return provider;
     }
 
@@ -200,12 +200,12 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         if (existingProvider == null) {
             throw new IllegalArgumentException("提供商不存在: " + provider.getCode());
         }
-        
+
         // 检查是否是系统内置提供商
-        if (ProviderType.SYSTEM.getCode().equals(existingProvider.getType())) {
+      /*  if (ProviderType.SYSTEM.getCode().equals(existingProvider.getType())) {
             throw new IllegalArgumentException("系统内置提供商不能修改");
-        }
-        
+        }*/
+
         // 更新提供商信息
         existingProvider.setName(provider.getName());
         existingProvider.setDescription(provider.getDescription());
@@ -214,16 +214,16 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         existingProvider.setSupportedModelTypes(provider.getSupportedModelTypes());
         existingProvider.setConfig(config);
         existingProvider.setUpdateTime(LocalDateTime.now());
-        
+
         // 保存到数据库
         providerMapper.updateById(existingProvider);
-        
+
         // 更新提供商服务
         ModelProviderService providerService = providerServiceMap.get(provider.getCode());
         if (providerService != null) {
             providerService.initialize(config);
         }
-        
+
         return existingProvider;
     }
 
@@ -236,20 +236,20 @@ public class ModelManagerServiceImpl implements ModelManagerService {
             return false;
         }
         
-        // 检查是否是系统内置提供商
+       /* // 检查是否是系统内置提供商
         if (ProviderType.SYSTEM.getCode().equals(existingProvider.getType())) {
             throw new IllegalArgumentException("系统内置提供商不能删除");
-        }
-        
+        }*/
+
         // 删除该提供商的所有模型
         modelMapper.deleteByProviderId(existingProvider.getId());
-        
+
         // 删除提供商
         providerMapper.deleteById(existingProvider.getId());
-        
+
         // 移除提供商服务
         providerServiceMap.remove(providerCode);
-        
+
         return true;
     }
 
@@ -261,23 +261,23 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         if (existingModel != null) {
             throw new IllegalArgumentException("模型代码已存在: " + model.getCode());
         }
-        
+
         // 检查提供商是否存在
         ModelProvider provider = providerMapper.selectByCode(model.getProviderCode());
         if (provider == null) {
             throw new IllegalArgumentException("提供商不存在: " + model.getProviderCode());
         }
-        
+
         // 设置模型信息
         model.setProviderId(provider.getId());
         model.setIsSystem(false);
         model.setConfig(config);
         model.setCreateTime(LocalDateTime.now());
         model.setUpdateTime(LocalDateTime.now());
-        
+
         // 保存到数据库
         modelMapper.insert(model);
-        
+
         return model;
     }
 
@@ -289,12 +289,12 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         if (existingModel == null) {
             throw new IllegalArgumentException("模型不存在: " + model.getCode());
         }
-        
+
         // 检查是否是系统内置模型
         if (existingModel.getIsSystem()) {
             throw new IllegalArgumentException("系统内置模型不能修改");
         }
-        
+
         // 更新模型信息
         existingModel.setName(model.getName());
         existingModel.setDescription(model.getDescription());
@@ -304,10 +304,10 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         existingModel.setConfig(config);
         existingModel.setCapabilities(model.getCapabilities());
         existingModel.setUpdateTime(LocalDateTime.now());
-        
+
         // 保存到数据库
         modelMapper.updateById(existingModel);
-        
+
         return existingModel;
     }
 
@@ -319,15 +319,15 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         if (existingModel == null) {
             return false;
         }
-        
+
         // 检查是否是系统内置模型
         if (existingModel.getIsSystem()) {
             throw new IllegalArgumentException("系统内置模型不能删除");
         }
-        
+
         // 删除模型
         modelMapper.deleteById(existingModel.getId());
-        
+
         return true;
     }
 
@@ -338,13 +338,13 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         if (model == null) {
             return Collections.emptyList();
         }
-        
+
         // 获取提供商服务
         ModelProviderService providerService = providerServiceMap.get(model.getProviderCode());
         if (providerService == null) {
             return Collections.emptyList();
         }
-        
+
         // 获取模型能力列表
         return providerService.getModelCapabilities(modelCode);
     }
@@ -362,14 +362,14 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         if (existingProvider == null) {
             throw new IllegalArgumentException("提供商不存在: " + providerCode);
         }
-        
+
         // 更新启用状态
         existingProvider.setEnabled(enabled);
         existingProvider.setUpdateTime(LocalDateTime.now());
-        
+
         // 保存到数据库
         providerMapper.updateById(existingProvider);
-        
+
         return existingProvider;
     }
 
@@ -381,14 +381,14 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         if (existingModel == null) {
             throw new IllegalArgumentException("模型不存在: " + modelCode);
         }
-        
+
         // 更新启用状态
         existingModel.setEnabled(enabled);
         existingModel.setUpdateTime(LocalDateTime.now());
-        
+
         // 保存到数据库
         modelMapper.updateById(existingModel);
-        
+
         return existingModel;
     }
 }

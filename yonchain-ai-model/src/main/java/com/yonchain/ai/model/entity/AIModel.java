@@ -1,10 +1,5 @@
 package com.yonchain.ai.model.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -16,13 +11,11 @@ import java.util.Map;
  */
 @Data
 @Accessors(chain = true)
-@TableName(value = "ai_model", autoResultMap = true)
 public class AIModel {
 
     /**
      * 主键ID
      */
-    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
@@ -83,19 +76,19 @@ public class AIModel {
     /**
      * 模型配置参数，JSON格式
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    //@TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> config;
 
     /**
      * 模型配置参数Schema，JSON Schema格式
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+   // @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String, Object> configSchema;
 
     /**
      * 模型能力标签，如文本生成、图像生成等
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
+  //  @TableField(typeHandler = JacksonTypeHandler.class)
     private String[] capabilities;
 
     /**

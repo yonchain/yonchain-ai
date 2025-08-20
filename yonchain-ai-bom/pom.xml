@@ -117,6 +117,34 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!--ollama模型模块 -->
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-ollama</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- openai模型模块 -->
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-openai</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- deepseek模型模块 -->
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-deepseek</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- anthropic模型模块 -->
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-anthropic</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.yonchain.ai</groupId>
                 <artifactId>yonchain-ai-model-spring-boot-starter</artifactId>

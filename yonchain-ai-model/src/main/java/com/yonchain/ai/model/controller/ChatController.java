@@ -4,7 +4,6 @@ package com.yonchain.ai.model.controller;
 import com.yonchain.ai.model.dto.ChatCompletionRequest;
 import com.yonchain.ai.model.dto.ChatCompletionResponse;
 import com.yonchain.ai.model.service.ChatService;
-import com.yonchain.ai.model.service.ModelInvokeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;

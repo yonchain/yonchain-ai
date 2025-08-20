@@ -61,8 +61,15 @@ public class ModelProviderConfigLoader {
         provider.setDescription(config.getProvider().getDescription());
         provider.setIconUrl(config.getProvider().getIconUrl());
         provider.setWebsiteUrl(config.getProvider().getWebsiteUrl());
-        provider.setSupportedModelTypes(String.join(",", config.getProvider().getSupportedModelTypes()));
-        provider.setConfigSchema(yamlMapper.valueToTree(config.getProvider().getConfigSchema()));
+        provider.setSupportedModelTypes(config.getProvider().getSupportedModelTypes());
+        
+        // 将JsonNode转换为Map<String, Object>
+        if (config.getProvider().getConfigSchema() != null) {
+            provider.setConfigSchema(yamlMapper.convertValue(
+                yamlMapper.valueToTree(config.getProvider().getConfigSchema()), 
+                yamlMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class)
+            ));
+        }
         
         // 设置模型列表
         List<AIModel> models = new ArrayList<>();
@@ -75,8 +82,16 @@ public class ModelProviderConfigLoader {
                 model.setIconUrl(modelConfig.getIconUrl());
                 model.setModelType(modelConfig.getModelType());
                 model.setVersion(modelConfig.getVersion());
-                model.setCapabilities(String.join(",", modelConfig.getCapabilities()));
-                model.setConfigSchema(yamlMapper.valueToTree(modelConfig.getConfigSchema()));
+                model.setCapabilities(modelConfig.getCapabilities().toArray(new String[modelConfig.getCapabilities().size()]));
+                
+                // 将JsonNode转换为Map<String, Object>
+                if (modelConfig.getConfigSchema() != null) {
+                    model.setConfigSchema(yamlMapper.convertValue(
+                        yamlMapper.valueToTree(modelConfig.getConfigSchema()), 
+                        yamlMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class)
+                    ));
+                }
+                
                 model.setProviderCode(provider.getCode());
                 models.add(model);
             }
@@ -94,7 +109,15 @@ public class ModelProviderConfigLoader {
                 capability.setType(capConfig.getType());
                 capability.setIcon(capConfig.getIcon());
                 capability.setSupportsStreaming(capConfig.isSupportsStreaming());
-                capability.setParamSchema(yamlMapper.valueToTree(capConfig.getParamSchema()));
+                
+                // 将JsonNode转换为Map<String, Object>
+                if (capConfig.getParamSchema() != null) {
+                    capability.setParamSchema(yamlMapper.convertValue(
+                        yamlMapper.valueToTree(capConfig.getParamSchema()), 
+                        yamlMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class)
+                    ));
+                }
+                
                 capabilities.put(key, capability);
             });
         }
