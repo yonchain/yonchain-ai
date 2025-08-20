@@ -36,7 +36,7 @@ public class AIModel {
     /**
      * 模型图标URL
      */
-    private String iconUrl;
+    private String icon;
 
     /**
      * 模型类型（TEXT: 文本, IMAGE: 图像, AUDIO: 音频, VIDEO: 视频, MULTIMODAL: 多模态）

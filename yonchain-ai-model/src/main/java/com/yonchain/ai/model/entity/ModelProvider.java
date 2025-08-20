@@ -38,7 +38,7 @@ public class ModelProvider {
     /**
      * 提供商图标URL
      */
-    private String iconUrl;
+    private String icon;
 
     /**
      * 提供商官网URL

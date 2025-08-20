@@ -425,7 +425,6 @@ public class DifyAppApi {
             @JsonProperty("icon_type") String iconType,
             @JsonProperty("icon") String icon,
             @JsonProperty("icon_background") String iconBackground,
-            @JsonProperty("icon_url") String iconUrl,
             @JsonProperty("description") String description,
             @JsonProperty("copyright") String copyright,
             @JsonProperty("privacy_policy") String privacyPolicy,

@@ -90,7 +90,7 @@ public class ModelManagerServiceImpl implements ModelManagerService {
                 // 存在则更新提供商信息
                 existingProvider.setName(providerInfo.getName());
                 existingProvider.setDescription(providerInfo.getDescription());
-                existingProvider.setIconUrl(providerInfo.getIconUrl());
+                existingProvider.setIcon(providerInfo.getIcon());
                 existingProvider.setWebsiteUrl(providerInfo.getWebsiteUrl());
                 existingProvider.setSupportedModelTypes(providerInfo.getSupportedModelTypes());
                 existingProvider.setConfigSchema(providerInfo.getConfigSchema());
@@ -118,7 +118,7 @@ public class ModelManagerServiceImpl implements ModelManagerService {
                         // 存在则更新
                         existingModel.setName(model.getName());
                         existingModel.setDescription(model.getDescription());
-                        existingModel.setIconUrl(model.getIconUrl());
+                        existingModel.setIcon(model.getIcon());
                         existingModel.setModelType(model.getModelType());
                         existingModel.setVersion(model.getVersion());
                         existingModel.setConfigSchema(model.getConfigSchema());
@@ -157,19 +157,76 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         return configProviders;
     }
 
+    /**
+     * 合并提供商配置：配置文件提供基础信息，数据库提供运行时配置
+     * @param configProvider 配置文件中的提供商信息（静态信息：模型列表、能力等）
+     * @param dbProvider 数据库中的提供商信息（动态配置：API Key、Base URL等）
+     * @return 合并后的提供商信息
+     */
+    private ModelProvider mergeProviderConfig(ModelProvider configProvider, ModelProvider dbProvider) {
+        // 创建新的提供商对象，避免修改原始对象
+        ModelProvider mergedProvider = new ModelProvider();
+        
+        // 基础信息来自配置文件（静态信息）
+        mergedProvider.setCode(configProvider.getCode());
+        mergedProvider.setName(configProvider.getName());
+        mergedProvider.setDescription(configProvider.getDescription());
+        mergedProvider.setIconUrl(configProvider.getIconUrl());
+        mergedProvider.setWebsiteUrl(configProvider.getWebsiteUrl());
+        mergedProvider.setSupportedModelTypes(configProvider.getSupportedModelTypes());
+        mergedProvider.setConfigSchema(configProvider.getConfigSchema());
+        mergedProvider.setModels(configProvider.getModels());
+        mergedProvider.setCapabilities(configProvider.getCapabilities());
+        
+        // 运行时配置来自数据库（动态配置：API Key、Base URL等敏感信息）
+        mergedProvider.setId(dbProvider.getId());
+        mergedProvider.setConfig(dbProvider.getConfig()); // API Key、Base URL等敏感配置
+        mergedProvider.setEnabled(dbProvider.getEnabled());
+        mergedProvider.setCreateTime(dbProvider.getCreateTime());
+        mergedProvider.setUpdateTime(dbProvider.getUpdateTime());
+        
+        return mergedProvider;
+    }
+
     @Override
     public List<ModelProvider> listProviders() {
-        // 从配置文件获取数据，而不是数据库
-        return getConfigProviders();
+        // 混合数据源：配置文件 + 数据库
+        List<ModelProvider> configProviders = getConfigProviders();
+        List<ModelProvider> dbProviders = providerMapper.selectAll();
+        
+        // 将数据库中的运行时配置合并到配置文件的提供商中
+        Map<String, ModelProvider> dbProviderMap = dbProviders.stream()
+                .collect(Collectors.toMap(ModelProvider::getCode, p -> p));
+        
+        return configProviders.stream().map(configProvider -> {
+            ModelProvider dbProvider = dbProviderMap.get(configProvider.getCode());
+            if (dbProvider != null) {
+                // 合并配置：配置文件提供基础信息，数据库提供运行时配置
+                return mergeProviderConfig(configProvider, dbProvider);
+            }
+            return configProvider;
+        }).collect(Collectors.toList());
     }
 
     @Override
     public ModelProvider getProvider(String providerCode) {
-        // 从配置文件获取数据，而不是数据库
-        return getConfigProviders().stream()
+        // 混合数据源：配置文件 + 数据库
+        ModelProvider configProvider = getConfigProviders().stream()
                 .filter(provider -> providerCode.equals(provider.getCode()))
                 .findFirst()
                 .orElse(null);
+        
+        if (configProvider == null) {
+            return null;
+        }
+        
+        // 从数据库获取运行时配置
+        ModelProvider dbProvider = providerMapper.selectByCode(providerCode);
+        if (dbProvider != null) {
+            return mergeProviderConfig(configProvider, dbProvider);
+        }
+        
+        return configProvider;
     }
 
     @Override
@@ -240,7 +297,7 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         // 更新提供商信息
         existingProvider.setName(provider.getName());
         existingProvider.setDescription(provider.getDescription());
-        existingProvider.setIconUrl(provider.getIconUrl());
+        existingProvider.setIcon(provider.getIcon());
         existingProvider.setWebsiteUrl(provider.getWebsiteUrl());
         existingProvider.setSupportedModelTypes(provider.getSupportedModelTypes());
         existingProvider.setConfig(config);
@@ -329,7 +386,7 @@ public class ModelManagerServiceImpl implements ModelManagerService {
         // 更新模型信息
         existingModel.setName(model.getName());
         existingModel.setDescription(model.getDescription());
-        existingModel.setIconUrl(model.getIconUrl());
+        existingModel.setIcon(model.getIcon());
         existingModel.setModelType(model.getModelType());
         existingModel.setVersion(model.getVersion());
         existingModel.setConfig(config);

@@ -137,7 +137,7 @@ public class ModelProviderConfigLoader {
         provider.setCode(config.getProvider().getCode());
         provider.setName(config.getProvider().getName());
         provider.setDescription(config.getProvider().getDescription());
-        provider.setIconUrl(config.getProvider().getIconUrl());
+        provider.setIcon(config.getProvider().getIcon());
         provider.setWebsiteUrl(config.getProvider().getWebsiteUrl());
         provider.setSupportedModelTypes(config.getProvider().getSupportedModelTypes());
         
@@ -157,7 +157,7 @@ public class ModelProviderConfigLoader {
                 model.setCode(modelConfig.getCode());
                 model.setName(modelConfig.getName());
                 model.setDescription(modelConfig.getDescription());
-                model.setIconUrl(modelConfig.getIconUrl());
+                model.setIcon(modelConfig.getIcon());
                 model.setModelType(modelConfig.getModelType());
                 model.setVersion(modelConfig.getVersion());
                 model.setCapabilities(modelConfig.getCapabilities().toArray(new String[modelConfig.getCapabilities().size()]));
@@ -219,7 +219,7 @@ public class ModelProviderConfigLoader {
         private String code;
         private String name;
         private String description;
-        private String iconUrl;
+        private String icon;
         private String websiteUrl;
         private List<String> supportedModelTypes;
         private Map<String, Object> configSchema;
@@ -230,7 +230,7 @@ public class ModelProviderConfigLoader {
         private String code;
         private String name;
         private String description;
-        private String iconUrl;
+        private String icon;
         private String modelType;
         private String version;
         private List<String> capabilities;

@@ -1,0 +1,182 @@
+# DeepSeek模型提供商配置文件
+
+# 提供商配置部分
+provider:
+  # 提供商唯一标识码，用于系统内部识别
+  code: deepseek
+  # 提供商显示名称
+  name: DeepSeek
+  # 提供商简要描述信息
+  description: DeepSeek提供的AI模型服务
+  # 提供商图标
+  icon: 🧠
+  # 提供商官方网站URL
+  websiteUrl: https://www.deepseek.com
+  # 该提供商支持的模型类型列表
+  supportedModelTypes:
+    - text    # 文本处理模型
+    - code    # 代码生成模型
+  # 提供商配置参数的JSON Schema定义
+  configSchema:
+    type: object
+    properties:
+      # API密钥配置
+      apiKey:
+        type: string
+        title: API密钥
+        description: DeepSeek API密钥
+      # API基础URL配置
+      baseUrl:
+        type: string
+        title: API基础URL
+        description: DeepSeek API基础URL，默认为https://api.deepseek.com
+        default: https://api.deepseek.com
+      # 代理URL配置
+      proxyUrl:
+        type: string
+        title: 代理URL
+        description: API请求代理URL（可选）
+    # 必填字段列表
+    required:
+      - apiKey
+
+# 模型列表
+models:
+  - code: deepseek-chat
+    name: DeepSeek Chat
+    description: DeepSeek聊天模型
+    modelType: text
+    version: v1
+    capabilities:
+      - chat
+      - text-generation
+    configSchema:
+      type: object
+      properties:
+        temperature:
+          type: number
+          title: 温度
+          description: 控制输出随机性
+          minimum: 0
+          maximum: 2
+          default: 1
+        maxTokens:
+          type: integer
+          title: 最大令牌数
+          description: 生成文本的最大长度
+          minimum: 1
+          maximum: 4096
+          default: 1024
+
+  - code: deepseek-coder
+    name: DeepSeek Coder
+    description: DeepSeek代码生成模型
+    modelType: code
+    version: v1
+    capabilities:
+      - code-generation
+      - chat
+    configSchema:
+      type: object
+      properties:
+        temperature:
+          type: number
+          title: 温度
+          description: 控制输出随机性
+          minimum: 0
+          maximum: 2
+          default: 0.1
+        maxTokens:
+          type: integer
+          title: 最大令牌数
+          description: 生成代码的最大长度
+          minimum: 1
+          maximum: 8192
+          default: 2048
+
+# 模型能力配置部分
+capabilities:
+  # 聊天对话能力配置
+  chat:
+    code: chat
+    name: 聊天
+    description: 进行多轮对话
+    type: text
+    icon: 💬
+    supportsStreaming: true
+    paramSchema:
+      type: object
+      properties:
+        messages:
+          type: array
+          title: 消息列表
+          description: 对话消息列表
+          items:
+            type: object
+            properties:
+              role:
+                type: string
+                title: 角色
+                description: 消息发送者的角色
+                enum:
+                  - system
+                  - user
+                  - assistant
+              content:
+                type: string
+                title: 内容
+                description: 消息内容
+            required:
+              - role
+              - content
+      required:
+        - messages
+
+  # 文本生成能力配置
+  text-generation:
+    code: text-generation
+    name: 文本生成
+    description: 生成自然语言文本
+    type: text
+    icon: 🤖
+    supportsStreaming: true
+    paramSchema:
+      type: object
+      properties:
+        prompt:
+          type: string
+          title: 提示词
+          description: 用于生成文本的提示词
+      required:
+        - prompt
+
+  # 代码生成能力配置
+  code-generation:
+    code: code-generation
+    name: 代码生成
+    description: 生成和优化代码
+    type: code
+    icon: 💻
+    supportsStreaming: true
+    paramSchema:
+      type: object
+      properties:
+        prompt:
+          type: string
+          title: 提示词
+          description: 用于生成代码的提示词
+        language:
+          type: string
+          title: 编程语言
+          description: 目标编程语言
+          enum:
+            - python
+            - java
+            - javascript
+            - typescript
+            - go
+            - rust
+            - cpp
+            - c
+      required:
+        - prompt
