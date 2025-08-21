@@ -1,23 +1,26 @@
+/*
 package com.yonchain.ai.model.service.impl;
 
-import com.yonchain.ai.model.dto.*;
-import com.yonchain.ai.model.entity.AIModel;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yonchain.ai.model.entity.AiModel;
 import com.yonchain.ai.model.entity.ModelProvider;
-import com.yonchain.ai.model.enums.ModelType;
-import com.yonchain.ai.model.service.ModelInvokeService;
-import com.yonchain.ai.model.service.ModelManagerService;
+import com.yonchain.ai.api.model.ModelInvokeService;
 import com.yonchain.ai.model.spi.ModelProviderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+*/
 /**
  * 模型调用服务实现类
- */
+ *//*
+
 @Slf4j
 @Service
 public class ModelInvokeServiceImpl implements ModelInvokeService {
@@ -25,29 +28,38 @@ public class ModelInvokeServiceImpl implements ModelInvokeService {
     @Autowired
     private ModelManagerService modelManagerService;
 
-    /**
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    */
+/**
      * 缓存已注册的模型提供商服务
-     */
+     *//*
+
     private final Map<String, ModelProviderService> providerServiceMap = new ConcurrentHashMap<>();
 
-    /**
+    */
+/**
      * 注册模型提供商服务
      *
      * @param providerCode 提供商代码
      * @param service      提供商服务
-     */
+     *//*
+
     public void registerProviderService(String providerCode, ModelProviderService service) {
         providerServiceMap.put(providerCode, service);
     }
 
-    /**
+    */
+/**
      * 获取模型提供商服务
      *
      * @param modelCode 模型代码
      * @return 提供商服务
-     */
+     *//*
+
     private ModelProviderService getProviderService(String modelCode) {
-        AIModel model = modelManagerService.getModel(modelCode);
+        AiModel model = modelManagerService.getModel(modelCode);
         if (model == null) {
             throw new IllegalArgumentException("模型不存在: " + modelCode);
         }
@@ -60,14 +72,16 @@ public class ModelInvokeServiceImpl implements ModelInvokeService {
         return service;
     }
 
-    /**
+    */
+/**
      * 获取模型配置
      *
      * @param modelCode 模型代码
      * @return 模型配置
-     */
+     *//*
+
     private Map<String, Object> getModelConfig(String modelCode) {
-        AIModel model = modelManagerService.getModel(modelCode);
+        AiModel model = modelManagerService.getModel(modelCode);
         if (model == null) {
             throw new IllegalArgumentException("模型不存在: " + modelCode);
         }
@@ -79,8 +93,18 @@ public class ModelInvokeServiceImpl implements ModelInvokeService {
 
         // 合并提供商配置和模型配置
         Map<String, Object> config = new ConcurrentHashMap<>();
-        if (provider.getConfig() != null) {
-            config.putAll(provider.getConfig());
+        
+        // 将提供商配置从JSON字符串转换为Map
+        if (StringUtils.hasText(provider.getConfig())) {
+            try {
+                Map<String, Object> providerConfig = objectMapper.readValue(
+                    provider.getConfig(), 
+                    new TypeReference<Map<String, Object>>() {}
+                );
+                config.putAll(providerConfig);
+            } catch (Exception e) {
+                log.warn("解析提供商配置失败: {}, 配置内容: {}", e.getMessage(), provider.getConfig());
+            }
         }
         
         // 添加API密钥、基础URL等配置
@@ -94,16 +118,26 @@ public class ModelInvokeServiceImpl implements ModelInvokeService {
             config.put("proxyUrl", provider.getProxyUrl());
         }
         
-        if (model.getConfig() != null) {
-            config.putAll(model.getConfig());
+        // 将模型配置从JSON字符串转换为Map
+        if (StringUtils.hasText(model.getConfig())) {
+            try {
+                Map<String, Object> modelConfig = objectMapper.readValue(
+                    model.getConfig(), 
+                    new TypeReference<Map<String, Object>>() {}
+                );
+                config.putAll(modelConfig);
+            } catch (Exception e) {
+                log.warn("解析模型配置失败: {}, 配置内容: {}", e.getMessage(), model.getConfig());
+            }
         }
 
         return config;
     }
 
- /*   @Override
+ */
+/*   @Override
     public ChatCompletionResponse chatCompletion(String modelCode, ChatCompletionRequest request) {
-        AIModel model = modelManagerService.getModel(modelCode);
+        AiModel model = modelManagerService.getModel(modelCode);
         if (model == null) {
             throw new IllegalArgumentException("模型不存在: " + modelCode);
         }
@@ -166,7 +200,7 @@ public class ModelInvokeServiceImpl implements ModelInvokeService {
 
     @Override
     public SseEmitter chatCompletionStream(String modelCode, ChatCompletionRequest request) {
-        AIModel model = modelManagerService.getModel(modelCode);
+        AiModel model = modelManagerService.getModel(modelCode);
         if (model == null) {
             throw new IllegalArgumentException("模型不存在: " + modelCode);
         }
@@ -214,11 +248,12 @@ public class ModelInvokeServiceImpl implements ModelInvokeService {
         }
         
         throw new UnsupportedOperationException("不支持的模型提供商: " + model.getProviderCode());
-    }*/
+    }*//*
+
 
     @Override
     public CompletionResponse textCompletion(String modelCode, CompletionRequest request) {
-        AIModel model = modelManagerService.getModel(modelCode);
+        AiModel model = modelManagerService.getModel(modelCode);
         if (model == null) {
             throw new IllegalArgumentException("模型不存在: " + modelCode);
         }
@@ -264,7 +299,7 @@ public class ModelInvokeServiceImpl implements ModelInvokeService {
 
     @Override
     public SseEmitter textCompletionStream(String modelCode, CompletionRequest request) {
-        AIModel model = modelManagerService.getModel(modelCode);
+        AiModel model = modelManagerService.getModel(modelCode);
         if (model == null) {
             throw new IllegalArgumentException("模型不存在: " + modelCode);
         }
@@ -306,7 +341,7 @@ public class ModelInvokeServiceImpl implements ModelInvokeService {
 
     @Override
     public ImageGenerationResponse generateImage(String modelCode, ImageGenerationRequest request) {
-        AIModel model = modelManagerService.getModel(modelCode);
+        AiModel model = modelManagerService.getModel(modelCode);
         if (model == null) {
             throw new IllegalArgumentException("模型不存在: " + modelCode);
         }
@@ -350,7 +385,7 @@ public class ModelInvokeServiceImpl implements ModelInvokeService {
 
     @Override
     public EmbeddingResponse createEmbedding(String modelCode, EmbeddingRequest request) {
-        AIModel model = modelManagerService.getModel(modelCode);
+        AiModel model = modelManagerService.getModel(modelCode);
         if (model == null) {
             throw new IllegalArgumentException("模型不存在: " + modelCode);
         }
@@ -391,4 +426,4 @@ public class ModelInvokeServiceImpl implements ModelInvokeService {
         
         throw new UnsupportedOperationException("不支持的模型提供商: " + model.getProviderCode());
     }
-}
+}*/

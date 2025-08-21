@@ -1,12 +1,10 @@
 package com.yonchain.ai.model.entity;
 
-import com.yonchain.ai.model.vo.ModelCapability;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 模型提供商实体类
@@ -18,7 +16,12 @@ public class ModelProvider {
     /**
      * 主键ID
      */
-    private Long id;
+    private String id;
+
+    /**
+     * 租户ID
+     */
+    private String tenantId;
 
     /**
      * 提供商代码，唯一标识
@@ -77,21 +80,21 @@ public class ModelProvider {
 
     /**
      * 提供商配置参数，JSON格式
+     * 数据库中存储为JSON字符串
      */
-  //  @TableField(typeHandler = JacksonTypeHandler.class)
-    private Map<String, Object> config;
+    private String config;
 
     /**
      * 提供商配置参数Schema，JSON Schema格式
+     * 数据库中存储为JSON字符串
      */
- //   @TableField(typeHandler = JacksonTypeHandler.class)
-    private Map<String, Object> configSchema;
+    private String configSchema;
 
     /**
      * 支持的模型类型列表
+     * 数据库中存储为JSON字符串数组
      */
- //   @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<String> supportedModelTypes;
+    private String modelType;
 
     /**
      * 创建时间
@@ -102,32 +105,16 @@ public class ModelProvider {
      * 更新时间
      */
     private LocalDateTime updateTime;
-    
+
     /**
      * 提供商支持的模型列表
+     * 数据库中存储为JSON字符串
      */
-  //  @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<AIModel> models;
-    
+    private List<AiModel> models;
+
     /**
      * 提供商支持的能力映射，key为能力代码，value为能力对象
+     * 数据库中存储为JSON字符串
      */
-   // @TableField(typeHandler = JacksonTypeHandler.class)
-    private Map<String, ModelCapability> capabilities;
-    
-    /**
-     * 获取提供商支持的所有模型列表
-     * @return 模型列表
-     */
-    public List<AIModel> getModels() {
-        return models;
-    }
-    
-    /**
-     * 获取提供商支持的能力映射
-     * @return 能力映射
-     */
-    public Map<String, ModelCapability> getCapabilities() {
-        return capabilities;
-    }
+    private String capabilities;
 }

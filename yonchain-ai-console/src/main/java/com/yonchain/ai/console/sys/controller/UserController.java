@@ -342,6 +342,7 @@ public class UserController extends BaseController {
                 "  \"system:users:create\",\n" +
                 "  \"system:users:create\",\n" +
                 "  \"plugins:view\",\n" +
+                "  \"mcp:view\",\n" +
                 "  \"model:view\"\n" +
                 "]");
     }

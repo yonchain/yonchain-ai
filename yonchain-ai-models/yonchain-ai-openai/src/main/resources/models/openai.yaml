@@ -12,14 +12,16 @@ provider:
   icon: 🤖
   # 提供商官方网站URL
   websiteUrl: https://openai.com
+  # 排序权重，数值越小排序越靠前
+  sortOrder: 1
   # 该提供商支持的模型类型列表
   supportedModelTypes:
-    - text    # 文本处理模型
-    - image   # 图像生成模型
-    - embedding  # 文本嵌入模型
-    - audio   # 音频处理模型
+    - text        # 文本处理模型
+    - image       # 图像生成模型
+    - embedding   # 文本嵌入模型
+    - audio       # 音频处理模型
   # 提供商配置参数的JSON Schema定义
-  configSchema:
+  parameterSchema:
     type: object
     properties:
       # API密钥配置
@@ -41,14 +43,6 @@ provider:
     # 必填字段列表
     required:
       - apiKey
-
-# 模型文件列表
-models:
-  # 模型配置文件列表，系统将加载这些文件中定义的模型
-  - gpt-4.yml           # GPT-4模型配置文件
-  - gpt-3.5-turbo.yml   # GPT-3.5 Turbo模型配置文件
-  - dall-e-3.yml        # DALL-E 3模型配置文件
-  - text-embedding-ada-002.yml  # Text Embedding Ada 002模型配置文件
 
 # 模型能力配置部分，与provider和models同级
 capabilities:

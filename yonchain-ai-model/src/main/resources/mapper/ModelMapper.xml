@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yonchain.ai.model.mapper.ModelMapper">
+    
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.yonchain.ai.model.entity.AiModel">
+        <!-- 主键ID -->
+        <id column="id" property="id" jdbcType="VARCHAR" />
+        <!-- 租户ID -->
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
+        <!-- 模型代码 -->
+        <result column="code" property="code" jdbcType="VARCHAR" />
+        <!-- 模型名称 -->
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <!-- 模型描述 -->
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <!-- 模型图标 -->
+        <result column="icon" property="icon" jdbcType="VARCHAR" />
+        <!-- 模型类型 -->
+        <result column="model_type" property="modelType" jdbcType="VARCHAR" />
+        <!-- 模型提供商ID -->
+        <result column="provider_id" property="providerId" jdbcType="VARCHAR" />
+        <!-- 模型提供商代码 -->
+        <result column="provider_code" property="providerCode" jdbcType="VARCHAR" />
+        <!-- 模型版本 -->
+        <result column="version" property="version" jdbcType="VARCHAR" />
+        <!-- 数据来源 -->
+        <result column="source" property="source" jdbcType="VARCHAR" />
+        <!-- 是否是系统默认模型 -->
+        <result column="is_system" property="isSystem" jdbcType="BOOLEAN" />
+        <!-- 是否启用 -->
+        <result column="enabled" property="enabled" jdbcType="BOOLEAN" />
+        <!-- 排序号 -->
+        <result column="sort_order" property="sortOrder" jdbcType="INTEGER" />
+        <!-- 模型配置参数 -->
+        <result column="config" property="config" jdbcType="VARCHAR" />
+        <!-- 模型配置参数Schema -->
+        <result column="config_schema" property="configSchema" jdbcType="VARCHAR" />
+        <!-- 模型能力标签 -->
+        <result column="capabilities" property="capabilities" jdbcType="VARCHAR" />
+        <!-- 创建时间 -->
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <!-- 更新时间 -->
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, tenant_id, code, name, description, icon, model_type, provider_id, provider_code,
+        version, source, is_system, enabled, sort_order, config, config_schema, capabilities,
+        create_time, update_time
+    </sql>
+
+    <!-- 根据ID查询模型 -->
+    <select id="selectById" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ai_model
+        WHERE id = #{id}
+    </select>
+
+    <!-- 根据代码查询模型 -->
+    <select id="selectByCode" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ai_model
+        WHERE code = #{code}
+    </select>
+
+    <!-- 根据提供商代码查询模型列表 -->
+    <select id="selectByProviderCode" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ai_model
+        WHERE provider_code = #{providerCode}
+        AND enabled = true
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 根据租户ID查询模型列表 -->
+    <select id="selectByTenantId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ai_model
+        WHERE tenant_id = #{tenantId}
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 查询所有启用的模型 -->
+    <select id="selectEnabled" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ai_model
+        WHERE enabled = true
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 分页查询模型列表 -->
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ai_model
+        <where>
+            <if test="tenantId != null and tenantId != ''">
+                AND tenant_id = #{tenantId}
+            </if>
+            <if test="code != null and code != ''">
+                AND code LIKE CONCAT('%', #{code}, '%')
+            </if>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="modelType != null and modelType != ''">
+                AND model_type = #{modelType}
+            </if>
+            <if test="providerCode != null and providerCode != ''">
+                AND provider_code = #{providerCode}
+            </if>
+            <if test="enabled != null">
+                AND enabled = #{enabled}
+            </if>
+            <if test="isSystem != null">
+                AND is_system = #{isSystem}
+            </if>
+        </where>
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 插入模型 -->
+    <insert id="insert" parameterType="com.yonchain.ai.model.entity.AiModel">
+        INSERT INTO ai_model (
+            id, tenant_id, code, name, description, icon, model_type, provider_id, provider_code,
+            version, source, is_system, enabled, sort_order, config, config_schema, capabilities,
+            create_time, update_time
+        )
+        VALUES (
+            #{id}, #{tenantId}, #{code}, #{name}, #{description}, #{icon}, #{modelType}, #{providerId}, #{providerCode},
+            #{version}, #{source}, #{isSystem}, #{enabled}, #{sortOrder}, #{config}, #{configSchema}, #{capabilities},
+            #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <!-- 更新模型 -->
+    <update id="update" parameterType="com.yonchain.ai.model.entity.AiModel">
+        UPDATE ai_model
+        SET code = #{code},
+            name = #{name},
+            description = #{description},
+            icon = #{icon},
+            model_type = #{modelType},
+            provider_id = #{providerId},
+            provider_code = #{providerCode},
+            version = #{version},
+            source = #{source},
+            is_system = #{isSystem},
+            enabled = #{enabled},
+            sort_order = #{sortOrder},
+            config = #{config},
+            config_schema = #{configSchema},
+            capabilities = #{capabilities},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID删除模型 -->
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM ai_model
+        WHERE id = #{id}
+    </delete>
+
+    <!-- 批量删除模型 -->
+    <delete id="batchDelete">
+        DELETE FROM ai_model
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 更新启用状态 -->
+    <update id="updateEnabled">
+        UPDATE ai_model
+        SET enabled = #{enabled},
+            update_time = #{updateTime}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据模型类型统计数量 -->
+    <select id="countByModelType" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM ai_model
+        WHERE model_type = #{modelType}
+        <if test="enabled != null">
+            AND enabled = #{enabled}
+        </if>
+    </select>
+
+    <!-- 根据提供商代码统计模型数量 -->
+    <select id="countByProviderCode" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM ai_model
+        WHERE provider_code = #{providerCode}
+        <if test="enabled != null">
+            AND enabled = #{enabled}
+        </if>
+    </select>
+
+    <!-- 批量插入模型 -->
+    <insert id="batchInsert">
+        INSERT INTO ai_model (
+            id, tenant_id, code, name, description, icon, model_type, provider_id, provider_code,
+            version, source, is_system, enabled, sort_order, config, config_schema, capabilities,
+            create_time, update_time
+        )
+        VALUES
+        <foreach collection="models" item="model" separator=",">
+            (
+                #{model.id}, #{model.tenantId}, #{model.code}, #{model.name}, #{model.description}, 
+                #{model.icon}, #{model.modelType}, #{model.providerId}, #{model.providerCode},
+                #{model.version}, #{model.source}, #{model.isSystem}, #{model.enabled}, #{model.sortOrder}, 
+                #{model.config}, #{model.configSchema}, #{model.capabilities},
+                #{model.createTime}, #{model.updateTime}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

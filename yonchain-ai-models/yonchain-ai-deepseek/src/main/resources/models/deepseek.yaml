@@ -1,0 +1,77 @@
+# DeepSeek模型提供商配置文件
+
+# 提供商配置部分
+provider:
+  # 提供商唯一标识码，用于系统内部识别
+  code: deepseek
+  # 提供商显示名称
+  name: DeepSeek
+  # 提供商简要描述信息
+  description: DeepSeek提供的AI模型服务
+  # 提供商图标
+  icon: 🧠
+  # 提供商官方网站URL
+  websiteUrl: https://www.deepseek.com
+  # 排序权重，数值越小排序越靠前
+  sortOrder: 2
+  # 该提供商支持的模型类型列表
+  supportedModelTypes:
+    - text        # 文本处理模型
+    - chat        # 对话聊天模型
+    - code        # 代码生成模型
+  # 提供商配置参数的JSON Schema定义
+  configSchema:
+    type: object
+    properties:
+      # API密钥配置
+      apiKey:
+        type: string
+        title: API密钥
+        description: DeepSeek API密钥
+      # API基础URL配置
+      baseUrl:
+        type: string
+        title: API基础URL
+        description: DeepSeek API基础URL，默认为https://api.deepseek.com
+        default: https://api.deepseek.com
+      # 代理URL配置
+      proxyUrl:
+        type: string
+        title: 代理URL
+        description: API请求代理URL（可选）
+    # 必填字段列表
+    required:
+      - apiKey
+
+# 模型文件列表
+models:
+  # 模型配置文件列表，系统将加载这些文件中定义的模型
+  - deepseek-chat.yaml      # DeepSeek Chat模型配置文件
+  - deepseek-coder.yaml     # DeepSeek Coder模型配置文件
+
+# 模型能力配置部分
+capabilities:
+  # 文本生成能力配置
+  text-generation:
+    code: text-generation
+    name: 文本生成
+    description: 生成自然语言文本
+    type: text
+    icon: 🤖
+    supportsStreaming: true
+  # 聊天对话能力配置
+  chat:
+    code: chat
+    name: 聊天
+    description: 进行多轮对话
+    type: text
+    icon: 💬
+    supportsStreaming: true
+  # 代码生成能力配置
+  code-generation:
+    code: code-generation
+    name: 代码生成
+    description: 生成和优化代码
+    type: code
+    icon: 💻
+    supportsStreaming: true

@@ -84,6 +84,30 @@ public class OpenAiChatConfiguration {
         if (this.openAiChatModel == null) {
             this.openAiChatModel = createOpenAiChatModel();
         }
+
+        if (toolCallingManager == null) {
+            this.toolCallingManager = ToolCallingManager.builder().build();
+        }
+
+        if (retryTemplate == null) {
+            this.retryTemplate = RetryTemplate.defaultInstance();
+        }
+
+        if (observationRegistry == null) {
+            this.observationRegistry = ObservationRegistry.NOOP;
+        }
+
+        if (toolExecutionEligibilityPredicate == null) {
+            this.toolExecutionEligibilityPredicate = new DefaultToolExecutionEligibilityPredicate();
+        }
+
+        if (restClientBuilder == null) {
+            this.restClientBuilder = RestClient.builder();
+        }
+
+        if (webClientBuilder == null) {
+            this.webClientBuilder = WebClient.builder();
+        }
     }
 
     /**
@@ -307,30 +331,6 @@ public class OpenAiChatConfiguration {
         protected void validate() {
             if (apiKey == null || apiKey.trim().isEmpty()) {
                 throw new IllegalStateException("API密钥不能为空");
-            }
-            
-            if (toolCallingManager == null) {
-                this.toolCallingManager = ToolCallingManager.builder().build();
-            }
-            
-            if (retryTemplate == null) {
-                this.retryTemplate = RetryTemplate.defaultInstance();
-            }
-            
-            if (observationRegistry == null) {
-                this.observationRegistry = ObservationRegistry.NOOP;
-            }
-            
-            if (toolExecutionEligibilityPredicate == null) {
-                this.toolExecutionEligibilityPredicate = new DefaultToolExecutionEligibilityPredicate();
-            }
-            
-            if (restClientBuilder == null) {
-                this.restClientBuilder = RestClient.builder();
-            }
-            
-            if (webClientBuilder == null) {
-                this.webClientBuilder = WebClient.builder();
             }
         }
     }

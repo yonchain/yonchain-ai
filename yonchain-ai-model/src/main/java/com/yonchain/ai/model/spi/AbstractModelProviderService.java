@@ -1,6 +1,6 @@
 package com.yonchain.ai.model.spi;
 
-import com.yonchain.ai.model.entity.AIModel;
+import com.yonchain.ai.model.entity.AiModel;
 import com.yonchain.ai.model.entity.ModelProvider;
 import com.yonchain.ai.model.vo.ModelCapability;
 
@@ -69,7 +69,7 @@ public abstract class AbstractModelProviderService implements ModelProviderServi
     }
 
     @Override
-    public List<AIModel> getModels() {
+    public List<AiModel> getModels() {
         // 默认返回通过listModels()获取的模型列表
         return listModels();
     }

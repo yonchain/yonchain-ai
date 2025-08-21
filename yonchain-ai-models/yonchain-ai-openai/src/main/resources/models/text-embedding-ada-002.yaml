@@ -1,21 +1,41 @@
-# Text Embedding Ada 002模型配置文件
+# Text Embedding Ada 002 模型配置
 model:
-  # 模型唯一标识码
-  code: text-embedding-ada-002
+  # 模型唯一标识符
+  code: "text-embedding-ada-002"
   # 模型显示名称
-  name: Text Embedding Ada 002
-  # 模型描述
-  description: OpenAI的文本嵌入模型，用于生成文本的向量表示
+  name: "Text Embedding Ada 002"
+  # 模型详细描述
+  description: "OpenAI的文本嵌入模型，用于向量化文本"
   # 模型图标
-  icon: 📊
-  # 模型类型：文本嵌入
-  modelType: embedding
+  icon: "🔤"
+  # 所属提供商代码
+  provider: "openai"
+  # 模型类型：embedding
+  modelType: "embedding"
   # 模型版本号
   version: "1.0"
-  # 模型支持的能力列表
+  # 排序权重，数值越小排序越靠前
+  sortOrder: 4
+  # 模型支持的功能列表
   capabilities:
-    - text-embedding  # 支持文本嵌入
-  # 模型配置参数的JSON Schema定义（嵌入模型无需额外参数）
+    - "embedding"
+    - "text_similarity"
+  # 模型配置参数定义
   configSchema:
     type: object
-    properties: {}
+    properties:
+      # 嵌入向量维度
+      dimensions:
+        type: integer
+        title: 向量维度
+        description: 嵌入向量的维度
+        default: 1536
+      # 编码格式
+      encoding_format:
+        type: string
+        title: 编码格式
+        description: 返回数据的编码格式
+        enum:
+          - float
+          - base64
+        default: float

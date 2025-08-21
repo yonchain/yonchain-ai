@@ -3,11 +3,15 @@ package com.yonchain.ai.console;
 import com.yonchain.ai.api.app.Application;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.exception.YonchainException;
+import com.yonchain.ai.api.model.ModelInfo;
+import com.yonchain.ai.api.model.ModelProvider;
 import com.yonchain.ai.api.sys.*;
 import com.yonchain.ai.api.tag.Tag;
 import com.yonchain.ai.console.app.response.AppResponse;
 import com.yonchain.ai.console.file.entity.FileEntity;
 import com.yonchain.ai.console.file.response.FileResponse;
+import com.yonchain.ai.console.model.response.ModelProviderResponse;
+import com.yonchain.ai.console.model.response.ModelResponse;
 import com.yonchain.ai.console.sys.response.*;
 import com.yonchain.ai.console.tag.response.TagResponse;
 import com.yonchain.ai.web.response.ListResponse;
@@ -39,6 +43,161 @@ public class ResponseFactory {
     public ResponseFactory(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
+
+
+    /**
+     * 创建模型响应对象
+     * <p>
+     * 将Model实体对象转换为标准化的API响应格式
+     * 包含模型的基本信息和状态
+     * </p>
+     *
+     * @param model 模型实体对象，包含模型基本信息，不能为null
+     * @return 标准化后的模型响应对象，包含模型ID、名称、描述、状态等信息
+     * @see ModelInfo
+     * @see ModelResponse
+     */
+    public ModelResponse createModelResponse(ModelInfo model) {
+        ModelResponse response = new ModelResponse();
+        // 设置模型ID
+        response.setId(model.getId());
+        // 设置模型名称
+        response.setModelName(model.getModelName());
+        // 设置模型类型
+        response.setModelType(model.getModelType());
+        // 设置提供商名称
+        response.setProviderName(model.getProviderName());
+        // 设置加密配置
+        // response.setEncryptedConfig(model.getEncryptedConfig());
+        // 设置创建时间
+        response.setCreatedAt(model.getCreatedAt());
+        // 设置是否有效
+        response.setIsValid(model.getIsValid());
+        return response;
+    }
+
+
+    /**
+     * 创建模型分页响应对象
+     * <p>
+     * 将模型分页数据转换为标准化的API分页响应格式
+     * 包含分页元数据和转换后的模型数据列表
+     * </p>
+     *
+     * @param models 模型分页数据对象，包含分页信息和模型数据列表，不能为null
+     * @return 标准化后的模型分页响应对象，包含分页元数据和转换后的模型列表
+     * @see ModelInfo
+     * @see ModelResponse
+     * @see PageResponse
+     */
+    public PageResponse<ModelResponse> createModelPageResponse(Page<ModelInfo> models) {
+        PageResponse<ModelResponse> response = new PageResponse<>();
+        // 设置当前页码
+        response.setPageNum(models.getCurrent());
+        // 设置每页记录数
+        response.setPageSize(models.getSize());
+        // 设置总记录数
+        response.setTotal(models.getTotal());
+        // 转换应用数据列表
+        response.setData(models.getRecords().stream()
+                .map(this::createModelResponse)
+                .filter(Objects::nonNull)
+                .toList());
+        return response;
+    }
+
+    /**
+     * 创建模型提供商响应对象
+     * <p>
+     * 将ModelProvider实体对象转换为标准化的API响应格式
+     * 包含模型提供商的基本信息、配置和状态
+     * </p>
+     *
+     * @param provider 模型提供商实体对象，包含模型提供商基本信息，不能为null
+     * @return 标准化后的模型提供商响应对象，包含提供商ID、名称、类型、配额等信息
+     * @see ModelProvider
+     * @see ModelProviderResponse
+     */
+    public ModelProviderResponse createModelProviderResponse(ModelProvider provider) {
+        ModelProviderResponse response = new ModelProviderResponse();
+        // 设置提供商ID
+        response.setId(provider.getId());
+        // 设置租户ID
+        response.setTenantId(provider.getTenantId());
+        // 设置提供商名称
+        response.setProviderName(provider.getProviderName());
+        // 设置提供商类型
+        response.setProviderType(provider.getProviderType());
+        // 设置加密配置
+        response.setEncryptedConfig(provider.getEncryptedConfig());
+        // 设置是否有效
+        response.setIsValid(provider.getIsValid());
+        // 设置最后使用时间
+        response.setLastUsed(provider.getLastUsed());
+        // 设置配额类型
+        response.setQuotaType(provider.getQuotaType());
+        // 设置配额限制
+        response.setQuotaLimit(provider.getQuotaLimit());
+        // 设置已用配额
+        response.setQuotaUsed(provider.getQuotaUsed());
+        // 设置创建时间
+        response.setCreatedAt(provider.getCreatedAt());
+        // 设置更新时间
+        response.setUpdatedAt(provider.getUpdatedAt());
+        return response;
+    }
+
+    /**
+     * 创建模型提供商分页响应对象
+     * <p>
+     * 将模型提供商分页数据转换为标准化的API分页响应格式
+     * 包含分页元数据和转换后的模型提供商数据列表
+     * </p>
+     *
+     * @param providers 模型提供商分页数据对象，包含分页信息和模型提供商数据列表，不能为null
+     * @return 标准化后的模型提供商分页响应对象，包含分页元数据和转换后的模型提供商列表
+     * @see ModelProvider
+     * @see ModelProviderResponse
+     * @see PageResponse
+     */
+    public PageResponse<ModelProviderResponse> createModelProviderPageResponse(Page<ModelProvider> providers) {
+        PageResponse<ModelProviderResponse> response = new PageResponse<>();
+        // 设置当前页码
+        response.setPageNum(providers.getCurrent());
+        // 设置每页记录数
+        response.setPageSize(providers.getSize());
+        // 设置总记录数
+        response.setTotal(providers.getTotal());
+        // 转换模型提供商数据列表
+        response.setData(providers.getRecords().stream()
+                .map(this::createModelProviderResponse)
+                .filter(Objects::nonNull)
+                .toList());
+        return response;
+    }
+
+    /**
+     * 创建模型提供商列表响应对象
+     * <p>
+     * 将模型提供商列表转换为标准化的API列表响应格式
+     * 包含模型提供商数据列表但不包含分页信息
+     * </p>
+     *
+     * @param providers 模型提供商列表，包含模型提供商数据，不能为null
+     * @return 标准化后的模型提供商列表响应对象，包含模型提供商数据列表
+     * @see ModelProvider
+     * @see ModelProviderResponse
+     * @see ListResponse
+     */
+    public ListResponse<ModelProviderResponse> createModelProviderListResponse(List<ModelProvider> providers) {
+        ListResponse<ModelProviderResponse> response = new ListResponse<>();
+        response.setData(providers.stream()
+                .map(this::createModelProviderResponse)
+                .filter(Objects::nonNull)
+                .toList());
+        return response;
+    }
+
 
     /**
      * 创建用户响应对象

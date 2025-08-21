@@ -6,12 +6,16 @@ model:
   name: DALL-E 3
   # 模型描述
   description: OpenAI的DALL-E 3模型，强大的图像生成模型
+  # 所属提供商唯一标识码
+  provider: "openai"
   # 模型图标
   icon: 🎨
   # 模型类型：图像生成
   modelType: image
   # 模型版本号
   version: "1.0"
+  # 排序权重，数值越小排序越靠前
+  sortOrder: 3
   # 模型支持的能力列表
   capabilities:
     - image-generation  # 支持图像生成

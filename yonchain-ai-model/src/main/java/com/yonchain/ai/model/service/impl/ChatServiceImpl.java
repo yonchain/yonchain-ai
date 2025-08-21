@@ -1,13 +1,12 @@
 package com.yonchain.ai.model.service.impl;
 
-import com.yonchain.ai.model.dto.ChatCompletionRequest;
-import com.yonchain.ai.model.dto.ChatCompletionResponse;
-import com.yonchain.ai.model.entity.AIModel;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yonchain.ai.api.model.ChatCompletionRequest;
+import com.yonchain.ai.api.model.ChatCompletionResponse;
+import com.yonchain.ai.model.entity.AiModel;
 import com.yonchain.ai.model.entity.ModelProvider;
-import com.yonchain.ai.model.enums.ModelType;
-import com.yonchain.ai.model.factory.AIModelClientFactory;
-import com.yonchain.ai.model.service.ChatService;
-import com.yonchain.ai.model.service.ModelManagerService;
+import com.yonchain.ai.model.factory.ModelClientFactory;
+import com.yonchain.ai.api.model.ChatService;
 import com.yonchain.ai.model.spi.ModelProviderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -20,7 +19,6 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import reactor.core.publisher.Flux;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,15 +33,18 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class ChatServiceImpl implements ChatService {
-
+/*
     @Autowired
-    private ModelManagerService modelManagerService;
+    private ModelManagerService modelManagerService;*/
 
     @Autowired(required = false)
     private ChatClient configFileChatClient;
 
     @Autowired
-    private AIModelClientFactory clientFactory;
+    private ModelClientFactory clientFactory;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     /**
      * 缓存已注册的模型提供商服务
@@ -56,8 +57,8 @@ public class ChatServiceImpl implements ChatService {
         validateChatCompletionRequest(modelCode, request);
         
         // 获取模型和提供商信息
-        AIModel model = getValidatedModel(modelCode);
-        ModelProvider provider = getValidatedProvider(model.getProviderCode());
+        AiModel model = null;//getValidatedModel(modelCode);
+        ModelProvider provider = null;//getValidatedProvider(model.getProviderCode());
         
         long startTime = System.currentTimeMillis();
         log.info("开始聊天完成请求 - 模型: {}, 提供商: {}, 消息数量: {}", 
@@ -94,13 +95,13 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
-    @Override
+/*    @Override
     public SseEmitter chatCompletionStream(String modelCode, ChatCompletionRequest request) {
         // 参数验证
         validateChatCompletionRequest(modelCode, request);
         
         // 获取模型和提供商信息
-        AIModel model = getValidatedModel(modelCode);
+        AiModel model = getValidatedModel(modelCode);
         ModelProvider provider = getValidatedProvider(model.getProviderCode());
         
         log.info("开始流式聊天完成请求 - 模型: {}, 提供商: {}, 消息数量: {}", 
@@ -134,7 +135,7 @@ public class ChatServiceImpl implements ChatService {
         
         return emitter;
     }
-    
+    */
     /**
      * 验证聊天完成请求参数
      */
@@ -162,11 +163,11 @@ public class ChatServiceImpl implements ChatService {
         }
     }
     
-    /**
+   /* *//**
      * 获取并验证模型
-     */
-    private AIModel getValidatedModel(String modelCode) {
-        AIModel model = modelManagerService.getModel(modelCode);
+     *//*
+    private AiModel getValidatedModel(String modelCode) {
+        AiModel model = modelManagerService.getModel(modelCode);
         if (model == null) {
             throw new IllegalArgumentException("模型不存在: " + modelCode);
         }
@@ -179,9 +180,9 @@ public class ChatServiceImpl implements ChatService {
         return model;
     }
     
-    /**
+    *//**
      * 获取并验证模型提供商
-     */
+     *//*
     private ModelProvider getValidatedProvider(String providerCode) {
         ModelProvider provider = modelManagerService.getProvider(providerCode);
         if (provider == null) {
@@ -194,12 +195,12 @@ public class ChatServiceImpl implements ChatService {
         }
         
         return provider;
-    }
+    }*/
     
     /**
      * 获取聊天客户端，支持降级处理
      */
-    private ChatClient getChatClientWithFallback(AIModel model, ModelProvider provider) {
+    private ChatClient getChatClientWithFallback(AiModel model, ModelProvider provider) {
         try {
             // 优先使用动态创建的客户端
             ChatClient dynamicClient = clientFactory.getChatClient(model, provider);
@@ -254,7 +255,7 @@ public class ChatServiceImpl implements ChatService {
     /**
      * 创建增强的Prompt对象
      */
-    private Prompt createEnhancedPrompt(List<Message> messages, ChatCompletionRequest request, AIModel model) {
+    private Prompt createEnhancedPrompt(List<Message> messages, ChatCompletionRequest request, AiModel model) {
         // 基础Prompt
         Prompt prompt = new Prompt(messages);
         
@@ -273,7 +274,7 @@ public class ChatServiceImpl implements ChatService {
     /**
      * 执行聊天请求，支持重试和错误处理
      */
-    private ChatResponse executeChatRequest(ChatClient chatClient, Prompt prompt, AIModel model) {
+    private ChatResponse executeChatRequest(ChatClient chatClient, Prompt prompt, AiModel model) {
         try {
             return chatClient.prompt(prompt)
                     .call()
@@ -326,7 +327,7 @@ public class ChatServiceImpl implements ChatService {
      * 执行流式聊天请求
      */
     private void executeStreamingChatRequest(SseEmitter emitter, ChatClient chatClient, 
-                                           Prompt prompt, AIModel model, ModelProvider provider) {
+                                           Prompt prompt, AiModel model, ModelProvider provider) {
         // 使用线程池执行异步任务
         new Thread(() -> {
             try {
@@ -356,7 +357,7 @@ public class ChatServiceImpl implements ChatService {
      * 执行OpenAI风格的流式请求
      */
     private void executeOpenAIStyleStreaming(SseEmitter emitter, ChatClient chatClient, 
-                                           Prompt prompt, AIModel model) {
+                                           Prompt prompt, AiModel model) {
         try {
             log.debug("开始OpenAI风格流式请求 - 模型: {}", model.getCode());
             
@@ -406,7 +407,7 @@ public class ChatServiceImpl implements ChatService {
      * 执行Anthropic风格的流式请求
      */
     private void executeAnthropicStyleStreaming(SseEmitter emitter, ChatClient chatClient, 
-                                              Prompt prompt, AIModel model) {
+                                              Prompt prompt, AiModel model) {
         try {
             log.debug("开始Anthropic风格流式请求 - 模型: {}", model.getCode());
             
@@ -424,7 +425,7 @@ public class ChatServiceImpl implements ChatService {
      * 执行默认的流式请求
      */
     private void executeDefaultStreaming(SseEmitter emitter, ChatClient chatClient, 
-                                       Prompt prompt, AIModel model) {
+                                       Prompt prompt, AiModel model) {
         try {
             log.debug("开始默认流式请求 - 模型: {}", model.getCode());
             
@@ -530,11 +531,11 @@ public class ChatServiceImpl implements ChatService {
                 .sum();
     }
 
-    /**
+  /*  *//**
      * 获取模型提供商服务
-     */
+     *//*
     private ModelProviderService getProviderService(String modelCode) {
-        AIModel model = modelManagerService.getModel(modelCode);
+        AiModel model = modelManagerService.getModel(modelCode);
         if (model == null) {
             throw new IllegalArgumentException("模型不存在: " + modelCode);
         }
@@ -545,43 +546,5 @@ public class ChatServiceImpl implements ChatService {
         }
 
         return service;
-    }
-
-    /**
-     * 获取模型配置
-     */
-    private Map<String, Object> getModelConfig(String modelCode) {
-        AIModel model = modelManagerService.getModel(modelCode);
-        if (model == null) {
-            throw new IllegalArgumentException("模型不存在: " + modelCode);
-        }
-
-        ModelProvider provider = modelManagerService.getProvider(model.getProviderCode());
-        if (provider == null) {
-            throw new IllegalArgumentException("模型提供商不存在: " + model.getProviderCode());
-        }
-
-        // 合并提供商配置和模型配置
-        Map<String, Object> config = new ConcurrentHashMap<>();
-        if (provider.getConfig() != null) {
-            config.putAll(provider.getConfig());
-        }
-
-        // 添加API密钥、基础URL等配置
-        if (provider.getApiKey() != null) {
-            config.put("apiKey", provider.getApiKey());
-        }
-        if (provider.getBaseUrl() != null) {
-            config.put("baseUrl", provider.getBaseUrl());
-        }
-        if (provider.getProxyUrl() != null) {
-            config.put("proxyUrl", provider.getProxyUrl());
-        }
-
-        if (model.getConfig() != null) {
-            config.putAll(model.getConfig());
-        }
-
-        return config;
-    }
+    }*/
 }
