@@ -1,0 +1,41 @@
+# Grok模型提供商配置文件
+provider:
+  # 提供商唯一标识码
+  code: "grok"
+  # 提供商显示名称
+  name: "Grok"
+  # 提供商简要描述信息
+  description: "xAI提供的Grok系列AI模型服务"
+  # 提供商图标
+  icon: "🚀"
+  # 提供商官方网站URL
+  websiteUrl: "https://x.ai"
+  # 排序权重，数值越小排序越靠前
+  sortOrder: 4
+  # 该提供商支持的模型类型列表
+  supportedModelTypes:
+    - "chat"        # 支持聊天对话模型
+    - "completion"  # 支持文本补全模型
+  # 提供商配置参数的JSON Schema定义
+  configSchema:
+    type: object
+    properties:
+      # API密钥配置
+      apiKey:
+        type: string
+        title: API密钥
+        description: Grok API密钥
+      # API基础URL配置
+      baseUrl:
+        type: string
+        title: API基础URL
+        description: Grok API基础URL
+        default: "https://api.x.ai"
+      # 代理URL配置（可选）
+      proxyUrl:
+        type: string
+        title: 代理URL
+        description: API请求代理URL（可选）
+    # 必填字段列表
+    required:
+      - apiKey

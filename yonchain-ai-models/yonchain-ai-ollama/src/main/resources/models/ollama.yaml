@@ -1,0 +1,40 @@
+# Ollama模型提供商配置文件
+provider:
+  # 提供商唯一标识码
+  code: "ollama"
+  # 提供商显示名称
+  name: "Ollama"
+  # 提供商简要描述信息
+  description: "本地部署的Ollama模型服务"
+  # 提供商图标
+  icon: "🦙"
+  # 提供商官方网站URL
+  websiteUrl: "https://ollama.ai"
+  # 排序权重，数值越小排序越靠前
+  sortOrder: 5
+  # 该提供商支持的模型类型列表
+  supportedModelTypes:
+    - "chat"        # 支持聊天对话模型
+    - "completion"  # 支持文本补全模型
+    - "embedding"   # 支持文本嵌入模型
+  # 提供商配置参数的JSON Schema定义
+  configSchema:
+    type: object
+    properties:
+      # API基础URL配置
+      baseUrl:
+        type: string
+        title: API基础URL
+        description: Ollama API基础URL
+        default: "http://localhost:11434"
+      # 连接超时时间
+      timeout:
+        type: integer
+        title: 连接超时时间
+        description: API请求超时时间（秒）
+        default: 30
+        minimum: 1
+        maximum: 300
+    # 必填字段列表
+    required:
+      - baseUrl

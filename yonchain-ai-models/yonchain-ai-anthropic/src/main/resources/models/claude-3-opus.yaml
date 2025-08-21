@@ -1,0 +1,51 @@
+# Claude 3 Opus 模型配置
+model:
+  # 模型唯一标识符
+  code: "claude-3-opus"
+  # 模型显示名称
+  name: "Claude 3 Opus"
+  # 模型详细描述
+  description: "Anthropic最强大的Claude 3模型，具有卓越的推理和创作能力"
+  # 模型图标
+  icon: "🎭"
+  # 所属提供商代码
+  provider: "anthropic"
+  # 模型类型：chat/completion/embedding/image
+  modelType: "chat"
+  # 模型版本号
+  version: "1.0"
+  # 排序权重，数值越小排序越靠前
+  sortOrder: 1
+  # 模型支持的功能列表
+  capabilities:
+    - "chat"              # 支持对话聊天
+    - "completion"        # 支持文本补全
+    - "analysis"          # 支持文本分析
+  # 模型配置参数定义
+  configSchema:
+    type: object
+    properties:
+      # 温度参数，控制输出的随机性，值越高输出越随机
+      temperature:
+        type: number
+        title: 温度参数
+        description: 控制输出的随机性，值越高输出越随机
+        default: 0.7
+        minimum: 0
+        maximum: 1
+      # 最大令牌数，生成文本的最大令牌数量
+      max_tokens:
+        type: integer
+        title: 最大令牌数
+        description: 生成文本的最大令牌数量
+        default: 4096
+        minimum: 1
+        maximum: 200000
+      # 核采样参数，控制词汇选择的多样性
+      top_p:
+        type: number
+        title: 核采样参数
+        description: 核采样参数，控制词汇选择的多样性
+        default: 1.0
+        minimum: 0
+        maximum: 1
