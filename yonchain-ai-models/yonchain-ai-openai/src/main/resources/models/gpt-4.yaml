@@ -20,7 +20,7 @@ model:
     - "completion"        # 支持文本补全
     - "function_calling"  # 支持函数调用
   # 模型参数配置定义
-  parameterSchema:
+  configSchema:
     # 温度参数，控制输出的随机性，值越高输出越随机
     temperature:
       type: "number"

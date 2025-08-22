@@ -16,10 +16,8 @@
 
 package com.yonchain.ai.console.model.request;
 
-import com.yonchain.ai.web.request.PageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 /**
  * 模型提供商查询请求
@@ -28,9 +26,8 @@ import lombok.EqualsAndHashCode;
  * @since 1.0.0
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
 @Schema(description = "模型提供商查询请求")
-public class ModelProviderQueryRequest extends PageRequest {
+public class ModelProviderQueryRequest {
 
     /**
      * 提供商名称

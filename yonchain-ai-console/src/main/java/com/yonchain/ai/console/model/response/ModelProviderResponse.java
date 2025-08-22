@@ -16,6 +16,8 @@
 
 package com.yonchain.ai.console.model.response;
 
+import com.yonchain.ai.api.model.ModelProviderCapabilities;
+import com.yonchain.ai.api.model.ModelProviderConfigItem;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -79,11 +81,11 @@ public class ModelProviderResponse {
      * 提供商配置参数的JSON Schema定义
      */
     @Schema(description = "配置参数Schema")
-    private Map<String, Object> configSchema;
+    private List<ModelProviderConfigItem> configSchema;
 
     /**
      * 提供商支持的能力配置
      */
     @Schema(description = "能力配置")
-    private Map<String, Object> capabilities;
+    private ModelProviderCapabilities capabilities;
 }

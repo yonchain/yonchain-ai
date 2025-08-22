@@ -16,7 +16,7 @@
 
 package com.yonchain.ai.model.mapper;
 
-import com.yonchain.ai.model.entity.ModelProvider;
+import com.yonchain.ai.model.entity.ModelProviderEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -39,7 +39,7 @@ public interface ModelProviderMapper {
      * @param id 模型提供商ID
      * @return 模型提供商实体
      */
-    ModelProvider selectById(@Param("id") String id);
+    ModelProviderEntity selectById(@Param("id") String id);
 
     /**
      * 查询模型提供商列表
@@ -48,7 +48,7 @@ public interface ModelProviderMapper {
      * @param queryParam 查询参数
      * @return 模型提供商列表
      */
-    List<ModelProvider> selectList(@Param("tenantId") String tenantId, @Param("params") Map<String, Object> queryParam);
+    List<ModelProviderEntity> selectList(@Param("tenantId") String tenantId, @Param("params") Map<String, Object> queryParam);
 
     /**
      * 计算符合条件的记录数
@@ -65,7 +65,7 @@ public interface ModelProviderMapper {
      * @param provider 模型提供商实体
      * @return 影响行数
      */
-    int insert(ModelProvider provider);
+    int insert(ModelProviderEntity provider);
 
     /**
      * 更新模型提供商
@@ -73,7 +73,7 @@ public interface ModelProviderMapper {
      * @param provider 模型提供商实体
      * @return 影响行数
      */
-    int update(ModelProvider provider);
+    int update(ModelProviderEntity provider);
 
     /**
      * 删除模型提供商
@@ -92,31 +92,48 @@ public interface ModelProviderMapper {
     int batchDelete(@Param("ids") List<String> ids);
 
     /**
-     * 根据提供商名称查询模型提供商
+     * 根据提供商代码查询模型提供商
      *
      * @param tenantId 租户ID
-     * @param providerName 模型提供商名称
+     * @param providerCode 模型提供商代码
      * @return 模型提供商实体
      */
-    ModelProvider selectByProviderName(@Param("tenantId") String tenantId, @Param("providerName") String providerName);
+    ModelProviderEntity selectByProviderCode(@Param("tenantId") String tenantId, @Param("providerCode") String providerCode);
 
     /**
-     * 根据提供商类型查询模型提供商
+     * 根据启用状态查询模型提供商
      *
      * @param tenantId 租户ID
-     * @param providerType 模型提供商类型
+     * @param enabled 是否启用
      * @return 模型提供商列表
      */
-    List<ModelProvider> selectByProviderType(@Param("tenantId") String tenantId, @Param("providerType") String providerType);
+    List<ModelProviderEntity> selectByEnabled(@Param("tenantId") String tenantId, @Param("enabled") Boolean enabled);
+
+    // ========== 以下方法从ModelProviderConfigMapper迁移 ==========
 
     /**
-     * 更新配额使用情况
+     * 根据租户ID和提供商代码查询配置
      *
-     * @param id 模型提供商ID
-     * @param quotaUsed 已用配额
-     * @param lastUsed 最后使用时间
+     * @param tenantId 租户ID
+     * @param providerCode 提供商代码
+     * @return 模型提供商实体
+     */
+    ModelProviderEntity selectByTenantAndCode(@Param("tenantId") String tenantId, @Param("providerCode") String providerCode);
+
+    /**
+     * 根据租户ID查询所有提供商配置
+     *
+     * @param tenantId 租户ID
+     * @return 模型提供商列表
+     */
+    List<ModelProviderEntity> selectByTenantId(@Param("tenantId") String tenantId);
+
+    /**
+     * 根据租户ID删除所有配置
+     *
+     * @param tenantId 租户ID
      * @return 影响行数
      */
-    int updateQuotaUsage(@Param("id") String id, @Param("quotaUsed") Long quotaUsed, @Param("lastUsed") LocalDateTime lastUsed);
+    int deleteByTenantId(@Param("tenantId") String tenantId);
 
 }

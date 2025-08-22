@@ -1,6 +1,6 @@
 package com.yonchain.ai.model.mapper;
 
-import com.yonchain.ai.model.entity.AiModel;
+import com.yonchain.ai.model.entity.ModelEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,7 +21,7 @@ public interface ModelMapper {
      * @param id 模型ID
      * @return 模型实体
      */
-    AiModel selectById(@Param("id") String id);
+    ModelEntity selectById(@Param("id") String id);
 
     /**
      * 根据租户ID查询模型列表
@@ -30,7 +30,7 @@ public interface ModelMapper {
      * @param params   查询参数
      * @return 模型列表
      */
-    List<AiModel> selectList(@Param("tenantId") String tenantId, @Param("params") Map<String, Object> params);
+    List<ModelEntity> selectList(@Param("tenantId") String tenantId, @Param("params") Map<String, Object> params);
 
     /**
      * 插入模型
@@ -38,7 +38,7 @@ public interface ModelMapper {
      * @param model 模型实体
      * @return 影响行数
      */
-    void insert(AiModel model);
+    void insert(ModelEntity model);
 
     /**
      * 更新模型
@@ -46,7 +46,7 @@ public interface ModelMapper {
      * @param model 模型实体
      * @return 影响行数
      */
-    void update(AiModel model);
+    void update(ModelEntity model);
 
     /**
      * 删除模型
@@ -57,25 +57,37 @@ public interface ModelMapper {
     void deleteById(@Param("id") String id);
     
     /**
-     * 设置默认模型
+     * 根据租户ID和模型代码查询配置
      *
-     * @param modelId 模型ID
      * @param tenantId 租户ID
+     * @param modelCode 模型代码
+     * @return 模型实体
      */
-    void setTenantDefaultAiModel(@Param("modelId") String modelId, @Param("tenantId") String tenantId);
-    
+    ModelEntity selectByTenantAndModelCode(@Param("tenantId") String tenantId, @Param("modelCode") String modelCode);
+
     /**
-     * 清除租户的所有默认模型
+     * 根据租户ID和提供商代码查询模型列表
      *
      * @param tenantId 租户ID
+     * @param providerCode 提供商代码
+     * @return 模型列表
      */
-    void clearTenantDefaultAiModels(@Param("tenantId") String tenantId);
-    
+    List<ModelEntity> selectByTenantAndProviderCode(@Param("tenantId") String tenantId, @Param("providerCode") String providerCode);
+
     /**
-     * 获取租户的默认模型
+     * 根据启用状态查询模型列表
      *
      * @param tenantId 租户ID
-     * @return 默认模型
+     * @param enabled 是否启用
+     * @return 模型列表
      */
-    AiModel getTenantDefaultAiModel(@Param("tenantId") String tenantId);
+    List<ModelEntity> selectByEnabled(@Param("tenantId") String tenantId, @Param("enabled") Boolean enabled);
+
+    /**
+     * 根据租户ID删除所有模型配置
+     *
+     * @param tenantId 租户ID
+     * @return 影响行数
+     */
+    int deleteByTenantId(@Param("tenantId") String tenantId);
 }

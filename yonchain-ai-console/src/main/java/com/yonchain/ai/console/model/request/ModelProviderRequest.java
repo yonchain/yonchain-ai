@@ -18,27 +18,36 @@ package com.yonchain.ai.console.model.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.Map;
+
 /**
- * 模型提供商创建、更新请求
+ * 模型提供商配置请求
  *
  * @author Cgy
  * @since 1.0.0
  */
 @Data
-@Schema(description = "模型提供商请求")
+@Schema(description = "模型提供商配置请求")
 public class ModelProviderRequest {
+
+    /**
+     * 提供商编码
+     */
+    @NotBlank(message = "提供商编码不能为空")
+    @Size(max = 50, message = "提供商编码长度不能超过50个字符")
+    @Schema(description = "提供商编码", required = true, example = "openai")
+    private String providerCode;
 
     /**
      * 提供商名称
      */
-    @NotBlank(message = "提供商名称不能为空")
     @Size(max = 50, message = "提供商名称长度不能超过50个字符")
-    @Schema(description = "提供商名称", required = true, example = "OpenAI")
+    @Schema(description = "提供商名称", example = "OpenAI")
     private String providerName;
-
 
     /**
      * 提供商描述
@@ -56,9 +65,14 @@ public class ModelProviderRequest {
     /**
      * API基础URL
      */
-    @NotBlank(message = "API基础URL不能为空")
-    @Schema(description = "API基础URL", required = true, example = "https://api.openai.com/v1")
+    @Schema(description = "API基础URL", example = "https://api.openai.com/v1")
     private String apiBaseUrl;
 
+    /**
+     * 提供商配置信息
+     */
+    @NotNull(message = "配置信息不能为空")
+    @Schema(description = "提供商配置信息", required = true, example = "{\"apiKey\": \"sk-xxx\", \"timeout\": 30}")
+    private Map<String, Object> config;
 
 }

@@ -1,71 +1,73 @@
 package com.yonchain.ai.model.entity;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
+
 import java.time.LocalDateTime;
 
 /**
- * 模型提供商配置实体
- * 存储租户级别的提供商动态配置（API密钥、代理设置等）
+ * 模型提供商实体类
+ * 对应数据库表：model_provider
  */
 @Data
-public class ModelProviderConfig {
-    
+@Accessors(chain = true)
+public class ModelProviderEntity {
+
     /**
      * 主键ID
      */
     private String id;
-    
+
     /**
      * 租户ID
      */
     private String tenantId;
-    
+
     /**
-     * 提供商代码（对应静态配置中的code）
+     * 提供商代码，关联静态配置文件中的provider.code
      */
     private String providerCode;
-    
+
     /**
      * API密钥
      */
     private String apiKey;
-    
+
     /**
-     * API基础URL（可覆盖默认值）
+     * API基础URL，可覆盖静态配置
      */
     private String baseUrl;
-    
+
     /**
      * API代理URL
      */
     private String proxyUrl;
-    
+
     /**
-     * 自定义配置（JSON格式）
-     * 存储提供商特定的配置参数
+     * 自定义配置参数，JSON格式
      */
     private String customConfig;
-    
+
     /**
-     * 是否启用
+     * 租户是否启用该提供商
      */
     private Boolean enabled;
-    
+
     /**
      * 创建时间
      */
     private LocalDateTime createTime;
-    
+
     /**
      * 更新时间
      */
     private LocalDateTime updateTime;
-    
+
     /**
      * 创建者
      */
     private String createdBy;
-    
+
     /**
      * 更新者
      */

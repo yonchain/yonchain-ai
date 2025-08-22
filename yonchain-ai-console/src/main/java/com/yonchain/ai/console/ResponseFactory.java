@@ -10,6 +10,7 @@ import com.yonchain.ai.api.tag.Tag;
 import com.yonchain.ai.console.app.response.AppResponse;
 import com.yonchain.ai.console.file.entity.FileEntity;
 import com.yonchain.ai.console.file.response.FileResponse;
+import com.yonchain.ai.console.model.response.ModelConfigResponse;
 import com.yonchain.ai.console.model.response.ModelProviderResponse;
 import com.yonchain.ai.console.model.response.ModelResponse;
 import com.yonchain.ai.console.sys.response.*;
@@ -24,6 +25,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 响应工厂类，用于创建和构建API响应对象
@@ -70,12 +72,34 @@ public class ResponseFactory {
         // 设置加密配置
         // response.setEncryptedConfig(model.getEncryptedConfig());
         // 设置创建时间
-       // response.setCreatedAt(model.getCreatedAt());
+        // response.setCreatedAt(model.getCreatedAt());
         // 设置是否有效
-       // response.setIsValid(model.getIsValid());
+        // response.setIsValid(model.getIsValid());
         return response;
     }
 
+
+    /**
+     * 创建模型响应列表
+     * <p>
+     * 将模型分页数据转换为标准化的API响应列表格式
+     * 包含分页元数据和转换后的模型数据列表
+     * </p>
+     *
+     * @param models 模型分页数据对象，包含分页信息和模型数据列表，不能为null
+     * @return 标准化后的模型响应列表对象，包含分页元数据和转换后的模型列表
+     * @see ModelInfo
+     * @see ModelResponse
+     * @see PageResponse
+     */
+    public ListResponse<ModelResponse> createModelListResponse(List<ModelInfo> models) {
+        ListResponse<ModelResponse> response = new ListResponse<>();
+        response.setData(models.stream()
+                .map(this::createModelResponse)
+                .toList());
+        return response;
+
+    }
 
     /**
      * 创建模型分页响应对象
@@ -857,7 +881,6 @@ public class ResponseFactory {
         return response;
     }
 
-
     /**
      * 创建角色组响应对象
      * <p>
@@ -957,6 +980,61 @@ public class ResponseFactory {
     public ListResponse<TagResponse> createTagResponseList(List<Tag> tags) {
         ListResponse<TagResponse> response = new ListResponse<>();
         response.setData(tags.stream().map(this::createTagResponse).toList());
+        return response;
+    }
+
+    /**
+     * 创建模型配置响应对象
+     * <p>
+     * 将ModelInfo实体对象转换为标准化的模型配置API响应格式
+     * 包含模型的基本信息和配置项列表
+     * </p>
+     *
+     * @param model 模型实体对象，包含模型配置信息，不能为null
+     * @return 标准化后的模型配置响应对象，包含模型代码、名称、启用状态和配置项
+     * @throws IllegalArgumentException 如果model参数为null
+     * @see ModelInfo
+     * @see ModelConfigResponse
+     */
+    public ModelConfigResponse createModelConfigResponse(ModelInfo model) {
+        if (model == null) {
+            throw new IllegalArgumentException("Model cannot be null");
+        }
+
+        ModelConfigResponse response = new ModelConfigResponse();
+        
+        // 设置模型代码（使用模型名称作为代码）
+        response.setModelCode(model.getName());
+        
+        // 设置模型名称
+        response.setModelName(model.getName());
+        
+        // 设置是否启用（根据状态判断，假设状态为1表示启用）
+        response.setEnabled(model.getEnabled());
+        
+        // 处理配置项列表
+        if (model.getConfigSchema() != null && !model.getConfigSchema().isEmpty()) {
+            List<ModelConfigResponse.ConfigItem> configItems = model.getConfigSchema().stream()
+                .map(entry -> {
+                    ModelConfigResponse.ConfigItem item = new ModelConfigResponse.ConfigItem();
+                    item.setKey(entry.getName());
+                    item.setValue(entry.getValue());
+                    // 根据值类型设置type
+                    if (entry.getValue() instanceof Number) {
+                        item.setType("number");
+                    } else if (entry.getValue() instanceof Boolean) {
+                        item.setType("boolean");
+                    } else {
+                        item.setType("string");
+                    }
+                    item.setTitle(entry.getTitle());
+                    item.setRequired(false);
+                    return item;
+                })
+                .collect(Collectors.toList());
+            response.setConfigItems(configItems);
+        }
+        
         return response;
     }
 }

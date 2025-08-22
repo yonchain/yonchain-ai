@@ -167,7 +167,7 @@ public interface ModelService {
      * @param modelCode 模型代码
      * @return 租户模型配置
      */
-    Map<String, Object> getModelConfig(String tenantId, String modelCode);
+    ModelInfo getModelConfig(String tenantId, String modelCode);
 
     /**
      * 保存租户的模型配置
@@ -176,5 +176,7 @@ public interface ModelService {
      * @param modelCode 模型代码
      * @param config 配置信息
      */
-    void saveModelConfig(String tenantId, String modelCode, Map<String, Object> config);
+    void saveModelConfig(String tenantId, ModelInfo modelInfo);
+
+    ModelInfo getModel(String modelCode);
 }

@@ -1,7 +1,7 @@
 package com.yonchain.ai.model.spi;
 
-import com.yonchain.ai.model.entity.AiModel;
-import com.yonchain.ai.model.entity.ModelProvider;
+import com.yonchain.ai.model.entity.ModelEntity;
+import com.yonchain.ai.model.entity.ModelProviderEntity;
 import com.yonchain.ai.model.vo.ModelCapability;
 
 import java.util.List;
@@ -17,20 +17,20 @@ public interface ModelProviderService {
      * 获取提供商信息
      * @return 提供商信息
      */
-    ModelProvider getProviderInfo();
+    ModelProviderEntity getProviderInfo();
 
     /**
      * 获取提供商支持的所有模型列表
      * @return 模型列表
      */
-    List<AiModel> listModels();
+    List<ModelEntity> listModels();
 
     /**
      * 获取指定模型信息
      * @param modelCode 模型代码
      * @return 模型信息
      */
-    AiModel getModel(String modelCode);
+    ModelEntity getModel(String modelCode);
 
     /**
      * 获取模型配置参数Schema
@@ -78,7 +78,7 @@ public interface ModelProviderService {
      * 通过API获取实时模型列表（如果支持）
      * @return 模型列表
      */
-    List<AiModel> getModels();
+    List<ModelEntity> getModels();
 
     /**
      * 获取提供商支持的能力映射

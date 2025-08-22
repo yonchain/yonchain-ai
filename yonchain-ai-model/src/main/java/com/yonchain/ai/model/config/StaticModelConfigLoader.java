@@ -177,7 +177,7 @@ public class StaticModelConfigLoader {
         private String website;
         private String apiDocUrl;
         private List<String> supportedFeatures;
-        private Map<String, Object> parameterSchema;
+        private Map<String, Object> configSchema;
     }
 
     /**
@@ -188,13 +188,13 @@ public class StaticModelConfigLoader {
         private String code;
         private String name;
         private String description;
+        private String icon;
         private String provider;
         private String type;
         private String version;
+        private Integer sortOrder;
         private List<String> capabilities;
-        private Map<String, Object> parameterSchema;
-        private Map<String, Object> defaultParameters;
-        private Map<String, Object> limits;
+        private Map<String, Object> configSchema;
     }
 
     // ==================== 配置视图类 ====================
@@ -245,7 +245,7 @@ public class StaticModelConfigLoader {
         private String type;
         private String version;
      //   private Map<String, Object> capabilities;
-        private Map<String, Object> parameterSchema;
+        private Map<String, Object> configSchema;
         private Map<String, Object> defaultParameters;
         private Map<String, Object> limits;
         private boolean configured;  // 租户是否已配置
@@ -268,8 +268,8 @@ public class StaticModelConfigLoader {
         public void setVersion(String version) { this.version = version; }
         //public Map<String, Object> getCapabilities() { return capabilities; }
       //  public void setCapabilities(Map<String, Object> capabilities) { this.capabilities = capabilities; }
-        public Map<String, Object> getParameterSchema() { return parameterSchema; }
-        public void setParameterSchema(Map<String, Object> parameterSchema) { this.parameterSchema = parameterSchema; }
+        public Map<String, Object> getParameterSchema() { return configSchema; }
+        public void setParameterSchema(Map<String, Object> configSchema) { this.configSchema = configSchema; }
         public Map<String, Object> getDefaultParameters() { return defaultParameters; }
         public void setDefaultParameters(Map<String, Object> defaultParameters) { this.defaultParameters = defaultParameters; }
         public Map<String, Object> getLimits() { return limits; }

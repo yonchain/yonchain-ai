@@ -3,8 +3,8 @@ package com.yonchain.ai.model.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.api.model.ChatCompletionRequest;
 import com.yonchain.ai.api.model.ChatCompletionResponse;
-import com.yonchain.ai.model.entity.AiModel;
-import com.yonchain.ai.model.entity.ModelProvider;
+import com.yonchain.ai.model.entity.ModelEntity;
+import com.yonchain.ai.model.entity.ModelProviderEntity;
 import com.yonchain.ai.model.factory.ModelClientFactory;
 import com.yonchain.ai.api.model.ChatService;
 import com.yonchain.ai.model.spi.ModelProviderService;
@@ -57,12 +57,12 @@ public class ChatServiceImpl implements ChatService {
         validateChatCompletionRequest(modelCode, request);
         
         // 获取模型和提供商信息
-        AiModel model = null;//getValidatedModel(modelCode);
-        ModelProvider provider = null;//getValidatedProvider(model.getProviderCode());
+        ModelEntity model = null;//getValidatedModel(modelCode);
+        ModelProviderEntity provider = null;//getValidatedProvider(model.getProviderCode());
         
         long startTime = System.currentTimeMillis();
         log.info("开始聊天完成请求 - 模型: {}, 提供商: {}, 消息数量: {}", 
-                modelCode, provider.getCode(), request.getMessages().size());
+                modelCode, provider.getProviderCode(), request.getMessages().size());
         
         try {
             // 使用优化后的客户端工厂获取聊天客户端
@@ -200,22 +200,22 @@ public class ChatServiceImpl implements ChatService {
     /**
      * 获取聊天客户端，支持降级处理
      */
-    private ChatClient getChatClientWithFallback(AiModel model, ModelProvider provider) {
+    private ChatClient getChatClientWithFallback(ModelEntity model, ModelProviderEntity provider) {
         try {
             // 优先使用动态创建的客户端
             ChatClient dynamicClient = clientFactory.getChatClient(model, provider);
-            log.debug("成功创建动态聊天客户端 - 模型: {}", model.getCode());
+            log.debug("成功创建动态聊天客户端 - 模型: {}", model.getModelCode());
             return dynamicClient;
         } catch (Exception e) {
             log.warn("无法创建动态聊天客户端，尝试使用配置文件客户端 - 模型: {}, 错误: {}", 
-                    model.getCode(), e.getMessage());
+                    model.getModelCode(), e.getMessage());
             
             // 降级使用配置文件创建的客户端
             if (configFileChatClient == null) {
                 throw new IllegalStateException("聊天客户端未配置，且无法动态创建客户端: " + e.getMessage());
             }
             
-            log.debug("使用配置文件聊天客户端 - 模型: {}", model.getCode());
+            log.debug("使用配置文件聊天客户端 - 模型: {}", model.getModelCode());
             return configFileChatClient;
         }
     }
@@ -255,7 +255,7 @@ public class ChatServiceImpl implements ChatService {
     /**
      * 创建增强的Prompt对象
      */
-    private Prompt createEnhancedPrompt(List<Message> messages, ChatCompletionRequest request, AiModel model) {
+    private Prompt createEnhancedPrompt(List<Message> messages, ChatCompletionRequest request, ModelEntity model) {
         // 基础Prompt
         Prompt prompt = new Prompt(messages);
         
@@ -265,7 +265,7 @@ public class ChatServiceImpl implements ChatService {
             // 创建带选项的Prompt
             // 注意：这里需要根据具体的Spring AI版本和模型提供商来调整
             log.debug("应用聊天选项 - 模型: {}, 温度: {}, 最大令牌: {}", 
-                    model.getCode(), request.getTemperature(), request.getMaxTokens());
+                    model.getModelCode(), request.getTemperature(), request.getMaxTokens());
         }
         
         return prompt;
@@ -274,13 +274,13 @@ public class ChatServiceImpl implements ChatService {
     /**
      * 执行聊天请求，支持重试和错误处理
      */
-    private ChatResponse executeChatRequest(ChatClient chatClient, Prompt prompt, AiModel model) {
+    private ChatResponse executeChatRequest(ChatClient chatClient, Prompt prompt, ModelEntity model) {
         try {
             return chatClient.prompt(prompt)
                     .call()
                     .chatResponse();
         } catch (Exception e) {
-            log.error("执行聊天请求失败 - 模型: {}, 错误: {}", model.getCode(), e.getMessage());
+            log.error("执行聊天请求失败 - 模型: {}, 错误: {}", model.getModelCode(), e.getMessage());
             throw new RuntimeException("模型调用失败: " + e.getMessage(), e);
         }
     }
@@ -326,12 +326,12 @@ public class ChatServiceImpl implements ChatService {
     /**
      * 执行流式聊天请求
      */
-    private void executeStreamingChatRequest(SseEmitter emitter, ChatClient chatClient, 
-                                           Prompt prompt, AiModel model, ModelProvider provider) {
+    private void executeStreamingChatRequest(SseEmitter emitter, ChatClient chatClient,
+                                             Prompt prompt, ModelEntity model, ModelProviderEntity provider) {
         // 使用线程池执行异步任务
         new Thread(() -> {
             try {
-                String providerCode = provider.getCode().toLowerCase();
+                String providerCode = provider.getProviderCode().toLowerCase();
                 
                 switch (providerCode) {
                     case "openai":
@@ -347,7 +347,7 @@ public class ChatServiceImpl implements ChatService {
                 }
                 
             } catch (Exception e) {
-                log.error("执行流式聊天请求失败 - 模型: {}, 错误: {}", model.getCode(), e.getMessage(), e);
+                log.error("执行流式聊天请求失败 - 模型: {}, 错误: {}", model.getModelCode(), e.getMessage(), e);
                 emitter.completeWithError(e);
             }
         }).start();
@@ -357,9 +357,9 @@ public class ChatServiceImpl implements ChatService {
      * 执行OpenAI风格的流式请求
      */
     private void executeOpenAIStyleStreaming(SseEmitter emitter, ChatClient chatClient, 
-                                           Prompt prompt, AiModel model) {
+                                           Prompt prompt, ModelEntity model) {
         try {
-            log.debug("开始OpenAI风格流式请求 - 模型: {}", model.getCode());
+            log.debug("开始OpenAI风格流式请求 - 模型: {}", model.getModelCode());
             
             // 使用Spring AI的流式API，返回Flux<ChatResponse>
             chatClient.prompt(prompt)
@@ -371,12 +371,12 @@ public class ChatServiceImpl implements ChatService {
                             String content = chunk.getResults().get(0).getOutput().getText();
                             if (content != null && !content.isEmpty()) {
                                 // 发送格式化的SSE数据
-                                String sseData = formatSseData(content, model.getCode());
+                                String sseData = formatSseData(content, model.getModelCode());
                                 emitter.send(sseData);
                             }
                         }
                     } catch (Exception e) {
-                        log.error("发送流式响应片段失败 - 模型: {}", model.getCode(), e);
+                        log.error("发送流式响应片段失败 - 模型: {}", model.getModelCode(), e);
                         emitter.completeWithError(e);
                     }
                 })
@@ -385,20 +385,20 @@ public class ChatServiceImpl implements ChatService {
                         // 发送结束标记
                         emitter.send("[DONE]");
                         emitter.complete();
-                        log.debug("OpenAI风格流式请求完成 - 模型: {}", model.getCode());
+                        log.debug("OpenAI风格流式请求完成 - 模型: {}", model.getModelCode());
                     } catch (Exception e) {
-                        log.error("完成流式请求失败 - 模型: {}", model.getCode(), e);
+                        log.error("完成流式请求失败 - 模型: {}", model.getModelCode(), e);
                         emitter.completeWithError(e);
                     }
                 })
                 .doOnError(error -> {
-                    log.error("OpenAI风格流式请求失败 - 模型: {}", model.getCode(), error);
+                    log.error("OpenAI风格流式请求失败 - 模型: {}", model.getModelCode(), error);
                     emitter.completeWithError(error);
                 })
                 .subscribe(); // 订阅Flux以开始流式处理
             
         } catch (Exception e) {
-            log.error("创建OpenAI风格流式请求失败 - 模型: {}", model.getCode(), e);
+            log.error("创建OpenAI风格流式请求失败 - 模型: {}", model.getModelCode(), e);
             emitter.completeWithError(e);
         }
     }
@@ -407,16 +407,16 @@ public class ChatServiceImpl implements ChatService {
      * 执行Anthropic风格的流式请求
      */
     private void executeAnthropicStyleStreaming(SseEmitter emitter, ChatClient chatClient, 
-                                              Prompt prompt, AiModel model) {
+                                              Prompt prompt, ModelEntity model) {
         try {
-            log.debug("开始Anthropic风格流式请求 - 模型: {}", model.getCode());
+            log.debug("开始Anthropic风格流式请求 - 模型: {}", model.getModelCode());
             
             // TODO: 实现Anthropic特定的流式处理逻辑
             // 目前使用默认实现
             executeDefaultStreaming(emitter, chatClient, prompt, model);
             
         } catch (Exception e) {
-            log.error("Anthropic风格流式请求失败 - 模型: {}", model.getCode(), e);
+            log.error("Anthropic风格流式请求失败 - 模型: {}", model.getModelCode(), e);
             emitter.completeWithError(e);
         }
     }
@@ -425,9 +425,9 @@ public class ChatServiceImpl implements ChatService {
      * 执行默认的流式请求
      */
     private void executeDefaultStreaming(SseEmitter emitter, ChatClient chatClient, 
-                                       Prompt prompt, AiModel model) {
+                                       Prompt prompt, ModelEntity model) {
         try {
-            log.debug("开始默认流式请求 - 模型: {}", model.getCode());
+            log.debug("开始默认流式请求 - 模型: {}", model.getModelCode());
             
             // 使用通用的流式处理，返回Flux<String>
             chatClient.prompt(prompt)
@@ -439,27 +439,27 @@ public class ChatServiceImpl implements ChatService {
                             emitter.send(content);
                         }
                     } catch (Exception e) {
-                        log.error("发送流式内容失败 - 模型: {}", model.getCode(), e);
+                        log.error("发送流式内容失败 - 模型: {}", model.getModelCode(), e);
                         emitter.completeWithError(e);
                     }
                 })
                 .doOnComplete(() -> {
                     try {
                         emitter.complete();
-                        log.debug("默认流式请求完成 - 模型: {}", model.getCode());
+                        log.debug("默认流式请求完成 - 模型: {}", model.getModelCode());
                     } catch (Exception e) {
-                        log.error("完成默认流式请求失败 - 模型: {}", model.getCode(), e);
+                        log.error("完成默认流式请求失败 - 模型: {}", model.getModelCode(), e);
                         emitter.completeWithError(e);
                     }
                 })
                 .doOnError(error -> {
-                    log.error("默认流式请求失败 - 模型: {}", model.getCode(), error);
+                    log.error("默认流式请求失败 - 模型: {}", model.getModelCode(), error);
                     emitter.completeWithError(error);
                 })
                 .subscribe(); // 订阅Flux以开始流式处理
             
         } catch (Exception e) {
-            log.error("创建默认流式请求失败 - 模型: {}", model.getCode(), e);
+            log.error("创建默认流式请求失败 - 模型: {}", model.getModelCode(), e);
             emitter.completeWithError(e);
         }
     }

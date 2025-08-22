@@ -1,7 +1,7 @@
 package com.yonchain.ai.model.factory;
 
-import com.yonchain.ai.model.entity.AiModel;
-import com.yonchain.ai.model.entity.ModelProvider;
+import com.yonchain.ai.model.entity.ModelEntity;
+import com.yonchain.ai.model.entity.ModelProviderEntity;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,18 +62,18 @@ public class ModelClientFactory {
      * @param provider 提供商信息
      * @return 聊天客户端
      */
-    public ChatClient getChatClient(AiModel model, ModelProvider provider) {
+    public ChatClient getChatClient(ModelEntity model, ModelProviderEntity provider) {
         if (model == null || provider == null) {
             throw new IllegalArgumentException("模型或提供商不能为空");
         }
 
-        String cacheKey = model.getCode() + "-" + provider.getId();
+        String cacheKey = model.getModelCode() + "-" + provider.getId();
         return chatClientCache.computeIfAbsent(cacheKey, key -> {
             // 使用模型工厂的通用方法获取ChatModel
             ChatModel chatModel = modelFactory.getChatModel(model, provider);
             
             // 根据提供商选择创建策略
-            String providerCode = provider.getCode().toLowerCase();
+            String providerCode = provider.getProviderCode().toLowerCase();
             Function<ChatModel, ChatClient> strategy = clientCreationStrategies.get(providerCode);
             
             if (strategy == null) {
@@ -93,12 +93,12 @@ public class ModelClientFactory {
      * @param providerType 提供商类型
      * @return 聊天客户端
      */
-    public ChatClient getChatClient(AiModel model, ModelProvider provider, String providerType) {
+    public ChatClient getChatClient(ModelEntity model, ModelProviderEntity provider, String providerType) {
         if (model == null || provider == null) {
             throw new IllegalArgumentException("模型或提供商不能为空");
         }
 
-        String cacheKey = model.getCode() + "-" + provider.getId() + "-" + providerType;
+        String cacheKey = model.getModelCode() + "-" + provider.getId() + "-" + providerType;
         return chatClientCache.computeIfAbsent(cacheKey, key -> {
             ChatModel chatModel;
             
@@ -132,13 +132,13 @@ public class ModelClientFactory {
     public ChatClient createChatClient(String apiKey, String baseUrl, String modelCode, 
                                      Float temperature, String providerType) {
         // 创建临时的ModelProvider和AiModel对象
-        ModelProvider tempProvider = new ModelProvider();
+        ModelProviderEntity tempProvider = new ModelProviderEntity();
         tempProvider.setApiKey(apiKey);
         tempProvider.setBaseUrl(baseUrl);
-        tempProvider.setCode(providerType);
+        tempProvider.setProviderCode(providerType);
 
-        AiModel tempModel = new AiModel();
-        tempModel.setCode(modelCode);
+        ModelEntity tempModel = new ModelEntity();
+        tempModel.setModelCode(modelCode);
         
         // 使用getChatModel方法创建ChatModel
         ChatModel chatModel = modelFactory.getChatModel(tempModel, tempProvider);
@@ -166,16 +166,16 @@ public class ModelClientFactory {
      * @param provider 提供商信息
      * @return 聊天客户端映射
      */
-    public Map<String, ChatClient> batchCreateChatClients(java.util.List<AiModel> models, ModelProvider provider) {
+    public Map<String, ChatClient> batchCreateChatClients(java.util.List<ModelEntity> models, ModelProviderEntity provider) {
         Map<String, ChatClient> clients = new ConcurrentHashMap<>();
         
         models.parallelStream().forEach(model -> {
             try {
                 ChatClient client = getChatClient(model, provider);
-                clients.put(model.getCode(), client);
+                clients.put(model.getModelCode(), client);
             } catch (Exception e) {
                 // 记录错误但不中断批量创建
-                System.err.println("创建模型 " + model.getCode() + " 的客户端失败: " + e.getMessage());
+                System.err.println("创建模型 " + model.getModelCode() + " 的客户端失败: " + e.getMessage());
             }
         });
         
@@ -188,15 +188,15 @@ public class ModelClientFactory {
      * @param models 模型列表
      * @param providers 提供商列表
      */
-    public void warmUpCache(java.util.List<AiModel> models, java.util.List<ModelProvider> providers) {
+    public void warmUpCache(java.util.List<ModelEntity> models, java.util.List<ModelProviderEntity> providers) {
         models.parallelStream().forEach(model -> 
             providers.parallelStream().forEach(provider -> {
                 try {
                     getChatClient(model, provider);
                 } catch (Exception e) {
                     // 忽略预热过程中的错误
-                    System.err.println("预热缓存失败 - 模型: " + model.getCode() + 
-                                     ", 提供商: " + provider.getCode() + ", 错误: " + e.getMessage());
+                    System.err.println("预热缓存失败 - 模型: " + model.getModelCode() +
+                                     ", 提供商: " + provider.getProviderCode() + ", 错误: " + e.getMessage());
                 }
             })
         );
