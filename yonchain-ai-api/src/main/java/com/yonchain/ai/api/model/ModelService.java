@@ -41,7 +41,7 @@ public interface ModelService {
      * 获取模型列表
      *
      * @param tenantId     租户ID
-     * @param providerName 提供商名称
+     * @param providerName 提供商名称（可选）
      * @return 模型列表
      */
     List<ModelInfo> getModels(String tenantId, String providerName);
@@ -56,6 +56,15 @@ public interface ModelService {
      * @return 模型分页列表
      */
     Page<ModelInfo> pageModels(String tenantId, Map<String, Object> queryParam, int pageNum, int pageSize);
+
+    /**
+     * 获取提供商列表
+     *
+     * @param tenantId 租户ID
+     * @param queryParam 查询参数
+     * @return 提供商列表
+     */
+    List<ModelProvider> getProviders(String tenantId, Map<String, Object> queryParam);
 
     /**
      * 创建模型
@@ -131,28 +140,41 @@ public interface ModelService {
      */
     void deleteProvider(String providerId);
 
-/*    *//**
-     * 设置默认模型
-     *
-     * @param tenantId      租户ID
-     * @param defaultModelInfos 默认模型
-     *//*
-    void setDefaultModelInfos(String tenantId, List<TenantDefaultModelInfo> defaultModelInfos);
+    // ==================== 租户配置管理方法 ====================
 
-    *//**
-     * 获取默认模型
+    /**
+     * 获取租户的模型提供商配置
      *
      * @param tenantId 租户ID
-     * @return 默认模型
-     *//*
-    List<TenantDefaultModelInfo> getDefaultModelInfos(String tenantId);
+     * @param providerCode 提供商代码
+     * @return 租户提供商配置
+     */
+    ProviderConfigResponse getProviderConfig(String tenantId, String providerCode);
 
-    *//**
-     * 获取默认模型
+    /**
+     * 保存租户的模型提供商配置
      *
-     * @param tenantId  租户ID
-     * @param modelType 模型类型
-     * @return 默认模型
-     *//*
-    TenantDefaultModelInfo getDefaultModelInfos(String tenantId, String modelType);*/
+     * @param tenantId 租户ID
+     * @param providerCode 提供商代码
+     * @param config 配置信息
+     */
+    void saveProviderConfig(String tenantId, String providerCode, Map<String, Object> config);
+
+    /**
+     * 获取租户的模型配置
+     *
+     * @param tenantId 租户ID
+     * @param modelCode 模型代码
+     * @return 租户模型配置
+     */
+    Map<String, Object> getModelConfig(String tenantId, String modelCode);
+
+    /**
+     * 保存租户的模型配置
+     *
+     * @param tenantId 租户ID
+     * @param modelCode 模型代码
+     * @param config 配置信息
+     */
+    void saveModelConfig(String tenantId, String modelCode, Map<String, Object> config);
 }

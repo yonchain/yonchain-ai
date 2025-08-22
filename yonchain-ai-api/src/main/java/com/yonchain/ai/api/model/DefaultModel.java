@@ -85,7 +85,12 @@ public class DefaultModel implements ModelInfo {
     /**
      * 模型配置参数定义
      */
-    private Map<String, Object> configSchema;
+    private List<ModelConfigItem> configSchema;
+
+    /**
+     * 是否已启用标识（租户级别）
+     */
+    private Boolean enabled;
 
     // Getters and Setters
 
@@ -200,12 +205,23 @@ public class DefaultModel implements ModelInfo {
     }
 
     @Override
-    public Map<String, Object> getConfigSchema() {
+    public List<ModelConfigItem> getConfigSchema() {
         return configSchema;
     }
 
     @Override
-    public void setConfigSchema(Map<String, Object> configSchema) {
+    public void setConfigSchema(List<ModelConfigItem> configSchema) {
         this.configSchema = configSchema;
     }
+
+    @Override
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
 }

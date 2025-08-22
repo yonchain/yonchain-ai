@@ -16,7 +16,6 @@
 package com.yonchain.ai.api.model;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 模型提供商接口
@@ -144,27 +143,42 @@ public interface ModelProvider {
      *
      * @return 配置参数Schema
      */
-    Map<String, Object> getConfigSchema();
+    List<ModelProviderConfigItem> getConfigSchema();
 
     /**
      * 设置提供商配置参数的JSON Schema定义
      *
      * @param configSchema 配置参数Schema
      */
-    void setConfigSchema(Map<String, Object> configSchema);
+    void setConfigSchema(List<ModelProviderConfigItem> configSchema);
 
     /**
      * 获取提供商支持的能力配置
      *
      * @return 能力配置
      */
-    Map<String, Object> getCapabilities();
+    ModelProviderCapabilities getCapabilities();
 
     /**
      * 设置提供商支持的能力配置
      *
      * @param capabilities 能力配置
      */
-    void setCapabilities(Map<String, Object> capabilities);
+    void setCapabilities(ModelProviderCapabilities capabilities);
+
+    /**
+     * 获取租户是否已启用该提供商
+     *
+     * @return 是否已启用
+     */
+    Boolean getEnabled();
+
+    /**
+     * 设置租户是否已启用该提供商
+     *
+     * @param enabled 是否已启用
+     */
+    void setEnabled(Boolean enabled);
+
 
 }

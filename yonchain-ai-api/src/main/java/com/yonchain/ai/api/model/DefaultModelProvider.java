@@ -16,7 +16,6 @@
 package com.yonchain.ai.api.model;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 模型提供商默认实现类
@@ -70,12 +69,17 @@ public class DefaultModelProvider implements ModelProvider {
     /**
      * 提供商配置参数的JSON Schema定义
      */
-    private Map<String, Object> configSchema;
+    private List<ModelProviderConfigItem> configSchema;
 
     /**
      * 提供商支持的能力配置
      */
-    private Map<String, Object> capabilities;
+    private ModelProviderCapabilities capabilities;
+
+    /**
+     * 是否已启用标识（租户级别）
+     */
+    private Boolean enabled;
 
     // Getters and Setters
 
@@ -160,22 +164,33 @@ public class DefaultModelProvider implements ModelProvider {
     }
 
     @Override
-    public Map<String, Object> getConfigSchema() {
+    public List<ModelProviderConfigItem> getConfigSchema() {
         return configSchema;
     }
 
     @Override
-    public void setConfigSchema(Map<String, Object> configSchema) {
+    public void setConfigSchema(List<ModelProviderConfigItem> configSchema) {
         this.configSchema = configSchema;
     }
 
     @Override
-    public Map<String, Object> getCapabilities() {
+    public ModelProviderCapabilities getCapabilities() {
         return capabilities;
     }
 
     @Override
-    public void setCapabilities(Map<String, Object> capabilities) {
+    public void setCapabilities(ModelProviderCapabilities capabilities) {
         this.capabilities = capabilities;
     }
+
+    @Override
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
 }

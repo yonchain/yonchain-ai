@@ -184,16 +184,30 @@ public interface ModelInfo {
     void setCapabilities(List<String> capabilities);
 
     /**
-     * 获取模型配置参数定义
+     * 获取模型配置参数的JSON Schema定义
      *
-     * @return 配置参数定义
+     * @return 配置参数Schema
      */
-    Map<String, Object> getConfigSchema();
+    List<ModelConfigItem> getConfigSchema();
 
     /**
-     * 设置模型配置参数定义
+     * 设置模型配置参数的JSON Schema定义
      *
-     * @param configSchema 配置参数定义
+     * @param configSchema 配置参数Schema
      */
-    void setConfigSchema(Map<String, Object> configSchema);
+    void setConfigSchema(List<ModelConfigItem> configSchema);
+
+    /**
+     * 获取是否已启用标识（租户级别）
+     *
+     * @return 是否已启用
+     */
+    Boolean getEnabled();
+
+    /**
+     * 设置是否已启用标识（租户级别）
+     *
+     * @param enabled 是否已启用
+     */
+    void setEnabled(Boolean enabled);
 }
