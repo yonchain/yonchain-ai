@@ -16,10 +16,12 @@
 
 package com.yonchain.ai.api.model;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
- * 模型实体类
+ * 模型信息接口，定义模型的基本属性和配置
+ * 与YAML模型配置文件保持一致
  *
  * @author chengy
  * @since 1.0.0
@@ -27,16 +29,16 @@ import java.time.LocalDateTime;
 public interface ModelInfo {
 
     /**
-     * 获取主键ID
+     * 获取模型ID
      *
-     * @return 主键ID
+     * @return 模型ID
      */
     String getId();
 
     /**
-     * 设置主键ID
+     * 设置模型ID
      *
-     * @param id 主键ID
+     * @param id 模型ID
      */
     void setId(String id);
 
@@ -55,100 +57,143 @@ public interface ModelInfo {
     void setTenantId(String tenantId);
 
     /**
-     * 获取提供商名称
+     * 获取模型唯一标识符
      *
-     * @return 提供商名称
+     * @return 模型代码
      */
-    String getProviderName();
+    String getCode();
 
     /**
-     * 设置提供商名称
+     * 设置模型唯一标识符
      *
-     * @param providerName 提供商名称
+     * @param code 模型代码
      */
-    void setProviderName(String providerName);
+    void setCode(String code);
 
     /**
-     * 获取模型名称
+     * 获取模型显示名称
      *
      * @return 模型名称
      */
-    String getModelName();
+    String getName();
 
     /**
-     * 设置模型名称
+     * 设置模型显示名称
      *
-     * @param modelName 模型名称
+     * @param name 模型名称
      */
-    void setModelName(String modelName);
+    void setName(String name);
 
     /**
-     * 获取模型类型
+     * 获取模型详细描述
+     *
+     * @return 模型描述
+     */
+    String getDescription();
+
+    /**
+     * 设置模型详细描述
+     *
+     * @param description 模型描述
+     */
+    void setDescription(String description);
+
+    /**
+     * 获取模型图标
+     *
+     * @return 模型图标
+     */
+    String getIcon();
+
+    /**
+     * 设置模型图标
+     *
+     * @param icon 模型图标
+     */
+    void setIcon(String icon);
+
+    /**
+     * 获取所属提供商代码
+     *
+     * @return 提供商代码
+     */
+    String getProvider();
+
+    /**
+     * 设置所属提供商代码
+     *
+     * @param provider 提供商代码
+     */
+    void setProvider(String provider);
+
+    /**
+     * 获取模型类型：CHAT/COMPLETION/EMBEDDING/IMAGE
      *
      * @return 模型类型
      */
-    String getModelType();
+    String getType();
 
     /**
      * 设置模型类型
      *
-     * @param modelType 模型类型
+     * @param type 模型类型
      */
-    void setModelType(String modelType);
+    void setType(String type);
 
     /**
-     * 获取加密配置
+     * 获取模型版本号
      *
-     * @return 加密配置
+     * @return 版本号
      */
-    String getEncryptedConfig();
+    String getVersion();
 
     /**
-     * 设置加密配置
+     * 设置模型版本号
      *
-     * @param encryptedConfig 加密配置
+     * @param version 版本号
      */
-    void setEncryptedConfig(String encryptedConfig);
+    void setVersion(String version);
 
     /**
-     * 获取是否有效
+     * 获取排序权重，数值越小排序越靠前
      *
-     * @return 是否有效
+     * @return 排序权重
      */
-    Boolean getIsValid();
+    Integer getSortOrder();
 
     /**
-     * 设置是否有效
+     * 设置排序权重
      *
-     * @param isValid 是否有效
+     * @param sortOrder 排序权重
      */
-    void setIsValid(Boolean isValid);
+    void setSortOrder(Integer sortOrder);
 
     /**
-     * 获取创建时间
+     * 获取模型支持的功能列表（英文名）
+     * 如：chat, completion, function_calling, analysis等
      *
-     * @return 创建时间
+     * @return 功能列表
      */
-    LocalDateTime getCreatedAt();
+    List<String> getCapabilities();
 
     /**
-     * 设置创建时间
+     * 设置模型支持的功能列表
      *
-     * @param createdAt 创建时间
+     * @param capabilities 功能列表
      */
-    void setCreatedAt(LocalDateTime createdAt);
+    void setCapabilities(List<String> capabilities);
 
     /**
-     * 获取更新时间
+     * 获取模型配置参数定义
      *
-     * @return 更新时间
+     * @return 配置参数定义
      */
-    LocalDateTime getUpdatedAt();
+    Map<String, Object> getConfigSchema();
 
     /**
-     * 设置更新时间
+     * 设置模型配置参数定义
      *
-     * @param updatedAt 更新时间
+     * @param configSchema 配置参数定义
      */
-    void setUpdatedAt(LocalDateTime updatedAt);
+    void setConfigSchema(Map<String, Object> configSchema);
 }

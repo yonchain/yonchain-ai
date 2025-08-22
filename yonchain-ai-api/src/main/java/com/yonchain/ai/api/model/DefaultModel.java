@@ -16,17 +16,19 @@
 
 package com.yonchain.ai.api.model;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
- * 模型实体类
+ * 模型信息默认实现类
+ * 与YAML模型配置文件保持一致
  *
  * @author chengy
  * @since 1.0.0
  */
 public class DefaultModel implements ModelInfo {
     /**
-     * 主键ID
+     * 模型ID
      */
     private String id;
 
@@ -36,111 +38,174 @@ public class DefaultModel implements ModelInfo {
     private String tenantId;
 
     /**
-     * 提供商名称
+     * 模型唯一标识符
      */
-    private String providerName;
+    private String code;
 
     /**
-     * 模型名称
+     * 模型显示名称
      */
-    private String modelName;
+    private String name;
+
+    /**
+     * 模型详细描述
+     */
+    private String description;
+
+    /**
+     * 模型图标
+     */
+    private String icon;
+
+    /**
+     * 所属提供商代码
+     */
+    private String provider;
 
     /**
      * 模型类型
      */
-    private String modelType;
+    private String type;
 
     /**
-     * 加密配置
+     * 模型版本号
      */
-    private String encryptedConfig;
+    private String version;
 
     /**
-     * 是否有效
+     * 排序权重
      */
-    private Boolean isValid;
+    private Integer sortOrder;
 
     /**
-     * 创建时间
+     * 模型支持的功能列表
      */
-    private LocalDateTime createdAt;
+    private List<String> capabilities;
 
     /**
-     * 更新时间
+     * 模型配置参数定义
      */
-    private LocalDateTime updatedAt;
+    private Map<String, Object> configSchema;
 
     // Getters and Setters
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
-    public String getProviderName() {
-        return providerName;
+    @Override
+    public String getCode() {
+        return code;
     }
 
-    public void setProviderName(String providerName) {
-        this.providerName = providerName;
+    @Override
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public String getModelName() {
-        return modelName;
+    @Override
+    public String getName() {
+        return name;
     }
 
-    public void setModelName(String modelName) {
-        this.modelName = modelName;
+    @Override
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getModelType() {
-        return modelType;
+    @Override
+    public String getDescription() {
+        return description;
     }
 
-    public void setModelType(String modelType) {
-        this.modelType = modelType;
+    @Override
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getEncryptedConfig() {
-        return encryptedConfig;
+    @Override
+    public String getIcon() {
+        return icon;
     }
 
-    public void setEncryptedConfig(String encryptedConfig) {
-        this.encryptedConfig = encryptedConfig;
+    @Override
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 
-    public Boolean getIsValid() {
-        return isValid;
+    @Override
+    public String getProvider() {
+        return provider;
     }
 
-    public void setIsValid(Boolean valid) {
-        isValid = valid;
+    @Override
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    @Override
+    public String getType() {
+        return type;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    @Override
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+    @Override
+    public String getVersion() {
+        return version;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    @Override
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    @Override
+    public Integer getSortOrder() {
+        return sortOrder;
+    }
+
+    @Override
+    public void setSortOrder(Integer sortOrder) {
+        this.sortOrder = sortOrder;
+    }
+
+    @Override
+    public List<String> getCapabilities() {
+        return capabilities;
+    }
+
+    @Override
+    public void setCapabilities(List<String> capabilities) {
+        this.capabilities = capabilities;
+    }
+
+    @Override
+    public Map<String, Object> getConfigSchema() {
+        return configSchema;
+    }
+
+    @Override
+    public void setConfigSchema(Map<String, Object> configSchema) {
+        this.configSchema = configSchema;
     }
 }

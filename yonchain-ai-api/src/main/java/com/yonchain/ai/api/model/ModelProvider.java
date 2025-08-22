@@ -15,16 +15,17 @@
  */
 package com.yonchain.ai.api.model;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
- * 模型提供商实体类
+ * 模型提供商接口
+ * 与YAML提供商配置文件保持一致
  *
  * @author Cgy
  * @since 1.0.0
  */
 public interface ModelProvider {
-
 
     /**
      * 获取主键ID
@@ -55,143 +56,115 @@ public interface ModelProvider {
     void setTenantId(String tenantId);
 
     /**
-     * 获取提供商名称
+     * 获取提供商唯一标识码
+     *
+     * @return 提供商代码
+     */
+    String getCode();
+
+    /**
+     * 设置提供商唯一标识码
+     *
+     * @param code 提供商代码
+     */
+    void setCode(String code);
+
+    /**
+     * 获取提供商显示名称
      *
      * @return 提供商名称
      */
-    String getProviderName();
+    String getName();
 
     /**
-     * 设置提供商名称
+     * 设置提供商显示名称
      *
-     * @param providerName 提供商名称
+     * @param name 提供商名称
      */
-    void setProviderName(String providerName);
+    void setName(String name);
 
     /**
-     * 获取提供商类型
+     * 获取提供商简要描述信息
      *
-     * @return 提供商类型
+     * @return 提供商描述
      */
-    String getProviderType();
+    String getDescription();
 
     /**
-     * 设置提供商类型
+     * 设置提供商简要描述信息
      *
-     * @param providerType 提供商类型
+     * @param description 提供商描述
      */
-    void setProviderType(String providerType);
+    void setDescription(String description);
 
     /**
-     * 获取加密配置
+     * 获取提供商图标
      *
-     * @return 加密配置
+     * @return 提供商图标
      */
-    String getEncryptedConfig();
+    String getIcon();
 
     /**
-     * 设置加密配置
+     * 设置提供商图标
      *
-     * @param encryptedConfig 加密配置
+     * @param icon 提供商图标
      */
-    void setEncryptedConfig(String encryptedConfig);
+    void setIcon(String icon);
 
     /**
-     * 获取最后使用时间
+     * 获取排序权重
      *
-     * @return 最后使用时间
+     * @return 排序权重
      */
-    LocalDateTime getLastUsed();
+    Integer getSortOrder();
 
     /**
-     * 设置最后使用时间
+     * 设置排序权重
      *
-     * @param lastUsed 最后使用时间
+     * @param sortOrder 排序权重
      */
-    void setLastUsed(LocalDateTime lastUsed);
+    void setSortOrder(Integer sortOrder);
 
     /**
-     * 获取配额类型
+     * 获取该提供商支持的模型类型列表
      *
-     * @return 配额类型
+     * @return 支持的模型类型列表
      */
-    String getQuotaType();
+    List<String> getSupportedModelTypes();
 
     /**
-     * 设置配额类型
+     * 设置该提供商支持的模型类型列表
      *
-     * @param quotaType 配额类型
+     * @param supportedModelTypes 支持的模型类型列表
      */
-    void setQuotaType(String quotaType);
+    void setSupportedModelTypes(List<String> supportedModelTypes);
 
     /**
-     * 获取配额限制
+     * 获取提供商配置参数的JSON Schema定义
      *
-     * @return 配额限制
+     * @return 配置参数Schema
      */
-    Long getQuotaLimit();
+    Map<String, Object> getConfigSchema();
 
     /**
-     * 设置配额限制
+     * 设置提供商配置参数的JSON Schema定义
      *
-     * @param quotaLimit 配额限制
+     * @param configSchema 配置参数Schema
      */
-    void setQuotaLimit(Long quotaLimit);
+    void setConfigSchema(Map<String, Object> configSchema);
 
     /**
-     * 获取已用配额
+     * 获取提供商支持的能力配置
      *
-     * @return 已用配额
+     * @return 能力配置
      */
-    Long getQuotaUsed();
+    Map<String, Object> getCapabilities();
 
     /**
-     * 设置已用配额
+     * 设置提供商支持的能力配置
      *
-     * @param quotaUsed 已用配额
+     * @param capabilities 能力配置
      */
-    void setQuotaUsed(Long quotaUsed);
-
-    /**
-     * 是否有效
-     *
-     * @return true表示有效
-     */
-    Boolean getIsValid();
-
-    /**
-     * 设置是否有效
-     *
-     * @param isValid true表示有效
-     */
-    void setIsValid(Boolean isValid);
-
-    /**
-     * 获取创建时间
-     *
-     * @return 创建时间
-     */
-    LocalDateTime getCreatedAt();
-
-    /**
-     * 设置创建时间
-     *
-     * @param createdAt 创建时间
-     */
-    void setCreatedAt(LocalDateTime createdAt);
-
-    /**
-     * 获取更新时间
-     *
-     * @return 更新时间
-     */
-    LocalDateTime getUpdatedAt();
-
-    /**
-     * 设置更新时间
-     *
-     * @param updatedAt 更新时间
-     */
-    void setUpdatedAt(LocalDateTime updatedAt);
+    void setCapabilities(Map<String, Object> capabilities);
 
 }
