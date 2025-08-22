@@ -62,17 +62,17 @@ public class ResponseFactory {
         // 设置模型ID
         response.setId(model.getId());
         // 设置模型名称
-        response.setModelName(model.getModelName());
+        response.setModelName(model.getName());
         // 设置模型类型
-        response.setModelType(model.getModelType());
+        response.setModelType(model.getType());
         // 设置提供商名称
-        response.setProviderName(model.getProviderName());
+        response.setProviderName(model.getProvider());
         // 设置加密配置
         // response.setEncryptedConfig(model.getEncryptedConfig());
         // 设置创建时间
-        response.setCreatedAt(model.getCreatedAt());
+       // response.setCreatedAt(model.getCreatedAt());
         // 设置是否有效
-        response.setIsValid(model.getIsValid());
+       // response.setIsValid(model.getIsValid());
         return response;
     }
 
@@ -110,40 +110,35 @@ public class ResponseFactory {
      * 创建模型提供商响应对象
      * <p>
      * 将ModelProvider实体对象转换为标准化的API响应格式
-     * 包含模型提供商的基本信息、配置和状态
+     * 包含模型提供商的基本信息、配置和能力
+     * 与YAML提供商配置文件保持一致
      * </p>
      *
      * @param provider 模型提供商实体对象，包含模型提供商基本信息，不能为null
-     * @return 标准化后的模型提供商响应对象，包含提供商ID、名称、类型、配额等信息
+     * @return 标准化后的模型提供商响应对象，包含提供商ID、名称、描述、能力等信息
      * @see ModelProvider
      * @see ModelProviderResponse
      */
     public ModelProviderResponse createModelProviderResponse(ModelProvider provider) {
         ModelProviderResponse response = new ModelProviderResponse();
-        // 设置提供商ID
+        // 设置主键ID
         response.setId(provider.getId());
-        // 设置租户ID
-        response.setTenantId(provider.getTenantId());
-        // 设置提供商名称
-        response.setProviderName(provider.getProviderName());
-        // 设置提供商类型
-        response.setProviderType(provider.getProviderType());
-        // 设置加密配置
-        response.setEncryptedConfig(provider.getEncryptedConfig());
-        // 设置是否有效
-        response.setIsValid(provider.getIsValid());
-        // 设置最后使用时间
-        response.setLastUsed(provider.getLastUsed());
-        // 设置配额类型
-        response.setQuotaType(provider.getQuotaType());
-        // 设置配额限制
-        response.setQuotaLimit(provider.getQuotaLimit());
-        // 设置已用配额
-        response.setQuotaUsed(provider.getQuotaUsed());
-        // 设置创建时间
-        response.setCreatedAt(provider.getCreatedAt());
-        // 设置更新时间
-        response.setUpdatedAt(provider.getUpdatedAt());
+        // 设置提供商唯一标识码
+        response.setCode(provider.getCode());
+        // 设置提供商显示名称
+        response.setName(provider.getName());
+        // 设置提供商简要描述信息
+        response.setDescription(provider.getDescription());
+        // 设置提供商图标
+        response.setIcon(provider.getIcon());
+        // 设置排序权重
+        response.setSortOrder(provider.getSortOrder());
+        // 设置该提供商支持的模型类型列表
+        response.setSupportedModelTypes(provider.getSupportedModelTypes());
+        // 设置提供商配置参数的JSON Schema定义
+        response.setConfigSchema(provider.getConfigSchema());
+        // 设置提供商支持的能力配置
+        response.setCapabilities(provider.getCapabilities());
         return response;
     }
 

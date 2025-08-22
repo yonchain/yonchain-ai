@@ -90,7 +90,7 @@ public class ModelController extends BaseController {
         ModelInfo model = new DefaultModel();
         model.setId(UUID.randomUUID().toString());
         model.setTenantId(getCurrentTenantId());
-        model.setIsValid(true);
+        //model.setIsValid(true);
 
         //设置模型信息
         this.populateModelFromRequest(model, request);
@@ -150,34 +150,34 @@ public class ModelController extends BaseController {
     private void populateModelFromRequest(ModelInfo model, ModelRequest request) {
         // 设置模型名称（如果不为空）
         if (request.getModelName() != null) {
-            model.setModelName(request.getModelName());
+            model.setName(request.getModelName());
         }
 
         // 设置模型类型（如果不为空）
         if (request.getModelType() != null) {
-            model.setModelType(request.getModelType());
+            model.setType(request.getModelType());
         }
 
         // 设置提供商名称（如果不为空）
         if (request.getProviderName() != null) {
-            model.setProviderName(request.getProviderName());
+            model.setProvider(request.getProviderName());
         }
 
         // 设置加密配置（如果不为空）
         if (request.getEncryptedConfig() != null) {
-            model.setEncryptedConfig(request.getEncryptedConfig());
+           // model.setEncryptedConfig(request.getEncryptedConfig());
         }
 
         // 设置模型为有效状态
-        model.setIsValid(true);
+       // model.setIsValid(true);
 
         // 设置当前时间为更新时间
-        model.setUpdatedAt(LocalDateTime.now());
+       // model.setUpdatedAt(LocalDateTime.now());
 
         // 如果是新建模型，设置创建时间
-        if (model.getCreatedAt() == null) {
+       /* if (model.getCreatedAt() == null) {
             model.setCreatedAt(LocalDateTime.now());
-        }
+        }*/
     }
 
 }
