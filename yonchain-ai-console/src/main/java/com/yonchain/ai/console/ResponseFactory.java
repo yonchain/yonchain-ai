@@ -160,9 +160,11 @@ public class ResponseFactory {
         // 设置该提供商支持的模型类型列表
         response.setSupportedModelTypes(provider.getSupportedModelTypes());
         // 设置提供商配置参数的JSON Schema定义
-        response.setConfigSchema(provider.getConfigSchema());
+        response.setConfigSchemas(provider.getConfigSchemas());
         // 设置提供商支持的能力配置
         response.setCapabilities(provider.getCapabilities());
+        //是否开启
+        response.setEnabled(provider.getEnabled());
         return response;
     }
 

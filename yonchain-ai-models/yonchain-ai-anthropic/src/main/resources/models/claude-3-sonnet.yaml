@@ -22,30 +22,28 @@ model:
     - "completion"        # 支持文本补全
     - "analysis"          # 支持文本分析
   # 模型配置参数定义
-  configSchema:
-    type: object
-    properties:
-      # 温度参数，控制输出的随机性，值越高输出越随机
-      temperature:
-        type: number
-        title: 温度参数
-        description: 控制输出的随机性，值越高输出越随机
-        default: 0.7
-        minimum: 0
-        maximum: 1
-      # 最大令牌数，生成文本的最大令牌数量
-      max_tokens:
-        type: integer
-        title: 最大令牌数
-        description: 生成文本的最大令牌数量
-        default: 4096
-        minimum: 1
-        maximum: 200000
-      # 核采样参数，控制词汇选择的多样性
-      top_p:
-        type: number
-        title: 核采样参数
-        description: 核采样参数，控制词汇选择的多样性
-        default: 1.0
-        minimum: 0
-        maximum: 1
+  configSchemas:
+    # 温度参数，控制输出的随机性，值越高输出越随机
+    - name: temperature
+      type: number
+      title: 温度参数
+      description: 控制输出的随机性，值越高输出越随机
+      defaultValue: 0.7
+      min: 0
+      max: 1
+    # 最大令牌数，生成文本的最大令牌数量
+    - name: max_tokens
+      type: integer
+      title: 最大令牌数
+      description: 生成文本的最大令牌数量
+      defaultValue: 4096
+      min: 1
+      max: 200000
+    # 核采样参数，控制词汇选择的多样性
+    - name: top_p
+      type: number
+      title: 核采样参数
+      description: 核采样参数，控制词汇选择的多样性
+      defaultValue: 1.0
+      min: 0
+      max: 1

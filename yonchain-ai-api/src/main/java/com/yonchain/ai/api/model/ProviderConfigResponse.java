@@ -54,7 +54,7 @@ public class ProviderConfigResponse {
     /**
      * 配置项列表
      */
-    private List<ModelProviderConfigItem> configItems;
+    private List<ModelConfigItem> configItems;
     
     /**
      * 整体配置状态
@@ -108,11 +108,11 @@ public class ProviderConfigResponse {
         this.configured = configured;
     }
 
-    public List<ModelProviderConfigItem> getConfigItems() {
+    public List<ModelConfigItem> getConfigItems() {
         return configItems;
     }
 
-    public void setConfigItems(List<ModelProviderConfigItem> configItems) {
+    public void setConfigItems(List<ModelConfigItem> configItems) {
         this.configItems = configItems;
     }
 

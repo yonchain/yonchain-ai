@@ -69,7 +69,7 @@ public class DefaultModelProvider implements ModelProvider {
     /**
      * 提供商配置参数的JSON Schema定义
      */
-    private List<ModelProviderConfigItem> configSchema;
+    private List<ModelConfigItem> configSchemas;
 
     /**
      * 提供商支持的能力配置
@@ -164,13 +164,13 @@ public class DefaultModelProvider implements ModelProvider {
     }
 
     @Override
-    public List<ModelProviderConfigItem> getConfigSchema() {
-        return configSchema;
+    public List<ModelConfigItem> getConfigSchemas() {
+        return configSchemas;
     }
 
     @Override
-    public void setConfigSchema(List<ModelProviderConfigItem> configSchema) {
-        this.configSchema = configSchema;
+    public void setConfigSchemas(List<ModelConfigItem> configSchemas) {
+        this.configSchemas = configSchemas;
     }
 
     @Override

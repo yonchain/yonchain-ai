@@ -21,21 +21,19 @@ model:
     - "embedding"
     - "text_similarity"
   # 模型配置参数定义
-  configSchema:
-    type: object
-    properties:
-      # 嵌入向量维度
-      dimensions:
-        type: integer
-        title: 向量维度
-        description: 嵌入向量的维度
-        default: 1536
-      # 编码格式
-      encoding_format:
-        type: string
-        title: 编码格式
-        description: 返回数据的编码格式
-        enum:
-          - float
-          - base64
-        default: float
+  configSchemas:
+    # 嵌入向量维度
+    - name: dimensions
+      type: integer
+      title: 向量维度
+      description: 嵌入向量的维度
+      defaultValue: 1536
+    # 编码格式
+    - name: encoding_format
+      type: string
+      title: 编码格式
+      description: 返回数据的编码格式
+      enum:
+        - float
+        - base64
+      defaultValue: float

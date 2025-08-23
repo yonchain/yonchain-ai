@@ -18,30 +18,25 @@ provider:
   supportedModelTypes:
     - text        # 文本处理模型
     - chat        # 对话聊天模型
-    - code        # 代码生成模型
   # 提供商配置参数的JSON Schema定义
-  configSchema:
-    type: object
-    properties:
-      # API密钥配置
-      apiKey:
-        type: string
-        title: API密钥
-        description: DeepSeek API密钥
-      # API基础URL配置
-      baseUrl:
-        type: string
-        title: API基础URL
-        description: DeepSeek API基础URL，默认为https://api.deepseek.com
-        default: https://api.deepseek.com
-      # 代理URL配置
-      proxyUrl:
-        type: string
-        title: 代理URL
-        description: API请求代理URL（可选）
-    # 必填字段列表
-    required:
-      - apiKey
+  configSchemas:
+    # API密钥配置
+    - name: apiKey
+      type: string
+      title: API密钥
+      description: DeepSeek API密钥
+      required: true
+    # API基础URL配置
+    - name: baseUrl
+      type: string
+      title: API基础URL
+      description: DeepSeek API基础URL，默认为https://api.deepseek.com
+      defaultValue: https://api.deepseek.com
+    # 代理URL配置
+    - name: proxyUrl
+      type: string
+      title: 代理URL
+      description: API请求代理URL（可选）
 
 # 模型文件列表
 models:

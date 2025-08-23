@@ -18,23 +18,19 @@ provider:
     - "completion"  # 支持文本补全模型
     - "embedding"   # 支持文本嵌入模型
   # 提供商配置参数的JSON Schema定义
-  configSchema:
-    type: object
-    properties:
-      # API基础URL配置
-      baseUrl:
-        type: string
-        title: API基础URL
-        description: Ollama API基础URL
-        default: "http://localhost:11434"
-      # 连接超时时间
-      timeout:
-        type: integer
-        title: 连接超时时间
-        description: API请求超时时间（秒）
-        default: 30
-        minimum: 1
-        maximum: 300
-    # 必填字段列表
-    required:
-      - baseUrl
+  configSchemas:
+    # API基础URL配置
+    - name: baseUrl
+      type: string
+      title: API基础URL
+      description: Ollama API基础URL
+      defaultValue: "http://localhost:11434"
+      required: true
+    # 连接超时时间
+    - name: timeout
+      type: integer
+      title: 连接超时时间
+      description: API请求超时时间（秒）
+      defaultValue: 30
+      min: 1
+      max: 300

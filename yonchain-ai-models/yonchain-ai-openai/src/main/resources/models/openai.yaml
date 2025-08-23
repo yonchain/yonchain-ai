@@ -19,22 +19,22 @@ provider:
     - embedding   # 文本嵌入模型
     - audio       # 音频处理模型
   # 提供商配置参数的JSON Schema定义
-  configSchema:
+  configSchemas:
     # API密钥配置
-    apiKey:
+    - name: apiKey
       type: string
       title: API密钥
       description: OpenAI API密钥
       required: true
     # API基础URL配置，可自定义API端点
-    baseUrl:
+    - name: baseUrl
       type: string
       title: API基础URL
       description: OpenAI API基础URL，默认为https://api.openai.com
-      default: https://api.openai.com
+      defaultValue: https://api.openai.com
       required: false
     # 代理URL配置，用于网络访问受限的环境
-    orgId:
+    - name: orgId
       type: string
       title: 组织 ID
       description: 组织 ID（可选）

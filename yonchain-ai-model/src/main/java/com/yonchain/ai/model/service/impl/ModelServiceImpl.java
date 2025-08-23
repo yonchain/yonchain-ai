@@ -7,7 +7,7 @@ import com.yonchain.ai.model.entity.ModelInstanceConfig;
 import com.yonchain.ai.model.mapper.ModelMapper;
 import com.yonchain.ai.model.mapper.ModelProviderMapper;
 import com.yonchain.ai.model.mapper.ModelInstanceConfigMapper;
-import com.yonchain.ai.model.config.StaticModelConfigLoader;
+import com.yonchain.ai.model.loader.ModelLoader;
 import com.yonchain.ai.api.common.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class ModelServiceImpl implements ModelService {
 
     @Autowired
-    private StaticModelConfigLoader staticConfigLoader;
+    private ModelLoader staticConfigLoader;
 
     @Autowired(required = false)
     private ModelMapper modelMapper;
@@ -49,7 +49,7 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public ModelInfo getModelById(String id) {
         // 从静态配置获取模型基础信息
-        StaticModelConfigLoader.StaticModelInfo staticConfig = staticConfigLoader.getModelConfig(id);
+        DefaultModel staticConfig = staticConfigLoader.getModelConfig(id);
         if (staticConfig == null) {
             return null;
         }
@@ -60,7 +60,7 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public List<ModelInfo> getModels(String tenantId, String providerName) {
         // 只返回静态配置的模型列表，不包含租户动态数据
-        Collection<StaticModelConfigLoader.StaticModelInfo> staticConfigs;
+        Collection<DefaultModel> staticConfigs;
 
         if (providerName != null) {
             staticConfigs = staticConfigLoader.getModelConfigsByProvider(providerName);
@@ -82,7 +82,7 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public Page<ModelInfo> pageModels(String tenantId, Map<String, Object> queryParam, int pageNum, int pageSize) {
         // 获取所有静态模型配置
-        Collection<StaticModelConfigLoader.StaticModelInfo> allStaticModels = staticConfigLoader.getAllModelConfigs();
+        Collection<DefaultModel> allStaticModels = staticConfigLoader.getAllModelConfigs();
 
         // 转换为ModelInfo并添加配置状态标签
         List<ModelInfo> allModels = allStaticModels.stream()
@@ -119,7 +119,7 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public ModelProvider getProviderById(String providerId) {
         // 从静态配置获取提供商基础信息
-        StaticModelConfigLoader.StaticModelProvider staticConfig = staticConfigLoader.getProviderConfig(providerId);
+        DefaultModelProvider staticConfig = staticConfigLoader.getProviderConfig(providerId);
         if (staticConfig == null) {
             return null;
         }
@@ -129,7 +129,7 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public List<ModelProvider> getProviders(String tenantId, Map<String, Object> queryParam) {
-        Collection<StaticModelConfigLoader.StaticModelProvider> staticConfigs = staticConfigLoader.getAllProviderConfigs();
+        Collection<DefaultModelProvider> staticConfigs = staticConfigLoader.getAllProviderConfigs();
 
         return staticConfigs.stream()
                 .map(staticConfig -> {
@@ -145,7 +145,7 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public Page<ModelProvider> pageProviders(String tenantId, Map<String, Object> queryParam, int pageNum, int pageSize) {
         // 获取所有静态提供商配置
-        Collection<StaticModelConfigLoader.StaticModelProvider> allStaticProviders = staticConfigLoader.getAllProviderConfigs();
+        Collection<DefaultModelProvider> allStaticProviders = staticConfigLoader.getAllProviderConfigs();
 
         // 转换为ModelProvider并添加配置状态标签
         List<ModelProvider> allProviders = allStaticProviders.stream()
@@ -193,7 +193,7 @@ public class ModelServiceImpl implements ModelService {
         ProviderConfigResponse response = new ProviderConfigResponse();
 
         // 1. 获取静态配置定义（来自YAML）
-        StaticModelConfigLoader.StaticModelProvider staticConfig = staticConfigLoader.getProviderConfig(providerCode);
+        DefaultModelProvider staticConfig = staticConfigLoader.getProviderConfig(providerCode);
         if (staticConfig == null) {
             return response;
         }
@@ -203,7 +203,6 @@ public class ModelServiceImpl implements ModelService {
         response.setName(staticConfig.getName());
         response.setDescription(staticConfig.getDescription());
         response.setIcon(staticConfig.getIcon());
-        // 将 Map<String, Object> 转换为 List<String>
         response.setSupportedModelTypes(staticConfig.getSupportedModelTypes());
 
         // 2. 获取租户级配置数据
@@ -222,7 +221,7 @@ public class ModelServiceImpl implements ModelService {
             }
         }
 
-        //response.setConfigItems(staticConfig.getConfigSchema() != null ? staticConfig.getConfigSchema() : new ArrayList<>());
+        response.setConfigItems(staticConfig.getConfigSchemas());
         response.setConfigured(configured);
         response.setEnabled(enabled);
         response.setLastUpdated(lastUpdated);
@@ -280,7 +279,7 @@ public class ModelServiceImpl implements ModelService {
 
         try {
             // 验证模型是否存在于静态配置中
-            StaticModelConfigLoader.StaticModelInfo staticConfig = staticConfigLoader.getModelConfig(modelInfo.getCode());
+            DefaultModel staticConfig = staticConfigLoader.getModelConfig(modelInfo.getCode());
             if (staticConfig == null) {
                 throw new IllegalArgumentException("模型不存在: " + modelInfo.getCode());
             }
@@ -408,7 +407,7 @@ public class ModelServiceImpl implements ModelService {
             }
 
             // 获取静态配置作为基础
-            StaticModelConfigLoader.StaticModelInfo staticConfig = staticConfigLoader.getModelConfig(modelCode);
+            DefaultModel staticConfig = staticConfigLoader.getModelConfig(modelCode);
             if (staticConfig == null) {
                 log.warn("未找到静态模型配置: modelCode={}", modelCode);
                 return null;
@@ -514,41 +513,17 @@ public class ModelServiceImpl implements ModelService {
     /**
      * 转换静态模型配置为ModelInfo
      */
-    private ModelInfo convertToModelInfo(StaticModelConfigLoader.StaticModelInfo staticConfig) {
-        DefaultModel modelInfo = new DefaultModel();
-        modelInfo.setId(staticConfig.getCode());
-        modelInfo.setCode(staticConfig.getCode());
-        modelInfo.setName(staticConfig.getName());
-        modelInfo.setDescription(staticConfig.getDescription());
-        modelInfo.setIcon(staticConfig.getIcon());
-        modelInfo.setProvider(staticConfig.getProvider());
-        modelInfo.setType(staticConfig.getType());
-        modelInfo.setVersion(staticConfig.getVersion());
-        modelInfo.setSortOrder(staticConfig.getSortOrder());
-        // 处理 capabilities 的类型转换
-      /*  Map<String, Object> capabilities = staticConfig.getCapabilities();
-        if (capabilities != null) {
-            modelInfo.setCapabilities(capabilities);
-        }*/
-
-        return modelInfo;
+    private ModelInfo convertToModelInfo(DefaultModel staticConfig) {
+        // 由于已经是DefaultModel类型，直接返回即可
+        return staticConfig;
     }
 
     /**
      * 转换静态提供商配置为ModelProvider
      */
-    private ModelProvider convertToModelProvider(StaticModelConfigLoader.StaticModelProvider staticConfig) {
-        DefaultModelProvider provider = new DefaultModelProvider();
-        provider.setCode(staticConfig.getCode());
-        provider.setName(staticConfig.getName());
-        provider.setDescription(staticConfig.getDescription());
-        provider.setIcon(staticConfig.getIcon());
-        provider.setSortOrder(0); // 默认排序
-        // 将 Map<String, Object> 转换为 List<String>
-        List<String> supportedTypes = staticConfig.getSupportedModelTypes();
-        provider.setSupportedModelTypes(supportedTypes);
-
-        return provider;
+    private ModelProvider convertToModelProvider(DefaultModelProvider staticConfig) {
+        // 由于已经是DefaultModelProvider类型，直接返回即可
+        return staticConfig;
     }
 
     /**

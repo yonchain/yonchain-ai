@@ -20,27 +20,25 @@ model:
   capabilities:
     - image-generation  # 支持图像生成
   # 模型配置参数的JSON Schema定义
-  configSchema:
-    type: object
-    properties:
-      # 图像尺寸参数
-      size:
-        type: string
-        title: 图像尺寸
-        description: 生成图像的尺寸
-        enum:
-          - 256x256    # 小尺寸
-          - 512x512    # 中等尺寸
-          - 1024x1024  # 标准尺寸
-          - 1792x1024  # 宽屏尺寸
-          - 1024x1792  # 竖屏尺寸
-        default: 1024x1024
-      # 图像质量参数
-      quality:
-        type: string
-        title: 图像质量
-        description: 生成图像的质量
-        enum:
-          - standard  # 标准质量
-          - hd        # 高清质量
-        default: standard
+  configSchemas:
+    # 图像尺寸参数
+    - name: size
+      type: string
+      title: 图像尺寸
+      description: 生成图像的尺寸
+      enum:
+        - 256x256    # 小尺寸
+        - 512x512    # 中等尺寸
+        - 1024x1024  # 标准尺寸
+        - 1792x1024  # 宽屏尺寸
+        - 1024x1792  # 竖屏尺寸
+      defaultValue: 1024x1024
+    # 图像质量参数
+    - name: quality
+      type: string
+      title: 图像质量
+      description: 生成图像的质量
+      enum:
+        - standard  # 标准质量
+        - hd        # 高清质量
+      defaultValue: standard

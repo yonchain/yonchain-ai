@@ -16,13 +16,12 @@
 
 package com.yonchain.ai.console.model.response;
 
+import com.yonchain.ai.api.model.ModelConfigItem;
 import com.yonchain.ai.api.model.ModelProviderCapabilities;
-import com.yonchain.ai.api.model.ModelProviderConfigItem;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 模型提供商响应
@@ -81,11 +80,17 @@ public class ModelProviderResponse {
      * 提供商配置参数的JSON Schema定义
      */
     @Schema(description = "配置参数Schema")
-    private List<ModelProviderConfigItem> configSchema;
+    private List<ModelConfigItem> configSchemas;
 
     /**
      * 提供商支持的能力配置
      */
     @Schema(description = "能力配置")
     private ModelProviderCapabilities capabilities;
+
+    /**
+     * 是否开启
+     */
+    @Schema(description = "是否开启")
+    private Boolean enabled;
 }

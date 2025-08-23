@@ -15,27 +15,22 @@ provider:
   # 该提供商支持的模型类型列表
   supportedModelTypes:
     - "chat"        # 支持聊天对话模型
-    - "completion"  # 支持文本补全模型
   # 提供商配置参数的JSON Schema定义
-  configSchema:
-    type: object
-    properties:
-      # API密钥配置
-      apiKey:
-        type: string
-        title: API密钥
-        description: Anthropic API密钥
-      # API基础URL配置
-      baseUrl:
-        type: string
-        title: API基础URL
-        description: Anthropic API基础URL
-        default: "https://api.anthropic.com"
-      # 代理URL配置（可选）
-      proxyUrl:
-        type: string
-        title: 代理URL
-        description: API请求代理URL（可选）
-    # 必填字段列表
-    required:
-      - apiKey
+  configSchemas:
+    # API密钥配置
+    - name: apiKey
+      type: string
+      title: API密钥
+      description: Anthropic API密钥
+      required: true
+    # API基础URL配置
+    - name: baseUrl
+      type: string
+      title: API基础URL
+      description: Anthropic API基础URL
+      defaultValue: "https://api.anthropic.com"
+    # 代理URL配置（可选）
+    - name: proxyUrl
+      type: string
+      title: 代理URL
+      description: API请求代理URL（可选）

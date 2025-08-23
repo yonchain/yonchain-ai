@@ -20,34 +20,34 @@ model:
     - "completion"        # 支持文本补全
     - "function_calling"  # 支持函数调用
   # 模型配置参数定义
-  configSchema:
+  configSchemas:
     # 温度参数，控制输出的随机性，值越高输出越随机
-    temperature:
+    - name: temperature
       type: "number"
-      default: 0.7
+      defaultValue: 0.7
       min: 0
       max: 2
     # 最大令牌数，生成文本的最大令牌数量
-    max_tokens:
+    - name: max_tokens
       type: "integer"
-      default: 4096
+      defaultValue: 4096
       min: 1
       max: 4096
     # 核采样参数，控制词汇选择的多样性
-    top_p:
+    - name: top_p
       type: "number"
-      default: 1.0
+      defaultValue: 1.0
       min: 0
       max: 1
     # 频率惩罚，减少重复内容的生成
-    frequency_penalty:
+    - name: frequency_penalty
       type: "number"
-      default: 0
+      defaultValue: 0
       min: -2
       max: 2
     # 存在惩罚，鼓励生成新颖内容
-    presence_penalty:
+    - name: presence_penalty
       type: "number"
-      default: 0
+      defaultValue: 0
       min: -2
       max: 2

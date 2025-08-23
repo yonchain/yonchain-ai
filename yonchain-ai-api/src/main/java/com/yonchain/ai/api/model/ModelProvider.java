@@ -143,14 +143,14 @@ public interface ModelProvider {
      *
      * @return 配置参数Schema
      */
-    List<ModelProviderConfigItem> getConfigSchema();
+    List<ModelConfigItem> getConfigSchemas();
 
     /**
      * 设置提供商配置参数的JSON Schema定义
      *
-     * @param configSchema 配置参数Schema
+     * @param configSchemas 配置参数Schema
      */
-    void setConfigSchema(List<ModelProviderConfigItem> configSchema);
+    void setConfigSchemas(List<ModelConfigItem> configSchemas);
 
     /**
      * 获取提供商支持的能力配置
