@@ -20,27 +20,25 @@ provider:
     - audio       # 音频处理模型
   # 提供商配置参数的JSON Schema定义
   configSchema:
-    type: object
-    properties:
-      # API密钥配置
-      apiKey:
-        type: string
-        title: API密钥
-        description: OpenAI API密钥
-        required: true
-      # API基础URL配置，可自定义API端点
-      baseUrl:
-        type: string
-        title: API基础URL
-        description: OpenAI API基础URL，默认为https://api.openai.com
-        default: https://api.openai.com
-        required: false
-      # 代理URL配置，用于网络访问受限的环境
-      orgId:
-        type: string
-        title: 组织 ID
-        description: 组织 ID（可选）
-        required: false
+    # API密钥配置
+    apiKey:
+      type: string
+      title: API密钥
+      description: OpenAI API密钥
+      required: true
+    # API基础URL配置，可自定义API端点
+    baseUrl:
+      type: string
+      title: API基础URL
+      description: OpenAI API基础URL，默认为https://api.openai.com
+      default: https://api.openai.com
+      required: false
+    # 代理URL配置，用于网络访问受限的环境
+    orgId:
+      type: string
+      title: 组织 ID
+      description: 组织 ID（可选）
+      required: false
 
 # 模型能力配置部分，与provider和models同级
 capabilities:

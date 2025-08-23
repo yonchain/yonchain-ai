@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * 模型服务实现类
- * 
+ * <p>
  * 设计原则：
  * 1. 静态配置由YAML管理（提供商元数据、模型定义、能力配置）
  * 2. 动态配置由数据库管理（租户API密钥、个性化参数、启用状态）
@@ -34,13 +34,13 @@ public class ModelServiceImpl implements ModelService {
 
     @Autowired
     private StaticModelConfigLoader staticConfigLoader;
-    
+
     @Autowired(required = false)
     private ModelMapper modelMapper;
-    
+
     @Autowired(required = false)
     private ModelProviderMapper modelProviderMapper;
-    
+
     @Autowired(required = false)
     private ModelInstanceConfigMapper modelInstanceConfigMapper;
 
@@ -49,25 +49,25 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public ModelInfo getModelById(String id) {
         // 从静态配置获取模型基础信息
-        StaticModelConfigLoader.ModelConfig staticConfig = staticConfigLoader.getModelConfig(id);
+        StaticModelConfigLoader.StaticModelInfo staticConfig = staticConfigLoader.getModelConfig(id);
         if (staticConfig == null) {
             return null;
         }
-        
+
         return convertToModelInfo(staticConfig);
     }
 
     @Override
     public List<ModelInfo> getModels(String tenantId, String providerName) {
         // 只返回静态配置的模型列表，不包含租户动态数据
-        Collection<StaticModelConfigLoader.ModelConfig> staticConfigs;
-        
+        Collection<StaticModelConfigLoader.StaticModelInfo> staticConfigs;
+
         if (providerName != null) {
             staticConfigs = staticConfigLoader.getModelConfigsByProvider(providerName);
         } else {
             staticConfigs = staticConfigLoader.getAllModelConfigs();
         }
-        
+
         return staticConfigs.stream()
                 .map(staticConfig -> {
                     DefaultModel modelInfo = (DefaultModel) convertToModelInfo(staticConfig);
@@ -82,8 +82,8 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public Page<ModelInfo> pageModels(String tenantId, Map<String, Object> queryParam, int pageNum, int pageSize) {
         // 获取所有静态模型配置
-        Collection<StaticModelConfigLoader.ModelConfig> allStaticModels = staticConfigLoader.getAllModelConfigs();
-        
+        Collection<StaticModelConfigLoader.StaticModelInfo> allStaticModels = staticConfigLoader.getAllModelConfigs();
+
         // 转换为ModelInfo并添加配置状态标签
         List<ModelInfo> allModels = allStaticModels.stream()
                 .map(staticConfig -> {
@@ -94,23 +94,23 @@ public class ModelServiceImpl implements ModelService {
                     return modelInfo;
                 })
                 .collect(Collectors.toList());
-        
+
         // 应用查询过滤条件
         List<ModelInfo> filteredModels = applyModelInfoFilters(allModels, queryParam);
-        
+
         // 手动分页
         int total = filteredModels.size();
         int startIndex = (pageNum - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, total);
-        
+
         List<ModelInfo> pageData = filteredModels.subList(startIndex, endIndex);
-        
+
         Page<ModelInfo> page = new Page<>();
         page.setRecords(pageData);
         page.setCurrent(pageNum);
         page.setSize(pageSize);
         page.setTotal(total);
-        
+
         return page;
     }
 
@@ -119,18 +119,18 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public ModelProvider getProviderById(String providerId) {
         // 从静态配置获取提供商基础信息
-        StaticModelConfigLoader.ProviderConfig staticConfig = staticConfigLoader.getProviderConfig(providerId);
+        StaticModelConfigLoader.StaticModelProvider staticConfig = staticConfigLoader.getProviderConfig(providerId);
         if (staticConfig == null) {
             return null;
         }
-        
+
         return convertToModelProvider(staticConfig);
     }
 
     @Override
     public List<ModelProvider> getProviders(String tenantId, Map<String, Object> queryParam) {
-        Collection<StaticModelConfigLoader.ProviderConfig> staticConfigs = staticConfigLoader.getAllProviderConfigs();
-        
+        Collection<StaticModelConfigLoader.StaticModelProvider> staticConfigs = staticConfigLoader.getAllProviderConfigs();
+
         return staticConfigs.stream()
                 .map(staticConfig -> {
                     DefaultModelProvider provider = (DefaultModelProvider) convertToModelProvider(staticConfig);
@@ -145,8 +145,8 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public Page<ModelProvider> pageProviders(String tenantId, Map<String, Object> queryParam, int pageNum, int pageSize) {
         // 获取所有静态提供商配置
-        Collection<StaticModelConfigLoader.ProviderConfig> allStaticProviders = staticConfigLoader.getAllProviderConfigs();
-        
+        Collection<StaticModelConfigLoader.StaticModelProvider> allStaticProviders = staticConfigLoader.getAllProviderConfigs();
+
         // 转换为ModelProvider并添加配置状态标签
         List<ModelProvider> allProviders = allStaticProviders.stream()
                 .map(staticConfig -> {
@@ -157,23 +157,23 @@ public class ModelServiceImpl implements ModelService {
                     return provider;
                 })
                 .collect(Collectors.toList());
-        
+
         // 应用查询过滤条件
         List<ModelProvider> filteredProviders = applyModelProviderFilters(allProviders, queryParam);
-        
+
         // 手动分页
         int total = filteredProviders.size();
         int startIndex = (pageNum - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, total);
-        
+
         List<ModelProvider> pageData = filteredProviders.subList(startIndex, endIndex);
-        
+
         Page<ModelProvider> page = new Page<>();
         page.setRecords(pageData);
         page.setCurrent(pageNum);
         page.setSize(pageSize);
         page.setTotal(total);
-        
+
         return page;
     }
 
@@ -184,34 +184,34 @@ public class ModelServiceImpl implements ModelService {
     }
 
     // ==================== 租户配置管理方法 ====================
-    
+
     /**
      * 获取租户提供商配置（静态定义与动态数据合并）
      */
     @Override
     public ProviderConfigResponse getProviderConfig(String tenantId, String providerCode) {
         ProviderConfigResponse response = new ProviderConfigResponse();
-        
+
         // 1. 获取静态配置定义（来自YAML）
-        StaticModelConfigLoader.ProviderConfig staticConfig = staticConfigLoader.getProviderConfig(providerCode);
+        StaticModelConfigLoader.StaticModelProvider staticConfig = staticConfigLoader.getProviderConfig(providerCode);
         if (staticConfig == null) {
             return response;
         }
-        
+
         // 设置提供商基本信息
         response.setCode(staticConfig.getCode());
         response.setName(staticConfig.getName());
         response.setDescription(staticConfig.getDescription());
         response.setIcon(staticConfig.getIcon());
         // 将 Map<String, Object> 转换为 List<String>
-        response.setSupportedModelTypes(staticConfig.getSupportedFeatures());
-        
+        response.setSupportedModelTypes(staticConfig.getSupportedModelTypes());
+
         // 2. 获取租户级配置数据
         Map<String, Object> tenantConfigData = new HashMap<>();
         boolean configured = false;
         boolean enabled = false;
         String lastUpdated = null;
-        
+
         if (modelProviderMapper != null) {
             ModelProviderEntity entity = modelProviderMapper.selectByTenantAndCode(tenantId, providerCode);
             if (entity != null) {
@@ -221,64 +221,15 @@ public class ModelServiceImpl implements ModelService {
                 lastUpdated = entity.getUpdateTime() != null ? entity.getUpdateTime().toString() : null;
             }
         }
-        
-        // 3. 合并静态定义和动态数据
-        List<ModelProviderConfigItem> configItems = new ArrayList<>();
-        Map<String, Object> configSchema = staticConfig.getConfigSchema();
-        
-        if (configSchema != null && configSchema.containsKey("properties")) {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> properties = (Map<String, Object>) configSchema.get("properties");
-            
-            int order = 0;
-            for (Map.Entry<String, Object> entry : properties.entrySet()) {
-                String fieldName = entry.getKey();
-                @SuppressWarnings("unchecked")
-                Map<String, Object> fieldSchema = (Map<String, Object>) entry.getValue();
 
-                ModelProviderConfigItem configItem = new ModelProviderConfigItem();
-                
-                // 静态属性（来自YAML配置定义）
-                //configItem.setName(fieldName);
-                configItem.setType((String) fieldSchema.get("type"));
-                configItem.setTitle((String) fieldSchema.get("title"));
-                configItem.setDescription((String) fieldSchema.get("description"));
-                configItem.setRequired((Boolean) fieldSchema.get("required"));
-                configItem.setDefaultValue(fieldSchema.get("default"));
-                configItem.setOrder(order++);
-                
-                // 设置敏感信息标识（密钥类字段）
-                if (fieldName.toLowerCase().contains("key") || fieldName.toLowerCase().contains("secret") || 
-                    fieldName.toLowerCase().contains("password") || fieldName.toLowerCase().contains("token")) {
-                    configItem.setSensitive(true);
-                }
-                
-                // 设置分组
-                if (fieldName.equals("apiKey") || fieldName.equals("baseUrl")) {
-                    configItem.setGroup("基础配置");
-                } else {
-                    configItem.setGroup("高级配置");
-                }
-                
-                // 动态数据（租户实际配置的值）
-                Object actualValue = tenantConfigData.get(fieldName);
-                configItem.setValue(actualValue);
-               // configItem.setConfigured(actualValue != null);
-                
-                configItems.add(configItem);
-            }
-        }
-
-
-        
-        response.setConfigItems(configItems);
+        //response.setConfigItems(staticConfig.getConfigSchema() != null ? staticConfig.getConfigSchema() : new ArrayList<>());
         response.setConfigured(configured);
         response.setEnabled(enabled);
         response.setLastUpdated(lastUpdated);
-        
+
         return response;
     }
-    
+
     /**
      * 保存租户提供商配置
      */
@@ -288,7 +239,7 @@ public class ModelServiceImpl implements ModelService {
             log.warn("数据库配置未启用，无法保存提供商配置");
             return;
         }
-        
+
         ModelProviderEntity entity = modelProviderMapper.selectByTenantAndCode(tenantId, providerCode);
         if (entity == null) {
             entity = new ModelProviderEntity();
@@ -305,7 +256,7 @@ public class ModelServiceImpl implements ModelService {
             modelProviderMapper.update(entity);
         }
     }
-    
+
     /**
      * 保存租户模型配置
      */
@@ -321,21 +272,21 @@ public class ModelServiceImpl implements ModelService {
         if (!StringUtils.hasText(modelInfo.getCode())) {
             throw new IllegalArgumentException("模型代码不能为空");
         }
-        
+
         if (modelMapper == null) {
             log.warn("数据库配置未启用，无法保存模型配置: tenantId={}, modelCode={}", tenantId, modelInfo.getCode());
             return;
         }
-        
+
         try {
             // 验证模型是否存在于静态配置中
-            StaticModelConfigLoader.ModelConfig staticConfig = staticConfigLoader.getModelConfig(modelInfo.getCode());
+            StaticModelConfigLoader.StaticModelInfo staticConfig = staticConfigLoader.getModelConfig(modelInfo.getCode());
             if (staticConfig == null) {
                 throw new IllegalArgumentException("模型不存在: " + modelInfo.getCode());
             }
-            
+
             ModelEntity entity = modelMapper.selectByTenantAndModelCode(tenantId, modelInfo.getCode());
-            
+
             // 构建配置Map
             Map<String, Object> config = new HashMap<>();
             if (modelInfo.getCapabilities() != null) {
@@ -344,9 +295,9 @@ public class ModelServiceImpl implements ModelService {
             if (modelInfo.getEnabled() != null) {
                 config.put("enabled", modelInfo.getEnabled());
             }
-            
+
             String configJson = convertMapToJson(config);
-            
+
             if (entity == null) {
                 // 创建新配置
                 entity = new ModelEntity();
@@ -384,7 +335,7 @@ public class ModelServiceImpl implements ModelService {
         if (modelInstanceConfigMapper == null) {
             throw new UnsupportedOperationException("数据库配置未启用，无法创建模型配置");
         }
-        
+
         // 创建租户模型实例配置
         ModelInstanceConfig config = new ModelInstanceConfig();
         config.setId(generateId());
@@ -395,7 +346,7 @@ public class ModelServiceImpl implements ModelService {
         config.setCreatedBy(getCurrentUserId());
         config.setCreateTime(LocalDateTime.now());
         config.setUpdateTime(LocalDateTime.now());
-        
+
         modelInstanceConfigMapper.insert(config);
         return config.getId();
     }
@@ -405,15 +356,15 @@ public class ModelServiceImpl implements ModelService {
         if (modelInstanceConfigMapper == null) {
             throw new UnsupportedOperationException("数据库配置未启用，无法更新模型配置");
         }
-        
+
         ModelInstanceConfig config = modelInstanceConfigMapper.selectByTenantAndCode(
-            model.getTenantId(), model.getCode());
-        
+                model.getTenantId(), model.getCode());
+
         if (config != null) {
             config.setEnabled(true);
             config.setUpdatedBy(getCurrentUserId());
             config.setUpdateTime(LocalDateTime.now());
-            
+
             modelInstanceConfigMapper.update(config);
         }
     }
@@ -423,7 +374,7 @@ public class ModelServiceImpl implements ModelService {
         if (modelInstanceConfigMapper == null) {
             throw new UnsupportedOperationException("数据库配置未启用，无法删除模型配置");
         }
-        
+
         modelInstanceConfigMapper.deleteById(id);
     }
 
@@ -432,22 +383,22 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public ModelInfo getModelConfig(String tenantId, String modelCode) {
         log.debug("获取租户模型配置: tenantId={}, modelCode={}", tenantId, modelCode);
-        
+
         if (!StringUtils.hasText(tenantId)) {
             log.error("租户ID不能为空");
             throw new IllegalArgumentException("租户ID不能为空");
         }
-        
+
         if (!StringUtils.hasText(modelCode)) {
             log.error("模型代码不能为空");
             throw new IllegalArgumentException("模型代码不能为空");
         }
-        
+
         if (modelMapper == null) {
             log.warn("数据库配置未启用，返回空配置: tenantId={}, modelCode={}", tenantId, modelCode);
             return null;
         }
-        
+
         try {
             // 根据租户和模型代码获取模型配置
             ModelEntity modelEntity = modelMapper.selectByTenantAndModelCode(tenantId, modelCode);
@@ -455,24 +406,24 @@ public class ModelServiceImpl implements ModelService {
                 log.warn("未找到模型配置: tenantId={}, modelCode={}", tenantId, modelCode);
                 return null;
             }
-            
+
             // 获取静态配置作为基础
-            StaticModelConfigLoader.ModelConfig staticConfig = staticConfigLoader.getModelConfig(modelCode);
+            StaticModelConfigLoader.StaticModelInfo staticConfig = staticConfigLoader.getModelConfig(modelCode);
             if (staticConfig == null) {
                 log.warn("未找到静态模型配置: modelCode={}", modelCode);
                 return null;
             }
-            
+
             // 转换为 ModelInfo，合并静态和动态配置
             DefaultModel modelInfo = (DefaultModel) convertToModelInfo(staticConfig);
             modelInfo.setEnabled(modelEntity.getEnabled());
-            
+
             // 设置动态配置
             Map<String, Object> dynamicConfig = convertJsonToMap(modelEntity.getModelConfig());
             if (dynamicConfig.containsKey("capabilities")) {
-               // modelInfo.setCapabilities((Map<String, Object>) dynamicConfig.get("capabilities"));
+                // modelInfo.setCapabilities((Map<String, Object>) dynamicConfig.get("capabilities"));
             }
-            
+
             log.debug("成功获取模型配置: {}", modelInfo);
             return modelInfo;
         } catch (Exception e) {
@@ -488,14 +439,14 @@ public class ModelServiceImpl implements ModelService {
         if (modelProviderMapper == null) {
             throw new UnsupportedOperationException("数据库配置未启用，无法创建提供商配置");
         }
-        
+
         ModelProviderEntity entity = new ModelProviderEntity();
         entity.setTenantId(modelProvider.getTenantId());
         entity.setProviderCode(modelProvider.getCode());
         entity.setEnabled(modelProvider.getEnabled());
         entity.setCreateTime(LocalDateTime.now());
         entity.setUpdateTime(LocalDateTime.now());
-        
+
         modelProviderMapper.insert(entity);
     }
 
@@ -504,10 +455,10 @@ public class ModelServiceImpl implements ModelService {
         if (modelProviderMapper == null) {
             throw new UnsupportedOperationException("数据库配置未启用，无法更新提供商配置");
         }
-        
+
         ModelProviderEntity entity = modelProviderMapper.selectByTenantAndCode(
-            modelProvider.getTenantId(), modelProvider.getCode());
-        
+                modelProvider.getTenantId(), modelProvider.getCode());
+
         if (entity != null) {
             entity.setEnabled(modelProvider.getEnabled());
             entity.setUpdateTime(LocalDateTime.now());
@@ -520,7 +471,7 @@ public class ModelServiceImpl implements ModelService {
         if (modelProviderMapper == null) {
             throw new UnsupportedOperationException("数据库配置未启用，无法删除提供商配置");
         }
-        
+
         modelProviderMapper.deleteById(providerId);
     }
 
@@ -531,7 +482,7 @@ public class ModelServiceImpl implements ModelService {
         if (modelProviderMapper == null) {
             return false;
         }
-        
+
         try {
             ModelProviderEntity config = modelProviderMapper.selectByTenantAndCode(tenantId, providerCode);
             return config != null;
@@ -548,7 +499,7 @@ public class ModelServiceImpl implements ModelService {
         if (modelMapper == null) {
             return false;
         }
-        
+
         try {
             ModelEntity config = modelMapper.selectByTenantAndModelCode(tenantId, modelCode);
             return config != null;
@@ -563,7 +514,7 @@ public class ModelServiceImpl implements ModelService {
     /**
      * 转换静态模型配置为ModelInfo
      */
-    private ModelInfo convertToModelInfo(StaticModelConfigLoader.ModelConfig staticConfig) {
+    private ModelInfo convertToModelInfo(StaticModelConfigLoader.StaticModelInfo staticConfig) {
         DefaultModel modelInfo = new DefaultModel();
         modelInfo.setId(staticConfig.getCode());
         modelInfo.setCode(staticConfig.getCode());
@@ -579,14 +530,14 @@ public class ModelServiceImpl implements ModelService {
         if (capabilities != null) {
             modelInfo.setCapabilities(capabilities);
         }*/
-        
+
         return modelInfo;
     }
 
     /**
      * 转换静态提供商配置为ModelProvider
      */
-    private ModelProvider convertToModelProvider(StaticModelConfigLoader.ProviderConfig staticConfig) {
+    private ModelProvider convertToModelProvider(StaticModelConfigLoader.StaticModelProvider staticConfig) {
         DefaultModelProvider provider = new DefaultModelProvider();
         provider.setCode(staticConfig.getCode());
         provider.setName(staticConfig.getName());
@@ -594,9 +545,9 @@ public class ModelServiceImpl implements ModelService {
         provider.setIcon(staticConfig.getIcon());
         provider.setSortOrder(0); // 默认排序
         // 将 Map<String, Object> 转换为 List<String>
-        List<String> supportedTypes = staticConfig.getSupportedFeatures();
+        List<String> supportedTypes = staticConfig.getSupportedModelTypes();
         provider.setSupportedModelTypes(supportedTypes);
-        
+
         return provider;
     }
 
@@ -607,7 +558,7 @@ public class ModelServiceImpl implements ModelService {
         if (queryParam == null || queryParam.isEmpty()) {
             return models;
         }
-        
+
         return models.stream()
                 .filter(model -> {
                     // 按提供商过滤
@@ -617,7 +568,7 @@ public class ModelServiceImpl implements ModelService {
                             return false;
                         }
                     }
-                    
+
                     // 按类型过滤
                     if (queryParam.containsKey("type")) {
                         String type = (String) queryParam.get("type");
@@ -625,7 +576,7 @@ public class ModelServiceImpl implements ModelService {
                             return false;
                         }
                     }
-                    
+
                     // 按配置状态过滤
                     if (queryParam.containsKey("configured")) {
                         Boolean configured = (Boolean) queryParam.get("configured");
@@ -633,17 +584,17 @@ public class ModelServiceImpl implements ModelService {
                             return false;
                         }
                     }
-                    
+
                     // 按名称模糊搜索
                     if (queryParam.containsKey("keyword")) {
                         String keyword = (String) queryParam.get("keyword");
                         if (StringUtils.hasText(keyword)) {
                             String lowerKeyword = keyword.toLowerCase();
                             return model.getName().toLowerCase().contains(lowerKeyword) ||
-                                   (model.getDescription() != null && model.getDescription().toLowerCase().contains(lowerKeyword));
+                                    (model.getDescription() != null && model.getDescription().toLowerCase().contains(lowerKeyword));
                         }
                     }
-                    
+
                     return true;
                 })
                 .collect(Collectors.toList());
@@ -656,7 +607,7 @@ public class ModelServiceImpl implements ModelService {
         if (queryParam == null || queryParam.isEmpty()) {
             return providers;
         }
-        
+
         return providers.stream()
                 .filter(provider -> {
                     // 按配置状态过滤
@@ -666,17 +617,17 @@ public class ModelServiceImpl implements ModelService {
                             return false;
                         }
                     }
-                    
+
                     // 按名称模糊搜索
                     if (queryParam.containsKey("keyword")) {
                         String keyword = (String) queryParam.get("keyword");
                         if (StringUtils.hasText(keyword)) {
                             String lowerKeyword = keyword.toLowerCase();
                             return provider.getName().toLowerCase().contains(lowerKeyword) ||
-                                   (provider.getDescription() != null && provider.getDescription().toLowerCase().contains(lowerKeyword));
+                                    (provider.getDescription() != null && provider.getDescription().toLowerCase().contains(lowerKeyword));
                         }
                     }
-                    
+
                     return true;
                 })
                 .collect(Collectors.toList());
@@ -718,7 +669,8 @@ public class ModelServiceImpl implements ModelService {
         }
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+            return objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {
+            });
         } catch (Exception e) {
             log.error("转换JSON到Map失败: {}", json, e);
             return new HashMap<>();
