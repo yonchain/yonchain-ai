@@ -9,6 +9,7 @@ import com.yonchain.ai.model.mapper.ModelProviderMapper;
 import com.yonchain.ai.model.mapper.ModelInstanceConfigMapper;
 import com.yonchain.ai.model.loader.ModelLoader;
 import com.yonchain.ai.api.common.Page;
+import com.yonchain.ai.util.IdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -58,12 +59,12 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public List<ModelInfo> getModels(String tenantId, String providerName) {
+    public List<ModelInfo> getModels(String tenantId, Map<String, Object> queryParam) {
         // 只返回静态配置的模型列表，不包含租户动态数据
         Collection<DefaultModel> staticConfigs;
 
-        if (providerName != null) {
-            staticConfigs = staticConfigLoader.getModelConfigsByProvider(providerName);
+        if (queryParam.containsKey("provider") && StringUtils.hasText((String) queryParam.get("provider"))) {
+            staticConfigs = staticConfigLoader.getModelConfigsByProvider((String) queryParam.get("provider"));
         } else {
             staticConfigs = staticConfigLoader.getAllModelConfigs();
         }
@@ -211,14 +212,12 @@ public class ModelServiceImpl implements ModelService {
         boolean enabled = false;
         String lastUpdated = null;
 
-        if (modelProviderMapper != null) {
-            ModelProviderEntity entity = modelProviderMapper.selectByTenantAndCode(tenantId, providerCode);
-            if (entity != null) {
-                tenantConfigData = convertJsonToMap(entity.getCustomConfig());
-                configured = true;
-                enabled = entity.getEnabled();
-                lastUpdated = entity.getUpdateTime() != null ? entity.getUpdateTime().toString() : null;
-            }
+        ModelProviderEntity entity = modelProviderMapper.selectByTenantAndCode(tenantId, providerCode);
+        if (entity != null) {
+            tenantConfigData = convertJsonToMap(entity.getCustomConfig());
+            configured = true;
+            enabled = entity.getEnabled();
+            lastUpdated = entity.getUpdateTime() != null ? entity.getUpdateTime().toString() : null;
         }
 
         response.setConfigItems(staticConfig.getConfigSchemas());
@@ -242,15 +241,16 @@ public class ModelServiceImpl implements ModelService {
         ModelProviderEntity entity = modelProviderMapper.selectByTenantAndCode(tenantId, providerCode);
         if (entity == null) {
             entity = new ModelProviderEntity();
+            entity.setId(IdUtil.generateId());
             entity.setTenantId(tenantId);
             entity.setProviderCode(providerCode);
             entity.setCustomConfig(convertMapToJson(config));
-            entity.setEnabled(true);
+            entity.setEnabled((Boolean) config.get("enabled"));
             entity.setCreateTime(LocalDateTime.now());
             entity.setUpdateTime(LocalDateTime.now());
             modelProviderMapper.insert(entity);
         } else {
-            entity.setCustomConfig(convertMapToJson(config));
+            entity.setCustomConfig(convertMapToJson((Map<String, Object>) config.get("config")));
             entity.setUpdateTime(LocalDateTime.now());
             modelProviderMapper.update(entity);
         }
@@ -523,6 +523,7 @@ public class ModelServiceImpl implements ModelService {
      */
     private ModelProvider convertToModelProvider(DefaultModelProvider staticConfig) {
         // 由于已经是DefaultModelProvider类型，直接返回即可
+        // 确保模型数量字段已设置（ModelLoader在初始化时已经设置了这个值）
         return staticConfig;
     }
 

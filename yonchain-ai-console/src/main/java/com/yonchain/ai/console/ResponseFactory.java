@@ -165,6 +165,8 @@ public class ResponseFactory {
         response.setCapabilities(provider.getCapabilities());
         //是否开启
         response.setEnabled(provider.getEnabled());
+        //模型总数
+        response.setModelCount(provider.getModelCount());
         return response;
     }
 

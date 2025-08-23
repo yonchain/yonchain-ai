@@ -10,7 +10,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -27,6 +26,7 @@ public class ModelLoader {
 
     private final Map<String, DefaultModelProvider> providerConfigs = new HashMap<>();
     private final Map<String, DefaultModel> modelConfigs = new HashMap<>();
+    private final Map<String, List<DefaultModel>> providerModelMap = new HashMap<>();
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
     @PostConstruct
@@ -36,6 +36,8 @@ public class ModelLoader {
             loadProviderConfigs();
             // 加载所有模型配置
             loadModelConfigs();
+            // 构建提供商-模型映射关系并计算模型数量
+            buildProviderModelMapping();
             log.info("静态模型配置加载完成: {} 个提供商, {} 个模型", providerConfigs.size(), modelConfigs.size());
         } catch (Exception e) {
             log.error("加载静态模型配置失败", e);
@@ -84,6 +86,42 @@ public class ModelLoader {
                 }
             } catch (Exception e) {
                 log.warn("加载模型配置失败: {}", resource.getFilename(), e);
+            }
+        }
+    }
+
+    /**
+     * 构建提供商-模型映射关系并计算模型数量
+     */
+    private void buildProviderModelMapping() {
+        // 清空现有映射
+        providerModelMap.clear();
+        
+        // 按提供商分组模型
+        Map<String, List<DefaultModel>> groupedModels = modelConfigs.values().stream()
+                .filter(model -> StringUtils.hasText(model.getProvider()))
+                .collect(Collectors.groupingBy(DefaultModel::getProvider));
+        
+        // 构建映射并设置模型数量
+        for (Map.Entry<String, List<DefaultModel>> entry : groupedModels.entrySet()) {
+            String providerCode = entry.getKey();
+            List<DefaultModel> models = entry.getValue();
+            
+            // 存储映射关系
+            providerModelMap.put(providerCode, models);
+            
+            // 设置提供商的模型数量
+            DefaultModelProvider provider = providerConfigs.get(providerCode);
+            if (provider != null) {
+                provider.setModelCount(models.size());
+                log.debug("提供商 {} 包含 {} 个模型", providerCode, models.size());
+            }
+        }
+        
+        // 为没有模型的提供商设置数量为0
+        for (DefaultModelProvider provider : providerConfigs.values()) {
+            if (provider.getModelCount() == null) {
+                provider.setModelCount(0);
             }
         }
     }
@@ -187,10 +225,6 @@ public class ModelLoader {
                 item.setMax((Number) itemConfig.get("maximum"));
             }
             
-            /*if (itemConfig.containsKey("options")) {
-                item.setOptions((List<Object>) itemConfig.get("options"));
-            }*/
-            
             items.add(item);
         }
         
@@ -237,10 +271,6 @@ public class ModelLoader {
                 item.setMax((Number) itemConfig.get("maximum"));
             }
             
-           /* if (itemConfig.containsKey("options")) {
-                item.setOptions((List<Object>) itemConfig.get("options"));
-            }*/
-            
             items.add(item);
         }
         
@@ -276,15 +306,58 @@ public class ModelLoader {
     }
 
     /**
-     * 获取指定提供商的所有模型配置
+     * 获取指定提供商的所有模型配置（优化版本，直接从映射获取）
      */
-    public Collection<DefaultModel> getModelConfigsByProvider(String providerName) {
-        if (!StringUtils.hasText(providerName)) {
+    public List<DefaultModel> getModelConfigsByProvider(String providerCode) {
+        if (!StringUtils.hasText(providerCode)) {
             return Collections.emptyList();
         }
         
-        return modelConfigs.values().stream()
-                .filter(model -> providerName.equals(model.getProvider()))
-                .collect(Collectors.toList());
+        List<DefaultModel> models = providerModelMap.get(providerCode);
+        return models != null ? new ArrayList<>(models) : Collections.emptyList();
+    }
+
+    /**
+     * 获取指定提供商的模型数量
+     */
+    public int getModelCountByProvider(String providerCode) {
+        if (!StringUtils.hasText(providerCode)) {
+            return 0;
+        }
+        
+        List<DefaultModel> models = providerModelMap.get(providerCode);
+        return models != null ? models.size() : 0;
+    }
+
+    /**
+     * 获取所有提供商的模型统计信息
+     */
+    public Map<String, Integer> getProviderModelStats() {
+        Map<String, Integer> stats = new HashMap<>();
+        for (Map.Entry<String, List<DefaultModel>> entry : providerModelMap.entrySet()) {
+            stats.put(entry.getKey(), entry.getValue().size());
+        }
+        return stats;
+    }
+
+    /**
+     * 检查提供商是否存在
+     */
+    public boolean hasProvider(String providerCode) {
+        return StringUtils.hasText(providerCode) && providerConfigs.containsKey(providerCode);
+    }
+
+    /**
+     * 检查模型是否存在
+     */
+    public boolean hasModel(String modelCode) {
+        return StringUtils.hasText(modelCode) && modelConfigs.containsKey(modelCode);
+    }
+
+    /**
+     * 检查指定提供商是否有模型
+     */
+    public boolean hasModelsForProvider(String providerCode) {
+        return getModelCountByProvider(providerCode) > 0;
     }
 }

@@ -16,21 +16,16 @@
 
 package com.yonchain.ai.console.model.controller;
 
-import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.exception.YonchainIllegalStateException;
-import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
-import com.yonchain.ai.api.model.DefaultModelProvider;
 import com.yonchain.ai.api.model.ModelProvider;
 import com.yonchain.ai.api.model.ModelService;
 import com.yonchain.ai.api.model.ProviderConfigResponse;
 import com.yonchain.ai.console.BaseController;
-import com.yonchain.ai.console.model.dto.ProviderConfigRequest;
+import com.yonchain.ai.console.model.request.ProviderConfigRequest;
 import com.yonchain.ai.console.model.request.ModelProviderQueryRequest;
-import com.yonchain.ai.console.model.request.ModelProviderRequest;
 import com.yonchain.ai.console.model.response.ModelProviderResponse;
 import com.yonchain.ai.web.response.ApiResponse;
 import com.yonchain.ai.web.response.ListResponse;
-import com.yonchain.ai.web.response.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -39,7 +34,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -120,16 +114,12 @@ public class ModelProviderController extends BaseController {
             @RequestBody @Valid ProviderConfigRequest request) {
 
         // 构建配置Map传递给service层
-        Map<String, Object> config = new HashMap<>();
-        config.put("apiKey", request.getApiKey());
-        config.put("baseUrl", request.getBaseUrl());
-        config.put("enabled", request.getEnabled());
-        config.put("description", request.getDescription());
-        if (request.getConfigParams() != null) {
-            config.putAll(request.getConfigParams());
-        }
+        Map<String, Object> param = new HashMap<>();
+        param.put("enabled", request.getEnabled());
+        param.put("config", request.getConfig());
 
-        modelService.saveProviderConfig(this.getCurrentTenantId(), request.getProviderType(), config);
+
+        modelService.saveProviderConfig(this.getCurrentTenantId(), request.getProvider(), param);
 
         return ApiResponse.success();
     }

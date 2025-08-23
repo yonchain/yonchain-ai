@@ -180,5 +180,18 @@ public interface ModelProvider {
      */
     void setEnabled(Boolean enabled);
 
+    /**
+     * 获取该提供商下的模型数量
+     *
+     * @return 模型数量
+     */
+    Integer getModelCount();
+
+    /**
+     * 设置该提供商下的模型数量
+     *
+     * @param modelCount 模型数量
+     */
+    void setModelCount(Integer modelCount);
 
 }

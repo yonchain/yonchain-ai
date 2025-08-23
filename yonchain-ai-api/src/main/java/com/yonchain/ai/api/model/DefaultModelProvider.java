@@ -81,6 +81,11 @@ public class DefaultModelProvider implements ModelProvider {
      */
     private Boolean enabled;
 
+    /**
+     * 该提供商下的模型数量
+     */
+    private Integer modelCount;
+
     // Getters and Setters
 
     @Override
@@ -191,6 +196,16 @@ public class DefaultModelProvider implements ModelProvider {
     @Override
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    @Override
+    public Integer getModelCount() {
+        return modelCount;
+    }
+
+    @Override
+    public void setModelCount(Integer modelCount) {
+        this.modelCount = modelCount;
     }
 
 }

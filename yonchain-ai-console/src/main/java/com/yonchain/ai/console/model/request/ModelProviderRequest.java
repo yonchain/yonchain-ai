@@ -40,33 +40,43 @@ public class ModelProviderRequest {
     @NotBlank(message = "提供商编码不能为空")
     @Size(max = 50, message = "提供商编码长度不能超过50个字符")
     @Schema(description = "提供商编码", required = true, example = "openai")
-    private String providerCode;
+    private String provider;
 
-    /**
+/*
+    */
+/**
      * 提供商名称
-     */
+     *//*
+
     @Size(max = 50, message = "提供商名称长度不能超过50个字符")
     @Schema(description = "提供商名称", example = "OpenAI")
     private String providerName;
 
-    /**
+    */
+/**
      * 提供商描述
-     */
+     *//*
+
     @Size(max = 500, message = "提供商描述长度不能超过500个字符")
     @Schema(description = "提供商描述", example = "OpenAI API提供商")
     private String description;
 
-    /**
+    */
+/**
      * 提供商图标
-     */
+     *//*
+
     @Schema(description = "提供商图标URL", example = "https://example.com/openai-icon.png")
     private String icon;
 
-    /**
+    */
+/**
      * API基础URL
-     */
+     *//*
+
     @Schema(description = "API基础URL", example = "https://api.openai.com/v1")
     private String apiBaseUrl;
+*/
 
     /**
      * 提供商配置信息

@@ -10,8 +10,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @Schema(description = "模型查询请求参数")
-@EqualsAndHashCode(callSuper = true)
-public class ModelQueryRequest extends PageRequest {
+public class ModelQueryRequest  {
 
     /**
      * 模型类型
@@ -23,6 +22,6 @@ public class ModelQueryRequest extends PageRequest {
      * 提供商名称
      */
     @Schema(description = "模型提供商")
-    private String providerName;
+    private String provider;
 
 }

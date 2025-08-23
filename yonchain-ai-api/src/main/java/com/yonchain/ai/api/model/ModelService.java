@@ -41,10 +41,10 @@ public interface ModelService {
      * 获取模型列表
      *
      * @param tenantId     租户ID
-     * @param providerName 提供商名称（可选）
+     * @param queryParam 查询参数
      * @return 模型列表
      */
-    List<ModelInfo> getModels(String tenantId, String providerName);
+    List<ModelInfo> getModels(String tenantId, Map<String, Object> queryParam);
 
     /**
      * 分页获取模型列表

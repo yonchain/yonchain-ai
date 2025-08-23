@@ -93,4 +93,10 @@ public class ModelProviderResponse {
      */
     @Schema(description = "是否开启")
     private Boolean enabled;
+
+    /**
+     * 模型总数
+     */
+    @Schema(description = "模型总数")
+    private Integer modelCount;
 }

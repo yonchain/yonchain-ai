@@ -68,18 +68,18 @@ public class ModelController extends BaseController {
      */
     @Operation(summary = "分页查询模型", description = "根据条件分页查询模型列表")
     @GetMapping
-    public PageResponse<ModelResponse> getModels(
+    public ListResponse<ModelResponse> getModels(
             @Parameter(description = "查询条件", required = true)
             ModelQueryRequest request) {
 
         Map<String, Object> queryParam = new HashMap<>();
-        queryParam.put("tenantId", getCurrentTenantId());
-        queryParam.put("providerName", request.getProviderName());
+        queryParam.put("modelName", getCurrentTenantId());
+        queryParam.put("provider", request.getProvider());
         queryParam.put("modelType", request.getModelType());
 
-        Page<ModelInfo> models = modelService.pageModels(getCurrentTenantId(), queryParam,request.getPageNum(),request.getPageSize());
+        List<ModelInfo> models = modelService.getModels(getCurrentTenantId(), queryParam);
 
-        return responseFactory.createModelPageResponse(models);
+        return responseFactory.createModelListResponse(models);
     }
 
     /**
