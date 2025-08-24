@@ -91,14 +91,14 @@ public class ModelProviderController extends BaseController {
     /**
      * 获取模型提供商配置
      *
-     * @param code 模型提供商编码
+     * @param providerCode 模型提供商编码
      * @return 配置信息
      */
     @Operation(summary = "获取模型提供商配置", description = "根据编码获取模型提供商配置信息")
-    @GetMapping("/config")
-    public ProviderConfigResponse getProviderConfig(@RequestParam("code") String code) {
+    @GetMapping("/{providerCode}/config")
+    public ProviderConfigResponse getProviderConfig(@PathVariable String providerCode) {
 
-        return modelService.getProviderConfig(getCurrentTenantId(), code);
+        return modelService.getProviderConfig(getCurrentTenantId(), providerCode);
     }
 
     /**

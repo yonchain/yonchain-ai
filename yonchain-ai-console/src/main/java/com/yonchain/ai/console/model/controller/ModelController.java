@@ -95,7 +95,7 @@ public class ModelController extends BaseController {
             @Parameter(description = "模型编码", required = true)
             @RequestParam("modelCode") String modelCode) {
 
-        ModelInfo model = modelService.getModel(modelCode);
+        ModelInfo model = modelService.getModelConfig(this.getCurrentTenantId(),modelCode);
 
         if (model == null) {
             throw new YonchainResourceNotFoundException("模型不存在");

@@ -57,19 +57,9 @@ public class ProviderConfigResponse {
     private List<ModelConfigItem> configItems;
     
     /**
-     * 整体配置状态
-     */
-    private Boolean configured;
-    
-    /**
      * 是否启用
      */
     private Boolean enabled;
-    
-    /**
-     * 配置完整性百分比（0-100）
-     */
-    private Integer completeness;
     
     /**
      * 最后更新时间
@@ -84,13 +74,6 @@ public class ProviderConfigResponse {
         this.lastUpdated = lastUpdated;
     }
 
-    public Integer getCompleteness() {
-        return completeness;
-    }
-
-    public void setCompleteness(Integer completeness) {
-        this.completeness = completeness;
-    }
 
     public Boolean getEnabled() {
         return enabled;
@@ -100,13 +83,6 @@ public class ProviderConfigResponse {
         this.enabled = enabled;
     }
 
-    public Boolean getConfigured() {
-        return configured;
-    }
-
-    public void setConfigured(Boolean configured) {
-        this.configured = configured;
-    }
 
     public List<ModelConfigItem> getConfigItems() {
         return configItems;

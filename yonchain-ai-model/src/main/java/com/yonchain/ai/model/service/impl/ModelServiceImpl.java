@@ -1,5 +1,6 @@
 package com.yonchain.ai.model.service.impl;
 
+import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.model.*;
 import com.yonchain.ai.model.entity.ModelEntity;
 import com.yonchain.ai.model.entity.ModelProviderEntity;
@@ -73,7 +74,7 @@ public class ModelServiceImpl implements ModelService {
                 .map(staticConfig -> {
                     DefaultModel modelInfo = (DefaultModel) convertToModelInfo(staticConfig);
                     // 添加租户配置状态标签
-                    boolean enabled = isModelConfigured(tenantId, staticConfig.getCode());
+                    boolean enabled = isModelEnabled(tenantId, staticConfig.getCode());
                     modelInfo.setEnabled(enabled);
                     return modelInfo;
                 })
@@ -90,8 +91,8 @@ public class ModelServiceImpl implements ModelService {
                 .map(staticConfig -> {
                     DefaultModel modelInfo = (DefaultModel) convertToModelInfo(staticConfig);
                     // 添加租户配置状态标签
-                    boolean configured = isModelConfigured(tenantId, staticConfig.getCode());
-                    modelInfo.setEnabled(configured);
+                    boolean enabled = isProviderEnabled(tenantId, staticConfig.getCode());
+                    modelInfo.setEnabled(enabled);
                     return modelInfo;
                 })
                 .collect(Collectors.toList());
@@ -136,8 +137,8 @@ public class ModelServiceImpl implements ModelService {
                 .map(staticConfig -> {
                     DefaultModelProvider provider = (DefaultModelProvider) convertToModelProvider(staticConfig);
                     // 添加租户配置状态标签
-                    boolean configured = isProviderConfigured(tenantId, staticConfig.getCode());
-                    provider.setEnabled(configured);
+                    boolean enabled = isProviderEnabled(tenantId, staticConfig.getCode());
+                    provider.setEnabled(enabled);
                     return provider;
                 })
                 .collect(Collectors.toList());
@@ -153,8 +154,8 @@ public class ModelServiceImpl implements ModelService {
                 .map(staticConfig -> {
                     DefaultModelProvider provider = (DefaultModelProvider) convertToModelProvider(staticConfig);
                     // 添加租户配置状态标签
-                    boolean configured = isProviderConfigured(tenantId, staticConfig.getCode());
-                    provider.setEnabled(configured);
+                    boolean enabled = isProviderEnabled(tenantId, staticConfig.getCode());
+                    provider.setEnabled(enabled);
                     return provider;
                 })
                 .collect(Collectors.toList());
@@ -205,6 +206,7 @@ public class ModelServiceImpl implements ModelService {
         response.setDescription(staticConfig.getDescription());
         response.setIcon(staticConfig.getIcon());
         response.setSupportedModelTypes(staticConfig.getSupportedModelTypes());
+        response.setConfigItems(staticConfig.getConfigSchemas());
 
         // 2. 获取租户级配置数据
         Map<String, Object> tenantConfigData = new HashMap<>();
@@ -214,14 +216,12 @@ public class ModelServiceImpl implements ModelService {
 
         ModelProviderEntity entity = modelProviderMapper.selectByTenantAndCode(tenantId, providerCode);
         if (entity != null) {
-            tenantConfigData = convertJsonToMap(entity.getCustomConfig());
-            configured = true;
+            List<ModelConfigItem> configItems = convertJsonToModelConfigList(staticConfig.getConfigSchemas(), entity.getCustomConfig());
+            response.setConfigItems(configItems);
             enabled = entity.getEnabled();
             lastUpdated = entity.getUpdateTime() != null ? entity.getUpdateTime().toString() : null;
         }
 
-        response.setConfigItems(staticConfig.getConfigSchemas());
-        response.setConfigured(configured);
         response.setEnabled(enabled);
         response.setLastUpdated(lastUpdated);
 
@@ -250,6 +250,7 @@ public class ModelServiceImpl implements ModelService {
             entity.setUpdateTime(LocalDateTime.now());
             modelProviderMapper.insert(entity);
         } else {
+            entity.setEnabled((Boolean) config.get("enabled"));
             entity.setCustomConfig(convertMapToJson((Map<String, Object>) config.get("config")));
             entity.setUpdateTime(LocalDateTime.now());
             modelProviderMapper.update(entity);
@@ -291,9 +292,9 @@ public class ModelServiceImpl implements ModelService {
             if (modelInfo.getCapabilities() != null) {
                 config.put("capabilities", modelInfo.getCapabilities());
             }
-            if (modelInfo.getEnabled() != null) {
+           /* if (modelInfo.getEnabled() != null) {
                 config.put("enabled", modelInfo.getEnabled());
-            }
+            }*/
 
             String configJson = convertMapToJson(config);
 
@@ -303,13 +304,14 @@ public class ModelServiceImpl implements ModelService {
                 entity.setTenantId(tenantId);
                 entity.setModelCode(modelInfo.getCode());
                 entity.setModelConfig(configJson);
-                entity.setEnabled(true);
+                entity.setEnabled(modelInfo.getEnabled());
                 entity.setCreateTime(LocalDateTime.now());
                 entity.setUpdateTime(LocalDateTime.now());
                 modelMapper.insert(entity);
                 log.info("创建模型配置成功: tenantId={}, modelCode={}", tenantId, modelInfo.getCode());
             } else {
                 // 更新现有配置
+                entity.setEnabled(modelInfo.getEnabled());
                 entity.setModelConfig(configJson);
                 entity.setUpdateTime(LocalDateTime.now());
                 modelMapper.update(entity);
@@ -418,7 +420,7 @@ public class ModelServiceImpl implements ModelService {
             modelInfo.setEnabled(modelEntity.getEnabled());
 
             // 设置动态配置
-            Map<String, Object> dynamicConfig = convertJsonToMap(modelEntity.getModelConfig());
+            Map<String, Object> dynamicConfig = convertJsonToMapObject(modelEntity.getModelConfig());
             if (dynamicConfig.containsKey("capabilities")) {
                 // modelInfo.setCapabilities((Map<String, Object>) dynamicConfig.get("capabilities"));
             }
@@ -477,14 +479,10 @@ public class ModelServiceImpl implements ModelService {
     /**
      * 检查租户是否已配置指定提供商
      */
-    private boolean isProviderConfigured(String tenantId, String providerCode) {
-        if (modelProviderMapper == null) {
-            return false;
-        }
-
+    private boolean isProviderEnabled(String tenantId, String providerCode) {
         try {
             ModelProviderEntity config = modelProviderMapper.selectByTenantAndCode(tenantId, providerCode);
-            return config != null;
+            return config.getEnabled();
         } catch (Exception e) {
             log.warn("查询提供商配置失败: tenantId={}, providerCode={}", tenantId, providerCode, e);
             return false;
@@ -494,14 +492,10 @@ public class ModelServiceImpl implements ModelService {
     /**
      * 检查租户是否已配置指定模型
      */
-    private boolean isModelConfigured(String tenantId, String modelCode) {
-        if (modelMapper == null) {
-            return false;
-        }
-
+    private boolean isModelEnabled(String tenantId, String modelCode) {
         try {
             ModelEntity config = modelMapper.selectByTenantAndModelCode(tenantId, modelCode);
-            return config != null;
+            return config.getEnabled();
         } catch (Exception e) {
             log.warn("查询模型配置失败: tenantId={}, modelCode={}", tenantId, modelCode, e);
             return false;
@@ -621,25 +615,87 @@ public class ModelServiceImpl implements ModelService {
     }
 
     /**
-     * 将Map转换为JSON字符串
+     * 将JSON字符串转换为List<ModelConfigItem>
+     * 例如：{"apiKey":"","baseUrl":"https://api.deepseek.com","proxyUrl":""}
+     * @param json JSON字符串
+     * @param configItems 需要填充的配置项列表
+     * @return 填充后的配置项列表
      */
-    private String convertMapToJson(Map<String, Object> map) {
-        if (map == null) {
-            return null;
+    private List<ModelConfigItem> convertJsonToModelConfigList( List<ModelConfigItem> configItems,String json) {
+        if (json == null || json.trim().isEmpty()) {
+            return configItems;
         }
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.writeValueAsString(map);
+            // 解析JSON为Map
+            Map<String, Object> configMap = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+            
+            // 将JSON数据填充到已有的configItems中
+            for (ModelConfigItem item : configItems) {
+                if (configMap.containsKey(item.getName())) {
+                    item.setValue(configMap.get(item.getName()));
+                }
+            }
+            
+            return configItems;
         } catch (Exception e) {
-            log.error("转换Map到JSON失败", e);
-            return "{}";
+           throw new YonchainException("转换失败",e);
+        }
+    }
+    
+    /**
+     * 将JSON字符串转换为List<ModelConfigItem>
+     * 例如：{"apiKey":"","baseUrl":"https://api.deepseek.com","proxyUrl":""}
+     */
+    private List<ModelConfigItem> convertJsonToModelConfigList(String json) {
+        if (json == null || json.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            // 解析JSON为Map
+            Map<String, Object> configMap = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+            List<ModelConfigItem> configItems = new ArrayList<>();
+            
+            // 将Map中的每个键值对转换为ModelConfigItem
+            for (Map.Entry<String, Object> entry : configMap.entrySet()) {
+                ModelConfigItem item = new ModelConfigItem();
+                item.setName(entry.getKey());
+                item.setValue(entry.getValue());
+                // 设置其他必要的属性
+                item.setType(getTypeFromValue(entry.getValue()));
+                configItems.add(item);
+            }
+            
+            return configItems;
+        } catch (Exception e) {
+           throw new YonchainException("转换失败",e);
+        }
+    }
+    
+    /**
+     * 根据值推断类型
+     */
+    private String getTypeFromValue(Object value) {
+        if (value == null) {
+            return "string"; // 默认为字符串类型
+        } else if (value instanceof Number) {
+            if (value instanceof Integer || value instanceof Long) {
+                return "integer";
+            } else {
+                return "number";
+            }
+        } else if (value instanceof Boolean) {
+            return "boolean";
+        } else {
+            return "string";
         }
     }
 
     /**
-     * 将JSON字符串转换为Map
+     * 将JSON字符串转换为Map<String, Object>
      */
-    private Map<String, Object> convertJsonToMap(String json) {
+    private Map<String, Object> convertJsonToMapObject(String json) {
         if (json == null || json.trim().isEmpty()) {
             return new HashMap<>();
         }
@@ -648,8 +704,23 @@ public class ModelServiceImpl implements ModelService {
             return objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {
             });
         } catch (Exception e) {
-            log.error("转换JSON到Map失败: {}", json, e);
-            return new HashMap<>();
+            throw new YonchainException("转换失败", e);
+        }
+    }
+    
+    /**
+     * 将Map转换为JSON字符串
+     */
+    private String convertMapToJson(Map<String, Object> map) {
+        if (map == null) {
+            return "{}";
+        }
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(map);
+        } catch (Exception e) {
+            log.error("转换Map到JSON失败", e);
+            return "{}";
         }
     }
 }
