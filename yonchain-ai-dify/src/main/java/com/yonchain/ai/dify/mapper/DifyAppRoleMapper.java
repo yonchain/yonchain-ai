@@ -16,7 +16,7 @@
 package com.yonchain.ai.dify.mapper;
 
 import com.yonchain.ai.api.sys.Role;
-import com.yonchain.ai.app.entity.AppRoleEntiy;
+import com.yonchain.ai.dify.entity.DifyAppRoleEntiy;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -37,7 +37,7 @@ public interface DifyAppRoleMapper {
      * @param id 关联ID
      * @return 应用角色关联信息
      */
-    AppRoleEntiy selectById(@Param("id") String id);
+    DifyAppRoleEntiy selectById(@Param("id") String id);
 
     /**
      * 查询应用角色关联列表
@@ -45,7 +45,7 @@ public interface DifyAppRoleMapper {
      * @param appId 应用ID
      * @return 应用角色关联列表
      */
-    List<AppRoleEntiy> selectByAppId(@Param("appId") String appId);
+    List<DifyAppRoleEntiy> selectByAppId(@Param("appId") String appId);
 
     /**
      * 查询角色关联的应用列表
@@ -53,7 +53,7 @@ public interface DifyAppRoleMapper {
      * @param roleId 角色ID
      * @return 应用角色关联列表
      */
-    List<AppRoleEntiy> selectByRoleId(@Param("roleId") String roleId);
+    List<DifyAppRoleEntiy> selectByRoleId(@Param("roleId") String roleId);
 
     /**
      * 新增应用角色关联
@@ -61,7 +61,7 @@ public interface DifyAppRoleMapper {
      * @param appRole 应用角色关联信息
      * @return 影响行数
      */
-    int insert(AppRoleEntiy appRole);
+    int insert(DifyAppRoleEntiy appRole);
 
     /**
      * 修改应用角色关联
@@ -69,7 +69,7 @@ public interface DifyAppRoleMapper {
      * @param appRole 应用角色关联信息
      * @return 影响行数
      */
-    int update(AppRoleEntiy appRole);
+    int update(DifyAppRoleEntiy appRole);
 
     /**
      * 通过ID删除应用角色关联
