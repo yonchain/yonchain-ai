@@ -64,6 +64,16 @@ public interface ModelMapper {
      * @return 模型实体
      */
     ModelEntity selectByTenantAndModelCode(@Param("tenantId") String tenantId, @Param("modelCode") String modelCode);
+    
+    /**
+     * 根据租户ID、提供商代码和模型代码查询配置
+     *
+     * @param tenantId 租户ID
+     * @param providerCode 提供商代码
+     * @param modelCode 模型代码
+     * @return 模型实体
+     */
+    ModelEntity selectByTenantProviderAndModelCode(@Param("tenantId") String tenantId, @Param("providerCode") String providerCode, @Param("modelCode") String modelCode);
 
     /**
      * 根据租户ID和提供商代码查询模型列表

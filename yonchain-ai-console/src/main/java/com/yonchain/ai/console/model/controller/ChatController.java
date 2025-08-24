@@ -4,6 +4,7 @@ package com.yonchain.ai.console.model.controller;
 import com.yonchain.ai.api.model.ChatCompletionRequest;
 import com.yonchain.ai.api.model.ChatCompletionResponse;
 import com.yonchain.ai.api.model.ChatService;
+import com.yonchain.ai.console.BaseController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  */
 @RequestMapping
 @RestController
-public class ChatController {
+public class ChatController extends BaseController {
 
     @Autowired
     private ChatService chatService;
@@ -30,7 +31,8 @@ public class ChatController {
     public ResponseEntity<ChatCompletionResponse> chatCompletion(
             @Parameter(description = "模型代码") @PathVariable String modelCode,
             @RequestBody ChatCompletionRequest request) {
-        return ResponseEntity.ok(chatService.chatCompletion(modelCode, request));
+        String tenantId = this.getCurrentTenantId();
+        return ResponseEntity.ok(chatService.chatCompletion(tenantId, modelCode, request));
     }
 
     @PostMapping(value = "/models/{modelCode}/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

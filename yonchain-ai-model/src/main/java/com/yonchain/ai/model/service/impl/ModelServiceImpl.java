@@ -51,12 +51,19 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public ModelInfo getModelById(String id) {
         // 从静态配置获取模型基础信息
-        DefaultModel staticConfig = staticConfigLoader.getModelConfig(id);
+        /*DefaultModel staticConfig = staticConfigLoader.getModelConfig(id);
         if (staticConfig == null) {
             return null;
         }
 
-        return convertToModelInfo(staticConfig);
+        return convertToModelInfo(staticConfig);*/
+        //TODO
+        return null;
+    }
+
+    @Override
+    public ModelInfo getModel(String provider, String modelCode) {
+        return staticConfigLoader.getModelConfig(provider, modelCode);
     }
 
     @Override
@@ -74,7 +81,7 @@ public class ModelServiceImpl implements ModelService {
                 .map(staticConfig -> {
                     DefaultModel modelInfo = (DefaultModel) convertToModelInfo(staticConfig);
                     // 添加租户配置状态标签
-                    boolean enabled = isModelEnabled(tenantId, staticConfig.getCode());
+                    boolean enabled = isModelEnabled(tenantId, modelInfo.getProvider(), staticConfig.getCode());
                     modelInfo.setEnabled(enabled);
                     return modelInfo;
                 })
@@ -280,7 +287,7 @@ public class ModelServiceImpl implements ModelService {
 
         try {
             // 验证模型是否存在于静态配置中
-            DefaultModel staticConfig = staticConfigLoader.getModelConfig(modelInfo.getCode());
+            DefaultModel staticConfig = staticConfigLoader.getModelConfig(modelInfo.getProvider(), modelInfo.getCode());
             if (staticConfig == null) {
                 throw new IllegalArgumentException("模型不存在: " + modelInfo.getCode());
             }
@@ -324,8 +331,53 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public ModelInfo getModel(String modelCode) {
-        return getModelById(modelCode);
+    public void updateModelStatus(String tenantId, String provider, String modelCode, boolean enabled) {
+        if (!StringUtils.hasText(tenantId)) {
+            throw new IllegalArgumentException("租户ID不能为空");
+        }
+        if (!StringUtils.hasText(provider)) {
+            throw new IllegalArgumentException("提供商代码不能为空");
+        }
+        if (!StringUtils.hasText(modelCode)) {
+            throw new IllegalArgumentException("模型代码不能为空");
+        }
+
+        if (modelMapper == null) {
+            log.warn("数据库配置未启用，无法更新模型状态: tenantId={}, provider={}, modelCode={}", tenantId, provider, modelCode);
+            return;
+        }
+
+        try {
+            // 查询租户是否存在该模型数据（使用提供商代码作为条件）
+            ModelEntity entity = modelMapper.selectByTenantProviderAndModelCode(tenantId, provider, modelCode);
+
+            // 如果存在则更新，否则新增
+            if (entity != null) {
+                // 更新现有配置
+                entity.setEnabled(enabled);
+                entity.setUpdateTime(LocalDateTime.now());
+                modelMapper.update(entity);
+                log.info("更新模型状态成功: tenantId={}, provider={}, modelCode={}, enabled={}",
+                        tenantId, provider, modelCode, enabled);
+            } else {
+                // 创建新配置
+                entity = new ModelEntity();
+                entity.setId(IdUtil.generateId());
+                entity.setTenantId(tenantId);
+                entity.setModelCode(modelCode);
+                entity.setProviderCode(provider);
+                entity.setModelConfig("{}"); // 默认空配置
+                entity.setEnabled(enabled);
+                entity.setCreateTime(LocalDateTime.now());
+                entity.setUpdateTime(LocalDateTime.now());
+                modelMapper.insert(entity);
+                log.info("创建模型状态成功: tenantId={}, provider={}, modelCode={}, enabled={}",
+                        tenantId, provider, modelCode, enabled);
+            }
+        } catch (Exception e) {
+            log.error("更新模型状态失败: tenantId={}, provider={}, modelCode={}", tenantId, provider, modelCode, e);
+            throw new RuntimeException("更新模型状态失败: " + e.getMessage(), e);
+        }
     }
 
 
@@ -409,7 +461,7 @@ public class ModelServiceImpl implements ModelService {
             }
 
             // 获取静态配置作为基础
-            DefaultModel staticConfig = staticConfigLoader.getModelConfig(modelCode);
+            DefaultModel staticConfig = null;//staticConfigLoader.getModelConfig(modelCode);
             if (staticConfig == null) {
                 log.warn("未找到静态模型配置: modelCode={}", modelCode);
                 return null;
@@ -492,14 +544,13 @@ public class ModelServiceImpl implements ModelService {
     /**
      * 检查租户是否已配置指定模型
      */
-    private boolean isModelEnabled(String tenantId, String modelCode) {
-        try {
-            ModelEntity config = modelMapper.selectByTenantAndModelCode(tenantId, modelCode);
+    private boolean isModelEnabled(String tenantId, String provider, String modelCode) {
+        ModelEntity config = modelMapper.selectByTenantProviderAndModelCode(tenantId, provider, modelCode);
+        if (config != null) {
             return config.getEnabled();
-        } catch (Exception e) {
-            log.warn("查询模型配置失败: tenantId={}, modelCode={}", tenantId, modelCode, e);
-            return false;
         }
+        //默认开启
+        return true;
     }
 
     // ==================== 私有辅助方法 ====================
@@ -617,32 +668,34 @@ public class ModelServiceImpl implements ModelService {
     /**
      * 将JSON字符串转换为List<ModelConfigItem>
      * 例如：{"apiKey":"","baseUrl":"https://api.deepseek.com","proxyUrl":""}
-     * @param json JSON字符串
+     *
+     * @param json        JSON字符串
      * @param configItems 需要填充的配置项列表
      * @return 填充后的配置项列表
      */
-    private List<ModelConfigItem> convertJsonToModelConfigList( List<ModelConfigItem> configItems,String json) {
+    private List<ModelConfigItem> convertJsonToModelConfigList(List<ModelConfigItem> configItems, String json) {
         if (json == null || json.trim().isEmpty()) {
             return configItems;
         }
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             // 解析JSON为Map
-            Map<String, Object> configMap = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
-            
+            Map<String, Object> configMap = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {
+            });
+
             // 将JSON数据填充到已有的configItems中
             for (ModelConfigItem item : configItems) {
                 if (configMap.containsKey(item.getName())) {
                     item.setValue(configMap.get(item.getName()));
                 }
             }
-            
+
             return configItems;
         } catch (Exception e) {
-           throw new YonchainException("转换失败",e);
+            throw new YonchainException("转换失败", e);
         }
     }
-    
+
     /**
      * 将JSON字符串转换为List<ModelConfigItem>
      * 例如：{"apiKey":"","baseUrl":"https://api.deepseek.com","proxyUrl":""}
@@ -654,9 +707,10 @@ public class ModelServiceImpl implements ModelService {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             // 解析JSON为Map
-            Map<String, Object> configMap = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+            Map<String, Object> configMap = objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {
+            });
             List<ModelConfigItem> configItems = new ArrayList<>();
-            
+
             // 将Map中的每个键值对转换为ModelConfigItem
             for (Map.Entry<String, Object> entry : configMap.entrySet()) {
                 ModelConfigItem item = new ModelConfigItem();
@@ -666,13 +720,13 @@ public class ModelServiceImpl implements ModelService {
                 item.setType(getTypeFromValue(entry.getValue()));
                 configItems.add(item);
             }
-            
+
             return configItems;
         } catch (Exception e) {
-           throw new YonchainException("转换失败",e);
+            throw new YonchainException("转换失败", e);
         }
     }
-    
+
     /**
      * 根据值推断类型
      */
@@ -707,7 +761,7 @@ public class ModelServiceImpl implements ModelService {
             throw new YonchainException("转换失败", e);
         }
     }
-    
+
     /**
      * 将Map转换为JSON字符串
      */

@@ -12,6 +12,8 @@ provider:
   websiteUrl: "https://www.anthropic.com"
   # 排序权重，数值越小排序越靠前
   sortOrder: 2
+  # 是否启用,默认不启用
+  enabled: false
   # 该提供商支持的模型类型列表
   supportedModelTypes:
     - "chat"        # 支持聊天对话模型
@@ -29,8 +31,3 @@ provider:
       title: API基础URL
       description: Anthropic API基础URL
       defaultValue: "https://api.anthropic.com"
-    # 代理URL配置（可选）
-    - name: proxyUrl
-      type: string
-      title: 代理URL
-      description: API请求代理URL（可选）

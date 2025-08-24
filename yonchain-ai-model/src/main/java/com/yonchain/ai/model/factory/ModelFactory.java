@@ -49,7 +49,7 @@ public class ModelFactory {
             throw new IllegalArgumentException("模型或提供商不能为空");
         }
 
-        String cacheKey = model.getModelCode() + "-" + provider.getId();
+        String cacheKey = model.getModelCode() + "-" + provider.getProviderCode();
         return chatModelCache.computeIfAbsent(cacheKey, key -> {
             // 使用枚举类型获取提供商类型
             ProviderType providerType = ProviderType.fromCode(provider.getProviderCode());

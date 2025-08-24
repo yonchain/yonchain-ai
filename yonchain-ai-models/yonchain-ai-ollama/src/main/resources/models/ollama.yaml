@@ -12,12 +12,20 @@ provider:
   websiteUrl: "https://ollama.ai"
   # 排序权重，数值越小排序越靠前
   sortOrder: 5
+  # 是否启用,默认不启用
+  enabled: false
   # 该提供商支持的模型类型列表
   supportedModelTypes:
     - "chat"        # 支持聊天对话模型
     - "embedding"   # 支持文本嵌入模型
   # 提供商配置参数的JSON Schema定义
   configSchemas:
+    # API密钥配置
+    - name: apiKey
+      type: string
+      title: API密钥
+      description: OpenAI API密钥
+      required: true
     # API基础URL配置
     - name: baseUrl
       type: string
@@ -25,11 +33,3 @@ provider:
       description: Ollama API基础URL
       defaultValue: "http://localhost:11434"
       required: true
-    # 连接超时时间
-    - name: timeout
-      type: integer
-      title: 连接超时时间
-      description: API请求超时时间（秒）
-      defaultValue: 30
-      min: 1
-      max: 300

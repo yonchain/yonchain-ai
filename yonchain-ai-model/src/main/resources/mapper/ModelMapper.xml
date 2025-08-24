@@ -51,6 +51,14 @@
         FROM model
         WHERE tenant_id = #{tenantId} AND model_code = #{modelCode}
     </select>
+    
+    <!-- 根据租户ID、提供商代码和模型代码查询配置 -->
+    <select id="selectByTenantProviderAndModelCode" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM model
+        WHERE tenant_id = #{tenantId} AND provider_code = #{providerCode} AND model_code = #{modelCode}
+    </select>
 
     <!-- 根据租户ID和提供商代码查询模型列表 -->
     <select id="selectByTenantAndProviderCode" resultMap="BaseResultMap">

@@ -9,6 +9,7 @@ import com.yonchain.ai.console.BaseController;
 import com.yonchain.ai.console.model.request.ModelQueryRequest;
 import com.yonchain.ai.console.model.request.ModelRequest;
 import com.yonchain.ai.console.model.request.ModelConfigRequest;
+import com.yonchain.ai.console.model.request.ModelUpdateStatusRequest;
 import com.yonchain.ai.console.model.response.ModelResponse;
 import com.yonchain.ai.console.model.response.ModelConfigResponse;
 import com.yonchain.ai.web.response.ApiResponse;
@@ -83,7 +84,7 @@ public class ModelController extends BaseController {
     }
 
     /**
-    /**
+     * /**
      * 获取模型配置
      *
      * @param modelCode 模型编码
@@ -95,7 +96,7 @@ public class ModelController extends BaseController {
             @Parameter(description = "模型编码", required = true)
             @RequestParam("modelCode") String modelCode) {
 
-        ModelInfo model = modelService.getModelConfig(this.getCurrentTenantId(),modelCode);
+        ModelInfo model = modelService.getModelConfig(this.getCurrentTenantId(), modelCode);
 
         if (model == null) {
             throw new YonchainResourceNotFoundException("模型不存在");
@@ -105,7 +106,7 @@ public class ModelController extends BaseController {
     }
 
     /**
-    /**
+     * /**
      * 保存模型配置
      *
      * @param request 模型配置请求
@@ -116,18 +117,36 @@ public class ModelController extends BaseController {
     public ApiResponse<Void> saveModelConfig(
             @Parameter(description = "模型配置请求", required = true)
             @Valid @RequestBody ModelConfigRequest request) {
-
-        ModelInfo model = modelService.getModel(request.getModelCode());
+/*
+        ModelInfo model = modelService.getModelByCode(request.getModelCode());
         if (model == null) {
             throw new YonchainResourceNotFoundException("模型不存在");
         }
-        
+
         model.setEnabled(request.getEnabled());
 
 
-        modelService.saveModelConfig(this.getCurrentTenantId(),model);
+        modelService.saveModelConfig(this.getCurrentTenantId(), model);*/
 
         return ApiResponse.success();
     }
+
+    /**
+     * 设置模型状态
+     *
+     * @param modelCode 模型编码
+     * @param request   请求
+     * @return 响应
+     */
+    @Operation(summary = "设置模型状态", description = "根据ID获取模型详细信息")
+    @PutMapping("/{modelCode}/status")
+    public ApiResponse updateStatus(
+            @Parameter(description = "模型编码", required = true, in = ParameterIn.PATH)
+            @PathVariable String modelCode,
+            @RequestBody ModelUpdateStatusRequest request) {
+        modelService.updateModelStatus(this.getCurrentTenantId(), request.getProvider(), modelCode, request.getEnabled());
+        return ApiResponse.success();
+    }
+
 
 }

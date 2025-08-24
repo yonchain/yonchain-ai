@@ -14,6 +14,8 @@ provider:
   websiteUrl: https://www.deepseek.com
   # 排序权重，数值越小排序越靠前
   sortOrder: 2
+  # 是否启用,默认不启用
+  enabled: false
   # 该提供商支持的模型类型列表
   supportedModelTypes:
     - text        # 文本处理模型
@@ -32,11 +34,6 @@ provider:
       title: API基础URL
       description: DeepSeek API基础URL，默认为https://api.deepseek.com
       defaultValue: https://api.deepseek.com
-    # 代理URL配置
-    - name: proxyUrl
-      type: string
-      title: 代理URL
-      description: API请求代理URL（可选）
 
 # 模型文件列表
 models:

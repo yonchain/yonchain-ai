@@ -9,13 +9,14 @@ public interface ChatService {
      * 聊天完成（Chat Completion）
      * 用于调用聊天模型进行对话
      *
+     * @param tenantId  租户id
      * @param modelCode 模型代码
      * @param request   请求参数
      * @return 聊天完成响应
      */
-    ChatCompletionResponse chatCompletion(String modelCode, ChatCompletionRequest request);
+    ChatCompletionResponse chatCompletion(String tenantId, String modelCode, ChatCompletionRequest request);
 
-/*    *//**
+    /*    *//**
      * 聊天完成（Chat Completion）- 流式输出
      * 用于调用聊天模型进行对话，支持流式输出
      *

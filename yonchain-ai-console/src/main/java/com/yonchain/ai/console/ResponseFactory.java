@@ -63,18 +63,20 @@ public class ResponseFactory {
         ModelResponse response = new ModelResponse();
         // 设置模型ID
         response.setId(model.getId());
+        // 设置模型编码
+        response.setModelCode(model.getCode());
         // 设置模型名称
         response.setModelName(model.getName());
         // 设置模型类型
         response.setModelType(model.getType());
         // 设置提供商名称
-        response.setProviderName(model.getProvider());
+        response.setProvider(model.getProvider());
         // 设置加密配置
         // response.setEncryptedConfig(model.getEncryptedConfig());
         // 设置创建时间
         // response.setCreatedAt(model.getCreatedAt());
         // 设置是否有效
-        // response.setIsValid(model.getIsValid());
+         response.setEnabled(model.getEnabled());
         return response;
     }
 

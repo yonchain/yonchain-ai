@@ -12,6 +12,8 @@ provider:
   icon: 🤖
   # 排序权重，数值越小排序越靠前
   sortOrder: 1
+  # 是否启用,默认启用
+  enabled: true
   # 该提供商支持的模型类型列表
   supportedModelTypes:
     - text        # 文本处理模型

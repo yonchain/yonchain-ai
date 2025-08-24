@@ -16,6 +16,8 @@ model:
   version: "1.0"
   # 排序权重，数值越小排序越靠前
   sortOrder: 4
+  # 是否启用,默认启用
+  enabled: true
   # 模型支持的功能列表
   capabilities:
     - "embedding"

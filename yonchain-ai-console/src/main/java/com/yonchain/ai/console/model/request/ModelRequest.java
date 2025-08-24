@@ -11,6 +11,7 @@ import lombok.Data;
 @Data
 @Schema(description = "模型创建/更新请求")
 public class ModelRequest {
+
     /**
      * 模型名称
      */

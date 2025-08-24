@@ -54,7 +54,7 @@ public class ModelLoader {
         for (Resource resource : resources) {
             try (InputStream inputStream = resource.getInputStream()) {
                 Map<String, Object> yamlMap = yamlMapper.readValue(inputStream, Map.class);
-                
+
                 // 检查是否为提供商配置文件
                 if (yamlMap.containsKey("provider")) {
                     DefaultModelProvider provider = loadProviderConfig((Map<String, Object>) yamlMap.get("provider"));
@@ -77,11 +77,11 @@ public class ModelLoader {
         for (Resource resource : resources) {
             try (InputStream inputStream = resource.getInputStream()) {
                 Map<String, Object> yamlMap = yamlMapper.readValue(inputStream, Map.class);
-                
+
                 // 检查是否为模型配置文件
                 if (yamlMap.containsKey("model")) {
                     DefaultModel model = loadModelConfig((Map<String, Object>) yamlMap.get("model"));
-                    modelConfigs.put(model.getCode(), model);
+                    modelConfigs.put(model.getProvider() + "&" + model.getCode(), model);
                     log.debug("加载模型配置: {}", model.getCode());
                 }
             } catch (Exception e) {
@@ -96,20 +96,20 @@ public class ModelLoader {
     private void buildProviderModelMapping() {
         // 清空现有映射
         providerModelMap.clear();
-        
+
         // 按提供商分组模型
         Map<String, List<DefaultModel>> groupedModels = modelConfigs.values().stream()
                 .filter(model -> StringUtils.hasText(model.getProvider()))
                 .collect(Collectors.groupingBy(DefaultModel::getProvider));
-        
+
         // 构建映射并设置模型数量
         for (Map.Entry<String, List<DefaultModel>> entry : groupedModels.entrySet()) {
             String providerCode = entry.getKey();
             List<DefaultModel> models = entry.getValue();
-            
+
             // 存储映射关系
             providerModelMap.put(providerCode, models);
-            
+
             // 设置提供商的模型数量
             DefaultModelProvider provider = providerConfigs.get(providerCode);
             if (provider != null) {
@@ -117,7 +117,7 @@ public class ModelLoader {
                 log.debug("提供商 {} 包含 {} 个模型", providerCode, models.size());
             }
         }
-        
+
         // 为没有模型的提供商设置数量为0
         for (DefaultModelProvider provider : providerConfigs.values()) {
             if (provider.getModelCount() == null) {
@@ -132,19 +132,19 @@ public class ModelLoader {
     @SuppressWarnings("unchecked")
     private DefaultModelProvider loadProviderConfig(Map<String, Object> yamlMap) {
         DefaultModelProvider provider = new DefaultModelProvider();
-        
+
         // 基本信息
         provider.setCode((String) yamlMap.get("code"));
         provider.setName((String) yamlMap.get("name"));
         provider.setDescription((String) yamlMap.get("description"));
         provider.setIcon((String) yamlMap.get("icon"));
-        
+
         // 支持的模型类型
         if (yamlMap.containsKey("supportedModelTypes")) {
             List<String> types = (List<String>) yamlMap.get("supportedModelTypes");
             provider.setSupportedModelTypes(types);
         }
-        
+
         // 配置模式
         if (yamlMap.containsKey("configSchemas")) {
             List<ModelConfigItem> configItems = convertListToModelConfigItems((List<Map<String, Object>>) yamlMap.get("configSchemas"));
@@ -159,7 +159,7 @@ public class ModelLoader {
     @SuppressWarnings("unchecked")
     private DefaultModel loadModelConfig(Map<String, Object> yamlMap) {
         DefaultModel model = new DefaultModel();
-        
+
         // 基本信息
         model.setCode((String) yamlMap.get("code"));
         model.setName((String) yamlMap.get("name"));
@@ -167,18 +167,18 @@ public class ModelLoader {
         model.setProvider((String) yamlMap.get("provider"));
         model.setType((String) yamlMap.get("modelType"));
         model.setIcon((String) yamlMap.get("icon"));
-        
+
         // 能力配置
         if (yamlMap.containsKey("capabilities")) {
-            model.setCapabilities((List<String>)yamlMap.get("capabilities"));
+            model.setCapabilities((List<String>) yamlMap.get("capabilities"));
         }
-        
+
         // 配置模式
         if (yamlMap.containsKey("configSchemas")) {
             List<ModelConfigItem> configItems = convertListToModelConfigItems((List<Map<String, Object>>) yamlMap.get("configSchemas"));
             model.setConfigSchema(configItems);
         }
-        
+
         return model;
     }
 
@@ -190,44 +190,44 @@ public class ModelLoader {
         if (configSchema == null) {
             return Collections.emptyList();
         }
-        
+
         List<ModelConfigItem> items = new ArrayList<>();
-        
+
         for (Map.Entry<String, Object> entry : configSchema.entrySet()) {
             String key = entry.getKey();
             Map<String, Object> itemConfig = (Map<String, Object>) entry.getValue();
-            
+
             ModelConfigItem item = new ModelConfigItem();
             item.setName(key);
             item.setType((String) itemConfig.get("type"));
             item.setTitle((String) itemConfig.get("title"));
             item.setDescription((String) itemConfig.get("description"));
-            
+
             if (itemConfig.containsKey("defaultValue")) {
                 item.setDefaultValue(itemConfig.get("defaultValue"));
             } else if (itemConfig.containsKey("default")) {
                 item.setDefaultValue(itemConfig.get("default"));
             }
-            
+
             if (itemConfig.containsKey("required")) {
                 item.setRequired((Boolean) itemConfig.get("required"));
             }
-            
+
             if (itemConfig.containsKey("min")) {
                 item.setMin((Number) itemConfig.get("min"));
             } else if (itemConfig.containsKey("minimum")) {
                 item.setMin((Number) itemConfig.get("minimum"));
             }
-            
+
             if (itemConfig.containsKey("max")) {
                 item.setMax((Number) itemConfig.get("max"));
             } else if (itemConfig.containsKey("maximum")) {
                 item.setMax((Number) itemConfig.get("maximum"));
             }
-            
+
             items.add(item);
         }
-        
+
         return items;
     }
 
@@ -239,41 +239,41 @@ public class ModelLoader {
         if (configSchemas == null) {
             return Collections.emptyList();
         }
-        
+
         List<ModelConfigItem> items = new ArrayList<>();
-        
+
         for (Map<String, Object> itemConfig : configSchemas) {
             ModelConfigItem item = new ModelConfigItem();
             item.setName((String) itemConfig.get("name"));
             item.setType((String) itemConfig.get("type"));
             item.setTitle((String) itemConfig.get("title"));
             item.setDescription((String) itemConfig.get("description"));
-            
+
             if (itemConfig.containsKey("defaultValue")) {
                 item.setDefaultValue(itemConfig.get("defaultValue"));
             } else if (itemConfig.containsKey("default")) {
                 item.setDefaultValue(itemConfig.get("default"));
             }
-            
+
             if (itemConfig.containsKey("required")) {
                 item.setRequired((Boolean) itemConfig.get("required"));
             }
-            
+
             if (itemConfig.containsKey("min")) {
                 item.setMin((Number) itemConfig.get("min"));
             } else if (itemConfig.containsKey("minimum")) {
                 item.setMin((Number) itemConfig.get("minimum"));
             }
-            
+
             if (itemConfig.containsKey("max")) {
                 item.setMax((Number) itemConfig.get("max"));
             } else if (itemConfig.containsKey("maximum")) {
                 item.setMax((Number) itemConfig.get("maximum"));
             }
-            
+
             items.add(item);
         }
-        
+
         return items;
     }
 
@@ -301,8 +301,8 @@ public class ModelLoader {
     /**
      * 根据ID获取模型配置
      */
-    public DefaultModel getModelConfig(String modelId) {
-        return modelConfigs.get(modelId);
+    public DefaultModel getModelConfig(String provider, String modelCode) {
+        return modelConfigs.get(provider + "_" + modelCode);
     }
 
     /**
@@ -312,7 +312,7 @@ public class ModelLoader {
         if (!StringUtils.hasText(providerCode)) {
             return Collections.emptyList();
         }
-        
+
         List<DefaultModel> models = providerModelMap.get(providerCode);
         return models != null ? new ArrayList<>(models) : Collections.emptyList();
     }
@@ -324,7 +324,7 @@ public class ModelLoader {
         if (!StringUtils.hasText(providerCode)) {
             return 0;
         }
-        
+
         List<DefaultModel> models = providerModelMap.get(providerCode);
         return models != null ? models.size() : 0;
     }

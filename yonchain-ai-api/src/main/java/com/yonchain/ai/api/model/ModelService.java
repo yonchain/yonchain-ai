@@ -38,9 +38,17 @@ public interface ModelService {
     ModelInfo getModelById(String id);
 
     /**
+     * 根据模型编码获取模型
+     *
+     * @param modelCode 模型编码
+     * @return 模型
+     */
+    ModelInfo getModel(String provider, String modelCode);
+
+    /**
      * 获取模型列表
      *
-     * @param tenantId     租户ID
+     * @param tenantId   租户ID
      * @param queryParam 查询参数
      * @return 模型列表
      */
@@ -60,7 +68,7 @@ public interface ModelService {
     /**
      * 获取提供商列表
      *
-     * @param tenantId 租户ID
+     * @param tenantId   租户ID
      * @param queryParam 查询参数
      * @return 提供商列表
      */
@@ -145,7 +153,7 @@ public interface ModelService {
     /**
      * 获取租户的模型提供商配置
      *
-     * @param tenantId 租户ID
+     * @param tenantId     租户ID
      * @param providerCode 提供商代码
      * @return 租户提供商配置
      */
@@ -154,16 +162,16 @@ public interface ModelService {
     /**
      * 保存租户的模型提供商配置
      *
-     * @param tenantId 租户ID
+     * @param tenantId     租户ID
      * @param providerCode 提供商代码
-     * @param config 配置信息
+     * @param config       配置信息
      */
     void saveProviderConfig(String tenantId, String providerCode, Map<String, Object> config);
 
     /**
      * 获取租户的模型配置
      *
-     * @param tenantId 租户ID
+     * @param tenantId  租户ID
      * @param modelCode 模型代码
      * @return 租户模型配置
      */
@@ -172,11 +180,18 @@ public interface ModelService {
     /**
      * 保存租户的模型配置
      *
-     * @param tenantId 租户ID
+     * @param tenantId  租户ID
      * @param modelCode 模型代码
-     * @param config 配置信息
+     * @param config    配置信息
      */
     void saveModelConfig(String tenantId, ModelInfo modelInfo);
 
-    ModelInfo getModel(String modelCode);
+    /**
+     * 设置模型状态
+     *
+     * @param provider  提供商
+     * @param modelCode 模型编码
+     * @param enabled   是否启用
+     */
+    void updateModelStatus(String tenantId, String provider, String modelCode, boolean enabled);
 }

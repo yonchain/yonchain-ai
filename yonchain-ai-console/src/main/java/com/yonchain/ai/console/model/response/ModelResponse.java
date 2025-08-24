@@ -18,6 +18,12 @@ public class ModelResponse {
     private String id;
 
     /**
+     * 模型编码
+     */
+    @Schema(description = "模型编码")
+    private String modelCode;
+
+    /**
      * 模型名称
      */
     @Schema(description = "模型名称")
@@ -32,8 +38,8 @@ public class ModelResponse {
     /**
      * 提供商名称
      */
-    @Schema(description = "模型提供商")
-    private String providerName;
+    @Schema(description = "模型编码")
+    private String provider;
 
     /**
      * 创建时间
@@ -45,5 +51,5 @@ public class ModelResponse {
      * 是否有效
      */
     @Schema(description = "模型是否有效")
-    private Boolean isValid;
+    private Boolean enabled;
 }

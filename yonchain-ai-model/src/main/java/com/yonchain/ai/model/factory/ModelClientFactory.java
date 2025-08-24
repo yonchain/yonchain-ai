@@ -67,7 +67,7 @@ public class ModelClientFactory {
             throw new IllegalArgumentException("模型或提供商不能为空");
         }
 
-        String cacheKey = model.getModelCode() + "-" + provider.getId();
+        String cacheKey = model.getModelCode() + "-" + provider.getProviderCode();
         return chatClientCache.computeIfAbsent(cacheKey, key -> {
             // 使用模型工厂的通用方法获取ChatModel
             ChatModel chatModel = modelFactory.getChatModel(model, provider);
@@ -98,7 +98,7 @@ public class ModelClientFactory {
             throw new IllegalArgumentException("模型或提供商不能为空");
         }
 
-        String cacheKey = model.getModelCode() + "-" + provider.getId() + "-" + providerType;
+        String cacheKey = model.getModelCode() + "-" + provider.getProviderCode() + "-" + providerType;
         return chatClientCache.computeIfAbsent(cacheKey, key -> {
             ChatModel chatModel;
             
