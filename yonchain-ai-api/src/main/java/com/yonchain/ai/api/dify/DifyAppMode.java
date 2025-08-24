@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.yonchain.ai.api.app;
+package com.yonchain.ai.api.dify;
 
 /**
  * 应用模式 枚举
  *
  * @author Cgy
  */
-public enum AppMode {
+public enum DifyAppMode {
 
     /**
      * 工作流模式，面向单轮自动化任务的编排工作流
@@ -54,7 +54,7 @@ public enum AppMode {
      *
      * @param value 模式对应的字符串值
      */
-    AppMode(String value) {
+    DifyAppMode(String value) {
         this.value = value;
     }
 
@@ -74,8 +74,8 @@ public enum AppMode {
      * @return 对应的AppMode枚举
      * @throws IllegalArgumentException 如果传入的模式字符串无效
      */
-    public static AppMode valueOfMode(String mode) {
-        for (AppMode appMode : values()) {
+    public static DifyAppMode valueOfMode(String mode) {
+        for (DifyAppMode appMode : values()) {
             if (appMode.getValue().equals(mode)) {
                 return appMode;
             }

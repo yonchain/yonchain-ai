@@ -1,7 +1,6 @@
 package com.yonchain.ai.dify;
 
-import com.yonchain.ai.api.dify.DifyAppService;
-import com.yonchain.ai.api.exception.YonchainException;
+import com.yonchain.ai.api.dify.DifyService;
 import com.yonchain.ai.dify.service.DifyAppServiceImpl;
 
 /**
@@ -11,7 +10,7 @@ import com.yonchain.ai.dify.service.DifyAppServiceImpl;
  */
 public class DifyConfiguration {
 
-    protected DifyAppService difyAppService;
+    protected DifyService difyAppService;
 
 
     protected DifyConfiguration(Builder builder) {
@@ -43,9 +42,9 @@ public class DifyConfiguration {
      */
     public static class Builder {
 
-        public DifyAppService difyAppService;
+        public DifyService difyAppService;
 
-        public Builder difyAppService(DifyAppService difyAppService) {
+        public Builder difyAppService(DifyService difyAppService) {
             this.difyAppService = difyAppService;
             return this;
         }

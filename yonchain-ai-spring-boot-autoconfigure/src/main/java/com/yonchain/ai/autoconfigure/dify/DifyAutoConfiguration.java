@@ -1,8 +1,7 @@
 package com.yonchain.ai.autoconfigure.dify;
 
 
-import com.yonchain.ai.api.dify.DifyAppService;
-import com.yonchain.ai.console.dify.DifyResponseFactory;
+import com.yonchain.ai.api.dify.DifyService;
 import com.yonchain.ai.dify.DifyConfiguration;
 import com.yonchain.ai.dify.service.DifyAppServiceImpl;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -19,21 +18,15 @@ public class DifyAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DifyResponseFactory difyResponseFactory() {
-        return new DifyResponseFactory();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public DifyConfiguration difyConfiguration(DifyAppService difyAppService) {
+    public DifyConfiguration difyConfiguration(DifyService difyService) {
         return DifyConfiguration.builder()
-                .difyAppService(difyAppService)
+                .difyAppService(difyService)
                 .build();
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public DifyAppService difyAppService() {
+    public DifyService difyAppService() {
         return new DifyAppServiceImpl();
     }
 }

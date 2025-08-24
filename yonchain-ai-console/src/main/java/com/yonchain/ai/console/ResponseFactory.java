@@ -2,12 +2,14 @@ package com.yonchain.ai.console;
 
 import com.yonchain.ai.api.app.Application;
 import com.yonchain.ai.api.common.Page;
+import com.yonchain.ai.api.dify.DifyApp;
 import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.model.ModelInfo;
 import com.yonchain.ai.api.model.ModelProvider;
 import com.yonchain.ai.api.sys.*;
 import com.yonchain.ai.api.tag.Tag;
 import com.yonchain.ai.console.app.response.AppResponse;
+import com.yonchain.ai.console.dify.response.DifyAppResponse;
 import com.yonchain.ai.console.file.entity.FileEntity;
 import com.yonchain.ai.console.file.response.FileResponse;
 import com.yonchain.ai.console.model.response.ModelConfigResponse;
@@ -1041,6 +1043,78 @@ public class ResponseFactory {
             response.setConfigItems(configItems);
         }
         
+        return response;
+    }
+
+
+    /**
+     * 创建应用响应对象
+     * <p>
+     * 将App实体对象转换为标准化的API响应格式
+     * 包含应用的基本信息、状态和时间戳
+     * </p>
+     *
+     * @param app 应用实体对象，包含应用基本信息，可为null
+     * @return 标准化后的应用响应对象，如果输入为null则返回null
+     * @throws NumberFormatException 如果状态转换失败
+     */
+    public DifyAppResponse createDifyAppResponse(DifyApp app) {
+        DifyAppResponse response = new DifyAppResponse();
+        // 设置应用ID
+        response.setId(app.getId());
+        // 设置租户ID
+        response.setTenantId(app.getTenantId());
+        // 设置应用名称
+        response.setName(app.getName());
+        // 设置应用模式
+        response.setMode(app.getMode());
+        //设置应用供应商
+        response.setProvider(app.getProvider());
+        //设置api key
+        response.setApiKey(app.getApiKey());
+        //设置基础URL
+        response.setBaseUrl(app.getBaseUrl());
+        // 设置应用图标URL
+        response.setIcon(app.getIcon());
+        // 设置图标背景色
+        response.setIconBackground(app.getIconBackground());
+        // 设置应用描述
+        response.setDescription(app.getDescription());
+        // 设置应用状态
+        response.setStatus(app.getStatus());
+        // 设置创建时间
+        response.setCreatedAt(app.getCreatedAt());
+        // 设置更新时间
+        response.setUpdatedAt(app.getUpdatedAt());
+        return response;
+    }
+
+    /**
+     * 创建应用分页响应对象
+     * <p>
+     * 将应用分页数据转换为标准化的API分页响应格式
+     * 包含分页元数据和转换后的应用数据列表
+     * </p>
+     *
+     * @param apps 应用分页数据对象，包含分页信息和应用数据列表，不能为null
+     * @return 标准化后的应用分页响应对象，包含分页元数据和转换后的应用列表
+     * @see Application
+     * @see AppResponse
+     * @see PageResponse
+     */
+    public PageResponse<DifyAppResponse> createDifyAppPageResponse(Page<DifyApp> apps) {
+        PageResponse<DifyAppResponse> response = new PageResponse<>();
+        // 设置当前页码
+        response.setPageNum(apps.getCurrent());
+        // 设置每页记录数
+        response.setPageSize(apps.getSize());
+        // 设置总记录数
+        response.setTotal(apps.getTotal());
+        // 转换应用数据列表
+        response.setData(apps.getRecords().stream()
+                .map(this::createDifyAppResponse)
+                .filter(Objects::nonNull)
+                .toList());
         return response;
     }
 }
