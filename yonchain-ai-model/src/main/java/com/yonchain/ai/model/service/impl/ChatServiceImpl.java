@@ -1,6 +1,7 @@
 package com.yonchain.ai.model.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.exception.YonchainIllegalStateException;
 import com.yonchain.ai.api.model.*;
 import com.yonchain.ai.api.model.enums.ModelType;
@@ -99,7 +100,7 @@ public class ChatServiceImpl implements ChatService {
         } catch (Exception e) {
             long duration = System.currentTimeMillis() - startTime;
             log.error("聊天完成请求失败 - 模型: {}, 耗时: {}ms, 错误: {}", modelCode, duration, e.getMessage(), e);
-            throw new RuntimeException("聊天完成请求失败: " + e.getMessage(), e);
+            throw new YonchainException("聊天完成请求失败: " + e.getMessage(), e);
         }
     }
 

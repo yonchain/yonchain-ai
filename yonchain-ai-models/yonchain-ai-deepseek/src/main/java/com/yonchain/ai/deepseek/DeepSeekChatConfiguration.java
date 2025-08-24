@@ -116,7 +116,7 @@ public class DeepSeekChatConfiguration {
                 .apiKey(apiKey)
                 .baseUrl(baseUrl)
                 .restClientBuilder(restClientBuilder)
-                .responseErrorHandler(responseErrorHandler)
+              //  .responseErrorHandler(responseErrorHandler)
                 .build();
     }
 
