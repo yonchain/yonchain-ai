@@ -1,7 +1,7 @@
 package com.yonchain.ai.chat;
 
-import com.yonchain.ai.app.AppResult;
-import com.yonchain.ai.app.ResultMetadata;
+import com.yonchain.ai.agent.AppResult;
+import com.yonchain.ai.agent.ResultMetadata;
 
 public class Generation implements AppResult<String> {
 

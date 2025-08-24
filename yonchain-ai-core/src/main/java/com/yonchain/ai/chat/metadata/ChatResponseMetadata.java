@@ -1,6 +1,6 @@
 package com.yonchain.ai.chat.metadata;
 
-import com.yonchain.ai.app.ResponseMetadata;
+import com.yonchain.ai.agent.ResponseMetadata;
 
 import java.util.Map;
 import java.util.Set;

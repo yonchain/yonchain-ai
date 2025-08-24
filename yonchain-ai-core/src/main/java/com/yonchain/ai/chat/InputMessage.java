@@ -1,6 +1,6 @@
 package com.yonchain.ai.chat;
 
-import com.yonchain.ai.app.AppRequest;
+import com.yonchain.ai.agent.AppRequest;
 import io.micrometer.common.lang.Nullable;
 
 public class InputMessage implements AppRequest<String> {

@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.yonchain.ai.dify.entity;
+package com.yonchain.ai.agent.entity;
 
 import com.yonchain.ai.api.agent.Application;
-import com.yonchain.ai.api.dify.DifyApp;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -30,7 +29,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class DifyAppEntity implements DifyApp {
+public class AppEntity implements Application {
 
     /**
      * 主键ID

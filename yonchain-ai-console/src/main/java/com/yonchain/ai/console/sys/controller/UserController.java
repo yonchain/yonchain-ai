@@ -321,10 +321,10 @@ public class UserController extends BaseController {
 
         return JSON.parseArray("[\n" +
                 "  \"dashboard:view\",\n" +
-                "  \"apps:view\",\n" +
-                "  \"apps:list\",\n" +
-                "  \"apps:create\",\n" +
-                "  \"apps:import\",\n" +
+                "  \"agents:view\",\n" +
+                "  \"agents:list\",\n" +
+                "  \"agents:create\",\n" +
+                "  \"agents:import\",\n" +
                 "  \"chat:view\",\n" +
                 "  \"chat:history\",\n" +
                 "  \"chat:create\",\n" +
@@ -342,6 +342,9 @@ public class UserController extends BaseController {
                 "  \"system:users:create\",\n" +
                 "  \"system:users:create\",\n" +
                 "  \"plugins:view\",\n" +
+                "  \"dify:apps:view\",\n" +
+                "  \"dify:apps:create\",\n" +
+                "  \"dify:apps:import\",\n" +
                 "  \"mcp:view\",\n" +
                 "  \"model:view\"\n" +
                 "]");

@@ -1,6 +1,6 @@
 package com.yonchain.ai.chat;
 
-import com.yonchain.ai.app.StreamingApp;
+import com.yonchain.ai.agent.StreamingApp;
 import reactor.core.publisher.Flux;
 
 @FunctionalInterface

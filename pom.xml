@@ -14,7 +14,7 @@
 
     <modules>
         <module>yonchain-ai-bom</module>
-        <module>yonchain-ai-app</module>
+        <module>yonchain-ai-agent</module>
         <module>yonchain-ai-commons</module>
         <module>yonchain-ai-dify</module>
         <module>yonchain-ai-n8n</module>

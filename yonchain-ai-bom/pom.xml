@@ -26,7 +26,7 @@
             <!--应用模块-->
             <dependency>
                 <groupId>com.yonchain.ai</groupId>
-                <artifactId>yonchain-ai-app</artifactId>
+                <artifactId>yonchain-ai-agent</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

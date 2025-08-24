@@ -19,9 +19,9 @@ package com.yonchain.ai.dify.api;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.yonchain.ai.app.ApiKey;
-import com.yonchain.ai.app.NoopApiKey;
-import com.yonchain.ai.app.SimpleApiKey;
+import com.yonchain.ai.agent.ApiKey;
+import com.yonchain.ai.agent.NoopApiKey;
+import com.yonchain.ai.agent.SimpleApiKey;
 import com.yonchain.ai.retry.RetryUtils;
 
 import org.springframework.http.HttpHeaders;

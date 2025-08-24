@@ -1,6 +1,6 @@
 package com.yonchain.ai.chat;
 
-import com.yonchain.ai.app.App;
+import com.yonchain.ai.agent.App;
 import reactor.core.publisher.Flux;
 
 /**

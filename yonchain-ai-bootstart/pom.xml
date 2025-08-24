@@ -31,7 +31,7 @@
         </dependency>
         <dependency>
             <groupId>com.yonchain.ai</groupId>
-            <artifactId>yonchain-ai-app</artifactId>
+            <artifactId>yonchain-ai-agent</artifactId>
         </dependency>
         <dependency>
             <groupId>com.yonchain.ai</groupId>

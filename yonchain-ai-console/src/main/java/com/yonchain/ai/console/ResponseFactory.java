@@ -1,6 +1,6 @@
 package com.yonchain.ai.console;
 
-import com.yonchain.ai.api.app.Application;
+import com.yonchain.ai.api.agent.Application;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.dify.DifyApp;
 import com.yonchain.ai.api.exception.YonchainException;
@@ -8,7 +8,7 @@ import com.yonchain.ai.api.model.ModelInfo;
 import com.yonchain.ai.api.model.ModelProvider;
 import com.yonchain.ai.api.sys.*;
 import com.yonchain.ai.api.tag.Tag;
-import com.yonchain.ai.console.app.response.AppResponse;
+import com.yonchain.ai.console.agent.response.AppResponse;
 import com.yonchain.ai.console.dify.response.DifyAppResponse;
 import com.yonchain.ai.console.file.entity.FileEntity;
 import com.yonchain.ai.console.file.response.FileResponse;
