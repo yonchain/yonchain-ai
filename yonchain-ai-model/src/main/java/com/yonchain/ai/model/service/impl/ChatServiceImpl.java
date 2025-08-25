@@ -4,9 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.exception.YonchainIllegalStateException;
 import com.yonchain.ai.api.model.*;
-import com.yonchain.ai.api.model.enums.ModelType;
-import com.yonchain.ai.model.chat.ChatModelManager;
-import com.yonchain.ai.model.chat.DelegatingChatModel;
 import com.yonchain.ai.model.entity.ModelEntity;
 import com.yonchain.ai.model.entity.ModelProviderEntity;
 import com.yonchain.ai.model.factory.ModelClientFactory;
@@ -57,10 +54,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Autowired
     private ModelProviderMapper modelProviderMapper;
-    
-    @Autowired
-    private ChatModelManager chatModelManager;
-    
+
     /**
      * 委托式聊天模型
      * 用于动态选择和路由到合适的ChatModel实现
@@ -276,15 +270,6 @@ public class ChatServiceImpl implements ChatService {
      */
     private ChatClient getChatClientWithFallback(ModelEntity model, ModelProviderEntity provider) {
         try {
-            // 优先使用委托式聊天模型
-            if (chatModel != null) {
-                // 确保模型已在委托模型中注册
-                ChatModel chatModel = chatModelManager.getChatModel(model.getTenantId(), model.getModelCode());
-                if (chatModel != null) {
-                    log.debug("使用委托式聊天模型 - 模型: {}", model.getModelCode());
-                    return ChatClient.create(chatModel);
-                }
-            }
             
             // 如果委托模型不可用，使用动态创建的客户端
             ChatClient dynamicClient = clientFactory.getChatClient(model, provider);

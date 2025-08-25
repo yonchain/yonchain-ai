@@ -3,14 +3,12 @@ package com.yonchain.ai.model.chat;
 import com.yonchain.ai.model.registry.ModelRegistry;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 委托式聊天模型，用于动态调用不同的模型实现

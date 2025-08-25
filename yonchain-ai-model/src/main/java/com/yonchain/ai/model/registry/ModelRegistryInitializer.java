@@ -90,14 +90,14 @@ public class ModelRegistryInitializer implements InitializingBean {
             
             // 为每个启用的模型和提供商组合创建ChatModel并注册到注册表
             for (ModelEntity model : modelMap.values()) {
-                if (model.getEnabled() == null || !model.getEnabled()) {
+                /*if (model.getEnabled() == null || !model.getEnabled()) {
                     continue;
-                }
+                }*/
                 
                 for (ModelProviderEntity provider : providerMap.values()) {
-                    if (provider.getEnabled() == null || !provider.getEnabled()) {
+                   /* if (provider.getEnabled() == null || !provider.getEnabled()) {
                         continue;
-                    }
+                    }*/
                     
                     try {
                         // 创建ChatModel
