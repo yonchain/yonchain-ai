@@ -2,11 +2,13 @@ package com.yonchain.ai.model.registry;
 
 import org.springframework.ai.chat.model.ChatModel;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * 模型注册表接口
  * <p>
  * 负责注册和管理ChatModel实例
- * 完全复制ChatModelRegistry的设计
  * 
  * @author Cgy
  */
@@ -43,4 +45,23 @@ public interface ModelRegistry {
      * @return 如果存在则返回true，否则返回false
      */
     boolean hasModel(String modelId);
+    
+    /**
+     * 获取所有已注册的模型ID
+     * 
+     * @return 所有已注册的模型ID列表
+     */
+    List<String> getAllModelIds();
+    
+    /**
+     * 清除所有已注册的模型
+     */
+    void clearAllModels();
+    
+    /**
+     * 获取已注册模型的数量
+     * 
+     * @return 已注册模型的数量
+     */
+    int getModelCount();
 }
