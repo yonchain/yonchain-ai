@@ -5,6 +5,8 @@ import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.exception.YonchainIllegalStateException;
 import com.yonchain.ai.api.model.*;
 import com.yonchain.ai.api.model.enums.ModelType;
+import com.yonchain.ai.model.chat.ChatModelManager;
+import com.yonchain.ai.model.chat.DelegatingChatModel;
 import com.yonchain.ai.model.entity.ModelEntity;
 import com.yonchain.ai.model.entity.ModelProviderEntity;
 import com.yonchain.ai.model.factory.ModelClientFactory;
@@ -17,6 +19,7 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +57,25 @@ public class ChatServiceImpl implements ChatService {
 
     @Autowired
     private ModelProviderMapper modelProviderMapper;
+    
+    @Autowired
+    private ChatModelManager chatModelManager;
+    
+    /**
+     * 委托式聊天模型
+     * 用于动态选择和路由到合适的ChatModel实现
+     */
+    @Autowired
+    private ChatModel chatModel;
+    
+/*
+    @jakarta.annotation.PostConstruct
+    public void init() {
+        // 初始化委托式聊天模型
+        delegatingChatModel = new DelegatingChatModel("gpt-3.5-turbo", chatModelManager);
+        log.info("委托式聊天模型初始化完成，默认模型: gpt-3.5-turbo");
+    }
+*/
 
     /**
      * 缓存已注册的模型提供商服务
@@ -74,7 +96,31 @@ public class ChatServiceImpl implements ChatService {
                 modelCode, provider.getProviderCode(), request.getMessages().size());
 
         try {
-            // 使用优化后的客户端工厂获取聊天客户端
+            // 使用委托式聊天模型直接调用
+            if (chatModel != null) {
+                // 转换请求消息格式
+                List<Message> messages = convertToSpringAIMessages(request.getMessages());
+                
+                // 创建Prompt对象，支持更多配置选项
+                Prompt prompt = createEnhancedPrompt(messages, request, model);
+                
+                // 直接使用委托式聊天模型调用
+                org.springframework.ai.chat.model.ChatResponse chatResponse =
+                        chatModel.call(prompt);
+                
+                // 转换并返回响应
+                ChatCompletionResponse response = convertToChatCompletionResponse(chatResponse, modelCode);
+                
+                long duration = System.currentTimeMillis() - startTime;
+                logChatStatistics(modelCode, request, response, duration);
+                
+                log.info("聊天完成请求成功(委托模式) - 模型: {}, 响应长度: {}, 耗时: {}ms",
+                        modelCode, response.getChoices().get(0).getMessage().getContent().length(), duration);
+                
+                return response;
+            }
+            
+            // 降级：使用优化后的客户端工厂获取聊天客户端
             ChatClient chatClient = getChatClientWithFallback(model, provider);
 
             // 转换请求消息格式
@@ -230,7 +276,17 @@ public class ChatServiceImpl implements ChatService {
      */
     private ChatClient getChatClientWithFallback(ModelEntity model, ModelProviderEntity provider) {
         try {
-            // 优先使用动态创建的客户端
+            // 优先使用委托式聊天模型
+            if (chatModel != null) {
+                // 确保模型已在委托模型中注册
+                ChatModel chatModel = chatModelManager.getChatModel(model.getTenantId(), model.getModelCode());
+                if (chatModel != null) {
+                    log.debug("使用委托式聊天模型 - 模型: {}", model.getModelCode());
+                    return ChatClient.create(chatModel);
+                }
+            }
+            
+            // 如果委托模型不可用，使用动态创建的客户端
             ChatClient dynamicClient = clientFactory.getChatClient(model, provider);
             log.debug("成功创建动态聊天客户端 - 模型: {}", model.getModelCode());
             return dynamicClient;

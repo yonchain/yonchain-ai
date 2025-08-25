@@ -20,6 +20,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * 应用实体类
@@ -110,5 +111,10 @@ public class AppEntity implements Application {
      * 更新者ID
      */
     private String updatedBy;
+
+    /**
+     * 更新者ID
+     */
+    private Map<String, Object> config;
 
 }

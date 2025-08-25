@@ -17,6 +17,7 @@ package com.yonchain.ai.api.agent;
 
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * 应用 接口
@@ -186,4 +187,8 @@ public interface Application {
      * 设置更新者ID
      */
     void setUpdatedBy(String updatedBy);
+
+    Map<String, Object> getConfig();
+
+    void setConfig(Map<String, Object> config);
 }

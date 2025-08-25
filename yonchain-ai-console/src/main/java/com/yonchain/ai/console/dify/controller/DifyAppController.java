@@ -104,10 +104,10 @@ public class DifyAppController extends BaseController {
 
         //从请求获取数据填充
         app.setName(request.getName());
-        app.setMode(request.getMode());
+/*        app.setMode(request.getMode());
         // app.setProvider(request.getProvider());
         app.setApiKey(request.getApiKey());
-        app.setBaseUrl(request.getBaseUrl());
+        app.setBaseUrl(request.getBaseUrl());*/
         app.setIcon(request.getIcon());
         app.setIconBackground(request.getIconBackground());
         app.setDescription(request.getDescription());

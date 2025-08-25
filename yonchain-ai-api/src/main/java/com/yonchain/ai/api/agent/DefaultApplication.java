@@ -17,6 +17,7 @@
 package com.yonchain.ai.api.agent;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * 应用实体类
@@ -105,6 +106,11 @@ public class DefaultApplication implements Application {
      * 更新者ID
      */
     private String updatedBy;
+
+    /**
+     * 更新者ID
+     */
+    private Map<String, Object> config;
 
     /**
      * 获取主键ID
@@ -392,6 +398,16 @@ public class DefaultApplication implements Application {
      */
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+    @Override
+    public Map<String, Object> getConfig() {
+        return config;
+    }
+
+    @Override
+    public void setConfig(Map<String, Object> config) {
+        this.config = config;
     }
 
 }

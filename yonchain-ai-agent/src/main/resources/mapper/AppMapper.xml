@@ -9,14 +9,6 @@
         <result column="tenant_id" property="tenantId" jdbcType="OTHER"/>
         <!-- 应用名称 -->
         <result column="name" property="name" jdbcType="VARCHAR"/>
-        <!-- 应用模式：completion/chat -->
-        <result column="mode" property="mode" jdbcType="VARCHAR"/>
-        <!-- 应用提供商 -->
-        <result column="provider" property="provider" jdbcType="VARCHAR"/>
-        <!-- API密钥 -->
-        <result column="api_key" property="apiKey" jdbcType="VARCHAR"/>
-        <!-- 应用基础URL -->
-        <result column="base_url" property="baseUrl" jdbcType="VARCHAR"/>
         <!-- 应用图标URL -->
         <result column="icon" property="icon" jdbcType="VARCHAR"/>
         <!-- 图标背景色 -->
@@ -39,8 +31,8 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, tenant_id, name, mode, icon, icon_background, provider, status,
-        description, icon_type, created_by, updated_by,base_url,api_key
+        id, tenant_id, name,  icon, icon_background, status,
+        description, icon_type, created_by, updated_by
     </sql>
 
     <!-- 通过ID查询单个应用 -->
@@ -58,7 +50,6 @@
         from app
         where tenant_id = #{tenantId}::uuid
         <if test="params.name != null and params.name != ''">and name like concat('%', #{params.name}, '%')</if>
-        <if test="params.mode != null and params.mode != ''">and mode = #{params.mode}</if>
         <if test="params.status != null and params.status != ''">and status = #{params.status}</if>
         <if test="params.roleIds != null and params.roleIds.size() > 0">
             AND EXISTS (
@@ -80,9 +71,6 @@
             <if test="id != null">id,</if>
             <if test="tenantId != null">tenant_id,</if>
             <if test="name != null">name,</if>
-            <if test="mode != null">mode,</if>
-            <if test="baseUrl != null">base_url,</if>
-            <if test="apiKey != null">api_key,</if>
             <if test="icon != null">icon,</if>
             <if test="iconBackground != null">icon_background,</if>
             <if test="provider != null">provider,</if>
@@ -98,12 +86,8 @@
             <if test="id != null">#{id}::uuid,</if>
             <if test="tenantId != null">#{tenantId}::uuid,</if>
             <if test="name != null">#{name},</if>
-            <if test="mode != null">#{mode},</if>
-            <if test="baseUrl != null">#{baseUrl},</if>
-            <if test="apiKey != null">#{apiKey},</if>
             <if test="icon != null">#{icon},</if>
             <if test="iconBackground != null">#{iconBackground},</if>
-            <if test="provider != null">#{provider},</if>
             <if test="status != null">#{status},</if>
             <if test="createdAt != null">#{createdAt},</if>
             <if test="updatedAt != null">#{updatedAt},</if>
@@ -120,12 +104,8 @@
         <set>
             <if test="tenantId != null">tenant_id = #{tenantId}::uuid,</if>
             <if test="name != null">name = #{name},</if>
-            <if test="mode != null">mode = #{mode},</if>
             <if test="icon != null">icon = #{icon},</if>
-            <if test="baseUrl != null">base_url = #{baseUrl},</if>
-            <if test="apiKey != null">api_key = #{apiKey},</if>
             <if test="iconBackground != null">icon_background = #{iconBackground},</if>
-            <if test="provider != null">provider = #{provider},</if>
             <if test="status != null">status = #{status},</if>
             <if test="updatedAt != null">updated_at = #{updatedAt},</if>
             <if test="description != null">description = #{description},</if>

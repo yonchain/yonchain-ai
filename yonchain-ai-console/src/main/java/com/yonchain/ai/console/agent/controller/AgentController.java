@@ -8,6 +8,7 @@ import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.api.sys.CurrentUser;
 import com.yonchain.ai.api.sys.Role;
 import com.yonchain.ai.console.BaseController;
+import com.yonchain.ai.console.agent.request.AgentPublishRequest;
 import com.yonchain.ai.console.agent.request.AppCreateRequest;
 import com.yonchain.ai.console.agent.request.AppQueryRequest;
 import com.yonchain.ai.console.agent.request.AppUpdateRequest;
@@ -53,7 +54,7 @@ public class AgentController extends BaseController {
         if (app == null) {
             throw new YonchainResourceNotFoundException("APP_NOT_FOUND", "应用未找到");
         }
-        return buildResponse(app);
+        return responseFactory.createAppResponse(app);
     }
 
 
@@ -104,10 +105,10 @@ public class AgentController extends BaseController {
 
         //从请求获取数据填充
         app.setName(request.getName());
-        app.setMode(request.getMode());
+  /*      app.setMode(request.getMode());
        // app.setProvider(request.getProvider());
         app.setApiKey(request.getApiKey());
-        app.setBaseUrl(request.getBaseUrl());
+        app.setBaseUrl(request.getBaseUrl());*/
         app.setIcon(request.getIcon());
         app.setIconBackground(request.getIconBackground());
         app.setDescription(request.getDescription());
@@ -169,13 +170,60 @@ public class AgentController extends BaseController {
         return ApiResponse.success();
     }
 
+    /**
+     * 发布智能体
+     *
+     * @param request 智能体发布请求
+     * @return 发布的智能体详情
+     */
+    @PostMapping("/{id}/publish")
+    @Operation(summary = "发布智能体", description = "发布新的智能体，包含提示词、知识库、插件、MCP和工作流配置")
+    public AppResponse publishAgent(@Parameter(description = "应用ID") @PathVariable String id,
+                                    @Valid @RequestBody AgentPublishRequest request) {
 
-    private AppResponse buildResponse(Application app) {
-        AppResponse response = responseFactory.createAppResponse(app);
-        List<Role> roles = agentService.getAppRoles(app.getId());
-        response.setRoleIds(roles.stream().map(Role::getId).collect(Collectors.toList()));
-        return response;
+        Application app = agentService.getAppById(id);
+        if (app == null) {
+            throw new YonchainResourceNotFoundException("APP_NOT_FOUND", "应用未找到");
+        }
+        // 从请求获取基本数据填充
+        app.setName(request.getName());
+        app.setIcon(request.getIcon());
+        app.setIconBackground(request.getIconBackground());
+        app.setDescription(request.getPrompt());//request.getDescription());
+        
+        // 设置智能体特有属性
+        Map<String, Object> config = new HashMap<>();
+        config.put("prompt", request.getPrompt());
+        
+        if (request.getKnowledgeBaseIds() != null && !request.getKnowledgeBaseIds().isEmpty()) {
+            config.put("knowledgeBaseIds", request.getKnowledgeBaseIds());
+        }
+        
+        if (request.getPluginIds() != null && !request.getPluginIds().isEmpty()) {
+            config.put("pluginIds", request.getPluginIds());
+        }
+        
+        if (request.getMcpConfig() != null && !request.getMcpConfig().isEmpty()) {
+            config.put("mcpConfig", request.getMcpConfig());
+        }
+        
+        if (StringUtils.hasText(request.getWorkflowId())) {
+            config.put("workflowId", request.getWorkflowId());
+        }
+        
+        app.setConfig(config);
+        app.setMode("agent"); // 设置为智能体模式
+        
+        app.setCreatedBy(this.getCurrentUserId());
+        app.setUpdatedBy(this.getCurrentUserId());
+
+        // 创建智能体应用
+        agentService.createApp(app, request.getRoleIds());
+
+        app = agentService.getAppById(app.getId());
+        return responseFactory.createAppResponse(app);
     }
+
 
     private PageResponse<AppResponse> buildResponse(Page<Application> apps) {
         PageResponse<AppResponse> response = responseFactory.createAppPageResponse(apps);

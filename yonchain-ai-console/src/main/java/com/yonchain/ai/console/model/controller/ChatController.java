@@ -32,7 +32,8 @@ public class ChatController extends BaseController {
             @Parameter(description = "模型代码") @PathVariable String modelCode,
             @RequestBody ChatCompletionRequest request) {
         String tenantId = this.getCurrentTenantId();
-        return ResponseEntity.ok(chatService.chatCompletion(tenantId, modelCode, request));
+        ChatCompletionResponse response = chatService.chatCompletion(tenantId, modelCode, request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping(value = "/models/{modelCode}/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

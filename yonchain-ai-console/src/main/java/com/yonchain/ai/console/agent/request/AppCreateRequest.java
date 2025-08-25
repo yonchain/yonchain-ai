@@ -20,15 +20,15 @@ public class AppCreateRequest {
     @NotBlank(message = "应用名称不能为空")
     @Schema(description = "应用名称", required = true)
     private String name;
-
-    /**
+/*
+    *//**
      * 应用模式
      * 必填字段，不能为空
      * 可选值：chat, completion, workflow 等
-     */
+     *//*
     @NotBlank(message = "应用模式不能为空")
     @Schema(description = "应用模式", required = true)
-    private String mode;
+    private String mode;*/
 
 /*
     */
@@ -42,20 +42,20 @@ public class AppCreateRequest {
     private String provider;
 */
 
-    /**
+/*    *//**
      * api秘钥
      * 必填字段，不能为空
-     */
+     *//*
     @NotBlank(message = "api秘钥不能为空")
     @Schema(description = "api秘钥", required = true)
     private String apiKey;
 
-    /**
+    *//**
      * 基础URL
-     */
+     *//*
     @NotBlank(message = "基础URL不能为空")
     @Schema(description = "基础URL", required = true)
-    private String baseUrl;
+    private String baseUrl;*/
 
     /**
      * 应用图标URL
