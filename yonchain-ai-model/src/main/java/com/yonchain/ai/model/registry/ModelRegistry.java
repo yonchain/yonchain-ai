@@ -1,51 +1,20 @@
 package com.yonchain.ai.model.registry;
 
-import org.springframework.ai.chat.model.ChatModel;
+import com.yonchain.ai.model.entity.ModelEntity;
+import com.yonchain.ai.model.entity.ModelProviderEntity;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * 模型注册表接口
  * <p>
- * 负责注册和管理ChatModel实例
+ * 负责注册和管理模型静态信息
  * 
  * @author Cgy
  */
 public interface ModelRegistry {
 
-    /**
-     * 注册ChatModel实例
-     * 
-     * @param modelId 模型ID
-     * @param chatModel ChatModel实例
-     */
-    void registerModel(String modelId, ChatModel chatModel);
-    
-    /**
-     * 获取ChatModel实例
-     * 
-     * @param modelId 模型ID
-     * @return ChatModel实例，如果未找到则返回null
-     */
-    ChatModel getModel(String modelId);
-    
-    /**
-     * 移除ChatModel实例
-     * 
-     * @param modelId 模型ID
-     * @return 被移除的ChatModel实例，如果未找到则返回null
-     */
-    ChatModel removeModel(String modelId);
-    
-    /**
-     * 检查是否存在指定的ChatModel实例
-     * 
-     * @param modelId 模型ID
-     * @return 如果存在则返回true，否则返回false
-     */
-    boolean hasModel(String modelId);
-    
     /**
      * 获取所有已注册的模型ID
      * 
@@ -54,14 +23,47 @@ public interface ModelRegistry {
     List<String> getAllModelIds();
     
     /**
-     * 清除所有已注册的模型
+     * 注册模型静态信息
+     * 
+     * @param modelId 模型ID
+     * @param model 模型实体
+     * @param provider 提供商实体
      */
-    void clearAllModels();
+    void registerModelInfo(String modelId, ModelEntity model, ModelProviderEntity provider);
     
     /**
-     * 获取已注册模型的数量
+     * 获取模型静态信息
      * 
-     * @return 已注册模型的数量
+     * @param modelId 模型ID
+     * @return 模型静态信息，包含模型实体和提供商实体，如果未找到则返回null
      */
-    int getModelCount();
+    ModelInfo getModelInfo(String modelId);
+    
+    /**
+     * 获取所有模型静态信息
+     * 
+     * @return 所有模型静态信息的映射，key为模型ID
+     */
+    Map<String, ModelInfo> getAllModelInfos();
+    
+    /**
+     * 模型静态信息类
+     */
+    class ModelInfo {
+        private final ModelEntity model;
+        private final ModelProviderEntity provider;
+        
+        public ModelInfo(ModelEntity model, ModelProviderEntity provider) {
+            this.model = model;
+            this.provider = provider;
+        }
+        
+        public ModelEntity getModel() {
+            return model;
+        }
+        
+        public ModelProviderEntity getProvider() {
+            return provider;
+        }
+    }
 }

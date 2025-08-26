@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.api.model.enums.ProviderType;
 import com.yonchain.ai.model.entity.ModelEntity;
 import com.yonchain.ai.model.entity.ModelProviderEntity;
+import com.yonchain.ai.model.registry.ModelRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +15,13 @@ import org.springframework.util.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * 模型工厂
  * 用于创建和缓存不同模型的ChatModel实例
  * 使用简单的条件判断替代策略模式，提供更好的性能和可维护性
+ * 整合了ModelConnectionPool的功能，负责模型实例的创建和缓存
  */
 @Slf4j
 @Component
@@ -26,6 +29,9 @@ public class ModelFactory {
 
     @Autowired
     private ObjectMapper objectMapper;
+    
+    @Autowired
+    private ModelRegistry modelRegistry;
 
     /**
      * 缓存已创建的ChatModel实例
@@ -35,6 +41,86 @@ public class ModelFactory {
 
     public ModelFactory() {
         // 不再需要初始化策略映射
+    }
+
+    /**
+     * 获取或创建ChatModel实例
+     * 这是一个延迟加载的实现，只有在实际需要使用模型时才创建连接
+     * 所有配置信息从注册表获取
+     * 
+     * @param modelId 模型ID
+     * @return ChatModel实例，如果无法创建则返回null
+     */
+    public ChatModel getModel(String modelId) {
+        // 首先检查模型是否已经在缓存中
+        ChatModel existingModel = chatModelCache.get(modelId);
+        if (existingModel != null) {
+            return existingModel;
+        }
+        
+        try {
+            // 从注册表获取静态信息
+            ModelRegistry.ModelInfo modelInfo = modelRegistry.getModelInfo(modelId);
+            
+            if (modelInfo == null) {
+                log.warn("注册表中未找到模型配置: {}", modelId);
+                return null;
+            }
+            
+            log.debug("从注册表获取到模型静态信息: {}", modelId);
+            
+            // 创建模型实例
+            ChatModel chatModel = getChatModel(modelInfo.getModel(), modelInfo.getProvider());
+            
+            if (chatModel != null) {
+                // 缓存模型实例以便重用
+                chatModelCache.put(modelId, chatModel);
+                log.info("成功创建并缓存模型: {}", modelId);
+                return chatModel;
+            } else {
+                log.warn("无法创建模型 {}, 工厂返回null", modelId);
+                return null;
+            }
+        } catch (Exception e) {
+            log.error("创建模型失败: {}, 错误: {}", modelId, e.getMessage(), e);
+            return null;
+        }
+    }
+    
+    /**
+     * 获取模型提供器函数
+     * 
+     * @return 模型提供器函数
+     */
+    public Function<String, ChatModel> getModelProvider() {
+        return this::getModel;
+    }
+    
+    /**
+     * 清除指定模型的缓存
+     * 
+     * @param modelId 模型ID
+     */
+    public void invalidateModel(String modelId) {
+        chatModelCache.remove(modelId);
+        log.info("已清除模型缓存: {}", modelId);
+    }
+    
+    /**
+     * 清除所有模型缓存
+     */
+    public void clearAllModels() {
+        chatModelCache.clear();
+        log.info("已清除所有模型缓存");
+    }
+    
+    /**
+     * 获取已缓存模型的数量
+     * 
+     * @return 已缓存模型的数量
+     */
+    public int getCachedModelCount() {
+        return chatModelCache.size();
     }
 
     /**
@@ -100,7 +186,7 @@ public class ModelFactory {
             throw new IllegalArgumentException("模型或提供商不能为空");
         }
 
-        String cacheKey = model.getModelCode() + "-" + provider.getId();
+        String cacheKey = model.getModelCode() + "-" + provider.getProviderCode();
         return chatModelCache.computeIfAbsent(cacheKey, key -> {
             return createDeepSeekChatModel(model, provider);
         });
@@ -119,7 +205,7 @@ public class ModelFactory {
             throw new IllegalArgumentException("模型或提供商不能为空");
         }
 
-        String cacheKey = model.getModelCode() + "-" + provider.getId();
+        String cacheKey = model.getModelCode() + "-" + provider.getProviderCode();
         return chatModelCache.computeIfAbsent(cacheKey, key -> {
             return createAnthropicChatModel(model, provider);
         });
@@ -300,35 +386,6 @@ public class ModelFactory {
             // 创建Ollama配置
             log.info("创建Ollama聊天模型: model={}, baseUrl={}", modelCode, baseUrl);
             
-            // 使用自定义的Ollama客户端实现
-            // 由于项目中没有OllamaChatConfiguration类，我们需要创建一个简单的实现
-            // 这里使用一个临时的适配器模式实现
-            /*class OllamaChatAdapter implements ChatModel {
-                private final String baseUrl;
-                private final String modelName;
-                private final Map<String, Object> parameters;
-                
-                public OllamaChatAdapter(String baseUrl, String modelName, Map<String, Object> parameters) {
-                    this.baseUrl = baseUrl != null && !baseUrl.isEmpty() ? baseUrl : "http://localhost:11434";
-                    this.modelName = modelName != null ? modelName : "llama2";
-                    this.parameters = parameters;
-                }
-                
-                @Override
-                public org.springframework.ai.chat.ChatResponse call(org.springframework.ai.chat.prompt.ChatPromptTemplate promptTemplate) {
-                    // 这里需要实现实际的调用逻辑
-                    log.warn("Ollama模型调用尚未实现，请创建OllamaChatConfiguration类");
-                    throw new UnsupportedOperationException("Ollama模型调用尚未实现，请创建OllamaChatConfiguration类");
-                }
-                
-                @Override
-                public org.springframework.ai.chat.ChatResponse call(org.springframework.ai.chat.prompt.Prompt prompt) {
-                    // 这里需要实现实际的调用逻辑
-                    log.warn("Ollama模型调用尚未实现，请创建OllamaChatConfiguration类");
-                    throw new UnsupportedOperationException("Ollama模型调用尚未实现，请创建OllamaChatConfiguration类");
-                }
-            }*/
-            
             // 创建参数Map
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("temperature", temperature);
@@ -366,37 +423,6 @@ public class ModelFactory {
             // 创建Grok配置
             log.info("创建Grok聊天模型: model={}, apiKey={}, baseUrl={}", 
                     modelCode, apiKey != null ? "已配置" : "未配置", baseUrl);
-            
-            // 使用自定义的Grok客户端实现
-            // 由于项目中没有GrokChatConfiguration类，我们需要创建一个简单的实现
-            // 这里使用一个临时的适配器模式实现
-        /*    class GrokChatAdapter implements ChatModel {
-                private final String apiKey;
-                private final String baseUrl;
-                private final String modelName;
-                private final Map<String, Object> parameters;
-                
-                public GrokChatAdapter(String apiKey, String baseUrl, String modelName, Map<String, Object> parameters) {
-                    this.apiKey = apiKey;
-                    this.baseUrl = baseUrl != null && !baseUrl.isEmpty() ? baseUrl : "https://api.grok.ai/v1";
-                    this.modelName = modelName != null ? modelName : "grok-1";
-                    this.parameters = parameters;
-                }
-                
-                @Override
-                public org.springframework.ai.chat.ChatResponse call(org.springframework.ai.chat.prompt.ChatPromptTemplate promptTemplate) {
-                    // 这里需要实现实际的调用逻辑
-                    log.warn("Grok模型调用尚未实现，请创建GrokChatConfiguration类");
-                    throw new UnsupportedOperationException("Grok模型调用尚未实现，请创建GrokChatConfiguration类");
-                }
-                
-                @Override
-                public org.springframework.ai.chat.ChatResponse call(org.springframework.ai.chat.prompt.Prompt prompt) {
-                    // 这里需要实现实际的调用逻辑
-                    log.warn("Grok模型调用尚未实现，请创建GrokChatConfiguration类");
-                    throw new UnsupportedOperationException("Grok模型调用尚未实现，请创建GrokChatConfiguration类");
-                }
-            }*/
             
             // 创建参数Map
             Map<String, Object> parameters = new HashMap<>();
@@ -470,7 +496,6 @@ public class ModelFactory {
         }
     }
 
-    // ==================== 辅助方法 ====================
     // ==================== 辅助方法 ====================
 
     /**
