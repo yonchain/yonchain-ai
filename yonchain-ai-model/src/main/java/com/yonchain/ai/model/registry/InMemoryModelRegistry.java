@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
  * 
  * @author Cgy
  */
-@Component
 public class InMemoryModelRegistry implements ModelRegistry {
 
     private static final Logger log = LoggerFactory.getLogger(InMemoryModelRegistry.class);

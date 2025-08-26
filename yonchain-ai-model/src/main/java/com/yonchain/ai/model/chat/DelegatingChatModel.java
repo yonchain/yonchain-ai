@@ -11,7 +11,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 
-import java.util.List;
 
 /**
  * 委托式聊天模型，用于动态调用不同的模型实现
@@ -145,14 +144,6 @@ public class DelegatingChatModel implements ChatModel {
      */
     public boolean isModelAvailable(String modelId) {
         // 检查模型是否在注册表中有配置信息
-        return modelRegistry.getModelInfo(modelId) != null;
-    }
-
-    /**
-     * 获取所有可用的模型ID
-     * @return 模型ID列表
-     */
-    public List<String> getAvailableModelIds() {
-        return modelRegistry.getAllModelIds();
+        return modelRegistry.getModel(modelId) != null;
     }
 }

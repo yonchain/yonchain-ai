@@ -5,12 +5,9 @@ import com.yonchain.ai.api.model.ModelInfo;
 import com.yonchain.ai.api.model.ModelProvider;
 import com.yonchain.ai.deepseek.DeepSeekChatConfiguration;
 import com.yonchain.ai.model.registry.ModelRegistry;
-import com.yonchain.ai.openai.OpenAiChatConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -22,19 +19,24 @@ import java.util.function.Function;
  * 负责创建和管理模型实例，整合了 ModelConnectionPool 的功能
  * 所有配置信息从 ModelRegistry 获取
  */
-@Component
 public class ModelFactory {
 
     private static final Logger log = LoggerFactory.getLogger(ModelFactory.class);
 
-    @Autowired
-    private ModelRegistry modelRegistry;
+    private final ModelRegistry modelRegistry;
 
     // 模型实例缓存
     private final Map<String, ChatModel> modelCache = new ConcurrentHashMap<>();
 
     // 模型提供器函数缓存
     private final Map<String, Function<String, ChatModel>> providerCache = new ConcurrentHashMap<>();
+
+    // 提供商信息缓存
+    private final Map<String, ModelProvider> providerInfoCache = new ConcurrentHashMap<>();
+
+    public ModelFactory(ModelRegistry modelRegistry) {
+        this.modelRegistry = modelRegistry;
+    }
 
     /**
      * 获取或创建模型实例
@@ -59,11 +61,20 @@ public class ModelFactory {
     }
 
     /**
+     * 清除指定提供商的缓存
+     */
+    public void invalidateProvider(String providerCode) {
+        providerInfoCache.remove(providerCode);
+        log.info("已清除提供商缓存: {}", providerCode);
+    }
+
+    /**
      * 清除所有模型缓存
      */
     public void clearAllModels() {
         modelCache.clear();
         providerCache.clear();
+        providerInfoCache.clear();
         log.info("已清除所有模型缓存");
     }
 
@@ -82,20 +93,24 @@ public class ModelFactory {
             log.info("开始创建模型实例: {}", modelId);
 
             // 从注册表获取模型信息
-            ModelRegistry.RegistryModelInfo registryModelInfo = modelRegistry.getModelInfo(modelId);
-            if (registryModelInfo == null) {
+            ModelInfo model = modelRegistry.getModel(modelId);
+            if (model == null) {
                 throw new IllegalArgumentException("未找到模型配置: " + modelId);
             }
 
-            ModelInfo model = registryModelInfo.getModel();
-            ModelProvider provider = registryModelInfo.getProvider();
+            // 获取提供商信息
+            String providerCode = model.getProvider();
+            if (providerCode == null) {
+                throw new IllegalArgumentException("模型未指定提供商: " + modelId);
+            }
 
-            if (model == null || provider == null) {
-                throw new IllegalArgumentException("模型或提供商配置不完整: " + modelId);
+            // 从注册表获取提供商信息
+            ModelProvider provider = getProviderFromRegistry(providerCode);
+            if (provider == null) {
+                throw new IllegalArgumentException("未找到提供商配置: " + providerCode);
             }
 
             // 根据提供商类型创建对应的模型
-            String providerCode = provider.getCode();
             ChatModel chatModel = createChatModelByProvider(providerCode, model, provider);
 
             log.info("成功创建模型实例: {}", modelId);
@@ -105,6 +120,21 @@ public class ModelFactory {
             log.error("创建模型实例失败: {}", modelId, e);
             throw new RuntimeException("创建模型实例失败: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * 从注册表获取提供商信息（带缓存优化）
+     */
+    private ModelProvider getProviderFromRegistry(String providerCode) {
+        return providerInfoCache.computeIfAbsent(providerCode, code -> {
+            List<ModelProvider> providers = modelRegistry.getProviders();
+            for (ModelProvider provider : providers) {
+                if (code.equals(provider.getCode())) {
+                    return provider;
+                }
+            }
+            return null;
+        });
     }
 
     /**
@@ -194,20 +224,20 @@ public class ModelFactory {
     private ChatModel createDeepSeekChatModel(ModelInfo model, ModelProvider provider) {
         try {
             String modelCode = model.getCode();
-            
+
             // 从provider和model的config中获取DeepSeek特有的参数
             List<ModelConfigItem> providerConfigSchemas = provider.getConfigSchemas();
             List<ModelConfigItem> modelConfigItems = model.getConfigSchemas();
-            
+
             // DeepSeek可能需要的参数：apiKey, baseUrl, model, temperature, maxTokens, topP, topK等
             String apiKey = "";
             String baseUrl = "";
 
-            for (ModelConfigItem item : providerConfigSchemas){
-                if (item.getName().equals("apiKey")){
+            for (ModelConfigItem item : providerConfigSchemas) {
+                if (item.getName().equals("apiKey")) {
                     apiKey = item.getValue().toString();
                 }
-                if (item.getName().equals("baseUrl")){
+                if (item.getName().equals("baseUrl")) {
                     baseUrl = item.getValue().toString();
                 }
             }
@@ -217,23 +247,23 @@ public class ModelFactory {
             Integer maxTokens = getConfigValue(modelConfig, providerConfig, "maxTokens", 2048);
             Double topP = getConfigValue(modelConfig, providerConfig, "topP", 1.0);
             Integer topK = getConfigValue(modelConfig, providerConfig, "topK", 50);*/
-            
+
             // 创建DeepSeek配置
-            log.info("创建DeepSeek聊天模型: model={}, apiKey={}, baseUrl={}", 
+            log.info("创建DeepSeek聊天模型: model={}, apiKey={}, baseUrl={}",
                     modelCode, apiKey != null ? "已配置" : "未配置", baseUrl);
-            
+
             // 使用自定义的DeepSeekChatConfiguration
-            DeepSeekChatConfiguration.Builder configBuilder = 
+            DeepSeekChatConfiguration.Builder configBuilder =
                     DeepSeekChatConfiguration.builder()
-                    .apiKey(apiKey)
-                    .baseUrl(baseUrl != null && !baseUrl.isEmpty() ? baseUrl : "https://api.deepseek.com/v1")
-                    .model(modelCode != null ? modelCode : "deepseek-chat");
-                  //  .temperature(temperature);
-            
+                            .apiKey(apiKey)
+                            .baseUrl(baseUrl != null && !baseUrl.isEmpty() ? baseUrl : "https://api.deepseek.com/v1")
+                            .model(modelCode != null ? modelCode : "deepseek-chat");
+            //  .temperature(temperature);
+
             // 创建DeepSeek聊天模型
             DeepSeekChatConfiguration configuration = configBuilder.build();
             return configuration.getDeepSeekChatModel();
-            
+
         } catch (Exception e) {
             log.error("创建DeepSeek聊天模型失败", e);
             throw new RuntimeException("创建DeepSeek聊天模型失败: " + e.getMessage(), e);
