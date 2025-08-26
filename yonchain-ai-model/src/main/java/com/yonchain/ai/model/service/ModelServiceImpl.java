@@ -1,4 +1,4 @@
- package com.yonchain.ai.model.service;
+package com.yonchain.ai.model.service;
 
 import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.model.*;
@@ -56,7 +56,7 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public ModelInfo getModelById(String id) {
-        return  modelRegistry.getModel(id);
+        return modelRegistry.getModel(id);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class ModelServiceImpl implements ModelService {
             String provider = String.valueOf(queryParam.get("provider"));
             modelInfos = modelRegistry.getModelsByProvider(provider);
         } else {
-           throw new YonchainException("缺少提供商参数");
+            throw new YonchainException("缺少提供商参数");
         }
 
         // 设置租户启用状态
@@ -130,10 +130,10 @@ public class ModelServiceImpl implements ModelService {
         }
 
         BeanUtils.copyProperties(provider, response);
-        
+
         // 获取基础配置模式
         List<ModelConfigItem> configItems = provider.getConfigSchemas();
-        
+
         // 获取租户级配置数据
         boolean enabled = provider.getEnabled() != null ? provider.getEnabled() : false;
         String lastUpdated = null;
@@ -153,7 +153,7 @@ public class ModelServiceImpl implements ModelService {
 
             }
         }
-        
+
         response.setConfigItems(configItems);
         response.setEnabled(enabled);
         response.setLastUpdated(lastUpdated);
@@ -176,7 +176,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     /**
-    /**
+     * /**
      * 保存租户提供商配置（同步到注册表）
      */
     @Override
@@ -267,7 +267,7 @@ public class ModelServiceImpl implements ModelService {
                 throw new IllegalArgumentException("模型不存在: " + modelInfo.getCode());
             }
 
-            ModelEntity entity = modelMapper.selectByTenantAndModelCode(tenantId, modelInfo.getCode());
+            ModelEntity entity = modelMapper.selectByTenantProviderAndModelCode(tenantId, modelInfo.getProvider(), modelInfo.getCode());
 
             // 构建配置Map
             Map<String, Object> config = new HashMap<>();
@@ -351,7 +351,7 @@ public class ModelServiceImpl implements ModelService {
                 if (modelInfo != null) {
                     // 更新模型状态
                     modelInfo.setEnabled(enabled);
-                    
+
                     // 同步到注册表
                     syncModelToRegistry(modelInfo);
 
@@ -381,7 +381,7 @@ public class ModelServiceImpl implements ModelService {
                 if (modelInfo != null) {
                     // 更新模型状
                     modelInfo.setEnabled(enabled);
-                    
+
                     // 同步到注册表
                     syncModelToRegistry(modelInfo);
                 }
@@ -458,7 +458,7 @@ public class ModelServiceImpl implements ModelService {
             modelRegistry.registerProvider(provider);
 
             // 清除模型工厂缓存，确保下次获取时使用最新配置
-         //   modelFactory.invalidateModel(modelId);
+            //   modelFactory.invalidateModel(modelId);
 
             log.info("已同步提供商配置到注册表: {}", provider.getCode());
         } catch (Exception e) {
@@ -588,7 +588,7 @@ public class ModelServiceImpl implements ModelService {
         return configItems.stream().map(item -> {
             ModelConfigItem newItem = new ModelConfigItem();
             BeanUtils.copyProperties(item, newItem);
-            
+
             // 如果保存的配置中有对应的值，则回填
             if (savedConfig.containsKey(item.getName())) {
                 Object value = savedConfig.get(item.getName());
@@ -596,7 +596,7 @@ public class ModelServiceImpl implements ModelService {
                     newItem.setValue(value.toString());
                 }
             }
-            
+
             return newItem;
         }).collect(Collectors.toList());
     }

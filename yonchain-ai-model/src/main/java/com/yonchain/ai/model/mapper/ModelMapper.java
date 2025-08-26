@@ -55,16 +55,7 @@ public interface ModelMapper {
      * @return 影响行数
      */
     void deleteById(@Param("id") String id);
-    
-    /**
-     * 根据租户ID和模型代码查询配置
-     *
-     * @param tenantId 租户ID
-     * @param modelCode 模型代码
-     * @return 模型实体
-     */
-    ModelEntity selectByTenantAndModelCode(@Param("tenantId") String tenantId, @Param("modelCode") String modelCode);
-    
+
     /**
      * 根据租户ID、提供商代码和模型代码查询配置
      *

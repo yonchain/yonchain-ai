@@ -26,19 +26,21 @@ public class ChatController extends BaseController {
     @Autowired
     private ChatService chatService;
 
-    @PostMapping("/models/{modelCode}/chat")
+    @PostMapping("/model-providers/{providerCode}/models/{modelCode}/chat")
     @Operation(summary = "聊天完成（Chat Completion）")
     public ResponseEntity<ChatCompletionResponse> chatCompletion(
+            @Parameter(description = "提供商编码") @PathVariable String providerCode,
             @Parameter(description = "模型代码") @PathVariable String modelCode,
             @RequestBody ChatCompletionRequest request) {
         String tenantId = this.getCurrentTenantId();
-        ChatCompletionResponse response = chatService.chatCompletion(tenantId, modelCode, request);
+        ChatCompletionResponse response = chatService.chatCompletion(tenantId, providerCode, modelCode, request);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(value = "/models/{modelCode}/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PostMapping(value = "/model-providers/{providerCode}/models/{modelCode}/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "聊天完成（Chat Completion）- 流式输出")
     public SseEmitter chatCompletionStream(
+            @Parameter(description = "提供商编码") @PathVariable String providerCode,
             @Parameter(description = "模型代码") @PathVariable String modelCode,
             @RequestBody ChatCompletionRequest request) {
         //TODO 待开发

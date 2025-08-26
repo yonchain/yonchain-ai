@@ -2,6 +2,8 @@ package com.yonchain.ai.model.registry;
 
 import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.model.loader.ModelLoader;
+import com.yonchain.ai.model.mapper.ModelMapper;
+import com.yonchain.ai.model.mapper.ModelProviderMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -23,9 +25,18 @@ public class ModelRegistryInitializer implements CommandLineRunner {
 
     private final ModelLoader modelLoader;
 
-    public ModelRegistryInitializer(ModelRegistry modelRegistry, ModelLoader modelLoader) {
+    private final ModelProviderMapper modelProviderMapper;
+
+    private final ModelMapper modelMapper;
+
+    public ModelRegistryInitializer(ModelRegistry modelRegistry,
+                                    ModelLoader modelLoader,
+                                    ModelProviderMapper modelProviderMapper,
+                                    ModelMapper modelMapper) {
         this.modelLoader = modelLoader;
         this.modelRegistry = modelRegistry;
+        this.modelProviderMapper = modelProviderMapper;
+        this.modelMapper = modelMapper;
     }
 
     @Override

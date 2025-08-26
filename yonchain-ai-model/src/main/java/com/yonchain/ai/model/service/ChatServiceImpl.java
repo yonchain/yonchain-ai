@@ -51,7 +51,7 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private ModelProviderMapper modelProviderMapper;
 
-/*    *//**
+    /*    *//**
      * 委托式聊天模型
      * 用于动态选择和路由到合适的ChatModel实现
      *//*
@@ -67,18 +67,19 @@ public class ChatServiceImpl implements ChatService {
     }
 */
 
-/*    *//**
+    /*    */
+
+    /**
      * 缓存已注册的模型提供商服务
      *//*
     private final Map<String, ModelProviderService> providerServiceMap = new ConcurrentHashMap<>();*/
-
     @Override
-    public ChatCompletionResponse chatCompletion(String tenantId, String modelCode, ChatCompletionRequest request) {
+    public ChatCompletionResponse chatCompletion(String tenantId, String providerCode, String modelCode, ChatCompletionRequest request) {
         // 参数验证
         validateChatCompletionRequest(modelCode, request);
 
         // 获取模型和提供商信息
-        ModelEntity model = getValidatedModel(tenantId, modelCode);
+        ModelEntity model = getValidatedModel(tenantId, providerCode, modelCode);
         ModelProviderEntity provider = getValidatedProvider(tenantId, model.getProviderCode());
 
         long startTime = System.currentTimeMillis();
@@ -217,13 +218,13 @@ public class ChatServiceImpl implements ChatService {
     /**
      * 获取并验证模型
      */
-    private ModelEntity getValidatedModel(String tenantId, String modelCode) {
+    private ModelEntity getValidatedModel(String tenantId, String providerCode, String modelCode) {
         if (modelCode == null || modelCode.trim().isEmpty()) {
             throw new IllegalArgumentException("模型代码不能为空");
         }
 
         // 从数据库获取模型配置
-        ModelEntity model = modelMapper.selectByTenantAndModelCode(tenantId, modelCode);
+        ModelEntity model = modelMapper.selectByTenantProviderAndModelCode(tenantId, providerCode, modelCode);
         if (model == null) {
             throw new YonchainIllegalStateException("模型不存在: " + modelCode);
         }
@@ -263,7 +264,7 @@ public class ChatServiceImpl implements ChatService {
         return provider;
     }
 
-  /*  *//**
+    /*  *//**
      * 获取聊天客户端，支持降级处理
      *//*
     private ChatClient getChatClientWithFallback(ModelEntity model, ModelProviderEntity provider) {

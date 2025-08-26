@@ -102,8 +102,8 @@ public class DelegatingChatModel implements ChatModel {
 
         // 尝试从Prompt中获取模型ID
         String modelId = prompt.getOptions().getModel();
-        if (!StringUtils.hasText(modelId)) {
-            throw new YonchainIllegalStateException("模型ID不能为空");
+        if (StringUtils.hasText(modelId)) {
+            return modelId;
         }
 
         return defaultModelId;

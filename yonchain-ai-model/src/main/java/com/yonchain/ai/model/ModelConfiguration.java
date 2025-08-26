@@ -4,6 +4,8 @@ import com.yonchain.ai.model.chat.DelegatingChatModel;
 import com.yonchain.ai.model.factory.ModelFactory;
 import com.yonchain.ai.model.loader.ModelLoader;
 import com.yonchain.ai.model.loader.YamlModelLoader;
+import com.yonchain.ai.model.mapper.ModelMapper;
+import com.yonchain.ai.model.mapper.ModelProviderMapper;
 import com.yonchain.ai.model.registry.InMemoryModelRegistry;
 import com.yonchain.ai.model.registry.ModelRegistry;
 import com.yonchain.ai.model.registry.ModelRegistryInitializer;
@@ -36,8 +38,11 @@ public class ModelConfiguration {
     }
 
     @Bean
-    public ModelRegistryInitializer modelRegistryInitializer(ModelRegistry modelRegistry, ModelLoader modelLoader) {
-        return new ModelRegistryInitializer(modelRegistry, modelLoader);
+    public ModelRegistryInitializer modelRegistryInitializer(ModelRegistry modelRegistry,
+                                                             ModelLoader modelLoader,
+                                                             ModelProviderMapper modelProviderMapper,
+                                                             ModelMapper modelMapper) {
+        return new ModelRegistryInitializer(modelRegistry, modelLoader, modelProviderMapper, modelMapper);
     }
 
     @Bean
