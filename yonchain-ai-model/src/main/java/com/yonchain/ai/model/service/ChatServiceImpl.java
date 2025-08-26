@@ -1,32 +1,26 @@
 package com.yonchain.ai.model.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.exception.YonchainIllegalStateException;
 import com.yonchain.ai.api.model.*;
 import com.yonchain.ai.model.entity.ModelEntity;
 import com.yonchain.ai.model.entity.ModelProviderEntity;
-import com.yonchain.ai.model.factory.ModelClientFactory;
 import com.yonchain.ai.model.mapper.ModelMapper;
 import com.yonchain.ai.model.mapper.ModelProviderMapper;
-import com.yonchain.ai.model.spi.ModelProviderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.ai.chat.prompt.DefaultChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**

@@ -85,7 +85,7 @@ public class DefaultModel implements ModelInfo {
     /**
      * 模型配置参数定义
      */
-    private List<ModelConfigItem> configSchema;
+    private List<ModelConfigItem> configSchemas;
 
     /**
      * 是否已启用标识（租户级别）
@@ -205,13 +205,13 @@ public class DefaultModel implements ModelInfo {
     }
 
     @Override
-    public List<ModelConfigItem> getConfigSchema() {
-        return configSchema;
+    public List<ModelConfigItem> getConfigSchemas() {
+        return configSchemas;
     }
 
     @Override
-    public void setConfigSchema(List<ModelConfigItem> configSchema) {
-        this.configSchema = configSchema;
+    public void setConfigSchemas(List<ModelConfigItem> configSchema) {
+        this.configSchemas = configSchema;
     }
 
     @Override

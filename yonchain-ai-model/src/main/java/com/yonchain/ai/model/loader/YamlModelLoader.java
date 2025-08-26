@@ -141,7 +141,7 @@ public class YamlModelLoader implements ModelLoader {
         // 配置模式
         if (yamlMap.containsKey("configSchemas")) {
             List<ModelConfigItem> configItems = convertListToModelConfigItems((List<Map<String, Object>>) yamlMap.get("configSchemas"));
-            model.setConfigSchema(configItems);
+            model.setConfigSchemas(configItems);
         }
 
         return model;

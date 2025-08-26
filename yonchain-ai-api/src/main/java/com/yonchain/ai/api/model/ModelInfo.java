@@ -188,14 +188,14 @@ public interface ModelInfo {
      *
      * @return 配置参数Schema
      */
-    List<ModelConfigItem> getConfigSchema();
+    List<ModelConfigItem> getConfigSchemas();
 
     /**
      * 设置模型配置参数的JSON Schema定义
      *
      * @param configSchema 配置参数Schema
      */
-    void setConfigSchema(List<ModelConfigItem> configSchema);
+    void setConfigSchemas(List<ModelConfigItem> configSchema);
 
     /**
      * 获取是否已启用标识（租户级别）

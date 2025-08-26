@@ -1021,8 +1021,8 @@ public class ResponseFactory {
         response.setEnabled(model.getEnabled());
         
         // 处理配置项列表
-        if (model.getConfigSchema() != null && !model.getConfigSchema().isEmpty()) {
-            List<ModelConfigResponse.ConfigItem> configItems = model.getConfigSchema().stream()
+        if (model.getConfigSchemas() != null && !model.getConfigSchemas().isEmpty()) {
+            List<ModelConfigResponse.ConfigItem> configItems = model.getConfigSchemas().stream()
                 .map(entry -> {
                     ModelConfigResponse.ConfigItem item = new ModelConfigResponse.ConfigItem();
                     item.setKey(entry.getName());
