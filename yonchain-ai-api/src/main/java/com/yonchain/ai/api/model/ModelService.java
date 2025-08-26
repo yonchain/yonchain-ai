@@ -181,8 +181,7 @@ public interface ModelService {
      * 保存租户的模型配置
      *
      * @param tenantId  租户ID
-     * @param modelCode 模型代码
-     * @param config    配置信息
+     * @param modelInfo 模型代码
      */
     void saveModelConfig(String tenantId, ModelInfo modelInfo);
 
