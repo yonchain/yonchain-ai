@@ -42,14 +42,14 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private ModelManagerService modelManagerService;*/
 
-    @Autowired(required = false)
-    private ChatClient configFileChatClient;
-
     @Autowired
-    private ModelClientFactory clientFactory;
+    private ChatClient chatClient;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+/*    @Autowired
+    private ModelClientFactory clientFactory;*/
+
+/*    @Autowired
+    private ObjectMapper objectMapper;*/
 
     @Autowired
     private ModelMapper modelMapper;
@@ -57,12 +57,12 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private ModelProviderMapper modelProviderMapper;
 
-    /**
+/*    *//**
      * 委托式聊天模型
      * 用于动态选择和路由到合适的ChatModel实现
-     */
+     *//*
     @Autowired
-    private ChatModel chatModel;
+    private ChatModel chatModel;*/
     
 /*
     @jakarta.annotation.PostConstruct
@@ -73,10 +73,10 @@ public class ChatServiceImpl implements ChatService {
     }
 */
 
-    /**
+/*    *//**
      * 缓存已注册的模型提供商服务
-     */
-    private final Map<String, ModelProviderService> providerServiceMap = new ConcurrentHashMap<>();
+     *//*
+    private final Map<String, ModelProviderService> providerServiceMap = new ConcurrentHashMap<>();*/
 
     @Override
     public ChatCompletionResponse chatCompletion(String tenantId, String modelCode, ChatCompletionRequest request) {
@@ -92,29 +92,30 @@ public class ChatServiceImpl implements ChatService {
                 modelCode, provider.getProviderCode(), request.getMessages().size());
 
         try {
-            // 使用委托式聊天模型直接调用
-            if (chatModel != null) {
-                // 转换请求消息格式
-                List<Message> messages = convertToSpringAIMessages(request.getMessages());
+            // 转换请求消息格式
+            List<Message> messages = convertToSpringAIMessages(request.getMessages());
 
-                // 创建Prompt对象，支持更多配置选项
-                Prompt prompt = createEnhancedPrompt(messages, request, model);
+            // 创建Prompt对象，支持更多配置选项
+            Prompt prompt = createEnhancedPrompt(messages, request, model);
 
-                // 直接使用委托式聊天模型调用
-                org.springframework.ai.chat.model.ChatResponse chatResponse =
-                        chatModel.call(prompt);
+            // 直接使用委托式聊天模型调用
+/*                org.springframework.ai.chat.model.ChatResponse chatResponse =
+                        chatModel.call(prompt);*/
+            ChatResponse chatResponse = chatClient.prompt(prompt)
+                    .call()
+                    .chatResponse();
 
-                // 转换并返回响应
-                ChatCompletionResponse response = convertToChatCompletionResponse(chatResponse, modelCode);
+            // 转换并返回响应
+            ChatCompletionResponse response = convertToChatCompletionResponse(chatResponse, modelCode);
 
-                long duration = System.currentTimeMillis() - startTime;
-                logChatStatistics(modelCode, request, response, duration);
+            long duration = System.currentTimeMillis() - startTime;
+            logChatStatistics(modelCode, request, response, duration);
 
-                log.info("聊天完成请求成功(委托模式) - 模型: {}, 响应长度: {}, 耗时: {}ms",
-                        modelCode, response.getChoices().get(0).getMessage().getContent().length(), duration);
+            log.info("聊天完成请求成功(委托模式) - 模型: {}, 响应长度: {}, 耗时: {}ms",
+                    modelCode, response.getChoices().get(0).getMessage().getContent().length(), duration);
 
-                return response;
-            }
+            return response;
+/*
 
             // 降级：使用优化后的客户端工厂获取聊天客户端
             ChatClient chatClient = getChatClientWithFallback(model, provider);
@@ -138,6 +139,7 @@ public class ChatServiceImpl implements ChatService {
                     modelCode, response.getChoices().get(0).getMessage().getContent().length(), duration);
 
             return response;
+*/
 
         } catch (Exception e) {
             long duration = System.currentTimeMillis() - startTime;
@@ -215,8 +217,8 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
-    @Autowired
-    private ModelService modelService;
+/*    @Autowired
+    private ModelService modelService;*/
 
     /**
      * 获取并验证模型
@@ -267,9 +269,9 @@ public class ChatServiceImpl implements ChatService {
         return provider;
     }
 
-    /**
+  /*  *//**
      * 获取聊天客户端，支持降级处理
-     */
+     *//*
     private ChatClient getChatClientWithFallback(ModelEntity model, ModelProviderEntity provider) {
         try {
 
@@ -289,7 +291,7 @@ public class ChatServiceImpl implements ChatService {
             log.debug("使用配置文件聊天客户端 - 模型: {}", model.getModelCode());
             return configFileChatClient;
         }
-    }
+    }*/
 
     /**
      * 转换为Spring AI消息格式
