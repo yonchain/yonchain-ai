@@ -101,6 +101,7 @@ public class YamlModelLoader implements ModelLoader {
         provider.setName((String) yamlMap.get("name"));
         provider.setDescription((String) yamlMap.get("description"));
         provider.setIcon((String) yamlMap.get("icon"));
+        provider.setEnabled((Boolean) yamlMap.getOrDefault("enabled", true));
 
         // 支持的模型类型
         if (yamlMap.containsKey("supportedModelTypes")) {
@@ -130,6 +131,7 @@ public class YamlModelLoader implements ModelLoader {
         model.setProvider((String) yamlMap.get("provider"));
         model.setType((String) yamlMap.get("modelType"));
         model.setIcon((String) yamlMap.get("icon"));
+        model.setEnabled((Boolean) yamlMap.getOrDefault("enabled", true));
 
         // 能力配置
         if (yamlMap.containsKey("capabilities")) {

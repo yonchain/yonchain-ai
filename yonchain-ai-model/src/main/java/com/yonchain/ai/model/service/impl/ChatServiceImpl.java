@@ -18,6 +18,8 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.DefaultChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -94,26 +96,26 @@ public class ChatServiceImpl implements ChatService {
             if (chatModel != null) {
                 // 转换请求消息格式
                 List<Message> messages = convertToSpringAIMessages(request.getMessages());
-                
+
                 // 创建Prompt对象，支持更多配置选项
                 Prompt prompt = createEnhancedPrompt(messages, request, model);
-                
+
                 // 直接使用委托式聊天模型调用
                 org.springframework.ai.chat.model.ChatResponse chatResponse =
                         chatModel.call(prompt);
-                
+
                 // 转换并返回响应
                 ChatCompletionResponse response = convertToChatCompletionResponse(chatResponse, modelCode);
-                
+
                 long duration = System.currentTimeMillis() - startTime;
                 logChatStatistics(modelCode, request, response, duration);
-                
+
                 log.info("聊天完成请求成功(委托模式) - 模型: {}, 响应长度: {}, 耗时: {}ms",
                         modelCode, response.getChoices().get(0).getMessage().getContent().length(), duration);
-                
+
                 return response;
             }
-            
+
             // 降级：使用优化后的客户端工厂获取聊天客户端
             ChatClient chatClient = getChatClientWithFallback(model, provider);
 
@@ -270,7 +272,7 @@ public class ChatServiceImpl implements ChatService {
      */
     private ChatClient getChatClientWithFallback(ModelEntity model, ModelProviderEntity provider) {
         try {
-            
+
             // 如果委托模型不可用，使用动态创建的客户端
             ChatClient dynamicClient = clientFactory.getChatClient(model, provider);
             log.debug("成功创建动态聊天客户端 - 模型: {}", model.getModelCode());
@@ -326,7 +328,8 @@ public class ChatServiceImpl implements ChatService {
      */
     private Prompt createEnhancedPrompt(List<Message> messages, ChatCompletionRequest request, ModelEntity model) {
         // 基础Prompt
-        Prompt prompt = new Prompt(messages);
+        ChatOptions chatOptions = ChatOptions.builder().model(model.getModelCode() + "-" + model.getProviderCode()).build();
+        Prompt prompt = new Prompt(messages, chatOptions);
 
         // 如果有额外的配置参数，可以在这里添加
         // 例如：温度、最大令牌数等

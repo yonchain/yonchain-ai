@@ -59,67 +59,105 @@ public class ModelRegistryInitializer implements InitializingBean {
             Collection<? extends ModelProvider> providers = modelLoader.loadProviders();
             
             // 将模型信息转换为ModelEntity
-            Map<String, ModelEntity> modelMap = new HashMap<>();
-            for (ModelInfo model : models) {
-                ModelEntity modelEntity = new ModelEntity();
-                modelEntity.setModelCode(model.getCode());
-                // ModelEntity中没有setModelName等方法，只使用已有的属性
-                
-                // 设置是否启用
-                modelEntity.setEnabled(model.getEnabled());
-                
-                modelMap.put(model.getCode(), modelEntity);
-            }
+            Map<String, ModelEntity> modelMap = convertToModelEntities(models);
             
             // 将提供商信息转换为ModelProviderEntity
-            Map<String, ModelProviderEntity> providerMap = new HashMap<>();
-            for (ModelProvider provider : providers) {
-                ModelProviderEntity providerEntity = new ModelProviderEntity();
-                providerEntity.setProviderCode(provider.getCode());
-                // ModelProviderEntity中没有setProviderName等方法，只使用已有的属性
-                
-                // 设置API密钥和基础URL
-                providerEntity.setApiKey(provider.getCode()); // 临时使用code作为apiKey
-                providerEntity.setBaseUrl(""); // 默认为空
-                
-                // 设置是否启用
-                providerEntity.setEnabled(provider.getEnabled());
-                
-                providerMap.put(provider.getCode(), providerEntity);
-            }
+            Map<String, ModelProviderEntity> providerMap = convertToProviderEntities(providers);
             
-            // 为每个启用的模型和提供商组合创建ChatModel并注册到注册表
-            for (ModelEntity model : modelMap.values()) {
-                /*if (model.getEnabled() == null || !model.getEnabled()) {
-                    continue;
-                }*/
-                
-                for (ModelProviderEntity provider : providerMap.values()) {
-                   /* if (provider.getEnabled() == null || !provider.getEnabled()) {
-                        continue;
-                    }*/
-                    
-                    try {
-                        // 创建ChatModel
-                        ChatModel chatModel = modelFactory.getChatModel(model, provider);
-                        
-                        if (chatModel != null) {
-                            // 注册到注册表
-                            String modelId = model.getModelCode() + "-" + provider.getProviderCode();
-                            modelRegistry.registerModel(modelId, chatModel);
-                            logger.info("成功注册模型: {}", modelId);
-                        }else {
-                            throw new YonchainException("注册失败");
-                        }
-                    } catch (Exception e) {
-                        logger.error("注册模型失败: {} - {}, 错误: {}", model.getModelCode(), provider.getProviderCode(), e.getMessage());
-                    }
-                }
-            }
+            // 注册模型
+            int registeredCount = registerModels(modelMap, providerMap);
             
-            logger.info("模型注册表初始化完成，共注册 {} 个模型", modelRegistry.getModelCount());
+            logger.info("模型注册表初始化完成，共注册 {} 个模型", registeredCount);
         } catch (Exception e) {
             logger.error("初始化模型注册表失败", e);
+            throw new YonchainException("模型注册表初始化失败: " + e.getMessage(), e);
         }
+    }
+    
+    /**
+     * 将ModelInfo集合转换为ModelEntity映射
+     */
+    private Map<String, ModelEntity> convertToModelEntities(Collection<? extends ModelInfo> models) {
+        Map<String, ModelEntity> modelMap = new HashMap<>(models.size());
+        for (ModelInfo model : models) {
+            ModelEntity modelEntity = new ModelEntity();
+            modelEntity.setModelCode(model.getCode());
+            modelEntity.setProviderCode(model.getProvider());
+            modelEntity.setEnabled(model.getEnabled());
+            
+            modelMap.put(model.getCode(), modelEntity);
+        }
+        return modelMap;
+    }
+    
+    /**
+     * 将ModelProvider集合转换为ModelProviderEntity映射
+     */
+    private Map<String, ModelProviderEntity> convertToProviderEntities(Collection<? extends ModelProvider> providers) {
+        Map<String, ModelProviderEntity> providerMap = new HashMap<>(providers.size());
+        for (ModelProvider provider : providers) {
+            ModelProviderEntity providerEntity = new ModelProviderEntity();
+            providerEntity.setProviderCode(provider.getCode());
+            providerEntity.setEnabled(provider.getEnabled());
+            
+            // 提取配置信息
+            provider.getConfigSchemas().forEach(configItem -> {
+                if ("apiKey".equals(configItem.getName())) {
+                    providerEntity.setApiKey((String) configItem.getValue());
+                } else if ("baseUrl".equals(configItem.getName())) {
+                    providerEntity.setBaseUrl((String) configItem.getValue());
+                }
+            });
+            
+            providerMap.put(provider.getCode(), providerEntity);
+        }
+        return providerMap;
+    }
+    
+    /**
+     * 注册模型到注册表
+     * @return 成功注册的模型数量
+     */
+    private int registerModels(Map<String, ModelEntity> modelMap, Map<String, ModelProviderEntity> providerMap) {
+        int registeredCount = 0;
+        
+        for (ModelEntity model : modelMap.values()) {
+            // 只处理启用的模型
+            if (model.getEnabled() == null || !model.getEnabled()) {
+                logger.debug("跳过未启用的模型: {}", model.getModelCode());
+                continue;
+            }
+            
+            String providerCode = model.getProviderCode();
+            ModelProviderEntity provider = providerMap.get(providerCode);
+            
+            // 确保提供商存在且已启用
+            if (provider == null) {
+                throw new YonchainException("模型 " + model.getModelCode() + " 的提供商 " + providerCode + " 不存在");
+            }
+            
+            if (provider.getEnabled() == null || !provider.getEnabled()) {
+               //throw new YonchainException("模型 " + model.getModelCode() + " 的提供商 " + providerCode + " 未启用");
+            }
+            
+            // 注册模型
+            String modelId = model.getModelCode() + "-" + provider.getProviderCode();
+            try {
+                ChatModel chatModel = modelFactory.getChatModel(model, provider);
+                
+                if (chatModel != null) {
+                    modelRegistry.registerModel(modelId, chatModel);
+                    logger.info("成功注册模型: {}", modelId);
+                    registeredCount++;
+                } else {
+                    logger.warn("无法创建模型 {}, 工厂返回null", modelId);
+                }
+            } catch (Exception e) {
+                logger.error("注册模型失败: {}, 错误: {}", modelId, e.getMessage(), e);
+                // 继续注册其他模型，不中断流程
+            }
+        }
+        
+        return registeredCount;
     }
 }
