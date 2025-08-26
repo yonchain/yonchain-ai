@@ -1,7 +1,7 @@
 package com.yonchain.ai.model.registry;
 
-import com.yonchain.ai.model.entity.ModelEntity;
-import com.yonchain.ai.model.entity.ModelProviderEntity;
+import com.yonchain.ai.api.model.ModelInfo;
+import com.yonchain.ai.api.model.ModelProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,7 @@ public class InMemoryModelRegistry implements ModelRegistry {
      * 缓存模型静态信息
      * key: 模型ID (modelCode-providerCode)
      */
-    private final Map<String, ModelInfo> modelInfoRegistry = new ConcurrentHashMap<>();
+    private final Map<String, RegistryModelInfo> modelInfoRegistry = new ConcurrentHashMap<>();
 
     /**
      * 获取所有已注册的模型ID
@@ -44,12 +44,12 @@ public class InMemoryModelRegistry implements ModelRegistry {
      * 注册模型静态信息
      * 
      * @param modelId 模型ID
-     * @param model 模型实体
-     * @param provider 提供商实体
+     * @param model 模型信息
+     * @param provider 提供商信息
      */
     @Override
-    public void registerModelInfo(String modelId, ModelEntity model, ModelProviderEntity provider) {
-        ModelInfo modelInfo = new ModelInfo(model, provider);
+    public void registerModelInfo(String modelId, ModelInfo model, ModelProvider provider) {
+        RegistryModelInfo modelInfo = new RegistryModelInfo(model, provider);
         modelInfoRegistry.put(modelId, modelInfo);
         logger.info("已注册模型静态信息: {}", modelId);
     }
@@ -58,10 +58,10 @@ public class InMemoryModelRegistry implements ModelRegistry {
      * 获取模型静态信息
      * 
      * @param modelId 模型ID
-     * @return 模型静态信息，包含模型实体和提供商实体，如果未找到则返回null
+     * @return 模型静态信息，包含模型信息和提供商信息，如果未找到则返回null
      */
     @Override
-    public ModelInfo getModelInfo(String modelId) {
+    public RegistryModelInfo getModelInfo(String modelId) {
         return modelInfoRegistry.get(modelId);
     }
     
@@ -71,7 +71,7 @@ public class InMemoryModelRegistry implements ModelRegistry {
      * @return 所有模型静态信息的映射，key为模型ID
      */
     @Override
-    public Map<String, ModelInfo> getAllModelInfos() {
+    public Map<String, RegistryModelInfo> getAllModelInfos() {
         return new HashMap<>(modelInfoRegistry);
     }
     
@@ -81,8 +81,8 @@ public class InMemoryModelRegistry implements ModelRegistry {
      * @param modelId 模型ID
      * @return 被移除的模型静态信息，如果未找到则返回null
      */
-    public ModelInfo removeModelInfo(String modelId) {
-        ModelInfo removed = modelInfoRegistry.remove(modelId);
+    public RegistryModelInfo removeModelInfo(String modelId) {
+        RegistryModelInfo removed = modelInfoRegistry.remove(modelId);
         if (removed != null) {
             logger.info("已移除模型静态信息: {}", modelId);
         }
@@ -120,11 +120,11 @@ public class InMemoryModelRegistry implements ModelRegistry {
      * 更新模型静态信息
      * 
      * @param modelId 模型ID
-     * @param model 模型实体
-     * @param provider 提供商实体
+     * @param model 模型信息
+     * @param provider 提供商信息
      * @return 如果更新成功则返回true，否则返回false
      */
-    public boolean updateModelInfo(String modelId, ModelEntity model, ModelProviderEntity provider) {
+    public boolean updateModelInfo(String modelId, ModelInfo model, ModelProvider provider) {
         if (modelInfoRegistry.containsKey(modelId)) {
             registerModelInfo(modelId, model, provider);
             logger.info("已更新模型静态信息: {}", modelId);

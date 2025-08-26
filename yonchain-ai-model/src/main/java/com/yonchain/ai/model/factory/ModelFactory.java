@@ -2,9 +2,11 @@ package com.yonchain.ai.model.factory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yonchain.ai.api.model.ModelInfo;
+import com.yonchain.ai.api.model.ModelProvider;
 import com.yonchain.ai.api.model.enums.ProviderType;
-import com.yonchain.ai.model.entity.ModelEntity;
-import com.yonchain.ai.model.entity.ModelProviderEntity;
+import com.yonchain.ai.model.entity.ModelInfo;
+import com.yonchain.ai.model.entity.ModelProvider;
 import com.yonchain.ai.model.registry.ModelRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatModel;
@@ -60,7 +62,7 @@ public class ModelFactory {
         
         try {
             // 从注册表获取静态信息
-            ModelRegistry.ModelInfo modelInfo = modelRegistry.getModelInfo(modelId);
+            ModelRegistry.RegistryModelInfo modelInfo = modelRegistry.getModelInfo(modelId);
             
             if (modelInfo == null) {
                 log.warn("注册表中未找到模型配置: {}", modelId);
@@ -131,18 +133,18 @@ public class ModelFactory {
      * @param provider 提供商信息
      * @return 聊天模型
      */
-    public ChatModel getChatModel(ModelEntity model, ModelProviderEntity provider) {
+    public ChatModel getChatModel(ModelInfo model, ModelProvider provider) {
         if (model == null || provider == null) {
             throw new IllegalArgumentException("模型或提供商不能为空");
         }
 
-        String cacheKey = model.getModelCode() + "-" + provider.getProviderCode();
+        String cacheKey = model.getCode() + "-" + provider.getCode();
         return chatModelCache.computeIfAbsent(cacheKey, key -> {
             // 使用枚举类型获取提供商类型
-            ProviderType providerType = ProviderType.fromCode(provider.getProviderCode());
+            ProviderType providerType = ProviderType.fromCode(provider.getCode());
             
             if (providerType == null) {
-                throw new UnsupportedOperationException("不支持的提供商: " + provider.getProviderCode());
+                throw new UnsupportedOperationException("不支持的提供商: " + provider.getCode());
             }
             
             // 直接使用switch语句调用对应的创建方法
@@ -181,12 +183,12 @@ public class ModelFactory {
      * @param provider  提供商信息
      * @return DeepSeek聊天模型
      */
-    public ChatModel getDeepSeekChatModel(ModelEntity model, ModelProviderEntity provider) {
+    public ChatModel getDeepSeekChatModel(ModelInfo model, ModelProvider provider) {
         if (model == null || provider == null) {
             throw new IllegalArgumentException("模型或提供商不能为空");
         }
 
-        String cacheKey = model.getModelCode() + "-" + provider.getProviderCode();
+        String cacheKey = model.getCode() + "-" + provider.getCode();
         return chatModelCache.computeIfAbsent(cacheKey, key -> {
             return createDeepSeekChatModel(model, provider);
         });
@@ -200,12 +202,12 @@ public class ModelFactory {
      * @param provider  提供商信息
      * @return Anthropic聊天模型
      */
-    public ChatModel getAnthropicChatModel(ModelEntity model, ModelProviderEntity provider) {
+    public ChatModel getAnthropicChatModel(ModelInfo model, ModelProvider provider) {
         if (model == null || provider == null) {
             throw new IllegalArgumentException("模型或提供商不能为空");
         }
 
-        String cacheKey = model.getModelCode() + "-" + provider.getProviderCode();
+        String cacheKey = model.getCode() + "-" + provider.getCode();
         return chatModelCache.computeIfAbsent(cacheKey, key -> {
             return createAnthropicChatModel(model, provider);
         });
@@ -217,12 +219,12 @@ public class ModelFactory {
      * 创建OpenAI聊天模型
      * OpenAI特有的参数配置
      */
-    private ChatModel createOpenAiChatModel(ModelEntity model, ModelProviderEntity provider) {
+    private ChatModel createOpenAiChatModel(ModelInfo model, ModelProvider provider) {
         try {
             // OpenAI可能需要的参数：apiKey, baseUrl, model, temperature, maxTokens, topP, frequencyPenalty, presencePenalty等
-            String apiKey = provider.getApiKey();
+            String apiKey = provider.get();
             String baseUrl = provider.getBaseUrl();
-            String modelCode = model.getModelCode();
+            String modelCode = model.getCode();
             
             // 从provider和model的config中获取OpenAI特有的参数
             Map<String, Object> providerConfig = parseConfigToMap(provider.getCustomConfig());
@@ -274,12 +276,12 @@ public class ModelFactory {
      * 创建DeepSeek聊天模型
      * DeepSeek特有的参数配置
      */
-    private ChatModel createDeepSeekChatModel(ModelEntity model, ModelProviderEntity provider) {
+    private ChatModel createDeepSeekChatModel(ModelInfo model, ModelProvider provider) {
         try {
             // DeepSeek可能需要的参数：apiKey, baseUrl, model, temperature, maxTokens, topP, topK等
             String apiKey = provider.getApiKey();
             String baseUrl = provider.getBaseUrl();
-            String modelCode = model.getModelCode();
+            String modelCode = model.getCode();
             
             // 从provider和model的config中获取DeepSeek特有的参数
             Map<String, Object> providerConfig = parseConfigToMap(provider.getCustomConfig());
@@ -317,12 +319,12 @@ public class ModelFactory {
      * 创建Anthropic聊天模型
      * Anthropic特有的参数配置
      */
-    private ChatModel createAnthropicChatModel(ModelEntity model, ModelProviderEntity provider) {
+    private ChatModel createAnthropicChatModel(ModelInfo model, ModelProvider provider) {
         try {
             // Anthropic可能需要的参数：apiKey, baseUrl, model, temperature, maxTokens, topP, topK, stopSequences等
             String apiKey = provider.getApiKey();
             String baseUrl = provider.getBaseUrl();
-            String modelCode = model.getModelCode();
+            String modelCode = model.getCode();
             
             // 从provider和model的config中获取Anthropic特有的参数
             Map<String, Object> providerConfig = parseConfigToMap(provider.getCustomConfig());
@@ -366,11 +368,11 @@ public class ModelFactory {
      * 创建Ollama聊天模型
      * Ollama特有的参数配置
      */
-    private ChatModel createOllamaChatModel(ModelEntity model, ModelProviderEntity provider) {
+    private ChatModel createOllamaChatModel(ModelInfo model, ModelProvider provider) {
         try {
             // Ollama可能需要的参数：baseUrl, model, temperature, numPredict, topP, topK, repeatPenalty等
             String baseUrl = provider.getBaseUrl();
-            String modelCode = model.getModelCode();
+            String modelCode = model.getCode();
             
             // 从provider和model的config中获取Ollama特有的参数
             Map<String, Object> providerConfig = parseConfigToMap(provider.getCustomConfig());
@@ -405,15 +407,15 @@ public class ModelFactory {
      * 创建Grok聊天模型
      * Grok特有的参数配置
      */
-    private ChatModel createGrokChatModel(ModelEntity model, ModelProviderEntity provider) {
+    private ChatModel createGrokChatModel(ModelInfo model, ModelProvider provider) {
         try {
             // Grok可能需要的参数：apiKey, baseUrl, model, temperature, maxTokens等
             String apiKey = provider.getApiKey();
             String baseUrl = provider.getBaseUrl();
-            String modelCode = model.getModelCode();
+            String modelCode = model.getCode();
             
             // 从provider和model的config中获取Grok特有的参数
-            Map<String, Object> providerConfig = parseConfigToMap(provider.getCustomConfig());
+            Map<String, Object> providerConfig = parseConfigToMap(provider.getConfigSchemas());
             Map<String, Object> modelConfig = parseConfigToMap(model.getModelConfig());
             
             // Grok特有参数
@@ -439,7 +441,7 @@ public class ModelFactory {
     /**
      * 创建百度文心一言聊天模型
      */
-    private ChatModel createBaiduChatModel(ModelEntity model, ModelProviderEntity provider) {
+    private ChatModel createBaiduChatModel(ModelInfo model, ModelProvider provider) {
         try {
             // TODO: 实现百度文心一言模型创建
             throw new UnsupportedOperationException("百度文心一言模型创建暂未实现");
@@ -451,7 +453,7 @@ public class ModelFactory {
     /**
      * 创建阿里通义千问聊天模型
      */
-    private ChatModel createAlibabaChatModel(ModelEntity model, ModelProviderEntity provider) {
+    private ChatModel createAlibabaChatModel(ModelInfo model, ModelProvider provider) {
         try {
             // TODO: 实现阿里通义千问模型创建
             throw new UnsupportedOperationException("阿里通义千问模型创建暂未实现");
@@ -463,7 +465,7 @@ public class ModelFactory {
     /**
      * 创建腾讯混元聊天模型
      */
-    private ChatModel createTencentChatModel(ModelEntity model, ModelProviderEntity provider) {
+    private ChatModel createTencentChatModel(ModelInfo model, ModelProvider provider) {
         try {
             // TODO: 实现腾讯混元模型创建
             throw new UnsupportedOperationException("腾讯混元模型创建暂未实现");
@@ -475,7 +477,7 @@ public class ModelFactory {
     /**
      * 创建智谱AI聊天模型
      */
-    private ChatModel createZhipuChatModel(ModelEntity model, ModelProviderEntity provider) {
+    private ChatModel createZhipuChatModel(ModelInfo model, ModelProvider provider) {
         try {
             // TODO: 实现智谱AI模型创建
             throw new UnsupportedOperationException("智谱AI模型创建暂未实现");
@@ -487,7 +489,7 @@ public class ModelFactory {
     /**
      * 创建月之暗面Kimi聊天模型
      */
-    private ChatModel createMoonshotChatModel(ModelEntity model, ModelProviderEntity provider) {
+    private ChatModel createMoonshotChatModel(ModelInfo model, ModelProvider provider) {
         try {
             // TODO: 实现月之暗面Kimi模型创建
             throw new UnsupportedOperationException("月之暗面Kimi模型创建暂未实现");

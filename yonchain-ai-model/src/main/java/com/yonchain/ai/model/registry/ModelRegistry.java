@@ -1,7 +1,7 @@
 package com.yonchain.ai.model.registry;
 
-import com.yonchain.ai.model.entity.ModelEntity;
-import com.yonchain.ai.model.entity.ModelProviderEntity;
+import com.yonchain.ai.api.model.ModelInfo;
+import com.yonchain.ai.api.model.ModelProvider;
 
 import java.util.List;
 import java.util.Map;
@@ -26,43 +26,43 @@ public interface ModelRegistry {
      * 注册模型静态信息
      * 
      * @param modelId 模型ID
-     * @param model 模型实体
-     * @param provider 提供商实体
+     * @param model 模型信息
+     * @param provider 提供商信息
      */
-    void registerModelInfo(String modelId, ModelEntity model, ModelProviderEntity provider);
+    void registerModelInfo(String modelId, ModelInfo model, ModelProvider provider);
     
     /**
      * 获取模型静态信息
      * 
      * @param modelId 模型ID
-     * @return 模型静态信息，包含模型实体和提供商实体，如果未找到则返回null
+     * @return 模型静态信息，包含模型信息和提供商信息，如果未找到则返回null
      */
-    ModelInfo getModelInfo(String modelId);
+    RegistryModelInfo getModelInfo(String modelId);
     
     /**
      * 获取所有模型静态信息
      * 
      * @return 所有模型静态信息的映射，key为模型ID
      */
-    Map<String, ModelInfo> getAllModelInfos();
+    Map<String, RegistryModelInfo> getAllModelInfos();
     
     /**
      * 模型静态信息类
      */
-    class ModelInfo {
-        private final ModelEntity model;
-        private final ModelProviderEntity provider;
+    class RegistryModelInfo {
+        private final ModelInfo model;
+        private final ModelProvider provider;
         
-        public ModelInfo(ModelEntity model, ModelProviderEntity provider) {
+        public RegistryModelInfo(ModelInfo model, ModelProvider provider) {
             this.model = model;
             this.provider = provider;
         }
         
-        public ModelEntity getModel() {
+        public ModelInfo getModel() {
             return model;
         }
         
-        public ModelProviderEntity getProvider() {
+        public ModelProvider getProvider() {
             return provider;
         }
     }

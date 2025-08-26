@@ -1,4 +1,4 @@
-package com.yonchain.ai.model.service.impl;
+package com.yonchain.ai.model.service;
 
 import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.model.*;
@@ -61,59 +61,37 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public ModelInfo getModelById(String id) {
         // 从注册表获取模型信息
-        ModelRegistry.ModelInfo modelInfo = modelRegistry.getModelInfo(id);
+        ModelRegistry.RegistryModelInfo modelInfo = modelRegistry.getModelInfo(id);
         if (modelInfo == null) {
             return null;
         }
 
-        // 将ModelRegistry.ModelInfo转换为ModelInfo
-        DefaultModel model = new DefaultModel();
-        model.setId(id);
-        // 解析modelId，格式为：modelCode-providerCode
-        String[] parts = id.split("-");
-        if (parts.length == 2) {
-            model.setCode(parts[0]);
-            model.setProvider(parts[1]);
-        } else {
-            model.setCode(id);
-        }
-
-        // 设置模型启用状态
-        model.setEnabled(modelInfo.getModel().getEnabled());
-
-        return model;
+        // 直接返回注册表中的模型信息
+        return modelInfo.getModel();
     }
 
     @Override
     public ModelInfo getModel(String provider, String modelCode) {
         // 从注册表获取模型信息
         String modelId = modelCode + "-" + provider;
-        ModelRegistry.ModelInfo modelInfo = modelRegistry.getModelInfo(modelId);
+        ModelRegistry.RegistryModelInfo modelInfo = modelRegistry.getModelInfo(modelId);
         if (modelInfo == null) {
             return null;
         }
 
-        // 将ModelRegistry.ModelInfo转换为ModelInfo
-        DefaultModel model = new DefaultModel();
-        model.setId(modelId);
-        model.setCode(modelCode);
-        model.setProvider(provider);
-
-        // 设置模型启用状态
-        model.setEnabled(modelInfo.getModel().getEnabled());
-
-        return model;
+        // 直接返回注册表中的模型信息
+        return modelInfo.getModel();
     }
 
     @Override
     public List<ModelInfo> getModels(String tenantId, Map<String, Object> queryParam) {
         // 从注册表获取所有模型信息
-        Map<String, ModelRegistry.ModelInfo> modelInfos = modelRegistry.getAllModelInfos();
+        Map<String, ModelRegistry.RegistryModelInfo> modelInfos = modelRegistry.getAllModelInfos();
 
         List<ModelInfo> models = new ArrayList<>();
-        for (Map.Entry<String, ModelRegistry.ModelInfo> entry : modelInfos.entrySet()) {
+        for (Map.Entry<String, ModelRegistry.RegistryModelInfo> entry : modelInfos.entrySet()) {
             String modelId = entry.getKey();
-            ModelRegistry.ModelInfo info = entry.getValue();
+            ModelRegistry.RegistryModelInfo info = entry.getValue();
 
             // 解析modelId，格式为：modelCode-providerCode
             String[] parts = modelId.split("-");
@@ -127,10 +105,8 @@ public class ModelServiceImpl implements ModelService {
                     continue;
                 }
 
-                DefaultModel modelInfo = new DefaultModel();
-                modelInfo.setId(modelId);
-                modelInfo.setCode(modelCode);
-                modelInfo.setProvider(providerCode);
+                // 获取模型信息
+                ModelInfo modelInfo = info.getModel();
 
                 // 添加租户配置状态标签
                 boolean enabled = isModelEnabled(tenantId, providerCode, modelCode);
@@ -158,19 +134,15 @@ public class ModelServiceImpl implements ModelService {
         }
 
         // 从注册表获取模型信息
-        Map<String, ModelRegistry.ModelInfo> modelInfos = modelRegistry.getAllModelInfos();
-        for (Map.Entry<String, ModelRegistry.ModelInfo> entry : modelInfos.entrySet()) {
+        Map<String, ModelRegistry.RegistryModelInfo> modelInfos = modelRegistry.getAllModelInfos();
+        for (Map.Entry<String, ModelRegistry.RegistryModelInfo> entry : modelInfos.entrySet()) {
             String modelId = entry.getKey();
-            ModelRegistry.ModelInfo info = entry.getValue();
+            ModelRegistry.RegistryModelInfo info = entry.getValue();
 
             String[] parts = modelId.split("-");
             if (parts.length == 2 && parts[0].equals(modelCode)) {
-                // 创建ModelInfo
-                DefaultModel modelInfo = new DefaultModel();
-                modelInfo.setId(modelId);
-                modelInfo.setCode(modelCode);
-                modelInfo.setProvider(parts[1]);
-                modelInfo.setEnabled(info.getModel().getEnabled());
+                // 获取模型信息
+                ModelInfo modelInfo = info.getModel();
 
                 // 如果数据库配置可用，获取租户特定配置
                 if (modelMapper != null) {
@@ -181,7 +153,10 @@ public class ModelServiceImpl implements ModelService {
                         // 设置动态配置
                         Map<String, Object> dynamicConfig = convertJsonToMapObject(modelEntity.getModelConfig());
                         if (dynamicConfig.containsKey("capabilities")) {
-                            // modelInfo.setCapabilities((Map<String, Object>) dynamicConfig.get("capabilities"));
+                            Object capsObj = dynamicConfig.get("capabilities");
+                            if (capsObj instanceof List) {
+                                modelInfo.setCapabilities((List<String>) capsObj);
+                            }
                         }
                     }
                 }
@@ -198,13 +173,13 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public List<ModelProvider> getProviders(String tenantId, Map<String, Object> queryParam) {
         // 从注册表获取所有模型信息
-        Map<String, ModelRegistry.ModelInfo> modelInfos = modelRegistry.getAllModelInfos();
+        Map<String, ModelRegistry.RegistryModelInfo> modelInfos = modelRegistry.getAllModelInfos();
 
         // 提取所有提供商信息
-        Map<String, ModelProviderEntity> providerMap = new HashMap<>();
-        for (Map.Entry<String, ModelRegistry.ModelInfo> entry : modelInfos.entrySet()) {
+        Map<String, ModelProvider> providerMap = new HashMap<>();
+        for (Map.Entry<String, ModelRegistry.RegistryModelInfo> entry : modelInfos.entrySet()) {
             String modelId = entry.getKey();
-            ModelRegistry.ModelInfo info = entry.getValue();
+            ModelRegistry.RegistryModelInfo info = entry.getValue();
 
             String[] parts = modelId.split("-");
             if (parts.length == 2) {
@@ -214,20 +189,12 @@ public class ModelServiceImpl implements ModelService {
         }
 
         // 转换为ModelProvider列表
-        List<ModelProvider> providers = new ArrayList<>();
-        for (Map.Entry<String, ModelProviderEntity> entry : providerMap.entrySet()) {
-            String providerCode = entry.getKey();
-            ModelProviderEntity providerEntity = entry.getValue();
+        List<ModelProvider> providers = new ArrayList<>(providerMap.values());
 
-            DefaultModelProvider provider = new DefaultModelProvider();
-            provider.setId(providerCode);
-            provider.setCode(providerCode);
-
-            // 添加租户配置状态标签
-            boolean enabled = isProviderEnabled(tenantId, providerCode);
+        // 添加租户配置状态标签
+        for (ModelProvider provider : providers) {
+            boolean enabled = isProviderEnabled(tenantId, provider.getCode());
             provider.setEnabled(enabled);
-
-            providers.add(provider);
         }
 
         return providers;
@@ -290,22 +257,18 @@ public class ModelServiceImpl implements ModelService {
     @Override
     public ModelProvider getProviderById(String providerId) {
         // 从注册表获取所有模型信息
-        Map<String, ModelRegistry.ModelInfo> modelInfos = modelRegistry.getAllModelInfos();
+        Map<String, ModelRegistry.RegistryModelInfo> modelInfos = modelRegistry.getAllModelInfos();
 
         // 查找包含指定提供商的模型信息
-        for (Map.Entry<String, ModelRegistry.ModelInfo> entry : modelInfos.entrySet()) {
+        for (Map.Entry<String, ModelRegistry.RegistryModelInfo> entry : modelInfos.entrySet()) {
             String modelId = entry.getKey();
-            ModelRegistry.ModelInfo info = entry.getValue();
+            ModelRegistry.RegistryModelInfo info = entry.getValue();
 
             String[] parts = modelId.split("-");
             if (parts.length == 2) {
                 String providerCode = parts[1];
                 if (providerCode.equals(providerId)) {
-                    DefaultModelProvider provider = new DefaultModelProvider();
-                    provider.setId(providerId);
-                    provider.setCode(providerId);
-                    provider.setEnabled(info.getProvider().getEnabled());
-                    return provider;
+                    return info.getProvider();
                 }
             }
         }
@@ -326,21 +289,21 @@ public class ModelServiceImpl implements ModelService {
         response.setCode(providerCode);
 
         // 从注册表获取提供商信息
-        ModelProviderEntity providerEntity = null;
-        Map<String, ModelRegistry.ModelInfo> modelInfos = modelRegistry.getAllModelInfos();
-        for (ModelRegistry.ModelInfo info : modelInfos.values()) {
-            if (info.getProvider().getProviderCode().equals(providerCode)) {
-                providerEntity = info.getProvider();
+        ModelProvider provider = null;
+        Map<String, ModelRegistry.RegistryModelInfo> modelInfos = modelRegistry.getAllModelInfos();
+        for (ModelRegistry.RegistryModelInfo info : modelInfos.values()) {
+            if (info.getProvider().getCode().equals(providerCode)) {
+                provider = info.getProvider();
                 break;
             }
         }
 
-        if (providerEntity == null) {
+        if (provider == null) {
             return response;
         }
 
         // 获取租户级配置数据
-        boolean enabled = providerEntity.getEnabled() != null ? providerEntity.getEnabled() : false;
+        boolean enabled = provider.getEnabled() != null ? provider.getEnabled() : false;
         String lastUpdated = null;
 
         // 如果数据库配置可用，获取租户特定配置
@@ -397,12 +360,36 @@ public class ModelServiceImpl implements ModelService {
             entity.setUpdateTime(LocalDateTime.now());
             modelProviderMapper.update(entity);
 
-            // 同步到注册表
-            syncProviderToRegistry(entity);
+            // 从注册表获取提供商信息
+            ModelProvider provider = null;
+            Map<String, ModelRegistry.RegistryModelInfo> modelInfos = modelRegistry.getAllModelInfos();
+            for (ModelRegistry.RegistryModelInfo info : modelInfos.values()) {
+                if (info.getProvider().getCode().equals(providerCode)) {
+                    provider = info.getProvider();
+                    break;
+                }
+            }
+
+            if (provider != null) {
+                // 更新提供商信息
+                provider.setEnabled(entity.getEnabled());
+                
+                // 如果是DefaultModelProvider，可以设置更多属性
+                if (provider instanceof DefaultModelProvider) {
+                    DefaultModelProvider defaultProvider = (DefaultModelProvider) provider;
+                    
+                    // 如果有API Key或Base URL更新，同步这些值
+                    
+                    // 设置自定义配置
+                }
+                
+                // 同步到注册表
+                syncProviderToRegistry(provider);
+            }
 
             // 发布提供商配置变更事件
             if (eventPublisher != null) {
-                eventPublisher.publishEvent(new ProviderConfigChangeEvent(tenantId, providerCode, entity));
+                eventPublisher.publishEvent(new ProviderConfigChangeEvent(tenantId, providerCode, provider));
             }
         }
     }
@@ -431,7 +418,7 @@ public class ModelServiceImpl implements ModelService {
         try {
             // 验证模型是否存在于注册表中
             String modelId = modelInfo.getCode() + "-" + modelInfo.getProvider();
-            ModelRegistry.ModelInfo registryInfo = modelRegistry.getModelInfo(modelId);
+            ModelRegistry.RegistryModelInfo registryInfo = modelRegistry.getModelInfo(modelId);
             if (registryInfo == null) {
                 throw new IllegalArgumentException("模型不存在: " + modelInfo.getCode());
             }
@@ -461,7 +448,7 @@ public class ModelServiceImpl implements ModelService {
                 log.info("创建模型配置成功: tenantId={}, modelCode={}", tenantId, modelInfo.getCode());
 
                 // 同步到注册表
-                syncModelToRegistry(entity);
+                syncModelToRegistry(modelInfo);
             } else {
                 // 更新现有配置
                 entity.setEnabled(modelInfo.getEnabled());
@@ -471,11 +458,11 @@ public class ModelServiceImpl implements ModelService {
                 log.info("更新模型配置成功: tenantId={}, modelCode={}", tenantId, modelInfo.getCode());
 
                 // 同步到注册表
-                syncModelToRegistry(entity);
+                syncModelToRegistry(modelInfo);
 
                 // 发布模型配置变更事件
                 if (eventPublisher != null) {
-                    eventPublisher.publishEvent(new ModelConfigChangeEvent(tenantId, modelInfo.getCode(), entity));
+                    eventPublisher.publishEvent(new ModelConfigChangeEvent(tenantId, modelInfo.getCode(), modelInfo));
                 }
             }
         } catch (Exception e) {
@@ -514,12 +501,21 @@ public class ModelServiceImpl implements ModelService {
                 log.info("更新模型状态成功: tenantId={}, provider={}, modelCode={}, enabled={}",
                         tenantId, provider, modelCode, enabled);
 
-                // 同步到注册表
-                syncModelToRegistry(entity);
+                // 从注册表获取模型信息
+                String modelId = modelCode + "-" + provider;
+                ModelRegistry.RegistryModelInfo registryInfo = modelRegistry.getModelInfo(modelId);
+                if (registryInfo != null) {
+                    // 更新模型状态
+                    ModelInfo modelInfo = registryInfo.getModel();
+                    modelInfo.setEnabled(enabled);
+                    
+                    // 同步到注册表
+                    syncModelToRegistry(modelInfo);
 
-                // 发布模型配置变更事件
-                if (eventPublisher != null) {
-                    eventPublisher.publishEvent(new ModelConfigChangeEvent(tenantId, modelCode, entity));
+                    // 发布模型配置变更事件
+                    if (eventPublisher != null) {
+                        eventPublisher.publishEvent(new ModelConfigChangeEvent(tenantId, modelCode, modelInfo));
+                    }
                 }
             } else {
                 // 创建新配置
@@ -536,8 +532,17 @@ public class ModelServiceImpl implements ModelService {
                 log.info("创建模型状态成功: tenantId={}, provider={}, modelCode={}, enabled={}",
                         tenantId, provider, modelCode, enabled);
 
-                // 同步到注册表
-                syncModelToRegistry(entity);
+                // 从注册表获取模型信息
+                String modelId = modelCode + "-" + provider;
+                ModelRegistry.RegistryModelInfo registryInfo = modelRegistry.getModelInfo(modelId);
+                if (registryInfo != null) {
+                    // 更新模型状态
+                    ModelInfo modelInfo = registryInfo.getModel();
+                    modelInfo.setEnabled(enabled);
+                    
+                    // 同步到注册表
+                    syncModelToRegistry(modelInfo);
+                }
             }
         } catch (Exception e) {
             log.error("更新模型状态失败: tenantId={}, provider={}, modelCode={}", tenantId, provider, modelCode, e);
@@ -567,7 +572,7 @@ public class ModelServiceImpl implements ModelService {
         modelInstanceConfigMapper.insert(config);
 
         // 同步到注册表
-        syncModelInstanceToRegistry(config);
+        syncModelInstanceToRegistry(model);
 
         return config.getId();
     }
@@ -589,7 +594,7 @@ public class ModelServiceImpl implements ModelService {
             modelInstanceConfigMapper.update(config);
 
             // 同步到注册表
-            syncModelInstanceToRegistry(config);
+            syncModelInstanceToRegistry(model);
         }
     }
 
@@ -621,7 +626,7 @@ public class ModelServiceImpl implements ModelService {
         modelProviderMapper.insert(entity);
 
         // 同步到注册表
-        syncProviderToRegistry(entity);
+        syncProviderToRegistry(modelProvider);
     }
 
     @Override
@@ -639,7 +644,7 @@ public class ModelServiceImpl implements ModelService {
             modelProviderMapper.update(entity);
 
             // 同步到注册表
-            syncProviderToRegistry(entity);
+            syncProviderToRegistry(modelProvider);
         }
     }
 
@@ -688,19 +693,14 @@ public class ModelServiceImpl implements ModelService {
     /**
      * 同步模型配置到注册表
      */
-    private void syncModelToRegistry(ModelEntity entity) {
+    private void syncModelToRegistry(ModelInfo modelInfo) {
         try {
-            String modelId = entity.getModelCode() + "-" + entity.getProviderCode();
-            ModelRegistry.ModelInfo modelInfo = modelRegistry.getModelInfo(modelId);
+            String modelId = modelInfo.getCode() + "-" + modelInfo.getProvider();
+            ModelRegistry.RegistryModelInfo registryInfo = modelRegistry.getModelInfo(modelId);
 
-            if (modelInfo != null) {
-                // 更新模型实体
-                ModelEntity modelEntity = modelInfo.getModel();
-                modelEntity.setEnabled(entity.getEnabled());
-                modelEntity.setModelConfig(entity.getModelConfig());
-
+            if (registryInfo != null) {
                 // 重新注册到注册表
-                modelRegistry.registerModelInfo(modelId, modelEntity, modelInfo.getProvider());
+                modelRegistry.registerModelInfo(modelId, modelInfo, registryInfo.getProvider());
 
                 // 清除模型工厂缓存，确保下次获取时使用最新配置
                 modelFactory.invalidateModel(modelId);
@@ -713,34 +713,35 @@ public class ModelServiceImpl implements ModelService {
     }
 
     /**
-     * 同步提供商配置到注册表
+     * 同步提供商配置到注册表（使用ModelProviderEntity）
      */
     private void syncProviderToRegistry(ModelProviderEntity entity) {
         try {
             // 查找所有使用该提供商的模型
-            Map<String, ModelRegistry.ModelInfo> modelInfos = modelRegistry.getAllModelInfos();
-            for (Map.Entry<String, ModelRegistry.ModelInfo> entry : modelInfos.entrySet()) {
+            Map<String, ModelRegistry.RegistryModelInfo> modelInfos = modelRegistry.getAllModelInfos();
+            for (Map.Entry<String, ModelRegistry.RegistryModelInfo> entry : modelInfos.entrySet()) {
                 String modelId = entry.getKey();
-                ModelRegistry.ModelInfo info = entry.getValue();
+                ModelRegistry.RegistryModelInfo info = entry.getValue();
 
-                if (info.getProvider().getProviderCode().equals(entity.getProviderCode())) {
-                    // 更新提供商实体
-                    ModelProviderEntity providerEntity = info.getProvider();
-                    providerEntity.setEnabled(entity.getEnabled());
-
-                    // 如果有API Key或Base URL更新，同步这些值
-                    if (entity.getApiKey() != null) {
-                        providerEntity.setApiKey(entity.getApiKey());
-                    }
-                    if (entity.getBaseUrl() != null) {
-                        providerEntity.setBaseUrl(entity.getBaseUrl());
-                    }
-                    if (entity.getCustomConfig() != null) {
-                        providerEntity.setCustomConfig(entity.getCustomConfig());
+                if (info.getProvider().getCode().equals(entity.getProviderCode())) {
+                    // 更新提供商信息
+                    ModelProvider provider = info.getProvider();
+                    
+                    // 如果是DefaultModelProvider，可以设置更多属性
+                    if (provider instanceof DefaultModelProvider) {
+                        DefaultModelProvider defaultProvider = (DefaultModelProvider) provider;
+                        defaultProvider.setEnabled(entity.getEnabled());
+                        
+                        // 如果有API Key或Base URL更新，同步这些值
+                        
+                        // 设置自定义配置
+                    } else {
+                        // 基本属性设置
+                        provider.setEnabled(entity.getEnabled());
                     }
 
                     // 重新注册到注册表
-                    modelRegistry.registerModelInfo(modelId, info.getModel(), providerEntity);
+                    modelRegistry.registerModelInfo(modelId, info.getModel(), provider);
 
                     // 清除模型工厂缓存，确保下次获取时使用最新配置
                     modelFactory.invalidateModel(modelId);
@@ -754,20 +755,42 @@ public class ModelServiceImpl implements ModelService {
     }
 
     /**
+     * 同步提供商配置到注册表（使用ModelProvider接口）
+     */
+    private void syncProviderToRegistry(ModelProvider provider) {
+        try {
+            // 查找所有使用该提供商的模型
+            Map<String, ModelRegistry.RegistryModelInfo> modelInfos = modelRegistry.getAllModelInfos();
+            for (Map.Entry<String, ModelRegistry.RegistryModelInfo> entry : modelInfos.entrySet()) {
+                String modelId = entry.getKey();
+                ModelRegistry.RegistryModelInfo info = entry.getValue();
+
+                if (info.getProvider().getCode().equals(provider.getCode())) {
+                    // 重新注册到注册表
+                    modelRegistry.registerModelInfo(modelId, info.getModel(), provider);
+
+                    // 清除模型工厂缓存，确保下次获取时使用最新配置
+                    modelFactory.invalidateModel(modelId);
+                }
+            }
+
+            log.info("已同步提供商配置到注册表: {}", provider.getCode());
+        } catch (Exception e) {
+            log.error("同步提供商配置到注册表失败", e);
+        }
+    }
+
+    /**
      * 同步模型实例配置到注册表
      */
-    private void syncModelInstanceToRegistry(ModelInstanceConfig config) {
+    private void syncModelInstanceToRegistry(ModelInfo modelInfo) {
         try {
-            String modelId = config.getModelCode() + "-" + config.getProviderCode();
-            ModelRegistry.ModelInfo modelInfo = modelRegistry.getModelInfo(modelId);
+            String modelId = modelInfo.getCode() + "-" + modelInfo.getProvider();
+            ModelRegistry.RegistryModelInfo registryInfo = modelRegistry.getModelInfo(modelId);
 
-            if (modelInfo != null) {
-                // 更新模型实体
-                ModelEntity modelEntity = modelInfo.getModel();
-                modelEntity.setEnabled(config.getEnabled());
-
+            if (registryInfo != null) {
                 // 重新注册到注册表
-                modelRegistry.registerModelInfo(modelId, modelEntity, modelInfo.getProvider());
+                modelRegistry.registerModelInfo(modelId, modelInfo, registryInfo.getProvider());
 
                 // 清除模型工厂缓存，确保下次获取时使用最新配置
                 modelFactory.invalidateModel(modelId);
@@ -778,6 +801,7 @@ public class ModelServiceImpl implements ModelService {
             log.error("同步模型实例配置到注册表失败", e);
         }
     }
+
 
     // ==================== 私有辅助方法 ====================
 
@@ -912,12 +936,12 @@ public class ModelServiceImpl implements ModelService {
     public static class ProviderConfigChangeEvent {
         private String tenantId;
         private String providerCode;
-        private ModelProviderEntity entity;
+        private ModelProvider provider;
 
-        public ProviderConfigChangeEvent(String tenantId, String providerCode, ModelProviderEntity entity) {
+        public ProviderConfigChangeEvent(String tenantId, String providerCode, ModelProvider provider) {
             this.tenantId = tenantId;
             this.providerCode = providerCode;
-            this.entity = entity;
+            this.provider = provider;
         }
 
         public String getTenantId() {
@@ -928,8 +952,8 @@ public class ModelServiceImpl implements ModelService {
             return providerCode;
         }
 
-        public ModelProviderEntity getEntity() {
-            return entity;
+        public ModelProvider getProvider() {
+            return provider;
         }
     }
 
@@ -939,12 +963,12 @@ public class ModelServiceImpl implements ModelService {
     public static class ModelConfigChangeEvent {
         private String tenantId;
         private String modelCode;
-        private ModelEntity entity;
+        private ModelInfo model;
 
-        public ModelConfigChangeEvent(String tenantId, String modelCode, ModelEntity entity) {
+        public ModelConfigChangeEvent(String tenantId, String modelCode, ModelInfo model) {
             this.tenantId = tenantId;
             this.modelCode = modelCode;
-            this.entity = entity;
+            this.model = model;
         }
 
         public String getTenantId() {
@@ -955,9 +979,8 @@ public class ModelServiceImpl implements ModelService {
             return modelCode;
         }
 
-        public ModelEntity getEntity() {
-            return entity;
+        public ModelInfo getModel() {
+            return model;
         }
     }
-
 }

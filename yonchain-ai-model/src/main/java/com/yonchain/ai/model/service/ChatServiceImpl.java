@@ -1,4 +1,4 @@
-package com.yonchain.ai.model.service.impl;
+package com.yonchain.ai.model.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.api.exception.YonchainException;
