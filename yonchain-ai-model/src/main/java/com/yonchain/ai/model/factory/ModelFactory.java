@@ -1,5 +1,6 @@
 package com.yonchain.ai.model.factory;
 
+import com.yonchain.ai.api.exception.YonchainIllegalStateException;
 import com.yonchain.ai.api.model.ModelConfigItem;
 import com.yonchain.ai.api.model.ModelInfo;
 import com.yonchain.ai.api.model.ModelProvider;
@@ -8,6 +9,7 @@ import com.yonchain.ai.model.registry.ModelRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -235,9 +237,12 @@ public class ModelFactory {
 
             for (ModelConfigItem item : providerConfigSchemas) {
                 if (item.getName().equals("apiKey")) {
+                    if (item.getValue() == null){
+                        throw new YonchainIllegalStateException("DeepSeek模型提供商未配置apiKey");
+                    }
                     apiKey = item.getValue().toString();
                 }
-                if (item.getName().equals("baseUrl")) {
+                if (item.getName().equals("baseUrl") && item.getValue() != null) {
                     baseUrl = item.getValue().toString();
                 }
             }

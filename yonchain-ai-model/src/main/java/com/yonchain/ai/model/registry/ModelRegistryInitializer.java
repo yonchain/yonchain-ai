@@ -45,7 +45,17 @@ public class ModelRegistryInitializer implements CommandLineRunner {
 
         try {
             // 加载提供商配置
-            modelRegistry.registerProviders(modelLoader.loadProviders());
+            modelRegistry.registerProviders(modelLoader.loadProviders()
+                    .stream()
+                    .map(provider -> {
+                        provider.getConfigSchemas().forEach(item -> {
+                            if ("apiKey".equals(item.getName())) {
+                                item.setValue("sk-3ef709a6aa404b00af299c288264a48f");
+                            }
+                        });
+                        return provider;
+                    })
+                    .toList());
 
             // 加载模型配置
             modelRegistry.registerModels(modelLoader.loadModels());

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -46,7 +47,12 @@ public class DelegatingChatModel implements ChatModel {
     @Override
     public ChatResponse call(Prompt prompt) {
         String modelId = getModelIdFromPrompt(prompt);
-        return getModel(modelId).call(prompt);
+        return getModel(modelId).call(Prompt.builder()
+                .messages(prompt.getUserMessage())
+                .chatOptions(ChatOptions.builder()
+                        .model(modelId.substring(0, modelId.lastIndexOf('-')))
+                        .build())
+                .build());
     }
 
     /**
