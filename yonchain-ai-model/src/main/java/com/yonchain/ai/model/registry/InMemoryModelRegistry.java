@@ -27,6 +27,9 @@ public class InMemoryModelRegistry implements ModelRegistry {
     
     // 模型存储：key为providerCode，value为该提供商下的模型列表
     private final Map<String, List<ModelInfo>> modelsByProvider = new ConcurrentHashMap<>();
+    
+    // 模型ID缓存：key为modelId（格式：modelCode-providerCode），value为模型信息
+    private final Map<String, ModelInfo> modelIdCache = new ConcurrentHashMap<>();
 
     @Override
     public List<ModelProvider> getProviders() {
@@ -67,16 +70,25 @@ public class InMemoryModelRegistry implements ModelRegistry {
             throw new IllegalArgumentException("模型不能为空");
         }
         
-        String providerCode = model.getProviderCode();
+        String providerCode = model.getProvider();
         if (providerCode == null) {
             throw new IllegalArgumentException("模型的提供商代码不能为空");
+        }
+        
+        String modelCode = model.getCode();
+        if (modelCode == null) {
+            throw new IllegalArgumentException("模型代码不能为空");
         }
         
         // 确保提供商存在
         modelsByProvider.putIfAbsent(providerCode, new ArrayList<>());
         modelsByProvider.get(providerCode).add(model);
         
-        log.debug("注册模型: {} (提供商: {})", model.getCode(), providerCode);
+        // 同时存储到模型ID缓存中
+        String modelId = modelCode + "-" + providerCode;
+        modelIdCache.put(modelId, model);
+        
+        log.debug("注册模型: {} (提供商: {})", modelCode, providerCode);
     }
     
     @Override
@@ -97,5 +109,15 @@ public class InMemoryModelRegistry implements ModelRegistry {
             }
             log.info("批量注册模型完成，数量: {}", modelList.size());
         }
+    }
+    
+    @Override
+    public ModelInfo getModel(String modelId) {
+        if (modelId == null) {
+            return null;
+        }
+        
+        // 直接从缓存中获取，避免遍历
+        return modelIdCache.get(modelId);
     }
 }

@@ -65,8 +65,16 @@ public interface ModelRegistry {
 
     /**
      * 批量注册模型
-     *
+     * 
      * @param models 模型列表
      */
     void registerModels(Collection<? extends ModelInfo> models);
+    
+    /**
+     * 根据模型ID获取模型
+     * 
+     * @param modelId 模型ID（格式：modelCode-providerCode）
+     * @return 模型信息，如果未找到则返回null
+     */
+    ModelInfo getModel(String modelId);
 }
