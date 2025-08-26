@@ -83,13 +83,16 @@ public class ModelController extends BaseController {
         return responseFactory.createModelListResponse(models);
     }
 
-    /**
+/*
+    */
+/**
      * /**
      * 获取模型配置
      *
      * @param modelCode 模型编码
      * @return 模型配置响应
-     */
+     *//*
+
     @Operation(summary = "获取模型配置", description = "获取指定模型的租户级别配置信息")
     @GetMapping("/config")
     public ModelConfigResponse getModelConfig(
@@ -104,6 +107,7 @@ public class ModelController extends BaseController {
 
         return responseFactory.createModelConfigResponse(model);
     }
+*/
 
     /**
      * /**

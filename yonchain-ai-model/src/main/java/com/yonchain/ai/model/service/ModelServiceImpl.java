@@ -1,4 +1,4 @@
-package com.yonchain.ai.model.service;
+ package com.yonchain.ai.model.service;
 
 import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.model.*;
@@ -8,7 +8,6 @@ import com.yonchain.ai.model.factory.ModelFactory;
 import com.yonchain.ai.model.mapper.ModelMapper;
 import com.yonchain.ai.model.mapper.ModelProviderMapper;
 import com.yonchain.ai.model.registry.ModelRegistry;
-import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.util.IdUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -166,10 +165,15 @@ public class ModelServiceImpl implements ModelService {
     }
 
     /**
+    /**
      * 保存租户提供商配置（同步到注册表）
      */
     @Override
     public void saveProviderConfig(String tenantId, String providerCode, Map<String, Object> config) {
+        if (modelProviderMapper == null) {
+            log.warn("数据库配置未启用，无法保存提供商配置");
+            return;
+        }
 
         ModelProviderEntity entity = modelProviderMapper.selectByTenantAndCode(tenantId, providerCode);
         if (entity == null) {
@@ -202,14 +206,12 @@ public class ModelServiceImpl implements ModelService {
         }
 
         // 从注册表获取提供商信息
-        ModelProvider provider = null;
-        List<ModelProvider>  modelInfos = modelRegistry.getProviders();
-        for (ModelInfo info : modelInfos.values()) {
-            if (info.getProvider().getCode().equals(providerCode)) {
-                provider = info.getProvider();
-                break;
-            }
-        }
+        // 从注册表获取提供商信息
+        ModelProvider provider = modelRegistry.getProviders()
+                .stream()
+                .filter(p -> p.getCode().equals(providerCode))
+                .findFirst()
+                .orElse(null);
 
         if (provider != null) {
             // 更新提供商信息
@@ -592,6 +594,220 @@ public class ModelServiceImpl implements ModelService {
         public ModelProvider getProvider() {
             return provider;
         }
+    }
+
+    /**
+    // ==================== 缺失的接口方法实现 ====================
+
+    @Override
+    public ModelInfo getModelConfig(String tenantId, String modelCode) {
+        log.debug("获取租户模型配置: tenantId={}, modelCode={}", tenantId, modelCode);
+
+        if (!StringUtils.hasText(tenantId)) {
+            log.error("租户ID不能为空");
+            throw new IllegalArgumentException("租户ID不能为空");
+        }
+
+        if (!StringUtils.hasText(modelCode)) {
+            log.error("模型代码不能为空");
+            throw new IllegalArgumentException("模型代码不能为空");
+        }
+
+        // 从注册表获取模型信息
+        List<ModelInfo> allModels = modelRegistry.getAllModels();
+        for (ModelInfo modelInfo : allModels) {
+            if (modelInfo.getCode().equals(modelCode)) {
+                // 如果数据库配置可用，获取租户特定配置
+                if (modelMapper != null) {
+                    ModelEntity modelEntity = modelMapper.selectByTenantAndModelCode(tenantId, modelCode);
+                    if (modelEntity != null) {
+                        modelInfo.setEnabled(modelEntity.getEnabled());
+
+                        // 设置动态配置
+                        Map<String, Object> dynamicConfig = convertJsonToMapObject(modelEntity.getModelConfig());
+                        if (dynamicConfig.containsKey("capabilities")) {
+                            Object capsObj = dynamicConfig.get("capabilities");
+                            if (capsObj instanceof List) {
+                                modelInfo.setCapabilities((List<String>) capsObj);
+                            }
+                        }
+                    }
+                }
+
+                log.debug("成功获取模型配置: {}", modelInfo);
+                return modelInfo;
+            }
+        }
+
+        log.warn("未找到模型配置: tenantId={}, modelCode={}", tenantId, modelCode);
+        return null;
+    }
+
+    @Override
+    public Page<ModelInfo> pageModels(String tenantId, Map<String, Object> queryParam, int pageNum, int pageSize) {
+        // 获取所有模型
+        List<ModelInfo> allModels = getModels(tenantId, queryParam);
+
+        // 应用查询过滤条件
+        List<ModelInfo> filteredModels = applyModelInfoFilters(allModels, queryParam);
+
+        // 手动分页
+        int total = filteredModels.size();
+        int startIndex = (pageNum - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, total);
+
+        List<ModelInfo> pageData = filteredModels.subList(startIndex, endIndex);
+
+        Page<ModelInfo> page = new Page<>();
+        page.setRecords(pageData);
+        page.setCurrent(pageNum);
+        page.setSize(pageSize);
+        page.setTotal(total);
+
+        return page;
+    }
+
+    @Override
+    public Page<ModelProvider> pageProviders(String tenantId, Map<String, Object> queryParam, int pageNum, int pageSize) {
+        // 获取所有提供商
+        List<ModelProvider> allProviders = getProviders(tenantId, queryParam);
+
+        // 应用查询过滤条件
+        List<ModelProvider> filteredProviders = applyModelProviderFilters(allProviders, queryParam);
+
+        // 手动分页
+        int total = filteredProviders.size();
+        int startIndex = (pageNum - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, total);
+
+        List<ModelProvider> pageData = filteredProviders.subList(startIndex, endIndex);
+
+        Page<ModelProvider> page = new Page<>();
+        page.setRecords(pageData);
+        page.setCurrent(pageNum);
+        page.setSize(pageSize);
+        page.setTotal(total);
+
+        return page;
+    }
+
+    @Override
+    public List<ModelProvider> getProvidersByTenantId(String tenantId) {
+        // 委托给getProviders方法，保持向后兼容
+        return getProviders(tenantId, null);
+    }
+
+    @Override
+    public ModelProvider getProviderById(String providerId) {
+        return modelRegistry.getProviders()
+                .stream()
+                .filter(provider -> provider.getCode().equals(providerId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    // ==================== 模型实例管理方法 ====================
+
+    @Override
+    public String createModel(ModelInfo model) {
+        if (modelMapper == null) {
+            throw new UnsupportedOperationException("数据库配置未启用，无法创建模型配置");
+        }
+
+        // 创建租户模型实例配置
+        ModelEntity entity = new ModelEntity();
+        entity.setId(IdUtil.generateId());
+        entity.setTenantId(model.getTenantId());
+        entity.setModelCode(model.getCode());
+        entity.setProviderCode(model.getProvider());
+        entity.setEnabled(true);
+        entity.setCreateTime(LocalDateTime.now());
+        entity.setUpdateTime(LocalDateTime.now());
+
+        modelMapper.insert(entity);
+
+        // 同步到注册表
+        syncModelToRegistry(model);
+
+        return entity.getId();
+    }
+
+    @Override
+    public void updateModel(ModelInfo model) {
+        if (modelMapper == null) {
+            throw new UnsupportedOperationException("数据库配置未启用，无法更新模型配置");
+        }
+
+        ModelEntity entity = modelMapper.selectByTenantAndModelCode(model.getTenantId(), model.getCode());
+
+        if (entity != null) {
+            entity.setEnabled(true);
+            entity.setUpdateTime(LocalDateTime.now());
+
+            modelMapper.update(entity);
+
+            // 同步到注册表
+            syncModelToRegistry(model);
+        }
+    }
+
+    @Override
+    public void deleteModel(String id) {
+        if (modelMapper == null) {
+            throw new UnsupportedOperationException("数据库配置未启用，无法删除模型配置");
+        }
+
+        modelMapper.deleteById(id);
+    }
+
+    // ==================== 提供商管理方法 ====================
+
+    @Override
+    public void createProvider(ModelProvider modelProvider) {
+        if (modelProviderMapper == null) {
+            throw new UnsupportedOperationException("数据库配置未启用，无法创建提供商配置");
+        }
+
+        ModelProviderEntity entity = new ModelProviderEntity();
+        entity.setId(IdUtil.generateId());
+        entity.setTenantId(modelProvider.getTenantId());
+        entity.setProviderCode(modelProvider.getCode());
+        entity.setEnabled(modelProvider.getEnabled());
+        entity.setCreateTime(LocalDateTime.now());
+        entity.setUpdateTime(LocalDateTime.now());
+
+        modelProviderMapper.insert(entity);
+
+        // 同步到注册表
+        syncProviderToRegistry(modelProvider);
+    }
+
+    @Override
+    public void updateProvider(ModelProvider modelProvider) {
+        if (modelProviderMapper == null) {
+            throw new UnsupportedOperationException("数据库配置未启用，无法更新提供商配置");
+        }
+
+        ModelProviderEntity entity = modelProviderMapper.selectByTenantAndCode(
+                modelProvider.getTenantId(), modelProvider.getCode());
+
+        if (entity != null) {
+            entity.setEnabled(modelProvider.getEnabled());
+            entity.setUpdateTime(LocalDateTime.now());
+            modelProviderMapper.update(entity);
+
+            // 同步到注册表
+            syncProviderToRegistry(modelProvider);
+        }
+    }
+
+    @Override
+    public void deleteProvider(String providerId) {
+        if (modelProviderMapper == null) {
+            throw new UnsupportedOperationException("数据库配置未启用，无法删除提供商配置");
+        }
+
+        modelProviderMapper.deleteById(providerId);
     }
 
     /**

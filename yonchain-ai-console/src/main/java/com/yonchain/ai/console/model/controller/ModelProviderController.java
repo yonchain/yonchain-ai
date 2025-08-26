@@ -50,23 +50,6 @@ public class ModelProviderController extends BaseController {
     @Autowired
     private ModelService modelService;
 
-    /**
-     * 获取模型提供商详情
-     *
-     * @param id 模型提供商ID
-     * @return 模型提供商响应
-     */
-    @Operation(summary = "获取模型提供商详情", description = "根据ID获取模型提供商详细信息")
-    @GetMapping("/{id}")
-    public ModelProviderResponse getProviderById(
-            @Parameter(description = "模型提供商ID", required = true, in = ParameterIn.PATH)
-            @PathVariable String id) {
-        ModelProvider provider = modelService.getProviderById(id);
-        if (provider == null) {
-            throw new YonchainIllegalStateException("模型提供商不存在");
-        }
-        return responseFactory.createModelProviderResponse(provider);
-    }
 
     /**
      * 分页查询模型提供商
