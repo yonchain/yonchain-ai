@@ -398,9 +398,9 @@ public class ModelFactory {
     }
 
 
-    /**
+/*    *//**
      * 从配置中获取值，支持多个配置源的优先级
-     */
+     *//*
     @SuppressWarnings("unchecked")
     private <T> T getConfigValue(Map<String, Object> primaryConfig, Map<String, Object> secondaryConfig, String key, T defaultValue) {
         Object value = primaryConfig.get(key);
@@ -408,5 +408,5 @@ public class ModelFactory {
             value = secondaryConfig.get(key);
         }
         return value != null ? (T) value : defaultValue;
-    }
+    }*/
 }

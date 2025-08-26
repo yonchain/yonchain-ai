@@ -16,8 +16,8 @@ import org.springframework.context.annotation.Configuration;
 public class ModelConfiguration {
 
     @Bean
-    public ChatModel chatModel(ModelRegistry modelRegistry, ModelFactory modelFactory) {
-        return new DelegatingChatModel(modelRegistry, modelFactory);
+    public ChatModel chatModel(ModelFactory modelFactory) {
+        return new DelegatingChatModel(modelFactory);
     }
 
     @Bean
@@ -41,7 +41,7 @@ public class ModelConfiguration {
     }
 
     @Bean
-    public ModelFactory modelFactory(ModelRegistry modelRegistry){
+    public ModelFactory modelFactory(ModelRegistry modelRegistry) {
         return new ModelFactory(modelRegistry);
     }
 
