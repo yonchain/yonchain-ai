@@ -6,130 +6,96 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * 模型注册表实现类
+ * 内存模型注册表实现
  * <p>
- * 负责注册和管理模型静态信息
- *
+ * 负责在内存中注册和管理模型静态信息
+ * 
  * @author Cgy
  */
 @Component
 public class InMemoryModelRegistry implements ModelRegistry {
 
-    private static final Logger logger = LoggerFactory.getLogger(InMemoryModelRegistry.class);
+    private static final Logger log = LoggerFactory.getLogger(InMemoryModelRegistry.class);
 
-    /**
-     * 缓存模型静态信息
-     * key: 模型ID (modelCode-providerCode)
-     */
-    private final Map<String, RegistryModelInfo> modelInfoRegistry = new ConcurrentHashMap<>();
+    // 提供商存储：key为providerCode，value为提供商信息
+    private final Map<String, ModelProvider> providers = new ConcurrentHashMap<>();
+    
+    // 模型存储：key为providerCode，value为该提供商下的模型列表
+    private final Map<String, List<ModelInfo>> modelsByProvider = new ConcurrentHashMap<>();
 
-    /**
-     * 获取所有已注册的模型ID
-     *
-     * @return 所有已注册的模型ID
-     */
     @Override
-    public List<String> getAllModelIds() {
-        return modelInfoRegistry.keySet().stream().collect(Collectors.toList());
+    public List<ModelProvider> getProviders() {
+        return new ArrayList<>(providers.values());
+    }
+
+    @Override
+    public ModelInfo getModels(String modelId) {
+        return null;
+    }
+
+    @Override
+    public List<ModelInfo> getModelsByProvider(String providerCode) {
+        return new ArrayList<>(modelsByProvider.getOrDefault(providerCode, new ArrayList<>()));
     }
     
-    /**
-     * 注册模型静态信息
-     * 
-     * @param modelId 模型ID
-     * @param model 模型信息
-     * @param provider 提供商信息
-     */
     @Override
-    public void registerModelInfo(String modelId, ModelInfo model, ModelProvider provider) {
-        RegistryModelInfo modelInfo = new RegistryModelInfo(model, provider);
-        modelInfoRegistry.put(modelId, modelInfo);
-        logger.info("已注册模型静态信息: {}", modelId);
-    }
-    
-    /**
-     * 获取模型静态信息
-     * 
-     * @param modelId 模型ID
-     * @return 模型静态信息，包含模型信息和提供商信息，如果未找到则返回null
-     */
-    @Override
-    public RegistryModelInfo getModelInfo(String modelId) {
-        return modelInfoRegistry.get(modelId);
-    }
-    
-    /**
-     * 获取所有模型静态信息
-     * 
-     * @return 所有模型静态信息的映射，key为模型ID
-     */
-    @Override
-    public Map<String, RegistryModelInfo> getAllModelInfos() {
-        return new HashMap<>(modelInfoRegistry);
-    }
-    
-    /**
-     * 移除模型静态信息
-     * 
-     * @param modelId 模型ID
-     * @return 被移除的模型静态信息，如果未找到则返回null
-     */
-    public RegistryModelInfo removeModelInfo(String modelId) {
-        RegistryModelInfo removed = modelInfoRegistry.remove(modelId);
-        if (removed != null) {
-            logger.info("已移除模型静态信息: {}", modelId);
+    public void registerProvider(ModelProvider provider) {
+        if (provider == null) {
+            throw new IllegalArgumentException("提供商不能为空");
         }
-        return removed;
-    }
-    
-    /**
-     * 清除所有模型静态信息
-     */
-    public void clearAllModelInfos() {
-        modelInfoRegistry.clear();
-        logger.info("已清除所有模型静态信息");
-    }
-    
-    /**
-     * 获取已注册模型静态信息的数量
-     * 
-     * @return 已注册模型静态信息的数量
-     */
-    public int getModelInfoCount() {
-        return modelInfoRegistry.size();
-    }
-    
-    /**
-     * 检查是否存在指定的模型静态信息
-     * 
-     * @param modelId 模型ID
-     * @return 如果存在则返回true，否则返回false
-     */
-    public boolean hasModelInfo(String modelId) {
-        return modelInfoRegistry.containsKey(modelId);
-    }
-    
-    /**
-     * 更新模型静态信息
-     * 
-     * @param modelId 模型ID
-     * @param model 模型信息
-     * @param provider 提供商信息
-     * @return 如果更新成功则返回true，否则返回false
-     */
-    public boolean updateModelInfo(String modelId, ModelInfo model, ModelProvider provider) {
-        if (modelInfoRegistry.containsKey(modelId)) {
-            registerModelInfo(modelId, model, provider);
-            logger.info("已更新模型静态信息: {}", modelId);
-            return true;
+        
+        String providerCode = provider.getCode();
+        if (providerCode == null) {
+            throw new IllegalArgumentException("提供商代码不能为空");
         }
-        return false;
+        
+        providers.put(providerCode, provider);
+        // 确保该提供商有对应的模型列表
+        modelsByProvider.putIfAbsent(providerCode, new ArrayList<>());
+        
+        log.debug("注册提供商: {}", providerCode);
+    }
+    
+    @Override
+    public void registerModel(ModelInfo model) {
+        if (model == null) {
+            throw new IllegalArgumentException("模型不能为空");
+        }
+        
+        String providerCode = model.getProviderCode();
+        if (providerCode == null) {
+            throw new IllegalArgumentException("模型的提供商代码不能为空");
+        }
+        
+        // 确保提供商存在
+        modelsByProvider.putIfAbsent(providerCode, new ArrayList<>());
+        modelsByProvider.get(providerCode).add(model);
+        
+        log.debug("注册模型: {} (提供商: {})", model.getCode(), providerCode);
+    }
+    
+    @Override
+    public void registerProviders(Collection<? extends ModelProvider> providerList) {
+        if (providerList != null) {
+            for (ModelProvider provider : providerList) {
+                registerProvider(provider);
+            }
+            log.info("批量注册提供商完成，数量: {}", providerList.size());
+        }
+    }
+    
+    @Override
+    public void registerModels(Collection<? extends ModelInfo> modelList) {
+        if (modelList != null) {
+            for (ModelInfo model : modelList) {
+                registerModel(model);
+            }
+            log.info("批量注册模型完成，数量: {}", modelList.size());
+        }
     }
 }

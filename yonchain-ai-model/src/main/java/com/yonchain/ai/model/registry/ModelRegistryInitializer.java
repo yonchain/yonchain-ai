@@ -1,136 +1,50 @@
 package com.yonchain.ai.model.registry;
 
 import com.yonchain.ai.api.exception.YonchainException;
-import com.yonchain.ai.api.model.ModelInfo;
-import com.yonchain.ai.api.model.ModelProvider;
-import com.yonchain.ai.api.model.DefaultModel;
-import com.yonchain.ai.api.model.DefaultModelProvider;
 import com.yonchain.ai.model.loader.ModelLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.CommandLineRunner;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 模型注册表初始化器
  * <p>
- * 在应用启动时加载模型配置信息，但不立即创建模型实例
- * 遵循单一职责原则，只负责初始化配置
- * 
+ * 负责在应用启动时加载模型和提供商配置信息到注册表
+ * 不负责模型实例的创建和管理，只负责加载静态信息到注册表
+ *
  * @author Cgy
  */
-@Component
-public class ModelRegistryInitializer implements InitializingBean {
+public class ModelRegistryInitializer implements CommandLineRunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(ModelRegistryInitializer.class);
+    private static final Logger log = LoggerFactory.getLogger(ModelRegistryInitializer.class);
 
-    @Autowired
-    private ModelLoader modelLoader;
+    private final ModelRegistry modelRegistry;
 
-    @Autowired
-    private ModelRegistry modelRegistry;
-    
-    /**
-     * 在应用启动时加载模型配置信息
-     */
+    private final ModelLoader modelLoader;
+
+    public ModelRegistryInitializer(ModelRegistry modelRegistry, ModelLoader modelLoader) {
+        this.modelLoader = modelLoader;
+        this.modelRegistry = modelRegistry;
+    }
+
     @Override
-    public void afterPropertiesSet() throws Exception {
-        initializeModelRegistry();
+    public void run(String... args) {
+        log.info("开始初始化模型注册表...");
+
+        try {
+            // 加载提供商配置
+            modelRegistry.registerProviders(modelLoader.loadProviders());
+
+            // 加载模型配置
+            modelRegistry.registerModels(modelLoader.loadModels());
+
+            log.info("模型注册表初始化完成");
+
+        } catch (Exception e) {
+            log.error("模型注册表初始化失败", e);
+            throw new YonchainException("模型注册表初始化失败", e);
+        }
     }
 
-    /**
-     * 初始化模型注册表
-     * 只加载配置信息，不创建实际的模型实例
-     */
-    public void initializeModelRegistry() {
-        logger.info("开始初始化模型注册表配置...");
-        
-        try {
-            // 加载所有模型和提供商配置
-            Collection<? extends ModelInfo> models = modelLoader.loadModels();
-            Collection<? extends ModelProvider> providers = modelLoader.loadProviders();
-            
-            // 将模型信息转换为Map
-            Map<String, ModelInfo> modelMap = convertToModelMap(models);
-            
-            // 将提供商信息转换为Map
-            Map<String, ModelProvider> providerMap = convertToProviderMap(providers);
-            
-            // 初始化模型配置
-            int configuredCount = initializeModelConfigurations(modelMap, providerMap);
-            
-            logger.info("模型注册表配置初始化完成，共配置 {} 个模型", configuredCount);
-        } catch (Exception e) {
-            logger.error("初始化模型注册表配置失败", e);
-            throw new YonchainException("模型注册表配置初始化失败: " + e.getMessage(), e);
-        }
-    }
-    
-    /**
-     * 将ModelInfo集合转换为ModelInfo映射
-     */
-    private Map<String, ModelInfo> convertToModelMap(Collection<? extends ModelInfo> models) {
-        Map<String, ModelInfo> modelMap = new HashMap<>(models.size());
-        for (ModelInfo model : models) {
-            modelMap.put(model.getCode(), model);
-        }
-        return modelMap;
-    }
-    
-    /**
-     * 将ModelProvider集合转换为ModelProvider映射
-     */
-    private Map<String, ModelProvider> convertToProviderMap(Collection<? extends ModelProvider> providers) {
-        Map<String, ModelProvider> providerMap = new HashMap<>(providers.size());
-        for (ModelProvider provider : providers) {
-            providerMap.put(provider.getCode(), provider);
-        }
-        return providerMap;
-    }
-    
-    /**
-     * 初始化模型配置信息，但不立即创建模型实例
-     * @return 成功配置的模型数量
-     */
-    private int initializeModelConfigurations(Map<String, ModelInfo> modelMap, Map<String, ModelProvider> providerMap) {
-        int configuredCount = 0;
-        
-        for (ModelInfo model : modelMap.values()) {
-            // 只处理启用的模型
-            if (!model.getEnabled()) {
-                logger.debug("跳过未启用的模型: {}", model.getCode());
-                continue;
-            }
-            
-            String providerCode = model.getProvider();
-            ModelProvider provider = providerMap.get(providerCode);
-            
-            // 确保提供商存在且已启用
-            if (provider == null) {
-                logger.warn("模型 {} 的提供商 {} 不存在", model.getCode(), providerCode);
-                continue;
-            }
-            
-            if (!provider.getEnabled()) {
-                logger.debug("跳过未启用的提供商: {}", provider.getCode());
-                continue;
-            }
-            
-            // 生成模型ID
-            String modelId = model.getCode() + "-" + provider.getCode();
-            
-            // 将模型静态信息注册到注册表
-            modelRegistry.registerModelInfo(modelId, model, provider);
-            logger.info("已注册模型静态信息到注册表: {}", modelId);
-            
-            configuredCount++;
-        }
-        
-        return configuredCount;
-    }
 }

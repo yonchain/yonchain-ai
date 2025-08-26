@@ -3,67 +3,70 @@ package com.yonchain.ai.model.registry;
 import com.yonchain.ai.api.model.ModelInfo;
 import com.yonchain.ai.api.model.ModelProvider;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 模型注册表接口
  * <p>
  * 负责注册和管理模型静态信息
- * 
+ * 核心功能：
+ * 1. 能获取所有注册的提供商列表
+ * 2. 根据提供商获取所有的对应的模型列表
+ * 3. 支持注册提供商、模型
+ *
  * @author Cgy
  */
 public interface ModelRegistry {
 
     /**
-     * 获取所有已注册的模型ID
-     * 
-     * @return 所有已注册的模型ID列表
+     * 获取所有注册的提供商列表
+     *
+     * @return 所有已注册的提供商列表
      */
-    List<String> getAllModelIds();
-    
+    List<ModelProvider> getProviders();
+
     /**
-     * 注册模型静态信息
-     * 
+     * 根据模型id获取模型信息
+     *
      * @param modelId 模型ID
-     * @param model 模型信息
+     * @return 模型信息
+     */
+    ModelInfo getModels(String modelId);
+
+    /**
+     * 根据提供商获取所有的对应的模型列表
+     *
+     * @param providerCode 提供商代码
+     * @return 该提供商下的所有模型列表
+     */
+    List<ModelInfo> getModelsByProvider(String providerCode);
+
+    /**
+     * 注册提供商
+     *
      * @param provider 提供商信息
      */
-    void registerModelInfo(String modelId, ModelInfo model, ModelProvider provider);
-    
+    void registerProvider(ModelProvider provider);
+
     /**
-     * 获取模型静态信息
-     * 
-     * @param modelId 模型ID
-     * @return 模型静态信息，包含模型信息和提供商信息，如果未找到则返回null
+     * 注册模型
+     *
+     * @param model 模型信息
      */
-    RegistryModelInfo getModelInfo(String modelId);
-    
+    void registerModel(ModelInfo model);
+
     /**
-     * 获取所有模型静态信息
-     * 
-     * @return 所有模型静态信息的映射，key为模型ID
+     * 批量注册提供商
+     *
+     * @param providers 提供商列表
      */
-    Map<String, RegistryModelInfo> getAllModelInfos();
-    
+    void registerProviders(Collection<? extends ModelProvider> providers);
+
     /**
-     * 模型静态信息类
+     * 批量注册模型
+     *
+     * @param models 模型列表
      */
-    class RegistryModelInfo {
-        private final ModelInfo model;
-        private final ModelProvider provider;
-        
-        public RegistryModelInfo(ModelInfo model, ModelProvider provider) {
-            this.model = model;
-            this.provider = provider;
-        }
-        
-        public ModelInfo getModel() {
-            return model;
-        }
-        
-        public ModelProvider getProvider() {
-            return provider;
-        }
-    }
+    void registerModels(Collection<? extends ModelInfo> models);
 }

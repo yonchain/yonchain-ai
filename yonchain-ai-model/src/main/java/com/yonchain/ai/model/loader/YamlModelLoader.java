@@ -6,9 +6,7 @@ import com.yonchain.ai.api.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -17,11 +15,10 @@ import java.util.*;
  * <p>
  * 从YAML文件加载模型和提供商的配置信息
  * 遵循单一职责原则，只负责加载，不负责存储
- * 
+ *
  * @author Cgy
  */
 @Slf4j
-@Component
 public class YamlModelLoader implements ModelLoader {
 
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
@@ -29,7 +26,7 @@ public class YamlModelLoader implements ModelLoader {
     @Override
     public Collection<? extends ModelProvider> loadProviders() {
         Map<String, DefaultModelProvider> providerConfigs = new HashMap<>();
-        
+
         try {
             PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             Resource[] resources = resolver.getResources("classpath*:models/**/**.yaml");
@@ -48,19 +45,19 @@ public class YamlModelLoader implements ModelLoader {
                     log.warn("加载提供商配置失败: {}", resource.getFilename(), e);
                 }
             }
-            
+
             log.info("从YAML加载了 {} 个提供商配置", providerConfigs.size());
         } catch (Exception e) {
             log.error("加载提供商配置失败", e);
         }
-        
+
         return providerConfigs.values();
     }
 
     @Override
     public Collection<? extends ModelInfo> loadModels() {
         Map<String, DefaultModel> modelConfigs = new HashMap<>();
-        
+
         try {
             PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
             Resource[] resources = resolver.getResources("classpath*:models/**/**.yaml");
@@ -80,12 +77,12 @@ public class YamlModelLoader implements ModelLoader {
                     log.warn("加载模型配置失败: {}", resource.getFilename(), e);
                 }
             }
-            
+
             log.info("从YAML加载了 {} 个模型配置", modelConfigs.size());
         } catch (Exception e) {
             log.error("加载模型配置失败", e);
         }
-        
+
         return modelConfigs.values();
     }
 
@@ -189,7 +186,6 @@ public class YamlModelLoader implements ModelLoader {
 
             items.add(item);
         }
-
         return items;
     }
 }
