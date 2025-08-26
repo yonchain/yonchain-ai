@@ -46,7 +46,6 @@ public class DelegatingChatModel implements ChatModel {
     @Override
     public ChatResponse call(Prompt prompt) {
         String modelId = getModelIdFromPrompt(prompt);
-        logger.debug("使用模型 {} 处理请求", modelId);
         return getModel(modelId).call(prompt);
     }
 
@@ -59,7 +58,6 @@ public class DelegatingChatModel implements ChatModel {
     @Override
     public Flux<ChatResponse> stream(Prompt prompt) {
         String modelId = getModelIdFromPrompt(prompt);
-        logger.debug("使用模型 {} 处理流式请求", modelId);
         return getModel(modelId).stream(prompt);
     }
 
@@ -83,7 +81,7 @@ public class DelegatingChatModel implements ChatModel {
 
             // 如果默认模型也不存在，则抛出异常
             if (model == null) {
-                throw new YonchainIllegalStateException("无法找到默认模型: " + defaultModelId);
+                throw new YonchainIllegalStateException("无法找到默认模型: " + modelId);
             }
         }
 
