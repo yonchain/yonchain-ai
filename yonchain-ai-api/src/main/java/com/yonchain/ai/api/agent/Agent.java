@@ -17,6 +17,7 @@ package com.yonchain.ai.api.agent;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -223,34 +224,34 @@ public interface Agent {
     void setWelcomeMessage(String welcomeMessage);
     
     /**
-     * 获取知识库ID列表（JSON格式）
+     * 获取知识库ID列表
      */
-    String getKnowledgeBaseIds();
+    List<String> getKnowledgeBaseIds();
 
     /**
-     * 设置知识库ID列表（JSON格式）
+     * 设置知识库ID列表
      */
-    void setKnowledgeBaseIds(String knowledgeBaseIds);
+    void setKnowledgeBaseIds(List<String> knowledgeBaseIds);
     
     /**
-     * 获取插件ID列表（JSON格式）
+     * 获取插件ID列表
      */
-    String getPluginIds();
+    List<String> getPluginIds();
 
     /**
-     * 设置插件ID列表（JSON格式）
+     * 设置插件ID列表
      */
-    void setPluginIds(String pluginIds);
+    void setPluginIds(List<String> pluginIds);
     
     /**
-     * 获取MCP配置（JSON格式）
+     * 获取MCP配置
      */
-    String getMcpConfig();
+    Map<String, Object> getMcpConfig();
 
     /**
-     * 设置MCP配置（JSON格式）
+     * 设置MCP配置
      */
-    void setMcpConfig(String mcpConfig);
+    void setMcpConfig(Map<String, Object> mcpConfig);
     
     /**
      * 获取工作流ID

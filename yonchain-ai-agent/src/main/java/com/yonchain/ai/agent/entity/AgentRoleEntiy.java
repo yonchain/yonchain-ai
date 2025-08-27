@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
  * @author Cgy
  * @since 2024-01-20
  */
-public class AppRoleEntiy {
+public class AgentRoleEntiy {
 
     /**
      * 关联ID

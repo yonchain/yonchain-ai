@@ -17,6 +17,7 @@
 package com.yonchain.ai.api.agent;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,7 +26,7 @@ import java.util.Map;
  * @author Cgy
  * @since 2024-01-20
  */
-public class DefaultApplication implements Agent {
+public class DefaultAgent implements Agent {
 
     /**
      * 主键ID
@@ -128,19 +129,19 @@ public class DefaultApplication implements Agent {
     private String welcomeMessage;
     
     /**
-     * 知识库ID列表（JSON格式）
+     * 知识库ID列表
      */
-    private String knowledgeBaseIds;
+    private List<String> knowledgeBaseIds;
     
     /**
-     * 插件ID列表（JSON格式）
+     * 插件ID列表
      */
-    private String pluginIds;
+    private List<String> pluginIds;
     
     /**
-     * MCP配置（JSON格式）
+     * MCP配置
      */
-    private String mcpConfig;
+    private Map<String, Object> mcpConfig;
     
     /**
      * 工作流ID
@@ -491,32 +492,32 @@ public class DefaultApplication implements Agent {
     }
 
     @Override
-    public String getKnowledgeBaseIds() {
+    public List<String> getKnowledgeBaseIds() {
         return knowledgeBaseIds;
     }
 
     @Override
-    public void setKnowledgeBaseIds(String knowledgeBaseIds) {
+    public void setKnowledgeBaseIds(List<String> knowledgeBaseIds) {
         this.knowledgeBaseIds = knowledgeBaseIds;
     }
 
     @Override
-    public String getPluginIds() {
+    public List<String> getPluginIds() {
         return pluginIds;
     }
 
     @Override
-    public void setPluginIds(String pluginIds) {
+    public void setPluginIds(List<String> pluginIds) {
         this.pluginIds = pluginIds;
     }
 
     @Override
-    public String getMcpConfig() {
+    public Map<String, Object> getMcpConfig() {
         return mcpConfig;
     }
 
     @Override
-    public void setMcpConfig(String mcpConfig) {
+    public void setMcpConfig(Map<String, Object> mcpConfig) {
         this.mcpConfig = mcpConfig;
     }
 

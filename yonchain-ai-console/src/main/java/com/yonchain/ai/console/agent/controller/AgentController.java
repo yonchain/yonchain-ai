@@ -2,7 +2,7 @@ package com.yonchain.ai.console.agent.controller;
 
 import com.yonchain.ai.api.agent.Agent;
 import com.yonchain.ai.api.agent.AgentService;
-import com.yonchain.ai.api.agent.DefaultApplication;
+import com.yonchain.ai.api.agent.DefaultAgent;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.api.sys.CurrentUser;
@@ -98,7 +98,7 @@ public class AgentController extends BaseController {
     @PostMapping
     @Operation(summary = "创建应用", description = "创建新的应用")
     public AppResponse createApp(@Valid @RequestBody AppCreateRequest request) {
-        Agent app = new DefaultApplication();
+        Agent app = new DefaultAgent();
         app.setId(UUID.randomUUID().toString());
         app.setTenantId(this.getCurrentTenantId());
 

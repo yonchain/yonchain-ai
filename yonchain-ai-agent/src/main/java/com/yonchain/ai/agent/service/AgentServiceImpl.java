@@ -21,8 +21,8 @@ import com.yonchain.ai.agent.mapper.AgentPublishRecordMapper;
 import com.yonchain.ai.api.agent.*;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.sys.*;
-import com.yonchain.ai.agent.mapper.AppMapper;
-import com.yonchain.ai.agent.mapper.AppRoleMapper;
+import com.yonchain.ai.agent.mapper.AgentMapper;
+import com.yonchain.ai.agent.mapper.AgentRoleMapper;
 import com.yonchain.ai.util.Assert;
 import com.yonchain.ai.util.PageUtil;
 import com.github.pagehelper.PageHelper;
@@ -48,10 +48,10 @@ import java.util.stream.Collectors;
 public class AgentServiceImpl implements AgentService {
 
     @Autowired
-    private AppMapper appMapper;
+    private AgentMapper appMapper;
 
     @Autowired
-    private AppRoleMapper appRoleMapper;
+    private AgentRoleMapper appRoleMapper;
 
     @Autowired
     private RoleService roleService;
@@ -165,6 +165,9 @@ public class AgentServiceImpl implements AgentService {
 
 
 
+
+
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Agent publishAgent(String id, Agent agent, String publishedBy) {
@@ -178,7 +181,7 @@ public class AgentServiceImpl implements AgentService {
             }
         } else {
             // 创建新智能体
-            app = new DefaultApplication();
+            app = new DefaultAgent();
             app.setId(UUID.randomUUID().toString());
             app.setTenantId(getTenantIdByUserId(publishedBy)); // 需要实现此方法获取租户ID
             app.setCreatedBy(publishedBy);
@@ -205,21 +208,17 @@ public class AgentServiceImpl implements AgentService {
         app.setPublishedAt(LocalDateTime.now());
         app.setPublishVersion(newVersion);
 
-        // 将列表和Map转换为JSON字符串
-        try {
-            if (agent.getKnowledgeBaseIds() != null && !agent.getKnowledgeBaseIds().isEmpty()) {
-                app.setKnowledgeBaseIds(objectMapper.writeValueAsString(agent.getKnowledgeBaseIds()));
-            }
+        // 直接设置列表和Map对象
+        if (agent.getKnowledgeBaseIds() != null && !agent.getKnowledgeBaseIds().isEmpty()) {
+            app.setKnowledgeBaseIds(agent.getKnowledgeBaseIds());
+        }
 
-            if (agent.getPluginIds() != null && !agent.getPluginIds().isEmpty()) {
-                app.setPluginIds(objectMapper.writeValueAsString(agent.getPluginIds()));
-            }
+        if (agent.getPluginIds() != null && !agent.getPluginIds().isEmpty()) {
+            app.setPluginIds(agent.getPluginIds());
+        }
 
-            if (agent.getMcpConfig() != null && !agent.getMcpConfig().isEmpty()) {
-                app.setMcpConfig(objectMapper.writeValueAsString(agent.getMcpConfig()));
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("JSON处理错误: " + e.getMessage(), e);
+        if (agent.getMcpConfig() != null && !agent.getMcpConfig().isEmpty()) {
+            app.setMcpConfig(agent.getMcpConfig());
         }
 
         app.setWorkflowId(agent.getWorkflowId());
@@ -257,7 +256,7 @@ public class AgentServiceImpl implements AgentService {
         record.setModelId(agent.getModelId());
         record.setWelcomeMessage(agent.getWelcomeMessage());
 
-        // 将列表和Map转换为JSON字符串
+        // 需要将List和Map转换为JSON字符串，因为AgentPublishRecord仍然使用字符串格式
         try {
             if (agent.getKnowledgeBaseIds() != null && !agent.getKnowledgeBaseIds().isEmpty()) {
                 record.setKnowledgeBaseIds(objectMapper.writeValueAsString(agent.getKnowledgeBaseIds()));

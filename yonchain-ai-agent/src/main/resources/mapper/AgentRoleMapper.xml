@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yonchain.ai.agent.mapper.AppRoleMapper">
+<mapper namespace="com.yonchain.ai.agent.mapper.AgentRoleMapper">
 
-    <resultMap id="BaseResultMap" type="com.yonchain.ai.agent.entity.AppRoleEntiy">
+    <resultMap id="BaseResultMap" type="com.yonchain.ai.agent.entity.AgentRoleEntiy">
         <id column="id" property="id" jdbcType="VARCHAR"/>
         <result column="app_id" property="appId" jdbcType="VARCHAR"/>
         <result column="role_id" property="roleId" jdbcType="VARCHAR"/>

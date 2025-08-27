@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yonchain.ai.agent.mapper.AppMapper">
+<mapper namespace="com.yonchain.ai.agent.mapper.AgentMapper">
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.yonchain.ai.agent.entity.AppEntity">
+    <resultMap id="BaseResultMap" type="com.yonchain.ai.agent.entity.AgentEntity">
         <!-- 主键ID -->
         <id column="id" property="id" jdbcType="OTHER"/>
         <!-- 租户ID -->
         <result column="tenant_id" property="tenantId" jdbcType="OTHER"/>
         <!-- 应用名称 -->
         <result column="name" property="name" jdbcType="VARCHAR"/>
+        <!-- 应用模式 -->
+        <result column="mode" property="mode" jdbcType="VARCHAR"/>
+        <!-- 应用提供商 -->
+        <result column="provider" property="provider" jdbcType="VARCHAR"/>
+        <!-- API密钥 -->
+        <result column="api_key" property="apiKey" jdbcType="VARCHAR"/>
+        <!-- 基础URL -->
+        <result column="base_url" property="baseUrl" jdbcType="VARCHAR"/>
         <!-- 应用图标URL -->
         <result column="icon" property="icon" jdbcType="VARCHAR"/>
         <!-- 图标背景色 -->
@@ -27,19 +35,41 @@
         <result column="created_by" property="createdBy" jdbcType="OTHER"/>
         <!-- 更新者ID -->
         <result column="updated_by" property="updatedBy" jdbcType="OTHER"/>
+        <!-- 提示词 -->
+        <result column="prompt" property="prompt" jdbcType="VARCHAR"/>
+        <!-- 模型ID -->
+        <result column="model_id" property="modelId" jdbcType="OTHER"/>
+        <!-- 开场白 -->
+        <result column="welcome_message" property="welcomeMessage" jdbcType="VARCHAR"/>
+        <!-- 知识库ID列表（JSON格式） -->
+        <result column="knowledge_base_ids" property="knowledgeBaseId" jdbcType="VARCHAR"/>
+        <!-- 插件ID列表（JSON格式） -->
+        <result column="plugin_ids" property="pluginId" jdbcType="VARCHAR"/>
+        <!-- MCP配置（JSON格式） -->
+        <result column="mcp" property="mcp" jdbcType="VARCHAR"/>
+        <!-- 工作流ID -->
+        <result column="workflow_id" property="workflowId" jdbcType="OTHER"/>
+        <!-- 发布时间 -->
+        <result column="published_at" property="publishedAt" jdbcType="TIMESTAMP"/>
+        <!-- 发布者ID -->
+        <result column="published_by" property="publishedBy" jdbcType="OTHER"/>
+        <!-- 发布版本 -->
+        <result column="publish_version" property="publishVersion" jdbcType="INTEGER"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, tenant_id, name,  icon, icon_background, status,
-        description, icon_type, created_by, updated_by
+        id, tenant_id, name, mode, provider, api_key, base_url, icon, icon_background, status,
+        created_at, updated_at, description, icon_type, created_by, updated_by,
+        prompt, model_id, welcome_message, knowledge_base_ids, plugin_ids, mcp,
+        workflow_id, published_at, published_by, publish_version
     </sql>
 
     <!-- 通过ID查询单个应用 -->
     <select id="selectById" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from app
+        from agents
         where id = #{id}::uuid
     </select>
 
@@ -47,13 +77,13 @@
     <select id="selectList" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from app
+        form agents
         where tenant_id = #{tenantId}::uuid
         <if test="params.name != null and params.name != ''">and name like concat('%', #{params.name}, '%')</if>
         <if test="params.status != null and params.status != ''">and status = #{params.status}</if>
         <if test="params.roleIds != null and params.roleIds.size() > 0">
             AND EXISTS (
-            SELECT 1 FROM app_role
+            SELECT 1 form agents_role
             WHERE app_id = apps.id
             AND role_id IN
             <foreach collection="params.roleIds" item="roleId" open="(" separator="," close=")">
@@ -71,9 +101,12 @@
             <if test="id != null">id,</if>
             <if test="tenantId != null">tenant_id,</if>
             <if test="name != null">name,</if>
+            <if test="mode != null">mode,</if>
+            <if test="provider != null">provider,</if>
+            <if test="apiKey != null">api_key,</if>
+            <if test="baseUrl != null">base_url,</if>
             <if test="icon != null">icon,</if>
             <if test="iconBackground != null">icon_background,</if>
-            <if test="provider != null">provider,</if>
             <if test="status != null">status,</if>
             <if test="createdAt != null">created_at,</if>
             <if test="updatedAt != null">updated_at,</if>
@@ -81,11 +114,25 @@
             <if test="iconType != null">icon_type,</if>
             <if test="createdBy != null">created_by,</if>
             <if test="updatedBy != null">updated_by,</if>
+            <if test="prompt != null">prompt,</if>
+            <if test="modelId != null">model_id,</if>
+            <if test="welcomeMessage != null">welcome_message,</if>
+            <if test="knowledgeBaseId != null">knowledge_base_ids,</if>
+            <if test="pluginId != null">plugin_ids,</if>
+            <if test="mcp != null">mcp,</if>
+            <if test="workflowId != null">workflow_id,</if>
+            <if test="publishedAt != null">published_at,</if>
+            <if test="publishedBy != null">published_by,</if>
+            <if test="publishVersion != null">publish_version,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id}::uuid,</if>
             <if test="tenantId != null">#{tenantId}::uuid,</if>
             <if test="name != null">#{name},</if>
+            <if test="mode != null">#{mode},</if>
+            <if test="provider != null">#{provider},</if>
+            <if test="apiKey != null">#{apiKey},</if>
+            <if test="baseUrl != null">#{baseUrl},</if>
             <if test="icon != null">#{icon},</if>
             <if test="iconBackground != null">#{iconBackground},</if>
             <if test="status != null">#{status},</if>
@@ -95,6 +142,16 @@
             <if test="iconType != null">#{iconType},</if>
             <if test="createdBy != null">#{createdBy}::uuid,</if>
             <if test="updatedBy != null">#{updatedBy}::uuid,</if>
+            <if test="prompt != null">#{prompt},</if>
+            <if test="modelId != null">#{modelId}::uuid,</if>
+            <if test="welcomeMessage != null">#{welcomeMessage},</if>
+            <if test="knowledgeBaseId != null">#{knowledgeBaseId},</if>
+            <if test="pluginId != null">#{pluginId},</if>
+            <if test="mcp != null">#{mcp},</if>
+            <if test="workflowId != null">#{workflowId}::uuid,</if>
+            <if test="publishedAt != null">#{publishedAt},</if>
+            <if test="publishedBy != null">#{publishedBy}::uuid,</if>
+            <if test="publishVersion != null">#{publishVersion},</if>
         </trim>
     </insert>
 
@@ -104,6 +161,10 @@
         <set>
             <if test="tenantId != null">tenant_id = #{tenantId}::uuid,</if>
             <if test="name != null">name = #{name},</if>
+            <if test="mode != null">mode = #{mode},</if>
+            <if test="provider != null">provider = #{provider},</if>
+            <if test="apiKey != null">api_key = #{apiKey},</if>
+            <if test="baseUrl != null">base_url = #{baseUrl},</if>
             <if test="icon != null">icon = #{icon},</if>
             <if test="iconBackground != null">icon_background = #{iconBackground},</if>
             <if test="status != null">status = #{status},</if>
@@ -111,19 +172,29 @@
             <if test="description != null">description = #{description},</if>
             <if test="iconType != null">icon_type = #{iconType},</if>
             <if test="updatedBy != null">updated_by = #{updatedBy}::uuid,</if>
+            <if test="prompt != null">prompt = #{prompt},</if>
+            <if test="modelId != null">model_id = #{modelId}::uuid,</if>
+            <if test="welcomeMessage != null">welcome_message = #{welcomeMessage},</if>
+            <if test="knowledgeBaseId != null">knowledge_base_ids = #{knowledgeBaseId},</if>
+            <if test="pluginId != null">plugin_ids = #{pluginId},</if>
+            <if test="mcp != null">mcp = #{mcp},</if>
+            <if test="workflowId != null">workflow_id = #{workflowId}::uuid,</if>
+            <if test="publishedAt != null">published_at = #{publishedAt},</if>
+            <if test="publishedBy != null">published_by = #{publishedBy}::uuid,</if>
+            <if test="publishVersion != null">publish_version = #{publishVersion},</if>
         </set>
         where id = #{id}::uuid
     </update>
 
     <!-- 通过ID删除应用 -->
     <delete id="deleteById">
-        delete from app where id = #{id}::uuid
+        delete form agents where id = #{id}::uuid
     </delete>
 
     <!-- 通过ID批量删除应用 -->
     <delete id="deleteByIds">
 
-        delete from app where id in
+        delete form agents where id in
         <foreach collection="ids" item="id" open="(" separator="," close=")">
             #{id}::uuid
         </foreach>

@@ -16,7 +16,7 @@
 package com.yonchain.ai.agent.mapper;
 
 import com.yonchain.ai.api.sys.Role;
-import com.yonchain.ai.agent.entity.AppRoleEntiy;
+import com.yonchain.ai.agent.entity.AgentRoleEntiy;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -29,7 +29,7 @@ import java.util.List;
  * @since 2024-01-20
  */
 @Mapper
-public interface AppRoleMapper {
+public interface AgentRoleMapper {
 
     /**
      * 通过ID查询单个应用角色关联
@@ -37,7 +37,7 @@ public interface AppRoleMapper {
      * @param id 关联ID
      * @return 应用角色关联信息
      */
-    AppRoleEntiy selectById(@Param("id") String id);
+    AgentRoleEntiy selectById(@Param("id") String id);
 
     /**
      * 查询应用角色关联列表
@@ -45,7 +45,7 @@ public interface AppRoleMapper {
      * @param appId 应用ID
      * @return 应用角色关联列表
      */
-    List<AppRoleEntiy> selectByAppId(@Param("appId") String appId);
+    List<AgentRoleEntiy> selectByAppId(@Param("appId") String appId);
 
     /**
      * 查询角色关联的应用列表
@@ -53,7 +53,7 @@ public interface AppRoleMapper {
      * @param roleId 角色ID
      * @return 应用角色关联列表
      */
-    List<AppRoleEntiy> selectByRoleId(@Param("roleId") String roleId);
+    List<AgentRoleEntiy> selectByRoleId(@Param("roleId") String roleId);
 
     /**
      * 新增应用角色关联
@@ -61,7 +61,7 @@ public interface AppRoleMapper {
      * @param appRole 应用角色关联信息
      * @return 影响行数
      */
-    int insert(AppRoleEntiy appRole);
+    int insert(AgentRoleEntiy appRole);
 
     /**
      * 修改应用角色关联
@@ -69,7 +69,7 @@ public interface AppRoleMapper {
      * @param appRole 应用角色关联信息
      * @return 影响行数
      */
-    int update(AppRoleEntiy appRole);
+    int update(AgentRoleEntiy appRole);
 
     /**
      * 通过ID删除应用角色关联

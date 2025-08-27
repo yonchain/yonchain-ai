@@ -29,7 +29,7 @@ import java.util.Map;
  * @since 2024-01-20
  */
 @Mapper
-public interface AppMapper {
+public interface AgentMapper {
 
     /**
      * 通过ID查询单个应用
