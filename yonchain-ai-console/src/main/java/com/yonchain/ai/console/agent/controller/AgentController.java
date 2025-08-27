@@ -1,6 +1,6 @@
 package com.yonchain.ai.console.agent.controller;
 
-import com.yonchain.ai.api.agent.Application;
+import com.yonchain.ai.api.agent.Agent;
 import com.yonchain.ai.api.agent.AgentService;
 import com.yonchain.ai.api.agent.DefaultApplication;
 import com.yonchain.ai.api.common.Page;
@@ -25,7 +25,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 应用控制器
@@ -50,7 +49,7 @@ public class AgentController extends BaseController {
     @GetMapping("/{id}")
     @Operation(summary = "获取应用详情", description = "根据应用ID获取应用的详细信息")
     public AppResponse getAppById(@Parameter(description = "应用ID") @PathVariable String id) {
-        Application app = agentService.getAppById(id);
+        Agent app = agentService.getAppById(id);
         if (app == null) {
             throw new YonchainResourceNotFoundException("APP_NOT_FOUND", "应用未找到");
         }
@@ -85,7 +84,7 @@ public class AgentController extends BaseController {
         }
 
         //分页查询应用
-        Page<Application> apps = agentService.getAppsByPage(currentUser.getTenantId(), queryParam, request.getPageNum(), request.getPageSize());
+        Page<Agent> apps = agentService.getAppsByPage(currentUser.getTenantId(), queryParam, request.getPageNum(), request.getPageSize());
 
         return buildResponse(apps);
     }
@@ -99,7 +98,7 @@ public class AgentController extends BaseController {
     @PostMapping
     @Operation(summary = "创建应用", description = "创建新的应用")
     public AppResponse createApp(@Valid @RequestBody AppCreateRequest request) {
-        Application app = new DefaultApplication();
+        Agent app = new DefaultApplication();
         app.setId(UUID.randomUUID().toString());
         app.setTenantId(this.getCurrentTenantId());
 
@@ -135,7 +134,7 @@ public class AgentController extends BaseController {
     public AppResponse updateApp(@Parameter(description = "应用ID") @PathVariable String id,
                                  @Valid @RequestBody AppUpdateRequest request) {
         // 检查应用是否存在
-        Application app = agentService.getAppById(id);
+        Agent app = agentService.getAppById(id);
         if (app == null) {
             throw new YonchainResourceNotFoundException("APP_NOT_FOUND", "应用未找到");
         }
@@ -181,51 +180,28 @@ public class AgentController extends BaseController {
     public AppResponse publishAgent(@Parameter(description = "应用ID") @PathVariable String id,
                                     @Valid @RequestBody AgentPublishRequest request) {
 
-        Application app = agentService.getAppById(id);
+        // 检查应用是否存在
+        Agent app = agentService.getAppById(id);
         if (app == null) {
             throw new YonchainResourceNotFoundException("APP_NOT_FOUND", "应用未找到");
         }
-        // 从请求获取基本数据填充
-        app.setName(request.getName());
-        app.setIcon(request.getIcon());
-        app.setIconBackground(request.getIconBackground());
-        app.setDescription(request.getPrompt());//request.getDescription());
-        
-        // 设置智能体特有属性
-        Map<String, Object> config = new HashMap<>();
-        config.put("prompt", request.getPrompt());
-        
-        if (request.getKnowledgeBaseIds() != null && !request.getKnowledgeBaseIds().isEmpty()) {
-            config.put("knowledgeBaseIds", request.getKnowledgeBaseIds());
-        }
-        
-        if (request.getPluginIds() != null && !request.getPluginIds().isEmpty()) {
-            config.put("pluginIds", request.getPluginIds());
-        }
-        
-        if (request.getMcpConfig() != null && !request.getMcpConfig().isEmpty()) {
-            config.put("mcpConfig", request.getMcpConfig());
-        }
-        
-        if (StringUtils.hasText(request.getWorkflowId())) {
-            config.put("workflowId", request.getWorkflowId());
-        }
-        
-        app.setConfig(config);
-        app.setMode("agent"); // 设置为智能体模式
-        
-        app.setCreatedBy(this.getCurrentUserId());
-        app.setUpdatedBy(this.getCurrentUserId());
+        // 将请求转换为API接口对象
+        app.setPrompt(request.getPrompt());
+        app.setModelId(request.getModelId());
+        app.setWelcomeMessage(request.getWelcomeMessage());
+        app.setKnowledgeBaseIds(request.getKnowledgeBaseIds());
+        app.setPluginIds(request.getPluginIds());
+        app.setMcpConfig(request.getMcpConfig());
+        app.setWorkflowId(request.getWorkflowId());
 
-        // 创建智能体应用
-        agentService.createApp(app, request.getRoleIds());
-
-        app = agentService.getAppById(app.getId());
-        return responseFactory.createAppResponse(app);
+        // 调用服务发布智能体
+        Agent agent = agentService.publishAgent(id, app, this.getCurrentUserId());
+        
+        return responseFactory.createAppResponse(agent);
     }
 
 
-    private PageResponse<AppResponse> buildResponse(Page<Application> apps) {
+    private PageResponse<AppResponse> buildResponse(Page<Agent> apps) {
         PageResponse<AppResponse> response = responseFactory.createAppPageResponse(apps);
         response.getData().forEach(appResponse -> {
             List<Role> roles = agentService.getAppRoles(appResponse.getId());

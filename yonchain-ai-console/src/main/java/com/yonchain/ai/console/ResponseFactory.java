@@ -1,6 +1,7 @@
 package com.yonchain.ai.console;
 
-import com.yonchain.ai.api.agent.Application;
+import com.yonchain.ai.api.agent.Agent;
+import com.yonchain.ai.api.agent.AgentPublishRecord;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.dify.DifyApp;
 import com.yonchain.ai.api.exception.YonchainException;
@@ -8,6 +9,7 @@ import com.yonchain.ai.api.model.ModelInfo;
 import com.yonchain.ai.api.model.ModelProvider;
 import com.yonchain.ai.api.sys.*;
 import com.yonchain.ai.api.tag.Tag;
+import com.yonchain.ai.console.agent.response.AgentPublishRecordResponse;
 import com.yonchain.ai.console.agent.response.AppResponse;
 import com.yonchain.ai.console.dify.response.DifyAppResponse;
 import com.yonchain.ai.console.file.entity.FileEntity;
@@ -460,7 +462,7 @@ public class ResponseFactory {
      * @return 标准化后的应用响应对象，如果输入为null则返回null
      * @throws NumberFormatException 如果状态转换失败
      */
-    public AppResponse createAppResponse(Application app) {
+    public AppResponse createAppResponse(Agent app) {
         AppResponse response = new AppResponse();
         // 设置应用ID
         response.setId(app.getId());
@@ -500,11 +502,11 @@ public class ResponseFactory {
      *
      * @param apps 应用分页数据对象，包含分页信息和应用数据列表，不能为null
      * @return 标准化后的应用分页响应对象，包含分页元数据和转换后的应用列表
-     * @see Application
+     * @see Agent
      * @see AppResponse
      * @see PageResponse
      */
-    public PageResponse<AppResponse> createAppPageResponse(Page<Application> apps) {
+    public PageResponse<AppResponse> createAppPageResponse(Page<Agent> apps) {
         PageResponse<AppResponse> response = new PageResponse<>();
         // 设置当前页码
         response.setPageNum(apps.getCurrent());
@@ -1098,7 +1100,7 @@ public class ResponseFactory {
      *
      * @param apps 应用分页数据对象，包含分页信息和应用数据列表，不能为null
      * @return 标准化后的应用分页响应对象，包含分页元数据和转换后的应用列表
-     * @see Application
+     * @see DifyApp
      * @see AppResponse
      * @see PageResponse
      */
@@ -1115,6 +1117,68 @@ public class ResponseFactory {
                 .map(this::createDifyAppResponse)
                 .filter(Objects::nonNull)
                 .toList());
+        return response;
+    }
+
+
+    /**
+     * 创建Agent发布记录分页响应对象
+     * <p>
+     * 将Agent发布记录分页数据转换为标准化的API分页响应格式
+     * 包含分页元数据和转换后的Agent发布记录数据列表
+     * </p>
+     *
+     * @param records Agent发布记录分页数据对象，包含分页信息和发布记录数据列表，不能为null
+     * @return 标准化后的Agent发布记录分页响应对象，包含分页元数据和发布记录列表
+     * @see AgentPublishRecord
+     * @see AgentPublishRecordResponse
+     * @see PageResponse
+     */
+    public PageResponse<AgentPublishRecordResponse> createAgentPublishRecordPageResponse(Page<AgentPublishRecord> records) {
+        PageResponse<AgentPublishRecordResponse> pageResponse = new PageResponse<>();
+        // 设置当前页码
+        pageResponse.setPageNum(records.getCurrent());
+        // 设置每页记录数
+        pageResponse.setPageSize(records.getSize());
+        // 设置总记录数
+        pageResponse.setTotal(records.getTotal());
+        // 转换发布记录数据列表
+        pageResponse.setData(records.getRecords().stream()
+                .map(this::createAgentPublishRecordResponse)
+                .filter(Objects::nonNull)
+                .toList());
+        return pageResponse;
+    }
+
+    /**
+     * 创建Agent发布记录响应对象
+     * <p>
+     * 将AgentPublishRecord实体对象转换为标准化的API响应格式
+     * 包含Agent发布记录的基本信息、状态和时间戳
+     * </p>
+     *
+     * @param record Agent发布记录实体对象，包含发布记录基本信息，不能为null
+     * @return 标准化后的Agent发布记录响应对象，包含记录ID、版本、状态等信息
+     * @see AgentPublishRecord
+     * @see AgentPublishRecordResponse
+     */
+    public AgentPublishRecordResponse createAgentPublishRecordResponse(AgentPublishRecord record) {
+        AgentPublishRecordResponse response = new AgentPublishRecordResponse();
+        // 设置记录ID
+        response.setId(record.getId());
+        // 设置Agent ID
+        response.setAgentId(record.getAgentId());
+        // 设置版本号
+        response.setVersion(record.getVersion());
+        // 设置发布状态
+        response.setStatus(record.getStatus());
+        // 设置发布描述
+        response.setDescription(record.getDescription());
+        // 设置发布者ID
+        response.setPublishedBy(record.getPublishedBy());
+        // 设置发布时间
+        response.setPublishedAt(record.getPublishedAt());
+
         return response;
     }
 }

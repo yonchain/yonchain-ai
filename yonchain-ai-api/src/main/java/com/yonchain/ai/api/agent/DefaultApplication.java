@@ -25,7 +25,7 @@ import java.util.Map;
  * @author Cgy
  * @since 2024-01-20
  */
-public class DefaultApplication implements Application {
+public class DefaultApplication implements Agent {
 
     /**
      * 主键ID
@@ -108,9 +108,59 @@ public class DefaultApplication implements Application {
     private String updatedBy;
 
     /**
-     * 更新者ID
+     * 配置信息
      */
     private Map<String, Object> config;
+    
+    /**
+     * 提示词
+     */
+    private String prompt;
+    
+    /**
+     * 模型ID
+     */
+    private String modelId;
+    
+    /**
+     * 开场白
+     */
+    private String welcomeMessage;
+    
+    /**
+     * 知识库ID列表（JSON格式）
+     */
+    private String knowledgeBaseIds;
+    
+    /**
+     * 插件ID列表（JSON格式）
+     */
+    private String pluginIds;
+    
+    /**
+     * MCP配置（JSON格式）
+     */
+    private String mcpConfig;
+    
+    /**
+     * 工作流ID
+     */
+    private String workflowId;
+    
+    /**
+     * 发布时间
+     */
+    private LocalDateTime publishedAt;
+    
+    /**
+     * 发布者ID
+     */
+    private String publishedBy;
+    
+    /**
+     * 发布版本
+     */
+    private Integer publishVersion;
 
     /**
      * 获取主键ID
@@ -410,4 +460,103 @@ public class DefaultApplication implements Application {
         this.config = config;
     }
 
+    @Override
+    public String getPrompt() {
+        return prompt;
+    }
+
+    @Override
+    public void setPrompt(String prompt) {
+        this.prompt = prompt;
+    }
+
+    @Override
+    public String getModelId() {
+        return modelId;
+    }
+
+    @Override
+    public void setModelId(String modelId) {
+        this.modelId = modelId;
+    }
+
+    @Override
+    public String getWelcomeMessage() {
+        return welcomeMessage;
+    }
+
+    @Override
+    public void setWelcomeMessage(String welcomeMessage) {
+        this.welcomeMessage = welcomeMessage;
+    }
+
+    @Override
+    public String getKnowledgeBaseIds() {
+        return knowledgeBaseIds;
+    }
+
+    @Override
+    public void setKnowledgeBaseIds(String knowledgeBaseIds) {
+        this.knowledgeBaseIds = knowledgeBaseIds;
+    }
+
+    @Override
+    public String getPluginIds() {
+        return pluginIds;
+    }
+
+    @Override
+    public void setPluginIds(String pluginIds) {
+        this.pluginIds = pluginIds;
+    }
+
+    @Override
+    public String getMcpConfig() {
+        return mcpConfig;
+    }
+
+    @Override
+    public void setMcpConfig(String mcpConfig) {
+        this.mcpConfig = mcpConfig;
+    }
+
+    @Override
+    public String getWorkflowId() {
+        return workflowId;
+    }
+
+    @Override
+    public void setWorkflowId(String workflowId) {
+        this.workflowId = workflowId;
+    }
+
+    @Override
+    public LocalDateTime getPublishedAt() {
+        return publishedAt;
+    }
+
+    @Override
+    public void setPublishedAt(LocalDateTime publishedAt) {
+        this.publishedAt = publishedAt;
+    }
+
+    @Override
+    public String getPublishedBy() {
+        return publishedBy;
+    }
+
+    @Override
+    public void setPublishedBy(String publishedBy) {
+        this.publishedBy = publishedBy;
+    }
+
+    @Override
+    public Integer getPublishVersion() {
+        return publishVersion;
+    }
+
+    @Override
+    public void setPublishVersion(Integer publishVersion) {
+        this.publishVersion = publishVersion;
+    }
 }

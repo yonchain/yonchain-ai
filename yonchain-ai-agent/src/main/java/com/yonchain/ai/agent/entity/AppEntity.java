@@ -15,7 +15,7 @@
  */
 package com.yonchain.ai.agent.entity;
 
-import com.yonchain.ai.api.agent.Application;
+import com.yonchain.ai.api.agent.Agent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class AppEntity implements Application {
+public class AppEntity implements Agent {
 
     /**
      * 主键ID

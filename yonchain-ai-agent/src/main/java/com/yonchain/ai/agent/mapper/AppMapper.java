@@ -15,7 +15,7 @@
  */
 package com.yonchain.ai.agent.mapper;
 
-import com.yonchain.ai.api.agent.Application;
+import com.yonchain.ai.api.agent.Agent;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -37,7 +37,7 @@ public interface AppMapper {
      * @param id 应用ID
      * @return 应用信息
      */
-    Application selectById(@Param("id") String id);
+    Agent selectById(@Param("id") String id);
 
     /**
      * 查询应用列表
@@ -46,7 +46,7 @@ public interface AppMapper {
      * @param params   查询参数
      * @return 应用列表
      */
-    List<Application> selectList(@Param("tenantId") String tenantId, @Param("params") Map<String, Object> params);
+    List<Agent> selectList(@Param("tenantId") String tenantId, @Param("params") Map<String, Object> params);
 
     /**
      * 新增应用
@@ -54,7 +54,7 @@ public interface AppMapper {
      * @param app 应用信息
      * @return 影响行数
      */
-    int insert(Application app);
+    int insert(Agent app);
 
     /**
      * 修改应用
@@ -62,7 +62,7 @@ public interface AppMapper {
      * @param app 应用信息
      * @return 影响行数
      */
-    int update(Application app);
+    int update(Agent app);
 
     /**
      * 通过ID删除应用

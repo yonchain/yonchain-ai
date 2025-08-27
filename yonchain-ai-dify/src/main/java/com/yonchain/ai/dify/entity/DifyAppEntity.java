@@ -15,7 +15,6 @@
  */
 package com.yonchain.ai.dify.entity;
 
-import com.yonchain.ai.api.agent.Application;
 import com.yonchain.ai.api.dify.DifyApp;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

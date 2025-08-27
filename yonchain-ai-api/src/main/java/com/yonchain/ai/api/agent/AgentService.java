@@ -37,7 +37,7 @@ public interface AgentService {
      * @param id 应用ID
      * @return 应用信息
      */
-    Application getAppById(String id);
+    Agent getAppById(String id);
 
     /**
      * 分页查询应用列表
@@ -48,14 +48,14 @@ public interface AgentService {
      * @param pageSize   每页大小
      * @return 分页应用列表
      */
-    Page<Application> getAppsByPage(String tenantId, Map<String, Object> queryParam, int pageNum, int pageSize);
+    Page<Agent> getAppsByPage(String tenantId, Map<String, Object> queryParam, int pageNum, int pageSize);
 
     /**
      * 新增应用
      *
      * @param app 应用信息
      */
-    void createApp(Application app);
+    void createApp(Agent app);
 
     /**
      * 新增应用
@@ -63,14 +63,14 @@ public interface AgentService {
      * @param app     应用信息
      * @param roleIds 角色ID列表
      */
-    void createApp(Application app, List<String> roleIds);
+    void createApp(Agent app, List<String> roleIds);
 
     /**
      * 修改应用
      *
      * @param app 应用信息
      */
-    void updateApp(Application app);
+    void updateApp(Agent app);
 
     /**
      * 修改应用
@@ -78,7 +78,7 @@ public interface AgentService {
      * @param app     应用信息
      * @param roleIds 角色ID列表
      */
-    void updateApp(Application app, List<String> roleIds);
+    void updateApp(Agent app, List<String> roleIds);
 
     /**
      * 通过ID删除应用
@@ -102,5 +102,44 @@ public interface AgentService {
      * @param roleIds 角色ID列表
      */
     void saveAppRoles(String appId, List<String> roleIds);
+    
+    /**
+     * 发布智能体
+     *
+     * @param id         智能体ID，如果为null则创建新智能体
+     * @param agent    发布请求
+     * @param publishedBy 发布者ID
+     * @return 智能体应用
+     */
+    Agent publishAgent(String id, Agent agent, String publishedBy);
+    
+    /**
+     * 获取智能体最新发布记录
+     *
+     * @param agentId 智能体ID
+     * @return 发布记录
+     */
+    AgentPublishRecord getLatestAgentPublishRecord(String agentId);
+    
+    /**
+     * 获取智能体所有发布记录
+     *
+     * @param agentId 智能体ID
+     * @return 发布记录列表
+     */
+    List<AgentPublishRecord> getAgentPublishRecords(String agentId);
+    
+    /**
+     * 分页查询发布记录
+     *
+     * @param tenantId   租户ID
+     * @param queryParam 查询参数
+     * @param pageNum    页码
+     * @param pageSize   每页大小
+     * @return 分页发布记录列表
+     */
+    Page<AgentPublishRecord> getAgentPublishRecordsByPage(String tenantId, Map<String, Object> queryParam, int pageNum, int pageSize);
 
+
+    AgentPublishRecord getAgentPublishRecordById(String id);
 }

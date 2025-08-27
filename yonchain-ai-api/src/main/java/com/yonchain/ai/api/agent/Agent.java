@@ -25,7 +25,7 @@ import java.util.Map;
  * @author Cgy
  * @since 1.0.0
  */
-public interface Application {
+public interface Agent {
 
     /**
      * 获取主键ID
@@ -191,4 +191,104 @@ public interface Application {
     Map<String, Object> getConfig();
 
     void setConfig(Map<String, Object> config);
+    
+    /**
+     * 获取提示词
+     */
+    String getPrompt();
+
+    /**
+     * 设置提示词
+     */
+    void setPrompt(String prompt);
+    
+    /**
+     * 获取模型ID
+     */
+    String getModelId();
+
+    /**
+     * 设置模型ID
+     */
+    void setModelId(String modelId);
+    
+    /**
+     * 获取开场白
+     */
+    String getWelcomeMessage();
+
+    /**
+     * 设置开场白
+     */
+    void setWelcomeMessage(String welcomeMessage);
+    
+    /**
+     * 获取知识库ID列表（JSON格式）
+     */
+    String getKnowledgeBaseIds();
+
+    /**
+     * 设置知识库ID列表（JSON格式）
+     */
+    void setKnowledgeBaseIds(String knowledgeBaseIds);
+    
+    /**
+     * 获取插件ID列表（JSON格式）
+     */
+    String getPluginIds();
+
+    /**
+     * 设置插件ID列表（JSON格式）
+     */
+    void setPluginIds(String pluginIds);
+    
+    /**
+     * 获取MCP配置（JSON格式）
+     */
+    String getMcpConfig();
+
+    /**
+     * 设置MCP配置（JSON格式）
+     */
+    void setMcpConfig(String mcpConfig);
+    
+    /**
+     * 获取工作流ID
+     */
+    String getWorkflowId();
+
+    /**
+     * 设置工作流ID
+     */
+    void setWorkflowId(String workflowId);
+    
+    /**
+     * 获取发布时间
+     */
+    LocalDateTime getPublishedAt();
+
+    /**
+     * 设置发布时间
+     */
+    void setPublishedAt(LocalDateTime publishedAt);
+    
+    /**
+     * 获取发布者ID
+     */
+    String getPublishedBy();
+
+    /**
+     * 设置发布者ID
+     */
+    void setPublishedBy(String publishedBy);
+    
+    /**
+     * 获取发布版本
+     */
+    Integer getPublishVersion();
+
+    /**
+     * 设置发布版本
+     */
+    void setPublishVersion(Integer publishVersion);
 }

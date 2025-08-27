@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yonchain.ai.agent.mapper.AgentPublishRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.yonchain.ai.agent.entity.AgentPublishRecord">
+        <id property="id" column="id"/>
+        <result property="agentId" column="agent_id"/>
+        <result property="tenantId" column="tenant_id"/>
+        <result property="version" column="version"/>
+        <result property="name" column="name"/>
+        <result property="prompt" column="prompt"/>
+        <result property="modelId" column="model_id"/>
+        <result property="welcomeMessage" column="welcome_message"/>
+        <result property="knowledgeBaseIds" column="knowledge_base_ids"/>
+        <result property="pluginIds" column="plugin_ids"/>
+        <result property="mcpConfig" column="mcp_config"/>
+        <result property="workflowId" column="workflow_id"/>
+        <result property="description" column="description"/>
+        <result property="icon" column="icon"/>
+        <result property="iconBackground" column="icon_background"/>
+        <result property="publishedBy" column="published_by"/>
+        <result property="publishedAt" column="published_at"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.yonchain.ai.agent.entity.AgentPublishRecord">
+        INSERT INTO agent_publish_record (
+            id, agent_id, tenant_id, version, name, prompt, model_id, welcome_message,
+            knowledge_base_ids, plugin_ids, mcp_config, workflow_id, description,
+            icon, icon_background, published_by, published_at, status
+        ) VALUES (
+            #{id}::uuid, #{agentId}::uuid, #{tenantId}::uuid, #{version}, #{name}, #{prompt}, #{modelId}, #{welcomeMessage},
+            #{knowledgeBaseIds}, #{pluginIds}, #{mcpConfig}, #{workflowId}, #{description},
+            #{icon}, #{iconBackground}, #{publishedBy}::uuid, #{publishedAt}, #{status}
+        )
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM agent_publish_record WHERE id = #{id}::uuid
+    </select>
+
+    <select id="selectLatestByAgentId" resultMap="BaseResultMap">
+        SELECT * FROM agent_publish_record 
+        WHERE agent_id = #{agentId}::uuid 
+        ORDER BY version DESC 
+        LIMIT 1
+    </select>
+
+    <select id="selectByAgentId" resultMap="BaseResultMap">
+        SELECT * FROM agent_publish_record 
+        WHERE agent_id = #{agentId}::uuid 
+        ORDER BY version DESC
+    </select>
+
+    <select id="selectLatestVersionByAgentId" resultType="java.lang.Integer">
+        SELECT MAX(version) FROM agent_publish_record 
+        WHERE agent_id = #{agentId}::uuid
+    </select>
+
+    <select id="selectPageByTenantIdAndParams" resultMap="BaseResultMap">
+        SELECT * FROM agent_publish_record
+        WHERE tenant_id = #{tenantId}::uuid
+        <if test="params.agentId != null">
+            AND agent_id = #{params.agentId}::uuid
+        </if>
+        <if test="params.name != null">
+            AND name LIKE CONCAT('%', #{params.name}, '%')
+        </if>
+        <if test="params.status != null">
+            AND status = #{params.status}
+        </if>
+        ORDER BY published_at DESC
+    </select>
+
+    <select id="countByTenantIdAndParams" resultType="long">
+        SELECT COUNT(*) FROM agent_publish_record
+        WHERE tenant_id = #{tenantId}::uuid
+        <if test="params.agentId != null">
+            AND agent_id = #{params.agentId}::uuid
+        </if>
+        <if test="params.name != null">
+            AND name LIKE CONCAT('%', #{params.name}, '%')
+        </if>
+        <if test="params.status != null">
+            AND status = #{params.status}
+        </if>
+    </select>
+
+</mapper>
