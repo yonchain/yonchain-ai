@@ -18,7 +18,6 @@ package com.yonchain.ai.api.agent;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 应用实体类

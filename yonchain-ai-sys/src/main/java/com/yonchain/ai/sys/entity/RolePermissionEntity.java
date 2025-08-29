@@ -16,57 +16,29 @@
 
 package com.yonchain.ai.sys.entity;
 
-import com.yonchain.ai.api.sys.RoleGroup;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 /**
- * 角色组实体
+ * 角色权限关联实体类
  *
- * @author Cgy
+ * @author Qoder
  * @since 1.0.0
  */
 @Data
-public class RoleGroupEntity implements RoleGroup {
+public class RolePermissionEntity {
 
     /**
-     * 角色组ID
+     * 主键
      */
     private String id;
 
     /**
-     * 租户ID
+     * 角色ID
      */
-    private String tenantId;
+    private String roleId;
 
     /**
-     * 角色组名称
+     * 权限标识
      */
-    private String name;
-
-    /**
-     * 角色类型
-     */
-    private String category;
-
-    /**
-     * 创建人ID
-     */
-    private String createdBy;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createdAt;
-
-    /**
-     * 更新人ID
-     */
-    private String updatedBy;
-
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updatedAt;
+    private String permission;
 }

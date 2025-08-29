@@ -40,7 +40,7 @@ public class AgentPublishRecordResponse {
     private String welcomeMessage;
 
     @Schema(description = "知识库ID列表")
-    private List<String> knowledgeBaseIds;
+    private List<String> knowledgeIds;
 
     @Schema(description = "插件ID列表")
     private List<String> pluginIds;

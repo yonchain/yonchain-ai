@@ -29,7 +29,7 @@ public class DefaultAgentPublishRequest implements AgentPublishRequest {
     private String prompt;
     private String modelId;
     private String welcomeMessage;
-    private List<String> knowledgeBaseIds;
+    private List<String> knowledgeIds;
     private List<String> pluginIds;
     private Map<String, Object> mcpConfig;
     private String workflowId;
@@ -68,11 +68,11 @@ public class DefaultAgentPublishRequest implements AgentPublishRequest {
 
     @Override
     public List<String> getKnowledgeBaseIds() {
-        return knowledgeBaseIds;
+        return knowledgeIds;
     }
 
-    public void setKnowledgeBaseIds(List<String> knowledgeBaseIds) {
-        this.knowledgeBaseIds = knowledgeBaseIds;
+    public void setKnowledgeBaseIds(List<String> knowledgeIds) {
+        this.knowledgeIds = knowledgeIds;
     }
 
     @Override

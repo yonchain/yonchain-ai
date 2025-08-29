@@ -69,7 +69,7 @@ public class DefaultAgentPublishRecord implements AgentPublishRecord {
     /**
      * 知识库ID列表
      */
-    private String knowledgeBaseIds;
+    private String knowledgeIds;
 
     /**
      * 插件ID列表
@@ -198,12 +198,12 @@ public class DefaultAgentPublishRecord implements AgentPublishRecord {
 
     @Override
     public String getKnowledgeBaseIds() {
-        return knowledgeBaseIds;
+        return knowledgeIds;
     }
 
     @Override
-    public void setKnowledgeBaseIds(String knowledgeBaseIds) {
-        this.knowledgeBaseIds = knowledgeBaseIds;
+    public void setKnowledgeBaseIds(String knowledgeIds) {
+        this.knowledgeIds = knowledgeIds;
     }
 
     @Override

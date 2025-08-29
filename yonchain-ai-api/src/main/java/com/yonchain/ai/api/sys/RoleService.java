@@ -106,40 +106,19 @@ public interface RoleService {
     List<Role> getSystemRoles(String tenantId);
 
     /**
-     * 获取角色组
+     * 获取角色权限列表
      *
-     * @param roleGroupId 角色组ID
-     * @return 角色组
+     * @param roleId 角色ID
+     * @return 权限列表
      */
-    RoleGroup getRoleGroupById(String roleGroupId);
+    List<String> getRolePermissions(String roleId);
 
     /**
-     * 获取角色组列表
+     * 设置角色权限
      *
-     * @param params 查询参数
-     * @return 角色组列表
+     * @param roleId 角色ID
+     * @param permissions 权限列表
      */
-    List<RoleGroup> getRoleGroups(Map<String, Object> params);
+    void setRolePermissions(String roleId, List<String> permissions);
 
-
-    /**
-     * 获取角色组
-     *
-     * @param roleGroup 角色组
-     */
-    void createRoleGroup(RoleGroup roleGroup);
-
-    /**
-     * 更新角色组
-     *
-     * @param roleGroup 角色组
-     */
-    void updateRoleGroup(RoleGroup roleGroup);
-
-    /**
-     * 删除角色组
-     roleGroupId
-     * @param roleGroupId 角色组ID
-     */
-    void deleteRoleGroupById(String roleGroupId);
 }

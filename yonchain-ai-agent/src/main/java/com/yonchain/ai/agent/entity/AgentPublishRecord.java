@@ -56,7 +56,7 @@ public class AgentPublishRecord {
     /**
      * 知识库ID列表，JSON格式存储
      */
-    private String knowledgeBaseIds;
+    private String knowledgeIds;
 
     /**
      * 插件ID列表，JSON格式存储

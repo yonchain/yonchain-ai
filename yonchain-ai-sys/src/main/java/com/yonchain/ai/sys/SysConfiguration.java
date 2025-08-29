@@ -19,7 +19,6 @@ public class SysConfiguration {
     protected RoleService roleService;
     protected SecurityService securityService;
     protected IdmService idmService;
-    protected MenuService menuService;
     protected IdmCacheService idmCacheService;
 
     // 数据访问层依赖
@@ -27,9 +26,7 @@ public class SysConfiguration {
     protected TenantMapper tenantMapper;
     protected UserTenantMapper tenantAccountJoinMapper;
     protected RoleMapper roleMapper;
-    protected MenuMapper menuMapper;
-    protected RoleMenuMapper roleMenuMapper;
-    protected RoleGroupMapper roleGroupMapper;
+    protected RolePermissionMapper rolePermissionMapper;
 
     //默认系统租户id
     protected String defaultTenantId;
@@ -41,8 +38,6 @@ public class SysConfiguration {
     protected RedisTemplate<String, Object> redisTemplate;
 
 
-
-
     protected SysConfiguration(Builder builder) {
         this.securityService = builder.securityService;
         this.userService = builder.userService;
@@ -52,10 +47,7 @@ public class SysConfiguration {
         this.tenantMapper = builder.tenantMapper;
         this.roleMapper = builder.roleMapper;
         this.tenantAccountJoinMapper = builder.tenantAccountJoinMapper;
-        this.menuMapper = builder.menuMapper;
-        this.menuService = builder.menuService;
-        this.roleMenuMapper = builder.roleMenuMapper;
-        this.roleGroupMapper = builder.roleGroupMapper;
+        this.rolePermissionMapper = builder.rolePermissionMapper;
         this.redisTemplate = builder.redisTemplate;
 
         init();
@@ -73,23 +65,19 @@ public class SysConfiguration {
 
         // 初始化RoleService
         if (this.roleService == null) {
-            this.roleService = new RoleServiceImpl(this.roleMapper,this.roleGroupMapper);
+            this.roleService = new RoleServiceImpl(this.roleMapper, this.rolePermissionMapper);
         }
 
         // 初始化UserService
         if (this.userService == null) {
-            this.userService = new UserServiceImpl(this.userMapper, this.securityService, this.roleMapper, this.tenantAccountJoinMapper, this.menuMapper);
+            this.userService = new UserServiceImpl(this.userMapper, this.securityService, rolePermissionMapper,
+                    this.roleMapper, this.tenantAccountJoinMapper);
         }
 
         // 初始化TenantService
         if (this.tenantService == null) {
             this.tenantService = new TenantServiceImpl(this.tenantMapper, this.tenantAccountJoinMapper,
-                    this.roleMapper, this.roleMenuMapper, this.menuMapper,this.roleGroupMapper,this.idmCacheService);
-        }
-
-        // 初始化MenuService
-        if (this.menuService == null) {
-            this.menuService = new MenuServiceImpl(this.menuMapper, this.roleMenuMapper);
+                    this.roleMapper, this.rolePermissionMapper, this.idmCacheService);
         }
 
         // 初始化IdmService
@@ -133,18 +121,6 @@ public class SysConfiguration {
     }
 
     /**
-     * 获取MenuService实例
-     * <p>
-     * 返回在构造时已初始化的实例
-     * </p>
-     *
-     * @return MenuService实例
-     */
-    public MenuService getMenuService() {
-        return menuService;
-    }
-
-    /**
      * 获取IdmService实例
      * <p>
      * 返回在构造时已初始化的实例
@@ -178,10 +154,7 @@ public class SysConfiguration {
         protected UserService userService;
         protected TenantService tenantService;
         protected RoleService roleService;
-        protected MenuMapper menuMapper;
-        protected MenuService menuService;
-        protected RoleMenuMapper roleMenuMapper;
-        protected RoleGroupMapper roleGroupMapper;
+        protected RolePermissionMapper rolePermissionMapper;
         protected RedisTemplate<String, Object> redisTemplate;
 
         protected Builder() {
@@ -228,23 +201,8 @@ public class SysConfiguration {
             return this;
         }
 
-        public Builder menuMapper(MenuMapper menuMapper) {
-            this.menuMapper = menuMapper;
-            return this;
-        }
-
-        public Builder menuService(MenuService menuService) {
-            this.menuService = menuService;
-            return this;
-        }
-
-        public Builder roleMenuMapper(RoleMenuMapper roleMenuMapper) {
-            this.roleMenuMapper = roleMenuMapper;
-            return this;
-        }
-
-        public Builder roleGroupMapper(RoleGroupMapper roleGroupMapper) {
-            this.roleGroupMapper = roleGroupMapper;
+        public Builder rolePermissionMapper(RolePermissionMapper rolePermissionMapper) {
+            this.rolePermissionMapper = rolePermissionMapper;
             return this;
         }
 
@@ -290,13 +248,6 @@ public class SysConfiguration {
             if (roleService == null) {
                 if (roleMapper == null) {
                     throw new IllegalStateException("未配置RoleMapper，必须配置RoleMapper或直接设置RoleService");
-                }
-            }
-
-            // 检查MenuService的依赖
-            if (menuService == null) {
-                if (menuMapper == null) {
-                    throw new IllegalStateException("未配置MenuMapper，必须配置MenuMapper或直接设置MenuService");
                 }
             }
 

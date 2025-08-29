@@ -17,6 +17,7 @@ package com.yonchain.ai.agent.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yonchain.ai.agent.entity.AgentEntity;
 import com.yonchain.ai.agent.mapper.AgentPublishRecordMapper;
 import com.yonchain.ai.api.agent.*;
 import com.yonchain.ai.api.common.Page;
@@ -27,6 +28,7 @@ import com.yonchain.ai.util.Assert;
 import com.yonchain.ai.util.PageUtil;
 import com.github.pagehelper.PageHelper;
 import io.micrometer.common.util.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,7 +104,9 @@ public class AgentServiceImpl implements AgentService {
     @Transactional(rollbackFor = Exception.class)
     public void createApp(Agent app, List<String> roleIds) {
         //创建应用
-        this.createApp(app);
+        Agent agent = new AgentEntity();
+        BeanUtils.copyProperties(app, agent);
+        this.createApp(agent);
 
         //保存应用关联的角色
         if (!CollectionUtils.isEmpty(roleIds)) {

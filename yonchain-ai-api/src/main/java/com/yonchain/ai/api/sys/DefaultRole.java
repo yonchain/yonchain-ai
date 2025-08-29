@@ -65,10 +65,6 @@ public class DefaultRole implements Role {
      */
     private String category;
 
-    /**
-     * 角色所属分组ID
-     */
-    private String groupId;
 
     /**
      * 获取角色ID
@@ -267,24 +263,6 @@ public class DefaultRole implements Role {
      */
     public void setCategory(String category) {
         this.category = category;
-    }
-
-    /**
-     * 获取角色所属分组ID
-     *
-     * @return 分组ID
-     */
-    public String getGroupId() {
-        return groupId;
-    }
-
-    /**
-     * 设置角色所属分组ID
-     *
-     * @param groupId 分组ID
-     */
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
     }
 
 }

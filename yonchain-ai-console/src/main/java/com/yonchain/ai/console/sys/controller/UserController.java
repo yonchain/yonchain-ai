@@ -23,7 +23,6 @@ import com.yonchain.ai.api.exception.YonchainForbiddenException;
 import com.yonchain.ai.api.exception.YonchainIllegalStateException;
 import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.api.sys.*;
-import com.yonchain.ai.api.sys.enums.MenuType;
 import com.yonchain.ai.api.sys.enums.RoleType;
 import com.yonchain.ai.api.security.SecurityService;
 import com.yonchain.ai.console.BaseController;
@@ -101,6 +100,7 @@ public class UserController extends BaseController {
      *
      * @return 当前用户信息
      */
+/*
     @GetMapping("/current")
     @Operation(summary = "获取当前用户信息")
     public Map<String, Object> getCurrentUserInfo() {
@@ -119,6 +119,7 @@ public class UserController extends BaseController {
                 .toArray(String[]::new));
         return map;
     }
+*/
 
     /**
      * 分页查询
@@ -293,11 +294,11 @@ public class UserController extends BaseController {
     }
 
 
-    /**
+/*    *//**
      * 获取当前用户菜单
      *
      * @return 当前用户菜单列表
-     */
+     *//*
     @GetMapping("/current/menus")
     @Operation(summary = "获取当前用户菜单", description = "获取当前登录用户的菜单列表")
     public ListResponse<MenuTreeResponse> getCurrentUserMenus() {
@@ -305,6 +306,21 @@ public class UserController extends BaseController {
         List<Menu> menus = userService.getUserMenus(getCurrentTenantId(), getCurrentUserId(), MenuType.MENU);
 
         return responseFactory.createMenuTreeListResponse(menus);
+    }*/
+
+
+    /**
+     * 获取当前用户菜单
+     *
+     * @return 当前用户菜单列表
+     */
+    @GetMapping("/permissions")
+    @Operation(summary = "获取当前用户菜单权限", description = "获取当前登录用户的权限列表")
+    public ListResponse<String> getUserPermissions() {
+        List<String> menus = userService.getUserPermissions(getCurrentTenantId(), getCurrentUserId());
+        ListResponse<String> response = new ListResponse<>("permissions");
+        response.setData(menus);
+        return response;
     }
 
 
@@ -317,7 +333,7 @@ public class UserController extends BaseController {
     @Operation(summary = "获取当前用户菜单", description = "获取当前登录用户的菜单列表")
     public JSONArray getCurrentUserMenus2() {
         //查询用户菜单列表
-       // List<Menu> menus = userService.getUserMenus(getCurrentTenantId(), getCurrentUserId(), MenuType.MENU);
+        // List<Menu> menus = userService.getUserMenus(getCurrentTenantId(), getCurrentUserId(), MenuType.MENU);
 
         return JSON.parseArray("[\n" +
                 "  \"dashboard:view\",\n" +

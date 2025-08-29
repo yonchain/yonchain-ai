@@ -18,10 +18,9 @@ package com.yonchain.ai.sys.service;
 
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.sys.Role;
-import com.yonchain.ai.api.sys.RoleGroup;
 import com.yonchain.ai.api.sys.RoleService;
-import com.yonchain.ai.sys.mapper.RoleGroupMapper;
 import com.yonchain.ai.sys.mapper.RoleMapper;
+import com.yonchain.ai.sys.mapper.RolePermissionMapper;
 import com.yonchain.ai.util.PageUtil;
 import com.github.pagehelper.PageHelper;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,11 +40,11 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleMapper roleMapper;
 
-    private final RoleGroupMapper roleGroupMapper;
+    private final RolePermissionMapper rolePermissionMapper;
 
-    public RoleServiceImpl(RoleMapper roleMapper,RoleGroupMapper roleGroupMapper) {
+    public RoleServiceImpl(RoleMapper roleMapper,RolePermissionMapper rolePermissionMapper) {
         this.roleMapper = roleMapper;
-        this.roleGroupMapper = roleGroupMapper;
+        this.rolePermissionMapper = rolePermissionMapper;
     }
 
     @Override
@@ -112,31 +111,20 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public RoleGroup getRoleGroupById(String roleGroupId) {
-        return roleGroupMapper.selectById(roleGroupId);
-    }
-
-    @Override
-    public List<RoleGroup> getRoleGroups(Map<String, Object> params) {
-        return roleGroupMapper.selectList(params);
-    }
-
-    @Override
-    public void createRoleGroup(RoleGroup roleGroup) {
-        roleGroup.setCreatedAt(LocalDateTime.now());
-        roleGroupMapper.insert(roleGroup);
-    }
-
-    @Override
-    public void updateRoleGroup(RoleGroup roleGroup) {
-        roleGroup.setUpdatedAt(LocalDateTime.now());
-        roleGroupMapper.update(roleGroup);
+    public List<String> getRolePermissions(String roleId) {
+        return rolePermissionMapper.selectPermissionsByRoleId(roleId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteRoleGroupById(String roleGroupId) {
-        roleGroupMapper.deleteById(roleGroupId);
+    public void setRolePermissions(String roleId, List<String> permissions) {
+        // 先删除该角色的所有权限
+        rolePermissionMapper.deleteByRoleId(roleId);
+        
+        // 如果权限列表不为空，则批量插入新权限
+        if (permissions != null && !permissions.isEmpty()) {
+            rolePermissionMapper.batchInsert(roleId, permissions);
+        }
     }
 
 }

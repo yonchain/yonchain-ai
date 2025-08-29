@@ -30,11 +30,11 @@
         <!-- 提示词 -->
         <result column="prompt" property="prompt" jdbcType="VARCHAR"/>
         <!-- 模型ID -->
-        <result column="model_id" property="modelId" jdbcType="OTHER"/>
+        <result column="model_id" property="modelId" jdbcType="VARCHAR"/>
         <!-- 开场白 -->
         <result column="welcome_message" property="welcomeMessage" jdbcType="VARCHAR"/>
         <!-- 知识库ID列表（JSON格式） -->
-        <result column="knowledge_base_id" property="knowledgeBaseId" jdbcType="VARCHAR"/>
+        <result column="knowledge_id" property="knowledgeId" jdbcType="VARCHAR"/>
         <!-- 插件ID列表（JSON格式） -->
         <result column="plugin_id" property="pluginId" jdbcType="VARCHAR"/>
         <!-- MCP配置（JSON格式） -->
@@ -53,7 +53,7 @@
     <sql id="Base_Column_List">
         id, tenant_id, name,  icon, icon_background, status,
         created_at, updated_at, description, icon_type, created_by, updated_by,
-        prompt, model_id, welcome_message, knowledge_base_id, plugin_id, mcp,
+        prompt, model_id, welcome_message, knowledge_id, plugin_id, mcp,
         workflow_id, published_at, published_by, publish_version
     </sql>
 
@@ -105,7 +105,7 @@
             <if test="prompt != null">prompt,</if>
             <if test="modelId != null">model_id,</if>
             <if test="welcomeMessage != null">welcome_message,</if>
-            <if test="knowledgeBaseId != null">knowledge_base_id,</if>
+            <if test="knowledgeId != null">knowledge_id,</if>
             <if test="pluginId != null">plugin_id,</if>
             <if test="mcp != null">mcp,</if>
             <if test="workflowId != null">workflow_id,</if>
@@ -129,7 +129,7 @@
             <if test="prompt != null">#{prompt},</if>
             <if test="modelId != null">#{modelId}::uuid,</if>
             <if test="welcomeMessage != null">#{welcomeMessage},</if>
-            <if test="knowledgeBaseId != null">#{knowledgeBaseId},</if>
+            <if test="knowledgeId != null">#{knowledgeId},</if>
             <if test="pluginId != null">#{pluginId},</if>
             <if test="mcp != null">#{mcp},</if>
             <if test="workflowId != null">#{workflowId}::uuid,</if>
@@ -155,7 +155,7 @@
             <if test="prompt != null">prompt = #{prompt},</if>
             <if test="modelId != null">model_id = #{modelId}::uuid,</if>
             <if test="welcomeMessage != null">welcome_message = #{welcomeMessage},</if>
-            <if test="knowledgeBaseId != null">knowledge_base_id = #{knowledgeBaseId},</if>
+            <if test="knowledgeId != null">knowledge_id = #{knowledgeId},</if>
             <if test="pluginId != null">plugin_id = #{pluginId},</if>
             <if test="mcp != null">mcp = #{mcp},</if>
             <if test="workflowId != null">workflow_id = #{workflowId}::uuid,</if>

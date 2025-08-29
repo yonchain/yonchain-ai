@@ -68,9 +68,4 @@ public class RoleEntity implements Role {
      * 角色类别(0-系统角色，1-业务角色)
      */
     private String category;
-
-    /**
-     * 角色所属分组ID
-     */
-    private String groupId;
 }

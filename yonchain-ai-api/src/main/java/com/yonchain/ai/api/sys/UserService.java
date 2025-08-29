@@ -18,7 +18,6 @@ package com.yonchain.ai.api.sys;
 
 
 import com.yonchain.ai.api.common.Page;
-import com.yonchain.ai.api.sys.enums.MenuType;
 
 import java.util.List;
 import java.util.Map;
@@ -78,7 +77,7 @@ public interface UserService {
     /**
      * 创建用户
      *
-     * @param user     用户对象
+     * @param user 用户对象
      */
     void createUser(User user);
 
@@ -149,12 +148,11 @@ public interface UserService {
     List<Role> getUserRoles(String tenantId, String userId);
 
     /**
-     * 获取用户菜单列表
+     * 获取用户权限列表
      *
      * @param tenantId 租户ID
      * @param userId   用户ID
-     * @param menuType 菜单类型
-     * @return 用户菜单列表
+     * @return 权限列表
      */
-    List<Menu> getUserMenus(String tenantId, String userId, MenuType menuType);
+    List<String> getUserPermissions(String tenantId, String userId);
 }

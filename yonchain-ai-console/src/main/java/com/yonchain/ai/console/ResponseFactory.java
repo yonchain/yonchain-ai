@@ -24,7 +24,6 @@ import com.yonchain.ai.web.response.PageResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.Duration;
@@ -314,8 +313,6 @@ public class ResponseFactory {
         roleResponse.setUpdatedAt(role.getUpdatedAt());
         // 设置更新人
         roleResponse.setUpdatedBy(role.getUpdatedBy());
-        // 设置角色所属组ID
-        roleResponse.setGroupId(role.getGroupId());
         //设置角色类别
         roleResponse.setCategory(role.getCategory());
         return roleResponse;
@@ -614,171 +611,6 @@ public class ResponseFactory {
         return response;
     }
 
-    /**
-     * 创建菜单响应对象
-     * <p>
-     * 将Menu实体对象转换为标准化的API响应格式
-     * 包含菜单的基本信息、元数据和权限标识
-     * </p>
-     *
-     * @param menu 菜单实体对象，包含菜单基本信息，不能为null
-     * @return 标准化后的菜单响应对象，包含菜单ID、名称、路径等信息
-     * @see Menu
-     * @see MenuResponse
-     */
-    public MenuResponse createMenuResponse(Menu menu) {
-        if (menu == null) {
-            return null;
-        }
-
-        MenuResponse response = new MenuResponse();
-        // 设置菜单ID
-        response.setId(menu.getId());
-        // 设置父菜单ID
-        response.setParentId(menu.getParentId());
-        // 设置菜单名称
-        response.setName(menu.getName());
-        // 设置菜单路径
-        response.setPath(menu.getPath());
-        // 设置是否隐藏
-        response.setIsHide(menu.getIsHide());
-        // 设置菜单图标
-        response.setIcon(menu.getIcon());
-        // 设置英文名称
-        response.setEnName(menu.getEnName());
-        // 设置是否外链
-        response.setIsLink(menu.getIsLink());
-        // 设置排序顺序
-        response.setSort(menu.getSort());
-        // 设置菜单类型
-        response.setMenuType(menu.getMenuType());
-        // 设置权限标识
-        response.setPermission(menu.getPermission());
-        // 设置创建时间
-        response.setCreatedAt(menu.getCreatedAt());
-        // 设置更新时间
-        response.setUpdatedAt(menu.getUpdatedAt());
-        return response;
-    }
-
-    /**
-     * 创建菜单分页响应对象
-     * <p>
-     * 将菜单分页数据转换为标准化的API分页响应格式
-     * 包含分页元数据和转换后的菜单数据列表
-     * </p>
-     *
-     * @param menus 菜单分页数据对象，包含分页信息和菜单数据列表，不能为null
-     * @return 标准化后的菜单分页响应对象，包含分页元数据和菜单列表
-     * @see Menu
-     * @see MenuResponse
-     * @see PageResponse
-     */
-    public PageResponse<MenuResponse> createMenuPageResponse(Page<Menu> menus) {
-        PageResponse<MenuResponse> response = new PageResponse<>();
-        // 设置当前页码
-        response.setPageNum(menus.getCurrent());
-        // 设置每页记录数
-        response.setPageSize(menus.getSize());
-        // 设置总记录数
-        response.setTotal(menus.getTotal());
-        // 设置菜单数据列表
-        response.setData(menus.getRecords().stream()
-                .map(this::createMenuResponse)
-                .filter(Objects::nonNull)
-                .toList());
-        return response;
-    }
-
-    /**
-     * 创建菜单树形结构响应对象
-     * <p>
-     * 将树形结构的菜单实体列表转换为标准化的树形结构响应格式
-     * 保留原有的层级关系并进行排序
-     * </p>
-     *
-     * @param menus 树形结构的菜单实体列表，不能为null
-     * @return 标准化后的菜单树形结构响应对象，包含层级关系的菜单列表
-     * @see Menu
-     * @see MenuTreeResponse
-     * @see ListResponse
-     */
-    public ListResponse<MenuTreeResponse> createMenuTreeListResponse(List<Menu> menus) {
-        ListResponse<MenuTreeResponse> response = new ListResponse<>();
-
-        if (menus == null || menus.isEmpty()) {
-            return response;
-        }
-
-        // 构建菜单映射表和根菜单列表
-        Map<String, MenuTreeResponse> menuMap = new HashMap<>();
-        List<MenuTreeResponse> rootMenus = new ArrayList<>();
-
-        // 第一遍遍历：创建所有菜单节点并放入映射表
-        for (Menu menu : menus) {
-            MenuTreeResponse menuTree = new MenuTreeResponse();
-            // 复制基本属性
-            BeanUtils.copyProperties(createMenuResponse(menu), menuTree);
-
-            /*// 设置菜单元数据
-            MenuTreeResponse.MenuMetaResponse metaResponse = new MenuTreeResponse.MenuMetaResponse();
-            metaResponse.setIsLink(menu.getIsLink());
-            metaResponse.setIsIframe(menu.getIsIframe());
-            metaResponse.setIsKeepAlive(menu.getIsKeepAlive());
-            metaResponse.setIcon(menu.getIcon());
-            metaResponse.setEnName(menu.getEnName());
-            metaResponse.setIsAffix(menu.getIsAffix());
-            metaResponse.setTitle(menu.getTitle());
-            metaResponse.setIsHide(menu.getIsHide());
-            menuTree.setMeta(metaResponse);*/
-
-            menuMap.put(menu.getId(), menuTree);
-        }
-
-        // 第二遍遍历：构建树形结构
-        for (MenuTreeResponse menuTree : menuMap.values()) {
-            String parentId = menuTree.getParentId();
-            //b61804f0-e99e-4c15-9f9c-0784b125888b--根菜单
-            if (parentId == null || "b61804f0-e99e-4c15-9f9c-0784b125888b".equals(parentId)) {
-                rootMenus.add(menuTree);
-            } else {
-                MenuTreeResponse parentMenu = menuMap.get(parentId);
-                if (parentMenu != null) {
-                    List<MenuTreeResponse> children = parentMenu.getChildren();
-                    if (children == null) {
-                        children = new ArrayList<>();
-                        parentMenu.setChildren(children);
-                    }
-                    children.add(menuTree);
-                }
-            }
-        }
-
-        // 递归排序整个树
-        Comparator<MenuTreeResponse> menuComparator = Comparator
-                .comparing(MenuTreeResponse::getSort, Comparator.nullsFirst(Comparator.naturalOrder()));
-
-        rootMenus.sort(menuComparator);
-        for (MenuTreeResponse menu : rootMenus) {
-            sortMenuTree(menu, menuComparator);
-        }
-
-        response.setData(rootMenus);
-        return response;
-    }
-
-    /**
-     * 递归排序菜单树
-     */
-    private void sortMenuTree(MenuTreeResponse menuTree, Comparator<MenuTreeResponse> comparator) {
-        if (menuTree.getChildren() != null && !menuTree.getChildren().isEmpty()) {
-            menuTree.getChildren().sort(comparator);
-            for (MenuTreeResponse child : menuTree.getChildren()) {
-                sortMenuTree(child, comparator);
-            }
-        }
-    }
-
 
     /**
      * 创建文件响应对象
@@ -859,58 +691,6 @@ public class ResponseFactory {
                 .map(this::createFileResponse)
                 .filter(Objects::nonNull)
                 .toList());
-        return response;
-    }
-
-    /**
-     * 创建角色组列表响应对象
-     * <p>
-     * 将RoleGroup实体对象转换为标准化的API响应格式
-     * 包含角色组的基本信息、权限标识和时间戳
-     * </p>
-     *
-     * @param groups 角色组列表
-     * @return 标准化后的角色组响应对象，包含角色组ID、名称、权限标识等信息
-     * @see RoleGroup
-     * @see RoleGroupResponse
-     */
-    public ListResponse<RoleGroupResponse> buildRoleGroupListResponse(List<RoleGroup> groups) {
-        ListResponse<RoleGroupResponse> response = new ListResponse<>();
-        response.setData(groups
-                .stream().
-                map(this::buildRoleGroupResponse)
-                .toList());
-        return response;
-    }
-
-    /**
-     * 创建角色组响应对象
-     * <p>
-     * 将RoleGroup实体对象转换为标准化的API响应格式
-     * 包含角色组的基本信息、权限标识和时间戳
-     * </p>
-     *
-     * @param roleGroup 角色组实体对象，包含角色组基本信息，不能为null
-     * @return 标准化后的角色组响应对象，包含角色组ID、名称、权限标识等信息
-     * @see RoleGroup
-     * @see RoleGroupResponse
-     */
-    public RoleGroupResponse buildRoleGroupResponse(RoleGroup roleGroup) {
-        RoleGroupResponse response = new RoleGroupResponse();
-        // 设置角色组ID
-        response.setId(roleGroup.getId());
-        // 设置角色组名称
-        response.setName(roleGroup.getName());
-        // 设置角色组类型
-        response.setCategory(roleGroup.getCategory());
-        // 设置创建人ID
-        response.setCreatedBy(roleGroup.getCreatedBy());
-        // 设置创建时间
-        response.setCreatedAt(roleGroup.getCreatedAt());
-        // 设置更新人ID
-        response.setUpdatedBy(roleGroup.getUpdatedBy());
-        // 设置更新时间
-        response.setUpdatedAt(roleGroup.getUpdatedAt());
         return response;
     }
 

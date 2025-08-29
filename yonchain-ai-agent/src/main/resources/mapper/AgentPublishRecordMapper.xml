@@ -11,7 +11,7 @@
         <result property="prompt" column="prompt"/>
         <result property="modelId" column="model_id"/>
         <result property="welcomeMessage" column="welcome_message"/>
-        <result property="knowledgeBaseIds" column="knowledge_base_ids"/>
+        <result property="knowledgeIds" column="knowledge_ids"/>
         <result property="pluginIds" column="plugin_ids"/>
         <result property="mcpConfig" column="mcp_config"/>
         <result property="workflowId" column="workflow_id"/>
@@ -26,11 +26,11 @@
     <insert id="insert" parameterType="com.yonchain.ai.agent.entity.AgentPublishRecord">
         INSERT INTO agent_publish_record (
             id, agent_id, tenant_id, version, name, prompt, model_id, welcome_message,
-            knowledge_base_ids, plugin_ids, mcp_config, workflow_id, description,
+            knowledge_ids, plugin_ids, mcp_config, workflow_id, description,
             icon, icon_background, published_by, published_at, status
         ) VALUES (
             #{id}::uuid, #{agentId}::uuid, #{tenantId}::uuid, #{version}, #{name}, #{prompt}, #{modelId}, #{welcomeMessage},
-            #{knowledgeBaseIds}, #{pluginIds}, #{mcpConfig}, #{workflowId}, #{description},
+            #{knowledgeIds}, #{pluginIds}, #{mcpConfig}, #{workflowId}, #{description},
             #{icon}, #{iconBackground}, #{publishedBy}::uuid, #{publishedAt}, #{status}
         )
     </insert>

@@ -21,12 +21,11 @@ import com.yonchain.ai.api.exception.YonchainForbiddenException;
 import com.yonchain.ai.api.exception.YonchainIllegalStateException;
 import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.api.sys.*;
-import com.yonchain.ai.api.sys.enums.MenuType;
 import com.yonchain.ai.api.security.Password;
 import com.yonchain.ai.api.security.SecurityService;
 import com.yonchain.ai.sys.entity.UserTenantEntity;
-import com.yonchain.ai.sys.mapper.MenuMapper;
 import com.yonchain.ai.sys.mapper.RoleMapper;
+import com.yonchain.ai.sys.mapper.RolePermissionMapper;
 import com.yonchain.ai.sys.mapper.UserTenantMapper;
 import com.yonchain.ai.sys.mapper.UserMapper;
 import com.yonchain.ai.util.IdUtil;
@@ -56,18 +55,18 @@ public class UserServiceImpl implements UserService {
 
     private final RoleMapper roleMapper;
 
-    private final MenuMapper menuMapper;
+    private final RolePermissionMapper rolePermissionMapper;
 
-    private final UserTenantMapper tenantAccountJoinMapper;
+    private final UserTenantMapper userTenantMapper;
 
     public UserServiceImpl(UserMapper userMapper, SecurityService securityService,
-                           RoleMapper roleMapper, UserTenantMapper tenantAccountJoinMapper,
-                           MenuMapper menuMapper) {
+                           RolePermissionMapper rolePermissionMapper,RoleMapper roleMapper,
+                           UserTenantMapper userTenantMapper) {
         this.userMapper = userMapper;
         this.securityService = securityService;
         this.roleMapper = roleMapper;
-        this.tenantAccountJoinMapper = tenantAccountJoinMapper;
-        this.menuMapper = menuMapper;
+        this.userTenantMapper = userTenantMapper;
+        this.rolePermissionMapper = rolePermissionMapper;
     }
 
     @Override
@@ -168,15 +167,15 @@ public class UserServiceImpl implements UserService {
 
 
         //添加到用户与租户关联表
-        UserTenantEntity tenantAccountJoinEntity = new UserTenantEntity();
-        tenantAccountJoinEntity.setId(IdUtil.generateId());
-        tenantAccountJoinEntity.setTenantId(tenantId);
-        tenantAccountJoinEntity.setAccountId(user.getId());
-        tenantAccountJoinEntity.setCurrent(true);
-        tenantAccountJoinEntity.setRole(systemRole.getCode());
-        tenantAccountJoinEntity.setCreatedAt(new Date());
-        tenantAccountJoinEntity.setUpdatedAt(new Date());
-        tenantAccountJoinMapper.insert(tenantAccountJoinEntity);
+        UserTenantEntity userTenantEntity = new UserTenantEntity();
+        userTenantEntity.setId(IdUtil.generateId());
+        userTenantEntity.setTenantId(tenantId);
+        userTenantEntity.setAccountId(user.getId());
+        userTenantEntity.setCurrent(true);
+        userTenantEntity.setRole(systemRole.getCode());
+        userTenantEntity.setCreatedAt(new Date());
+        userTenantEntity.setUpdatedAt(new Date());
+        userTenantMapper.insert(userTenantEntity);
 
         //添加到用户与角色关联表
         roleIds = roleIds.stream()
@@ -276,8 +275,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Menu> getUserMenus(String tenantId, String userId, MenuType menuType) {
-        return menuMapper.selectUserMenus(tenantId, userId, menuType.getValue());
+    public List<String> getUserPermissions(String tenantId, String userId) {
+        return userMapper.selectUserPermissions(tenantId, userId);
     }
 
 }

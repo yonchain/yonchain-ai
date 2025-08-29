@@ -38,18 +38,14 @@ public class SysAutoConfiguration {
         RoleMapper roleMapper = sqlSessionTemplate.getMapper(RoleMapper.class);
         TenantMapper tenantMapper = sqlSessionTemplate.getMapper(TenantMapper.class);
         UserTenantMapper tenantAccountJoinMapper = sqlSessionTemplate.getMapper(UserTenantMapper.class);
-        MenuMapper menuMapper = sqlSessionTemplate.getMapper(MenuMapper.class);
-        RoleMenuMapper roleMenuMapper = sqlSessionTemplate.getMapper(RoleMenuMapper.class);
-        RoleGroupMapper roleGroupMapper = sqlSessionTemplate.getMapper(RoleGroupMapper.class);
+        RolePermissionMapper menuMapper = sqlSessionTemplate.getMapper(RolePermissionMapper.class);
         return SysConfiguration.builder()
                 .securityService(securityService)
                 .userMapper(userMapper)
                 .roleMapper(roleMapper)
                 .tenantAccountJoinMapper(tenantAccountJoinMapper)
                 .tenantMapper(tenantMapper)
-                .menuMapper(menuMapper)
-                .roleMenuMapper(roleMenuMapper)
-                .roleGroupMapper(roleGroupMapper)
+                .rolePermissionMapper(menuMapper)
                 .redisTemplate(redisTemplate)
                 .build();
     }
@@ -89,19 +85,6 @@ public class SysAutoConfiguration {
     public RoleService roleService(SysConfiguration idmConfiguration) {
         return idmConfiguration.getRoleService();
     }
-
-    /**
-     * 创建MenuService Bean
-     *
-     * @param idmConfiguration IDM配置
-     * @return MenuService实例
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public MenuService menuService(SysConfiguration idmConfiguration) {
-        return idmConfiguration.getMenuService();
-    }
-
 
     /**
      * 创建IdmService Bean

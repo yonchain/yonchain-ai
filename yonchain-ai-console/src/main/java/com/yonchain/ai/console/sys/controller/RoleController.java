@@ -23,22 +23,24 @@ import com.yonchain.ai.api.sys.*;
 import com.yonchain.ai.api.sys.RoleCategory;
 import com.yonchain.ai.api.sys.enums.RoleType;
 import com.yonchain.ai.console.BaseController;
+import com.yonchain.ai.console.sys.request.RolePermissionRequest;
 import com.yonchain.ai.console.sys.request.RoleRequest;
+import com.yonchain.ai.console.sys.response.RolePermissionResponse;
 import com.yonchain.ai.console.sys.response.RoleResponse;
 import com.yonchain.ai.web.request.PageRequest;
 import com.yonchain.ai.web.response.ApiResponse;
 import com.yonchain.ai.web.response.ListResponse;
 import com.yonchain.ai.web.response.PageResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 角色控制器
@@ -53,9 +55,6 @@ public class RoleController extends BaseController {
 
     @Autowired
     private RoleService roleService;
-
-    @Autowired
-    private MenuService menuService;
 
     /**
      * 根据角色id获取角色信息
@@ -90,15 +89,7 @@ public class RoleController extends BaseController {
         //分页查询
         Page<Role> page = roleService.pageRoles(this.getCurrentTenantId(), queryParam, pageRequest.getPageNum(), pageRequest.getPageSize());
 
-        PageResponse<RoleResponse> response = responseFactory.createRolePageResponse(page);
-        response.getData().forEach(roleResponse -> {
-            //获取角色组名称
-            RoleGroup group = roleService.getRoleGroupById(roleResponse.getGroupId());
-            if (group != null) {
-                roleResponse.setGroupName(group.getName());
-            }
-        });
-        return response;
+        return responseFactory.createRolePageResponse(page);
     }
 
     /**
@@ -165,29 +156,6 @@ public class RoleController extends BaseController {
         return ApiResponse.success();
     }
 
-    /**
-     * 为角色分配菜单
-     *
-     * @param roleId  角色ID
-     * @param menuIds 菜单ID列表
-     * @return 操作结果
-     */
-    @PostMapping("/{roleId}/menus")
-    public ApiResponse<Void> assignRoleMenus(@PathVariable String roleId, @RequestBody List<String> menuIds) {
-        menuService.assignRoleMenus(roleId, menuIds);
-        return ApiResponse.success();
-    }
-
-    /**
-     * 获取角色菜单列表
-     *
-     * @param roleId 角色ID
-     * @return 菜单ID列表
-     */
-    @GetMapping("/{roleId}/menus")
-    public ApiResponse<List<String>> getRoleMenus(@PathVariable String roleId) {
-        return ApiResponse.success(menuService.getMenusByRoleId(roleId));
-    }
 
     /**
      * 查询租户下角色列表
@@ -205,13 +173,6 @@ public class RoleController extends BaseController {
         response.setData(response.getData().stream()
                 //将超级管理员角色排除
                 .filter(role -> !role.getCode().equals(RoleType.OWNER.getValue()))
-                .peek(roleResponse -> {
-                    //获取角色组名称
-                    RoleGroup group = roleService.getRoleGroupById(roleResponse.getGroupId());
-                    if (group != null) {
-                        roleResponse.setGroupName(group.getName());
-                    }
-                })
                 .toList());
         return response;
     }
@@ -238,6 +199,54 @@ public class RoleController extends BaseController {
         List<Role> roles = roleService.getRoleList(this.getCurrentTenantId(), queryParam);
 
         return ApiResponse.success(!roles.isEmpty());
+    }
+
+    /**
+     * 获取角色权限
+     *
+     * @param roleId 角色ID
+     * @return 角色权限信息
+     */
+    @GetMapping("/{roleId}/permissions")
+    @Operation(summary = "获取角色权限", description = "获取指定角色的菜单权限和操作权限")
+    public ListResponse<String> getRolePermissions(
+            @Parameter(description = "角色ID") @PathVariable String roleId) {
+        // 检查角色是否存在
+        Role role = roleService.getRoleById(roleId);
+        if (role == null) {
+            throw new YonchainResourceNotFoundException("角色不存在");
+        }
+
+        // 获取角色的所有菜单权限
+        List<String> permissions = roleService.getRolePermissions(roleId);
+
+        ListResponse<String> response = new ListResponse("permissions");
+        response.setData(permissions);
+        return response;
+    }
+
+    /**
+     * 设置角色权限
+     *
+     * @param roleId 角色ID
+     * @param request 权限请求
+     * @return 操作结果
+     */
+    @PutMapping("/{roleId}/permissions")
+    @Operation(summary = "设置角色权限", description = "设置指定角色的菜单权限和操作权限")
+    public ApiResponse<Void> setRolePermissions(
+            @Parameter(description = "角色ID") @PathVariable String roleId,
+            @Valid @RequestBody RolePermissionRequest request) {
+        // 检查角色是否存在
+        Role role = roleService.getRoleById(roleId);
+        if (role == null) {
+            throw new YonchainResourceNotFoundException("角色不存在");
+        }
+
+        // 分配权限
+        roleService.setRolePermissions(roleId, request.getPermissions());
+        
+        return ApiResponse.success();
     }
 
     /**

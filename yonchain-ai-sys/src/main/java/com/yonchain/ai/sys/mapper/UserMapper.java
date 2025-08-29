@@ -88,4 +88,12 @@ public interface UserMapper {
      */
     int updateLastLogin(@Param("id") String id, @Param("loginIp") String loginIp);
 
+    /**
+     * 查询用户权限
+     *
+     * @param tenantId 租户ID
+     * @param userId   用户ID
+     * @return 权限列表
+     */
+    List<String> selectUserPermissions(String tenantId, String userId);
 }

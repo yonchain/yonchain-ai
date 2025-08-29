@@ -3,7 +3,6 @@ package com.yonchain.ai.sys.service;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.sys.*;
 import com.yonchain.ai.api.sys.enums.RoleCategory;
-import com.yonchain.ai.api.sys.enums.RoleGroupCategory;
 import com.yonchain.ai.api.sys.enums.RoleType;
 import com.yonchain.ai.sys.entity.UserTenantEntity;
 import com.yonchain.ai.sys.mapper.*;
@@ -15,7 +14,6 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -31,24 +29,17 @@ public class TenantServiceImpl implements TenantService {
 
     private final RoleMapper roleMapper;
 
-    private final RoleMenuMapper roleMenuMapper;
-
-    private final MenuMapper menuMapper;
-
-    private final RoleGroupMapper roleGroupMapper;
+    private final RolePermissionMapper rolePermissionMapper;
 
     private final IdmCacheService idmCacheService;
 
     public TenantServiceImpl(TenantMapper tenantMapper, UserTenantMapper tenantAccountJoinMapper,
-                             RoleMapper roleMapper, RoleMenuMapper roleMenuMapper, MenuMapper menuMapper,
-                             RoleGroupMapper roleGroupMapper,
+                             RoleMapper roleMapper, RolePermissionMapper rolePermissionMapper,
                              IdmCacheService idmCacheService) {
         this.tenantMapper = tenantMapper;
         this.tenantAccountJoinMapper = tenantAccountJoinMapper;
         this.roleMapper = roleMapper;
-        this.roleMenuMapper = roleMenuMapper;
-        this.menuMapper = menuMapper;
-        this.roleGroupMapper = roleGroupMapper;
+        this.rolePermissionMapper = rolePermissionMapper;
         this.idmCacheService = idmCacheService;
     }
 
@@ -101,14 +92,6 @@ public class TenantServiceImpl implements TenantService {
         //插入租户
         tenantMapper.insert(tenant);
 
-        //插入默认角色组
-        RoleGroup roleGroup = new DefaultRoleGroup();
-        roleGroup.setId(IdUtil.generateId());
-        roleGroup.setTenantId(tenant.getId());
-        roleGroup.setName("默认");
-        roleGroup.setCategory(RoleGroupCategory.SYSTEM.getValue());
-        roleGroup.setCreatedAt(LocalDateTime.now());
-        roleGroupMapper.insert(roleGroup);
 
         //插入默认角色
         List<Role> systemRoles = new ArrayList<>();
@@ -118,7 +101,6 @@ public class TenantServiceImpl implements TenantService {
                 tenant.getId(),
                 "所有者",
                 RoleType.OWNER.getValue(),
-                roleGroup.getId(),
                 "系统默认角色，拥有所有权限",
                 RoleCategory.SYSTEM.getValue(),
                 "531a9f15-cfd7-456a-bda4-b4c3f7392800"
@@ -130,7 +112,6 @@ public class TenantServiceImpl implements TenantService {
                 tenant.getId(),
                 "管理员",
                 RoleType.ADMIN.getValue(),
-                roleGroup.getId(),
                 "系统默认角色，拥有大部分管理权限",
                 RoleCategory.SYSTEM.getValue(),
                 "531a9f15-cfd7-456a-bda4-b4c3f7392800"
@@ -141,7 +122,6 @@ public class TenantServiceImpl implements TenantService {
                 tenant.getId(),
                 "普通用户",
                 RoleType.NORMAL.getValue(),
-                roleGroup.getId(),
                 "系统默认角色，拥有基本操作权限",
                 RoleCategory.SYSTEM.getValue(),
                 "531a9f15-cfd7-456a-bda4-b4c3f7392800"
@@ -152,7 +132,6 @@ public class TenantServiceImpl implements TenantService {
                 tenant.getId(),
                 "编辑员",
                 RoleType.EDITOR.getValue(),
-                roleGroup.getId(),
                 "系统默认角色，拥有内容编辑权限",
                 RoleCategory.SYSTEM.getValue(),
                 "531a9f15-cfd7-456a-bda4-b4c3f7392800"
@@ -223,13 +202,12 @@ public class TenantServiceImpl implements TenantService {
      * @param createdBy   创建者ID
      * @return 角色对象
      */
-    private Role createRole(String tenantId, String name, String code, String groupId, String description, String category, String createdBy) {
+    private Role createRole(String tenantId, String name, String code, String description, String category, String createdBy) {
         Role role = new DefaultRole();
         role.setId(IdUtil.generateId());
         role.setName(name);
         role.setCode(code);
         role.setStatus("normal");
-        role.setGroupId(groupId);
         role.setDescription(description);
         role.setCategory(category);
         role.setTenantId(tenantId);

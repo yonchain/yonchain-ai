@@ -114,7 +114,7 @@ public interface AgentPublishRecord {
     /**
      * 设置知识库ID列表
      */
-    void setKnowledgeBaseIds(String knowledgeBaseIds);
+    void setKnowledgeBaseIds(String knowledgeIds);
 
     /**
      * 获取插件ID列表

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yonchain.ai.sys.mapper.RolePermissionMapper">
+
+    <resultMap id="BaseResultMap" type="com.yonchain.ai.sys.entity.RolePermissionEntity">
+        <id column="id" property="id" jdbcType="OTHER"/>
+        <result column="role_id" property="roleId" jdbcType="OTHER"/>
+        <result column="permission" property="permission" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, role_id, permission
+    </sql>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM sys_role_permission
+        WHERE id = #{id}::uuid
+    </select>
+
+    <!-- 查询列表 -->
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM sys_role_permission
+        <where>
+            <if test="params.roleId != null">
+                AND role_id = #{params.roleId}::uuid
+            </if>
+            <if test="params.permission != null">
+                AND permission = #{params.permission}
+            </if>
+        </where>
+        ORDER BY role_id, permission
+    </select>
+
+    <!-- 插入记录 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sys_role_permission(id, role_id, permission)
+        VALUES(#{id}::uuid, #{roleId}::uuid, #{permission})
+    </insert>
+
+    <!-- 根据ID删除 -->
+    <delete id="deleteById">
+        DELETE FROM sys_role_permission WHERE id = #{id}::uuid
+    </delete>
+
+    <!-- 根据角色ID删除 -->
+    <delete id="deleteByRoleId">
+        DELETE FROM sys_role_permission WHERE role_id = #{roleId}::uuid
+    </delete>
+
+    <!-- 根据权限删除 -->
+    <delete id="deleteByPermission">
+        DELETE FROM sys_role_permission WHERE permission = #{permission}
+    </delete>
+
+    <!-- 根据角色ID查询权限列表 -->
+    <select id="selectPermissionsByRoleId" resultType="java.lang.String">
+        SELECT permission FROM sys_role_permission WHERE role_id = #{roleId}::uuid
+        ORDER BY permission
+    </select>
+
+    <!-- 根据权限查询角色ID列表 -->
+    <select id="selectRoleIdsByPermission" resultType="java.lang.String">
+        SELECT role_id FROM sys_role_permission WHERE permission = #{permission}
+        ORDER BY role_id
+    </select>
+
+    <!-- 批量插入 -->
+    <insert id="batchInsert">
+        INSERT INTO sys_role_permission(id, role_id, permission)
+        VALUES
+        <foreach collection="permissions" item="permission" separator=",">
+            (gen_random_uuid()::uuid, #{roleId}::uuid, #{permission})
+        </foreach>
+    </insert>
+
+    <!-- 检查是否存在 -->
+    <select id="exists" resultType="boolean">
+        SELECT COUNT(1) > 0 FROM sys_role_permission 
+        WHERE role_id = #{roleId}::uuid AND permission = #{permission}
+    </select>
+
+</mapper>

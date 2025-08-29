@@ -165,17 +165,4 @@ public interface Role {
      */
     void setCategory(String category);
 
-    /**
-     * 获取角色所属分组ID
-     *
-     * @return 分组ID
-     */
-    String getGroupId();
-
-    /**
-     * 设置角色所属分组ID
-     *
-     * @param groupId 分组ID
-     */
-    void setGroupId(String groupId);
 }
