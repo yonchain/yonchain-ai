@@ -104,10 +104,6 @@ public class AgentController extends BaseController {
 
         //从请求获取数据填充
         app.setName(request.getName());
-  /*      app.setMode(request.getMode());
-       // app.setProvider(request.getProvider());
-        app.setApiKey(request.getApiKey());
-        app.setBaseUrl(request.getBaseUrl());*/
         app.setIcon(request.getIcon());
         app.setIconBackground(request.getIconBackground());
         app.setDescription(request.getDescription());
@@ -145,8 +141,6 @@ public class AgentController extends BaseController {
         app.setIconType(request.getIconType());
         app.setIconBackground(request.getIconBackground());
         app.setDescription(request.getDescription());
-        app.setApiKey(request.getApiKey());
-        app.setBaseUrl(request.getBaseUrl());
 
         app.setUpdatedBy(this.getCurrentUserId());
 
@@ -187,12 +181,12 @@ public class AgentController extends BaseController {
         }
         // 将请求转换为API接口对象
         app.setPrompt(request.getPrompt());
-        app.setModelId(request.getModelId());
+        app.setModelIds(request.getModelIds());
         app.setWelcomeMessage(request.getWelcomeMessage());
-        app.setKnowledgeBaseIds(request.getKnowledgeBaseIds());
+        app.setKnowledgeIds(request.getKnowledgeIds());
         app.setPluginIds(request.getPluginIds());
-        app.setMcpConfig(request.getMcpConfig());
-        app.setWorkflowId(request.getWorkflowId());
+        app.setMcps(request.getMcps());
+        app.setWorkflowIds(request.getWorkflowIds());
 
         // 调用服务发布智能体
         Agent agent = agentService.publishAgent(app, this.getCurrentUserId());

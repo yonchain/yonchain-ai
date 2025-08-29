@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 应用 接口
+ * 智能体 接口
  *
  * @author Cgy
  * @since 1.0.0
@@ -49,16 +49,6 @@ public interface Agent {
     void setTenantId(String tenantId);
 
     /**
-     * 获取提供商
-     */
-    String getProvider();
-
-    /**
-     * 设置提供商
-     */
-    void setProvider(String provider);
-
-    /**
      * 获取应用名称
      */
     String getName();
@@ -67,37 +57,6 @@ public interface Agent {
      * 设置应用名称
      */
     void setName(String name);
-
-    /**
-     * 获取应用模式
-     */
-    String getMode();
-
-    /**
-     * 设置应用模式
-     */
-    void setMode(String mode);
-
-    /**
-     * 获取API密钥
-     */
-    String getApiKey();
-
-    /**
-     * 设置API密钥
-     */
-    void setApiKey(String apiKey);
-
-    /**
-     * 获取基础URL
-     */
-    String getBaseUrl();
-
-    /**
-     * 设置基础URL
-     */
-    void setBaseUrl(String baseUrl);
-
 
     /**
      * 获取图标
@@ -189,10 +148,6 @@ public interface Agent {
      */
     void setUpdatedBy(String updatedBy);
 
-    Map<String, Object> getConfig();
-
-    void setConfig(Map<String, Object> config);
-    
     /**
      * 获取提示词
      */
@@ -202,17 +157,17 @@ public interface Agent {
      * 设置提示词
      */
     void setPrompt(String prompt);
-    
+
     /**
      * 获取模型ID
      */
-    String getModelId();
+    List<String> getModelIds();
 
     /**
      * 设置模型ID
      */
-    void setModelId(String modelId);
-    
+    void setModelIds(List<String> modelIds);
+
     /**
      * 获取开场白
      */
@@ -222,17 +177,17 @@ public interface Agent {
      * 设置开场白
      */
     void setWelcomeMessage(String welcomeMessage);
-    
+
     /**
      * 获取知识库ID列表
      */
-    List<String> getKnowledgeBaseIds();
+    List<String> getKnowledgeIds();
 
     /**
      * 设置知识库ID列表
      */
-    void setKnowledgeBaseIds(List<String> knowledgeBaseIds);
-    
+    void setKnowledgeIds(List<String> knowledgeIds);
+
     /**
      * 获取插件ID列表
      */
@@ -242,27 +197,27 @@ public interface Agent {
      * 设置插件ID列表
      */
     void setPluginIds(List<String> pluginIds);
-    
-    /**
-     * 获取MCP配置
-     */
-    Map<String, Object> getMcpConfig();
 
     /**
-     * 设置MCP配置
+     * 获取MCP列表
      */
-    void setMcpConfig(Map<String, Object> mcpConfig);
-    
-    /**
-     * 获取工作流ID
-     */
-    String getWorkflowId();
+    List<String> getMcps();
 
     /**
-     * 设置工作流ID
+     * 设置MCP列表
      */
-    void setWorkflowId(String workflowId);
-    
+    void setMcps(List<String> mcps);
+
+    /**
+     * 获取工作流ID列表
+     */
+    List<String> getWorkflowIds();
+
+    /**
+     * 设置工作流ID列表
+     */
+    void setWorkflowIds(List<String> workflowIds);
+
     /**
      * 获取发布时间
      */
@@ -272,7 +227,7 @@ public interface Agent {
      * 设置发布时间
      */
     void setPublishedAt(LocalDateTime publishedAt);
-    
+
     /**
      * 获取发布者ID
      */
@@ -282,7 +237,7 @@ public interface Agent {
      * 设置发布者ID
      */
     void setPublishedBy(String publishedBy);
-    
+
     /**
      * 获取发布版本
      */

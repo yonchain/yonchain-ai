@@ -39,29 +39,9 @@ public class DefaultAgent implements Agent {
     private String tenantId;
 
     /**
-     * 应用提供商
-     */
-    private String provider;
-
-    /**
      * 应用名称
      */
     private String name;
-
-    /**
-     * 应用模式
-     */
-    private String mode;
-
-    /**
-     * 应用秘钥
-     */
-    private String apiKey;
-
-    /**
-     * 基础URL
-     */
-    private String baseUrl;
 
     /**
      * 图标
@@ -109,356 +89,173 @@ public class DefaultAgent implements Agent {
     private String updatedBy;
 
     /**
-     * 配置信息
-     */
-    private Map<String, Object> config;
-    
-    /**
      * 提示词
      */
     private String prompt;
-    
+
     /**
      * 模型ID
      */
-    private String modelId;
-    
+    private List<String> modelIds;
+
     /**
      * 开场白
      */
     private String welcomeMessage;
-    
+
     /**
-     * 知识库ID列表
+     * 知识库ID列表（JSON格式，数据库存储）
      */
-    private List<String> knowledgeBaseIds;
-    
+    private List<String> knowledgeIds;
+
     /**
-     * 插件ID列表
+     * 插件ID列表（JSON格式，数据库存储）
      */
     private List<String> pluginIds;
-    
+
     /**
-     * MCP配置
+     * MCP配置（JSON格式，数据库存储）
      */
-    private Map<String, Object> mcpConfig;
-    
+    private List<String> mcps;
+
     /**
      * 工作流ID
      */
-    private String workflowId;
-    
+    private List<String> workflowIds;
+
     /**
      * 发布时间
      */
     private LocalDateTime publishedAt;
-    
+
     /**
      * 发布者ID
      */
     private String publishedBy;
-    
+
     /**
      * 发布版本
      */
     private Integer publishVersion;
 
-    /**
-     * 获取主键ID
-     *
-     * @return 主键ID
-     */
+    @Override
     public String getId() {
         return id;
     }
 
-    /**
-     * 设置主键ID
-     *
-     * @param id 主键ID
-     */
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
-    /**
-     * 获取租户ID
-     *
-     * @return 租户ID
-     */
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
-    /**
-     * 设置租户ID
-     *
-     * @param tenantId 租户ID
-     */
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
-    /**
-     * 获取应用名称
-     *
-     * @return 应用名称
-     */
+    @Override
     public String getName() {
         return name;
     }
 
-    /**
-     * 设置应用名称
-     *
-     * @param name 应用名称
-     */
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * 获取应用模式
-     *
-     * @return 应用模式
-     */
-    public String getMode() {
-        return mode;
-    }
-
-    /**
-     * 设置应用模式
-     *
-     * @param mode 应用模式
-     */
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
-
-    /**
-     * 获取应用提供商
-     *
-     * @return 应用提供商
-     */
-    public String getProvider() {
-        return provider;
-    }
-
-    /**
-     * 设置应用提供商
-     *
-     * @param provider 应用提供商
-     */
-    public void setProvider(String provider) {
-        this.provider = provider;
-    }
-
-    /**
-     * 获取应用秘钥
-     *
-     * @return 应用秘钥
-     */
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    /**
-     * 设置应用秘钥
-     *
-     * @param apiKey 应用秘钥
-     */
-    public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
-    }
-
-    /**
-     * 获取基础URL
-     *
-     * @return 基础URL
-     */
-    public String getBaseUrl() {
-        return baseUrl;
-    }
-
-    /**
-     * 设置基础URL
-     *
-     * @param baseUrl 基础URL
-     */
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
-    }
-
-    /**
-     * 获取图标
-     *
-     * @return 图标
-     */
+    @Override
     public String getIcon() {
         return icon;
     }
 
-    /**
-     * 设置图标
-     *
-     * @param icon 图标
-     */
+    @Override
     public void setIcon(String icon) {
         this.icon = icon;
     }
 
-    /**
-     * 获取图标背景
-     *
-     * @return 图标背景
-     */
+    @Override
     public String getIconBackground() {
         return iconBackground;
     }
 
-    /**
-     * 设置图标背景
-     *
-     * @param iconBackground 图标背景
-     */
+    @Override
     public void setIconBackground(String iconBackground) {
         this.iconBackground = iconBackground;
     }
 
-    /**
-     * 获取状态
-     *
-     * @return 状态
-     */
+    @Override
     public String getStatus() {
         return status;
     }
 
-    /**
-     * 设置状态
-     *
-     * @param status 状态
-     */
+    @Override
     public void setStatus(String status) {
         this.status = status;
     }
 
-    /**
-     * 获取创建时间
-     *
-     * @return 创建时间
-     */
+    @Override
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    /**
-     * 设置创建时间
-     *
-     * @param createdAt 创建时间
-     */
+    @Override
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    /**
-     * 获取更新时间
-     *
-     * @return 更新时间
-     */
+    @Override
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    /**
-     * 设置更新时间
-     *
-     * @param updatedAt 更新时间
-     */
+    @Override
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    /**
-     * 获取应用描述
-     *
-     * @return 应用描述
-     */
+    @Override
     public String getDescription() {
         return description;
     }
 
-    /**
-     * 设置应用描述
-     *
-     * @param description 应用描述
-     */
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
 
-    /**
-     * 获取图标类型
-     *
-     * @return 图标类型
-     */
+    @Override
     public String getIconType() {
         return iconType;
     }
 
-    /**
-     * 设置图标类型
-     *
-     * @param iconType 图标类型
-     */
+    @Override
     public void setIconType(String iconType) {
         this.iconType = iconType;
     }
 
-    /**
-     * 获取创建者ID
-     *
-     * @return 创建者ID
-     */
+    @Override
     public String getCreatedBy() {
         return createdBy;
     }
 
-    /**
-     * 设置创建者ID
-     *
-     * @param createdBy 创建者ID
-     */
+    @Override
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
-    /**
-     * 获取更新者ID
-     *
-     * @return 更新者ID
-     */
+    @Override
     public String getUpdatedBy() {
         return updatedBy;
     }
 
-    /**
-     * 设置更新者ID
-     *
-     * @param updatedBy 更新者ID
-     */
+    @Override
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
-    }
-
-    @Override
-    public Map<String, Object> getConfig() {
-        return config;
-    }
-
-    @Override
-    public void setConfig(Map<String, Object> config) {
-        this.config = config;
     }
 
     @Override
@@ -472,13 +269,12 @@ public class DefaultAgent implements Agent {
     }
 
     @Override
-    public String getModelId() {
-        return modelId;
+    public List<String> getModelIds() {
+        return modelIds;
     }
 
-    @Override
-    public void setModelId(String modelId) {
-        this.modelId = modelId;
+    public void setModelIds(List<String> modelIds) {
+        this.modelIds = modelIds;
     }
 
     @Override
@@ -492,13 +288,13 @@ public class DefaultAgent implements Agent {
     }
 
     @Override
-    public List<String> getKnowledgeBaseIds() {
-        return knowledgeBaseIds;
+    public List<String> getKnowledgeIds() {
+        return knowledgeIds;
     }
 
     @Override
-    public void setKnowledgeBaseIds(List<String> knowledgeBaseIds) {
-        this.knowledgeBaseIds = knowledgeBaseIds;
+    public void setKnowledgeIds(List<String> knowledgeIds) {
+        this.knowledgeIds = knowledgeIds;
     }
 
     @Override
@@ -512,23 +308,23 @@ public class DefaultAgent implements Agent {
     }
 
     @Override
-    public Map<String, Object> getMcpConfig() {
-        return mcpConfig;
+    public List<String> getMcps() {
+        return mcps;
     }
 
     @Override
-    public void setMcpConfig(Map<String, Object> mcpConfig) {
-        this.mcpConfig = mcpConfig;
+    public void setMcps(List<String> mcps) {
+        this.mcps = mcps;
     }
 
     @Override
-    public String getWorkflowId() {
-        return workflowId;
+    public List<String> getWorkflowIds() {
+        return workflowIds;
     }
 
     @Override
-    public void setWorkflowId(String workflowId) {
-        this.workflowId = workflowId;
+    public void setWorkflowIds(List<String> workflowIds) {
+        this.workflowIds = workflowIds;
     }
 
     @Override

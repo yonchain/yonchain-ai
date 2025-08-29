@@ -21,10 +21,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.api.agent.Agent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 应用实体类
@@ -50,26 +51,6 @@ public class AgentEntity implements Agent {
      * 应用名称
      */
     private String name;
-
-    /**
-     * 应用模式
-     */
-    private String mode;
-
-    /**
-     * 应用提供商
-     */
-    private String provider;
-
-    /**
-     * 应用秘钥
-     */
-    private String apiKey;
-
-    /**
-     * 基础URL
-     */
-    private String baseUrl;
 
     /**
      * 图标
@@ -117,153 +98,138 @@ public class AgentEntity implements Agent {
     private String updatedBy;
 
     /**
-     * 配置信息
-     */
-    private Map<String, Object> config;
-    
-    /**
      * 提示词
      */
     private String prompt;
-    
+
     /**
      * 模型ID
      */
     private String modelId;
-    
+
     /**
      * 开场白
      */
     private String welcomeMessage;
-    
+
     /**
      * 知识库ID列表（JSON格式，数据库存储）
      */
-    private String knowledgeBaseId;
-    
+    private String knowledgeId;
+
     /**
      * 插件ID列表（JSON格式，数据库存储）
      */
     private String pluginId;
-    
+
     /**
      * MCP配置（JSON格式，数据库存储）
      */
     private String mcp;
-    
+
     /**
      * 工作流ID
      */
     private String workflowId;
-    
+
     /**
      * 发布时间
      */
     private LocalDateTime publishedAt;
-    
+
     /**
      * 发布者ID
      */
     private String publishedBy;
-    
+
     /**
      * 发布版本
      */
     private Integer publishVersion;
-    
-    /**
-     * 知识库ID列表（内存对象，不存储到数据库）
-     */
-    private transient List<String> knowledgeBaseIdsList;
-    
-    /**
-     * 插件ID列表（内存对象，不存储到数据库）
-     */
-    private transient List<String> pluginIdsList;
-    
-    /**
-     * MCP配置（内存对象，不存储到数据库）
-     */
-    private transient Map<String, Object> mcpConfigMap;
-    
+
+
     @Override
-    public List<String> getKnowledgeBaseIds() {
-        if (knowledgeBaseIdsList == null && knowledgeBaseId != null) {
-            try {
-                knowledgeBaseIdsList = new ObjectMapper().readValue(knowledgeBaseId,
-                    new TypeReference<List<String>>() {});
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("解析知识库ID列表失败", e);
-            }
+    public List<String> getModelIds() {
+        if (!StringUtils.hasText(modelId)) {
+            return new ArrayList<>();
         }
-        return knowledgeBaseIdsList;
+        return Arrays.asList(modelId.split(","));
     }
-    
+
     @Override
-    public void setKnowledgeBaseIds(List<String> knowledgeBaseIds) {
-        this.knowledgeBaseIdsList = knowledgeBaseIds;
-        if (knowledgeBaseIds != null) {
-            try {
-                this.knowledgeBaseId = new ObjectMapper().writeValueAsString(knowledgeBaseIds);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("序列化知识库ID列表失败", e);
-            }
+    public void setModelIds(List<String> modelIds) {
+        if (CollectionUtils.isEmpty(modelIds)) {
+            this.modelId = null;
         } else {
-            this.knowledgeBaseId = null;
+            this.modelId = String.join(",", modelIds);
         }
     }
-    
+
+    @Override
+    public List<String> getKnowledgeIds() {
+        if (!StringUtils.hasText(knowledgeId)) {
+            return new ArrayList<>();
+        }
+        return Arrays.asList(knowledgeId.split(","));
+    }
+
+    @Override
+    public void setKnowledgeIds(List<String> knowledgeIds) {
+        if (CollectionUtils.isEmpty(knowledgeIds)) {
+            this.knowledgeId = null;
+        } else {
+            this.knowledgeId = String.join(",", knowledgeIds);
+        }
+    }
+
     @Override
     public List<String> getPluginIds() {
-        if (pluginIdsList == null && pluginId != null) {
-            try {
-                pluginIdsList = new ObjectMapper().readValue(pluginId,
-                    new TypeReference<List<String>>() {});
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("解析插件ID列表失败", e);
-            }
+        if (!StringUtils.hasText(pluginId)) {
+            return new ArrayList<>();
         }
-        return pluginIdsList;
+        return Arrays.asList(pluginId.split(","));
     }
-    
+
     @Override
     public void setPluginIds(List<String> pluginIds) {
-        this.pluginIdsList = pluginIds;
-        if (pluginIds != null) {
-            try {
-                this.pluginId = new ObjectMapper().writeValueAsString(pluginIds);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("序列化插件ID列表失败", e);
-            }
-        } else {
+        if (CollectionUtils.isEmpty(pluginIds)) {
             this.pluginId = null;
-        }
-    }
-    
-    @Override
-    public Map<String, Object> getMcpConfig() {
-        if (mcpConfigMap == null && mcp != null) {
-            try {
-                mcpConfigMap = new ObjectMapper().readValue(mcp,
-                    new TypeReference<Map<String, Object>>() {});
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("解析MCP配置失败", e);
-            }
-        }
-        return mcpConfigMap;
-    }
-    
-    @Override
-    public void setMcpConfig(Map<String, Object> mcp) {
-        this.mcpConfigMap = mcp;
-        if (mcp != null) {
-            try {
-                this.mcp = new ObjectMapper().writeValueAsString(mcp);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("序列化MCP配置失败", e);
-            }
         } else {
+            this.pluginId = String.join(",", pluginIds);
+        }
+    }
+
+    @Override
+    public List<String> getMcps() {
+        if (!StringUtils.hasText(mcp)) {
+            return new ArrayList<>();
+        }
+        return Arrays.asList(mcp.split(","));
+    }
+
+    @Override
+    public void setMcps(List<String> mcps) {
+        if (CollectionUtils.isEmpty(mcps)) {
             this.mcp = null;
+        } else {
+            this.mcp = String.join(",", mcps);
+        }
+    }
+
+    @Override
+    public List<String> getWorkflowIds() {
+        if (!StringUtils.hasText(workflowId)) {
+            return new ArrayList<>();
+        }
+        return Arrays.asList(workflowId.split(","));
+    }
+
+    @Override
+    public void setWorkflowIds(List<String> workflowIds) {
+        if (CollectionUtils.isEmpty(workflowIds)) {
+            this.workflowId = null;
+        } else {
+            this.workflowId = String.join(",", workflowIds);
         }
     }
 }

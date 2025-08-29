@@ -20,38 +20,23 @@ public class AgentPublishRequest {
     @NotBlank(message = "提示词不能为空")
     @Schema(description = "提示词", required = true)
     private String prompt;
-    
-    @Schema(description = "模型ID")
-    private String modelId;
+
+    @NotBlank(message = "模型ID不能为空")
+    @Schema(description = "模型ID", required = true)
+    private List<String> modelIds;
     
     @Schema(description = "开场白")
     private String welcomeMessage;
 
     @Schema(description = "知识库ID列表")
-    private List<String> knowledgeBaseIds;
+    private List<String> knowledgeIds;
 
     @Schema(description = "插件ID列表")
     private List<String> pluginIds;
 
     @Schema(description = "MCP配置")
-    private Map<String, Object> mcpConfig;
+    private List<String> mcps;
 
     @Schema(description = "工作流ID")
-    private String workflowId;
-    
-    @Schema(description = "智能体名称", required = true)
-    @NotBlank(message = "智能体名称不能为空")
-    private String name;
-    
-    @Schema(description = "智能体描述")
-    private String description;
-    
-    @Schema(description = "图标")
-    private String icon;
-    
-    @Schema(description = "图标背景色")
-    private String iconBackground;
-    
-    @Schema(description = "角色ID列表")
-    private List<String> roleIds;
+    private List<String> workflowIds;
 }

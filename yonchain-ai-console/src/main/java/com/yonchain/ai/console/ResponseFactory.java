@@ -470,14 +470,6 @@ public class ResponseFactory {
         response.setTenantId(app.getTenantId());
         // 设置应用名称
         response.setName(app.getName());
-        // 设置应用模式
-        response.setMode(app.getMode());
-        //设置应用供应商
-        response.setProvider(app.getProvider());
-        //设置api key
-        response.setApiKey(app.getApiKey());
-        //设置基础URL
-        response.setBaseUrl(app.getBaseUrl());
         // 设置应用图标URL
         response.setIcon(app.getIcon());
         // 设置图标背景色

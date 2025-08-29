@@ -206,11 +206,11 @@ public class AgentServiceImpl implements AgentService {
         record.setVersion(newVersion);
         record.setName(agent.getName());
         record.setPrompt(agent.getPrompt());
-        record.setModelId(agent.getModelId());
+       // record.setModelId(agent.getModelId());
         record.setWelcomeMessage(agent.getWelcomeMessage());
 
         // 需要将List和Map转换为JSON字符串，因为AgentPublishRecord仍然使用字符串格式
-        try {
+      /*  try {
             if (agent.getKnowledgeBaseIds() != null && !agent.getKnowledgeBaseIds().isEmpty()) {
                 record.setKnowledgeBaseIds(objectMapper.writeValueAsString(agent.getKnowledgeBaseIds()));
             }
@@ -226,7 +226,7 @@ public class AgentServiceImpl implements AgentService {
             throw new RuntimeException("JSON处理错误: " + e.getMessage(), e);
         }
 
-        record.setWorkflowId(agent.getWorkflowId());
+        record.setWorkflowId(agent.getWorkflowId());*/
         record.setDescription(agent.getDescription());
         record.setIcon(agent.getIcon());
         record.setIconBackground(agent.getIconBackground());
