@@ -35,7 +35,7 @@ import java.util.UUID;
  */
 @Tag(name = "租户(工作空间)管理", description = "租户相关接口")
 @RestController
-@RequestMapping("/workspaces")
+@RequestMapping("/tenants")
 public class TenantController extends BaseController {
 
     @Autowired

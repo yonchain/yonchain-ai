@@ -4,20 +4,20 @@
 
     <resultMap id="BaseResultMap" type="com.yonchain.ai.agent.entity.AgentRoleEntiy">
         <id column="id" property="id" jdbcType="VARCHAR"/>
-        <result column="app_id" property="appId" jdbcType="VARCHAR"/>
+        <result column="agent_id" property="agentId" jdbcType="VARCHAR"/>
         <result column="role_id" property="roleId" jdbcType="VARCHAR"/>
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, app_id, role_id, created_at
+        id, agent_id, role_id, created_at
     </sql>
 
     <!-- 通过ID查询单个应用角色关联 -->
     <select id="selectById" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM app_role
+        FROM agent_role
         WHERE id = #{id}::uuid
     </select>
 
@@ -25,30 +25,30 @@
     <select id="selectByAppId" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM app_role
-        WHERE app_id = #{appId}::uuid
+        FROM agent_role
+        WHERE agent_id = #{agentId}::uuid
     </select>
 
     <!-- 查询角色关联的应用列表 -->
     <select id="selectByRoleId" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM app_role
+        FROM agent_role
         WHERE role_id = #{roleId}::uuid
     </select>
 
     <!-- 新增应用角色关联 -->
     <insert id="insert" >
-        INSERT INTO app_role
+        INSERT INTO agent_role
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
-            <if test="appId != null">app_id,</if>
+            <if test="agentId != null">agent_id,</if>
             <if test="roleId != null">role_id,</if>
             created_at,
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id}::uuid,</if>
-            <if test="appId != null">#{appId}::uuid,</if>
+            <if test="agentId != null">#{agentId}::uuid,</if>
             <if test="roleId != null">#{roleId}::uuid,</if>
             CURRENT_TIMESTAMP,
         </trim>
@@ -56,9 +56,9 @@
 
     <!-- 修改应用角色关联 -->
     <update id="update" >
-        UPDATE app_role
+        UPDATE agent_role
         <set>
-            <if test="appId != null">app_id = #{appId}::uuid,</if>
+            <if test="agentId != null">agent_id = #{agentId}::uuid,</if>
             <if test="roleId != null">role_id = #{roleId}::uuid,</if>
         </set>
         WHERE id = #{id}::uuid
@@ -66,31 +66,31 @@
 
     <!-- 通过ID删除应用角色关联 -->
     <delete id="deleteById">
-        DELETE FROM app_role
+        DELETE FROM agent_role
         WHERE id = #{id}::uuid
     </delete>
 
     <!-- 通过应用ID删除所有关联角色 -->
     <delete id="deleteByAppId">
-        DELETE FROM app_role
-        WHERE app_id = #{appId}::uuid
+        DELETE FROM agent_role
+        WHERE agent_id = #{agentId}::uuid
     </delete>
 
     <!-- 通过角色ID删除所有关联应用 -->
     <delete id="deleteByRoleId">
-        DELETE FROM app_role
+        DELETE FROM agent_role
         WHERE role_id = #{roleId}::uuid
     </delete>
 
     <!-- 批量插入应用角色关联 -->
     <insert id="batchInsert">
-        INSERT INTO app_role
-        (id, app_id, role_id, created_at)
+        INSERT INTO agent_role
+        (id, agent_id, role_id, created_at)
         VALUES
         <foreach collection="roleIds" item="roleId" separator=",">
             (
             gen_random_uuid()::uuid,
-            #{appId}::uuid,
+            #{agentId}::uuid,
             #{roleId}::uuid,
             CURRENT_TIMESTAMP
             )
@@ -102,13 +102,13 @@
         SELECT
             role_.*
         FROM
-            app,
+            agent,
             sys_role role_,
-            app_role app_role
+            agent_role agent_role
         WHERE
-            app.ID = app_role.app_id
-          AND role_.ID = app_role.role_id
-          AND app_id = #{ appId }:: UUID
+            agent.ID = agent_role.agent_id
+          AND role_.ID = agent_role.role_id
+          AND agent_id = #{ agentId }:: UUID
     </select>
 
 </mapper>

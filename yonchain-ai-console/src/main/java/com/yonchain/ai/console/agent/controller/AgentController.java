@@ -195,7 +195,7 @@ public class AgentController extends BaseController {
         app.setWorkflowId(request.getWorkflowId());
 
         // 调用服务发布智能体
-        Agent agent = agentService.publishAgent(id, app, this.getCurrentUserId());
+        Agent agent = agentService.publishAgent(app, this.getCurrentUserId());
         
         return responseFactory.createAppResponse(agent);
     }

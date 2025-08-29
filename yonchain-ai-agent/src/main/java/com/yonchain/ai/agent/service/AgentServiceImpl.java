@@ -170,70 +170,23 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Agent publishAgent(String id, Agent agent, String publishedBy) {
-        Agent app;
-
-        // 检查是否是更新现有智能体
-        if (id != null) {
-            app = getAppById(id);
-            if (app == null) {
-                throw new RuntimeException("应用未找到: " + id);
-            }
-        } else {
-            // 创建新智能体
-            app = new DefaultAgent();
-            app.setId(UUID.randomUUID().toString());
-            app.setTenantId(getTenantIdByUserId(publishedBy)); // 需要实现此方法获取租户ID
-            app.setCreatedBy(publishedBy);
-            app.setMode("agent"); // 设置为智能体模式
-        }
-
+    public Agent publishAgent(Agent agent, String publishedBy) {
         // 获取最新版本号
-        Integer latestVersion = agentPublishRecordMapper.selectLatestVersionByAgentId(id);
+        Integer latestVersion = agentPublishRecordMapper.selectLatestVersionByAgentId(agent.getId());
         int newVersion = (latestVersion == null) ? 1 : latestVersion + 1;
 
         // 更新基本信息
-        app.setName(agent.getName());
-        app.setDescription(agent.getDescription() != null ? agent.getDescription() : agent.getPrompt());
-        app.setIcon(agent.getIcon());
-        app.setIconBackground(agent.getIconBackground());
-        app.setUpdatedBy(publishedBy);
-        app.setStatus("published"); // 设置状态为已发布
+        agent.setUpdatedBy(publishedBy);
+        agent.setStatus("published"); // 设置状态为已发布
+        agent.setPublishedAt(LocalDateTime.now());
+        agent.setPublishVersion(newVersion);
 
-        // 设置智能体特有属性
-        app.setPrompt(agent.getPrompt());
-        app.setModelId(agent.getModelId());
-        app.setWelcomeMessage(agent.getWelcomeMessage());
-        app.setPublishedBy(publishedBy);
-        app.setPublishedAt(LocalDateTime.now());
-        app.setPublishVersion(newVersion);
-
-        // 直接设置列表和Map对象
-        if (agent.getKnowledgeBaseIds() != null && !agent.getKnowledgeBaseIds().isEmpty()) {
-            app.setKnowledgeBaseIds(agent.getKnowledgeBaseIds());
-        }
-
-        if (agent.getPluginIds() != null && !agent.getPluginIds().isEmpty()) {
-            app.setPluginIds(agent.getPluginIds());
-        }
-
-        if (agent.getMcpConfig() != null && !agent.getMcpConfig().isEmpty()) {
-            app.setMcpConfig(agent.getMcpConfig());
-        }
-
-        app.setWorkflowId(agent.getWorkflowId());
-
-        // 更新或创建智能体
-        if (id != null) {
-            updateApp(app);
-        } else {
-            createApp(app);
-        }
+        updateApp(agent);
 
         // 创建发布记录
-        createAgentPublishRecordInternal(app.getId(), agent, publishedBy);
+        createAgentPublishRecordInternal(agent.getId(), agent, publishedBy);
 
-        return getAppById(app.getId());
+        return getAppById(agent.getId());
     }
 
     /**

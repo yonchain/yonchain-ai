@@ -162,10 +162,10 @@ public class TenantServiceImpl implements TenantService {
         roleMapper.batchInsert(systemRoles);
 
         // 添加管理员角色 (ADMIN)
-        roleMenuMapper.batchInsert(ownerRole.getId(), menuMapper.selectList(new HashMap<>())
+        /*roleMenuMapper.batchInsert(ownerRole.getId(), menuMapper.selectList(new HashMap<>())
                 .stream()
                 .map(Menu::getId)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList()));*/
 
     }
 

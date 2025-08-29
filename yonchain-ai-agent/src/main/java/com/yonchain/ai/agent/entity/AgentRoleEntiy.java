@@ -33,7 +33,7 @@ public class AgentRoleEntiy {
     /**
      * 应用ID
      */
-    private String appId;
+    private String agentId;
 
     /**
      * 角色ID
@@ -53,12 +53,12 @@ public class AgentRoleEntiy {
         this.id = id;
     }
 
-    public String getAppId() {
-        return appId;
+    public String getAgentId() {
+        return agentId;
     }
 
-    public void setAppId(String appId) {
-        this.appId = appId;
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
     }
 
     public String getRoleId() {

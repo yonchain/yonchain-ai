@@ -257,9 +257,6 @@ public class RoleController extends BaseController {
             role.setCode(request.getCode());
         }
 
-        if (request.isGroupIdSet()) {
-            role.setGroupId(request.getGroupId());
-        }
 
         // 填充角色描述
         if (request.isDescriptionSet()) {

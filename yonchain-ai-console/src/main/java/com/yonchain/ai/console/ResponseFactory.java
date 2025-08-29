@@ -443,7 +443,7 @@ public class ResponseFactory {
      * @see ListResponse
      */
     public ListResponse<TenantResponse> createTenantListResponse(List<Tenant> tenant) {
-        ListResponse<TenantResponse> response = new ListResponse<>("workspaces");
+        ListResponse<TenantResponse> response = new ListResponse<>("tenants");
         response.setData(tenant.stream()
                 .map(this::createTenantResponse)
                 .toList());

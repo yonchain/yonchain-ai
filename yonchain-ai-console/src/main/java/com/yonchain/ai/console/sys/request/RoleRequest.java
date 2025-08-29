@@ -34,12 +34,12 @@ public class RoleRequest {
     @Schema(description = "角色编码", required = true, example = "ADMIN")
     private String code;
 
-    /**
+/*    *//**
      * 角色组id
-     */
+     *//*
     @Schema(description = "角色组id")
     @NotBlank(message = "角色组id不能为空")
-    private String groupId;
+    private String groupId;*/
 
     /**
      * 状态
@@ -81,10 +81,6 @@ public class RoleRequest {
         return code;
     }
 
-    public String getGroupId() {
-        return groupId;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -113,11 +109,6 @@ public class RoleRequest {
     public void setCode(String code) {
         this.code = code;
         this.codeSet = true;
-    }
-
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
-        this.groupIdSet = true;
     }
 
     public void setDescription(String description) {

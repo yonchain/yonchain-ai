@@ -42,10 +42,10 @@ public interface AgentRoleMapper {
     /**
      * 查询应用角色关联列表
      *
-     * @param appId 应用ID
+     * @param agentId 应用ID
      * @return 应用角色关联列表
      */
-    List<AgentRoleEntiy> selectByAppId(@Param("appId") String appId);
+    List<AgentRoleEntiy> selectByAppId(@Param("agentId") String agentId);
 
     /**
      * 查询角色关联的应用列表
@@ -82,10 +82,10 @@ public interface AgentRoleMapper {
     /**
      * 通过应用ID删除所有关联角色
      *
-     * @param appId 应用ID
+     * @param agentId 应用ID
      * @return 影响行数
      */
-    int deleteByAppId(@Param("appId") String appId);
+    int deleteByAppId(@Param("agentId") String agentId);
 
     /**
      * 通过角色ID删除所有关联应用
@@ -98,17 +98,17 @@ public interface AgentRoleMapper {
     /**
      * 批量新增应用角色关联
      *
-     * @param appId   应用ID
+     * @param agentId   应用ID
      * @param roleIds 角色ID列表
      * @return 影响行数
      */
-    int batchInsert(@Param("appId") String appId, @Param("roleIds") List<String> roleIds);
+    int batchInsert(@Param("agentId") String agentId, @Param("roleIds") List<String> roleIds);
 
     /**
      * 通过应用ID查询角色列表
      *
-     * @param appId 应用ID
+     * @param agentId 应用ID
      * @return 角色列表
      */
-    List<Role> selectRoleByAppId(@Param("appId") String appId);
+    List<Role> selectRoleByAppId(@Param("agentId") String agentId);
 }

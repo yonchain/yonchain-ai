@@ -345,7 +345,9 @@ public class UserController extends BaseController {
                 "  \"dify:apps:view\",\n" +
                 "  \"dify:apps:create\",\n" +
                 "  \"dify:apps:import\",\n" +
+                "  \"system:tenants\",\n" +
                 "  \"mcp:view\",\n" +
+                "  \"system:oauth2-clients\",\n" +
                 "  \"model:view\"\n" +
                 "]");
     }

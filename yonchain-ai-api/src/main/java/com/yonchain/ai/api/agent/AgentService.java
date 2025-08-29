@@ -106,12 +106,11 @@ public interface AgentService {
     /**
      * 发布智能体
      *
-     * @param id         智能体ID，如果为null则创建新智能体
      * @param agent    发布请求
      * @param publishedBy 发布者ID
      * @return 智能体应用
      */
-    Agent publishAgent(String id, Agent agent, String publishedBy);
+    Agent publishAgent(Agent agent, String publishedBy);
     
     /**
      * 获取智能体最新发布记录
