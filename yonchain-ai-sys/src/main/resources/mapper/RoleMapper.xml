@@ -25,13 +25,11 @@
         <result column="tenant_id" property="tenantId" jdbcType="OTHER" />
         <!-- 角色类别，默认为1 -->
         <result column="category" property="category" jdbcType="VARCHAR" />
-        <!-- 角色所属分组ID -->
-        <result column="group_id" property="groupId" jdbcType="OTHER" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, name, code, description, status, created_by, created_at, updated_by, updated_at,tenant_id,category,group_id
+        id, name, code, description, status, created_by, created_at, updated_by, updated_at,tenant_id,category
     </sql>
 
     <!-- 根据ID查询角色 -->
@@ -58,9 +56,7 @@
             <if test="params.status != null and params.status != ''">
                 AND status = #{params.status}
             </if>
-            <if test="params.groupId != null and params.groupId != ''">
-                AND group_id = #{params.groupId}::uuid
-            </if>
+
             <if test="params.category != null and params.category != ''">
                 AND category = #{params.category}
             </if>
@@ -105,7 +101,7 @@
     <!-- 插入角色记录 -->
     <insert id="insert" parameterType="com.yonchain.ai.sys.entity.RoleEntity">
         INSERT INTO sys_role (
-            id, name, code, status, created_by, created_at, updated_by, updated_at,tenant_id,description,category,group_id
+            id, name, code, status, created_by, created_at, updated_by, updated_at,tenant_id,description,category
         )
         VALUES (
             #{id}::uuid, #{name}, #{code}, #{status},
@@ -121,7 +117,6 @@
             code = #{code},
             status = #{status},
             description = #{description},
-            group_id = #{groupId}::uuid,
             updated_by = #{updatedBy}::uuid,
             updated_at = CURRENT_TIMESTAMP
         WHERE id = #{id}::uuid
