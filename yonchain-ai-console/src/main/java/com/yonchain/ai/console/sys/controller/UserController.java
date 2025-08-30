@@ -79,21 +79,21 @@ public class UserController extends BaseController {
     @Operation(summary = "根据用户id获取用户信息")
     public UserResponse getById(@Parameter(description = "用户id") @PathVariable String userId) {
         User user = this.getUserFromRequest(userId);
-        return responseFactory.createUserResponse(user);
+        return this.buildDetailsResponse(user);
     }
 
-    /**
+  /*  *//**
      * 根据用户id获取用户信息详情
      *
      * @param userId 用户id
      * @return
-     */
+     *//*
     @GetMapping("/{userId}/details")
     @Operation(summary = "根据用户id获取用户信息")
     public UserResponse getDetailsById(@Parameter(description = "用户id") @PathVariable String userId) {
         User user = this.getUserFromRequest(userId);
         return this.buildDetailsResponse(user);
-    }
+    }*/
 
     /**
      * 获取当前登录用户信息
