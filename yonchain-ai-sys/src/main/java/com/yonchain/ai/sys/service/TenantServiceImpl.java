@@ -65,6 +65,11 @@ public class TenantServiceImpl implements TenantService {
     }
 
     @Override
+    public List<Tenant> getTenants(String userId, Map<String, Object> queryParam) {
+        return tenantMapper.selectList(userId, queryParam);
+    }
+
+    @Override
     public Page<Tenant> pageTenants(String userId, Map<String, Object> queryParam, int pageNum, int pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         List<Tenant> tenant = tenantMapper.selectList(userId, queryParam);
@@ -196,7 +201,6 @@ public class TenantServiceImpl implements TenantService {
      * @param tenantId    租户ID
      * @param name        角色名称
      * @param code        角色代码
-     * @param groupId     角色组id
      * @param description 角色描述
      * @param category    角色类别
      * @param createdBy   创建者ID

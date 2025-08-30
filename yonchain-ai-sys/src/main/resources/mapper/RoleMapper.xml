@@ -106,7 +106,7 @@
         VALUES (
             #{id}::uuid, #{name}, #{code}, #{status},
             #{createdBy}::uuid, #{createdAt}, #{updatedBy}::uuid,
-            #{updatedAt}, #{tenantId}::uuid, #{description}, #{category}, #{groupId}::uuid
+            #{updatedAt}, #{tenantId}::uuid, #{description}, #{category}
         )
     </insert>
 
@@ -143,12 +143,11 @@
             role_.*
         FROM
             sys_role role_,
-            sys_user_tenant user_tenant
+            sys_user_role user_role
         <where>
-            role_.code = user_tenant."role" AND
-            user_tenant.tenant_id = role_.tenant_id AND
-            user_tenant.tenant_id = #{tenantId}::uuid AND
-            user_tenant.account_id = #{userId}::uuid
+            role_.id = user_role.role_id AND
+            role_.tenant_id = #{tenantId}::uuid AND
+            user_role.user_id = #{userId}::uuid
         </where>
     </select>
 

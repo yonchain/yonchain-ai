@@ -44,14 +44,9 @@ public class DefaultTenant implements Tenant {
     private LocalDateTime updatedAt;
 
     /**
-     * 自定义配置
-     */
-    private String customConfig;
-
-    /**
      * 角色
      */
-    private String role;
+    private Boolean current;
 
     /**
      * 获取租户ID
@@ -180,39 +175,22 @@ public class DefaultTenant implements Tenant {
     }
 
     /**
-     * 获取自定义配置
+     * 获取当前租户
      *
-     * @return 自定义配置
-     */
-    public String getCustomConfig() {
-        return customConfig;
-    }
-
-    /**
-     * 设置自定义配置
-     *
-     * @param customConfig 自定义配置
-     */
-    public void setCustomConfig(String customConfig) {
-        this.customConfig = customConfig;
-    }
-
-    /**
-     * 获取角色
-     *
-     * @return 角色
+     * @return 当前租户
      */
     @Override
-    public String getRole() {
-        return role;
+    public Boolean getCurrent() {
+        return current;
     }
 
     /**
-     * 设置角色
+     * 设置当前租户
      *
-     * @param role 角色
+     * @param current 当前租户
      */
-    public void setRole(String role) {
-        this.role = role;
+    @Override
+    public void setCurrent(Boolean current) {
+        this.current = current;
     }
 }

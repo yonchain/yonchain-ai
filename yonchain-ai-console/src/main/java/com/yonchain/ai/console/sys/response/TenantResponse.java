@@ -69,4 +69,10 @@ public class TenantResponse {
      */
     @Schema(description = "角色")
     private String role;
+
+    /**
+     * 是否当前租户
+     */
+    @Schema(description = "是否当前租户")
+    private Boolean current;
 }

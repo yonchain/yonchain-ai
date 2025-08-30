@@ -48,13 +48,8 @@ public class TenantEntity implements Tenant {
     private LocalDateTime updatedAt;
 
     /**
-     * 自定义配置
+     * 是否当前租户
      */
-    private String customConfig;
-
-    /**
-     * 角色
-     */
-    private String role;
+    private Boolean current;
 
 }

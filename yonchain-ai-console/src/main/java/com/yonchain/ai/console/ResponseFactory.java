@@ -393,8 +393,8 @@ public class ResponseFactory {
         tenantResponse.setCreatedAt(tenant.getCreatedAt());
         // 设置更新时间
         tenantResponse.setUpdatedAt(tenant.getUpdatedAt());
-        // 设置自定义配置
-        tenantResponse.setCustomConfig(tenant.getCustomConfig());
+        // 设置是否当前租户
+        tenantResponse.setCurrent(tenant.getCurrent());
         return tenantResponse;
     }
 
@@ -440,7 +440,7 @@ public class ResponseFactory {
      * @see ListResponse
      */
     public ListResponse<TenantResponse> createTenantListResponse(List<Tenant> tenant) {
-        ListResponse<TenantResponse> response = new ListResponse<>("tenants");
+        ListResponse<TenantResponse> response = new ListResponse<>("workspaces");
         response.setData(tenant.stream()
                 .map(this::createTenantResponse)
                 .toList());

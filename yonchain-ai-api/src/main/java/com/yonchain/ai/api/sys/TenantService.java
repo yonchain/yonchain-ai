@@ -49,6 +49,15 @@ public interface TenantService {
     List<Tenant> getTenantsByUserId(String userId);
 
     /**
+     * 获取用户所有租户列表
+     *
+     * @param userId     用户id
+     * @param queryParam 查询参数
+     * @return 租户列表
+     */
+    List<Tenant> getTenants(String userId, Map<String, Object> queryParam);
+
+    /**
      * 分页获取用户所有租户
      *
      * @param userId   用户id

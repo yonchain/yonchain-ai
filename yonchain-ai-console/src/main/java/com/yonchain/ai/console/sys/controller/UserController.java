@@ -32,6 +32,7 @@ import com.yonchain.ai.console.sys.request.UserPasswordRestRequest;
 import com.yonchain.ai.console.sys.request.UserQueryRequest;
 import com.yonchain.ai.console.sys.request.UserUpdateRequest;
 import com.yonchain.ai.console.sys.response.MenuTreeResponse;
+import com.yonchain.ai.console.sys.response.TenantResponse;
 import com.yonchain.ai.console.sys.response.UserResponse;
 import com.yonchain.ai.util.Assert;
 import com.yonchain.ai.web.response.ApiResponse;
@@ -323,6 +324,19 @@ public class UserController extends BaseController {
         return response;
     }
 
+
+    /**
+     * 获取当前用户所属租户列表
+     *
+     * @return 租户列表
+     */
+/*    @Operation(summary = "查询当前用户所属租户列表")
+    @GetMapping
+    public ListResponse<TenantResponse> getTenants() {
+        String userId = this.getCurrentUserId();
+        List<Tenant> tenant = tenantService.getTenantsByUserId(userId);
+        return responseFactory.createTenantListResponse(tenant);
+    }*/
 
     /**
      * 获取当前用户菜单

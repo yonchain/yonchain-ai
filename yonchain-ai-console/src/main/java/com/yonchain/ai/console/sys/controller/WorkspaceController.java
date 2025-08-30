@@ -9,6 +9,7 @@ import com.yonchain.ai.api.sys.*;
 import com.yonchain.ai.console.BaseController;
 import com.yonchain.ai.console.sys.request.TenantQueryRequest;
 import com.yonchain.ai.console.sys.request.TenantRequest;
+import com.yonchain.ai.console.sys.request.WorkspaceSwitchRequest;
 import com.yonchain.ai.console.sys.response.TenantResponse;
 import com.yonchain.ai.util.Assert;
 import com.yonchain.ai.web.response.ApiResponse;
@@ -35,8 +36,8 @@ import java.util.UUID;
  */
 @Tag(name = "租户(工作空间)管理", description = "租户相关接口")
 @RestController
-@RequestMapping("/tenants")
-public class TenantController extends BaseController {
+@RequestMapping("/workspaces")
+public class WorkspaceController extends BaseController {
 
     @Autowired
     private TenantService tenantService;
@@ -57,38 +58,59 @@ public class TenantController extends BaseController {
         return this.responseFactory.createTenantResponse(tenant);
     }
 
-    /**
+/*    *//**
      * 获取当前用户所属租户列表
      *
      * @return 租户列表
-     */
+     *//*
     @Operation(summary = "查询当前用户所属租户列表")
     @GetMapping
     public ListResponse<TenantResponse> getTenants() {
         String userId = this.getCurrentUserId();
         List<Tenant> tenant = tenantService.getTenantsByUserId(userId);
         return responseFactory.createTenantListResponse(tenant);
-    }
+    }*/
 
-    /**
+/*    *//**
      * 分页查询租户(工作空间)列表
      *
      * @param request 租户查询请求对象
      * @return 分页响应对象
-     */
+     *//*
     @Operation(summary = "分页查询租户")
-    @GetMapping("/page")
+    @GetMapping
     public PageResponse<TenantResponse> pageTenants(TenantQueryRequest request) {
         String userId = this.getCurrentUserId();
 
         //查询参数
         Map<String, Object> queryParam = new HashMap<>();
-        queryParam.put("name", request.getName());
+        queryParam.put("keyword", request.getKeyword());
 
         //获取当前用户所属租户数据列表
         Page<Tenant> tenantPage = tenantService.pageTenants(userId, queryParam, request.getPageNum(), request.getPageSize());
 
         return responseFactory.createTenantPageResponse(tenantPage);
+    }*/
+
+    /**
+     * 查询租户(工作空间)列表
+     *
+     * @param request 租户查询请求对象
+     * @return 分页响应对象
+     */
+    @Operation(summary = "查询租户(工作空间)列表")
+    @GetMapping
+    public ListResponse<TenantResponse> getTenants(TenantQueryRequest request) {
+        String userId = this.getCurrentUserId();
+
+        //查询参数
+        Map<String, Object> queryParam = new HashMap<>();
+        queryParam.put("keyword", request.getKeyword());
+
+        //获取当前用户所属租户数据列表
+        List<Tenant> tenantPage = tenantService.getTenants(userId, queryParam);
+
+        return responseFactory.createTenantListResponse(tenantPage);
     }
 
     /**
@@ -152,14 +174,13 @@ public class TenantController extends BaseController {
     /**
      * 切换租户(工作空间)
      *
-     * @param tenantId 租户id
+     * @param request 请求
      * @return 租户响应
      */
     @Operation(summary = "切换租户")
     @PostMapping("/switch")
-    public ApiResponse<Void> switchTenant(@Parameter(description = "租户ID") @RequestParam("tenant_id") String tenantId) {
-        Assert.hasText(tenantId, "租户id不能为空");
-        Tenant tenant = getTenantFromRequest(tenantId);
+    public ApiResponse<Void> switchTenant(@RequestBody WorkspaceSwitchRequest request) {
+        Tenant tenant = getTenantFromRequest(request.getTenantId());
         tenantService.switchTenant(tenant.getId(), this.getCurrentUserId());
         return ApiResponse.success();
     }

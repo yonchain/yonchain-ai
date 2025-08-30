@@ -142,12 +142,13 @@ public class RoleController extends BaseController {
     /**
      * 批量删除角色
      *
-     * @param ids 角色id列表
+     * @param roleId 角色id列表
      * @return 保存后的角色信息
      */
-    @DeleteMapping
-    public ApiResponse<Void> deleteRole(@RequestBody List<String> ids) {
+    @DeleteMapping("/{roleId}")
+    public ApiResponse<Void> deleteRole(@PathVariable String roleId) {
         //系统角色不能删除
+        List<String> ids = new ArrayList<>(Collections.singleton(roleId));
         if (roleService.getSystemRoleCount(this.getCurrentTenantId(), ids) > 0) {
             throw new YonchainForbiddenException("系统角色不能删除");
         }

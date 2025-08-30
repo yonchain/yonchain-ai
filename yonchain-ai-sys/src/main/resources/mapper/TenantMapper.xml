@@ -17,13 +17,11 @@
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP" />
         <!-- 更新时间 -->
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP" />
-        <!-- 自定义配置，存储JSON格式的配置信息 -->
-        <result column="custom_config" property="customConfig" jdbcType="VARCHAR" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, name, encrypt_public_key, plan, status, created_at, updated_at, custom_config
+        id, name, encrypt_public_key, plan, status, created_at, updated_at
     </sql>
 
     <!-- 根据ID查询租户 -->
@@ -37,7 +35,7 @@
     <!-- 根据ID查询租户详情 -->
     <select id="selectDetailById" resultType="com.yonchain.ai.sys.entity.TenantEntity">
         SELECT
-            tenant.*,user_tenant.role
+            tenant.*
         FROM
             sys_tenant tenant,sys_user_tenant user_tenant
         <where>
@@ -48,16 +46,16 @@
     </select>
 
     <!-- 查询租户列表 -->
-    <select id="selectList" resultMap="BaseResultMap">
+    <select id="selectList" resultType="com.yonchain.ai.sys.entity.TenantEntity">
         SELECT
-            tenant.*
+            tenant.*,user_tenant.current
         FROM
             sys_tenant tenant,sys_user_tenant user_tenant
         <where>
             user_tenant.tenant_id = tenant.id AND
             user_tenant.account_id = #{userId}::uuid
-            <if test="params.name != null and params.name != ''">
-                AND name LIKE CONCAT('%', #{params.name}, '%')
+            <if test="params.keyword != null and params.keyword != ''">
+                AND name LIKE CONCAT('%', #{params.keyword}, '%')
             </if>
         </where>
         ORDER BY created_at DESC
@@ -79,7 +77,7 @@
     <!-- 根据用户id获取当前租户 -->
     <select id="selectCurrentTenantByUserId" resultType="com.yonchain.ai.sys.entity.TenantEntity">
         SELECT
-            tenant.*,user_tenant.role
+            tenant.*
         FROM
             sys_tenant tenant,sys_user_tenant user_tenant
             <where>
@@ -93,7 +91,7 @@
     <!-- 插入租户记录 -->
     <insert id="insert" parameterType="com.yonchain.ai.sys.entity.TenantEntity">
         INSERT INTO sys_tenant (
-            id,name, encrypt_public_key, plan, status, custom_config,created_at, updated_at
+            id,name, encrypt_public_key, plan, status, current,created_at, updated_at
         )
         VALUES (
             #{id}::uuid, #{name}, #{encryptPublicKey}, #{plan}, #{status}, #{customConfig}, #{createdAt}, #{updatedAt}
@@ -108,7 +106,7 @@
             plan = #{plan},
             status = #{status},
             updated_at = CURRENT_TIMESTAMP,
-            custom_config = #{customConfig}
+            current = #{customConfig}
         WHERE id = #{id}::uuid
     </update>
 

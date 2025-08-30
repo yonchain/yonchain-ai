@@ -106,31 +106,17 @@ public interface Tenant {
     void setUpdatedAt(LocalDateTime updatedAt);
 
     /**
-     * 获取自定义配置
+     * 获取当前租户
      *
-     * @return 自定义配置
+     * @return 当前租户
      */
-    String getCustomConfig();
+    Boolean getCurrent();
 
     /**
-     * 设置自定义配置
+     * 设置当前租户
      *
-     * @param customConfig 自定义配置
+     * @param current 当前租户
      */
-    void setCustomConfig(String customConfig);
-
-    /**
-     * 获取角色
-     *
-     * @return 角色
-     */
-    String getRole();
-
-    /**
-     * 获取角色
-     *
-     * @param role 角色
-     */
-    void setRole(String role);
+    void setCurrent(Boolean current);
 
 }

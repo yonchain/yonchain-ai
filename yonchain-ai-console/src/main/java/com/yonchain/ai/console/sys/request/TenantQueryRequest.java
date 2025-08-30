@@ -14,22 +14,22 @@ import lombok.EqualsAndHashCode;
 public class TenantQueryRequest extends PageRequest {
 
     /**
-     * 租户名称
+     * 关键字
      */
-    @Schema(description = "租户名称")
-    private String name;
+    @Schema(description = "关键字")
+    private String keyword;
 
-    /**
+/*    *//**
      * 计划类型
-     */
+     *//*
     @Schema(description = "计划类型", example = "basic")
     private String plan;
 
-    /**
+    *//**
      * 状态
-     */
+     *//*
     @Schema(description = "状态", example = "normal")
-    private String status;
+    private String status;*/
 
 /*    *//**
      * 获取租户

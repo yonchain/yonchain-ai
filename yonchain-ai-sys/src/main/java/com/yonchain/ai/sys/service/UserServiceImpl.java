@@ -152,7 +152,7 @@ public class UserServiceImpl implements UserService {
         //插入用户表
         this.createUser(user);
 
-        //获取系统默认角色和业务角色
+       /* //获取系统默认角色和业务角色
         Map<String, Object> roleQueryParam = new HashMap<>();
         roleQueryParam.put("roleIds", roleIds);
         roleQueryParam.put("category", "0");
@@ -163,7 +163,7 @@ public class UserServiceImpl implements UserService {
         if (roles.size() > 1) {
             throw new YonchainForbiddenException("角色不能包含多个默认角色");
         }
-        Role systemRole = roles.get(0);
+        Role systemRole = roles.get(0);*/
 
 
         //添加到用户与租户关联表
@@ -172,15 +172,16 @@ public class UserServiceImpl implements UserService {
         userTenantEntity.setTenantId(tenantId);
         userTenantEntity.setAccountId(user.getId());
         userTenantEntity.setCurrent(true);
-        userTenantEntity.setRole(systemRole.getCode());
+     //   userTenantEntity.setRole(systemRole.getCode());
         userTenantEntity.setCreatedAt(new Date());
         userTenantEntity.setUpdatedAt(new Date());
         userTenantMapper.insert(userTenantEntity);
 
         //添加到用户与角色关联表
-        roleIds = roleIds.stream()
+       /* roleIds = roleIds.stream()
                 .filter(roleId -> !roleId.equals(systemRole.getId()))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
+
 
     }
 
