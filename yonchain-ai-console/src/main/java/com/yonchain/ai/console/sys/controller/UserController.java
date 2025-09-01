@@ -101,26 +101,13 @@ public class UserController extends BaseController {
      *
      * @return 当前用户信息
      */
-/*
-    @GetMapping("/current")
+    @GetMapping("/profile")
     @Operation(summary = "获取当前用户信息")
-    public Map<String, Object> getCurrentUserInfo() {
-        // 获取当前用户信息
-        String userId = getCurrentUserId();
-        User user = this.getUserFromRequest(userId);
+    public UserResponse getProfile() {
+        User user = this.getUserFromRequest(getCurrentUserId());
 
-        // 获取用户信息及用户与菜单的按钮权限信息
-        List<Menu> menus = userService.getUserMenus(this.getCurrentTenantId(), user.getId(), MenuType.BUTTON);
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("user", this.buildDetailsResponse(user));
-        map.put("permissions", menus.stream()
-                .map(Menu::getPermission)
-                .distinct()
-                .toArray(String[]::new));
-        return map;
+        return this.buildDetailsResponse(user);
     }
-*/
 
     /**
      * 分页查询
