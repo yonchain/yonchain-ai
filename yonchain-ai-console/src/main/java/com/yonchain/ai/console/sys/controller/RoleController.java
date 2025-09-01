@@ -74,20 +74,18 @@ public class RoleController extends BaseController {
     /**
      * 分页查询角色
      *
-     * @param name 角色名称
+     * @param keyword 关键字
      * @return 角色分页列表
      */
     @GetMapping
-    public PageResponse<RoleResponse> pageRoles(@RequestParam(value = "name", required = false) String name,
-                                                @RequestParam(value = "group_id", required = false) String groupId,
-                                                PageRequest pageRequest) {
+    public PageResponse<RoleResponse> pageRoles(@RequestParam(value = "keyword", required = false) String keyword,
+                                                PageRequest request) {
         //构建查询参数
         Map<String, Object> queryParam = new HashMap<>();
-        queryParam.put("name", name);
-        queryParam.put("groupId", groupId);
+        queryParam.put("keyword", keyword);
 
         //分页查询
-        Page<Role> page = roleService.pageRoles(this.getCurrentTenantId(), queryParam, pageRequest.getPageNum(), pageRequest.getPageSize());
+        Page<Role> page = roleService.pageRoles(this.getCurrentTenantId(), queryParam, request.getPageNum(), request.getPageSize());
 
         return responseFactory.createRolePageResponse(page);
     }
@@ -230,14 +228,14 @@ public class RoleController extends BaseController {
      * 设置角色权限
      *
      * @param roleId 角色ID
-     * @param request 权限请求
+     * @param permissions 权限请求
      * @return 操作结果
      */
     @PutMapping("/{roleId}/permissions")
     @Operation(summary = "设置角色权限", description = "设置指定角色的菜单权限和操作权限")
     public ApiResponse<Void> setRolePermissions(
             @Parameter(description = "角色ID") @PathVariable String roleId,
-            @Valid @RequestBody RolePermissionRequest request) {
+             @RequestBody List<String> permissions) {
         // 检查角色是否存在
         Role role = roleService.getRoleById(roleId);
         if (role == null) {
@@ -245,7 +243,7 @@ public class RoleController extends BaseController {
         }
 
         // 分配权限
-        roleService.setRolePermissions(roleId, request.getPermissions());
+        roleService.setRolePermissions(roleId, permissions);
         
         return ApiResponse.success();
     }

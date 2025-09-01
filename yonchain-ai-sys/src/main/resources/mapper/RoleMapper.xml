@@ -53,6 +53,9 @@
             <if test="params.code != null and params.code != ''">
                 AND code LIKE CONCAT('%', #{params.code}, '%')
             </if>
+            <if test="params.keyword != null and params.keyword != ''">
+                AND name LIKE CONCAT('%', #{params.keyword}, '%')
+            </if>
             <if test="params.status != null and params.status != ''">
                 AND status = #{params.status}
             </if>

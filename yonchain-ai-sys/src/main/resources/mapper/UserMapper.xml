@@ -191,7 +191,7 @@
         SELECT DISTINCT rp.permission
         FROM sys_user u
         JOIN sys_user_tenant ut ON u.id = ut.account_id
-        JOIN sys_role r ON ut.role = r.code AND ut.tenant_id = r.tenant_id
+        JOIN sys_role r ON  ut.tenant_id = r.tenant_id
         JOIN sys_role_permission rp ON r.id = rp.role_id
         WHERE u.id = #{userId}::uuid
           AND ut.tenant_id = #{tenantId}::uuid

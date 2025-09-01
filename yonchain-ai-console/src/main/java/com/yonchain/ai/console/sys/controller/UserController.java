@@ -46,6 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 用户控制器
@@ -305,9 +306,9 @@ public class UserController extends BaseController {
     @GetMapping("/permissions")
     @Operation(summary = "获取当前用户菜单权限", description = "获取当前登录用户的权限列表")
     public ListResponse<String> getUserPermissions() {
-        List<String> menus = userService.getUserPermissions(getCurrentTenantId(), getCurrentUserId());
+        List<String> permissions = userService.getUserPermissions(getCurrentTenantId(), getCurrentUserId());
         ListResponse<String> response = new ListResponse<>("permissions");
-        response.setData(menus);
+        response.setData(permissions);
         return response;
     }
 
@@ -325,11 +326,11 @@ public class UserController extends BaseController {
         return responseFactory.createTenantListResponse(tenant);
     }*/
 
-    /**
+  /*  *//**
      * 获取当前用户菜单
      *
      * @return 当前用户菜单列表
-     */
+     *//*
     @GetMapping("/menus")
     @Operation(summary = "获取当前用户菜单", description = "获取当前登录用户的菜单列表")
     public JSONArray getCurrentUserMenus2() {
@@ -367,7 +368,7 @@ public class UserController extends BaseController {
                 "  \"system:oauth2-clients\",\n" +
                 "  \"model:view\"\n" +
                 "]");
-    }
+    }*/
 
 
 
