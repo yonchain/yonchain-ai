@@ -7,7 +7,6 @@
         <id column="id" property="id" jdbcType="OTHER" />
         <result column="tenant_id" property="tenantId" jdbcType="OTHER" />
         <result column="account_id" property="accountId" jdbcType="OTHER" />
-        <result column="role" property="role" jdbcType="VARCHAR"/>
         <result column="invited_by" property="invitedBy" jdbcType="OTHER" />
         <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
         <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
@@ -17,13 +16,12 @@
     <!-- 插入单条记录 -->
     <insert id="insert" parameterType="com.yonchain.ai.sys.entity.UserTenantEntity">
         INSERT INTO sys_user_tenant (
-            id, tenant_id, account_id, role,
+            id, tenant_id, account_id,
             invited_by, created_at, updated_at, current
         ) VALUES (
             #{id}::uuid,
             #{tenantId}::uuid,
             #{accountId}::uuid,
-            #{role,jdbcType=VARCHAR},
             #{invitedBy},
             #{createdAt,jdbcType=TIMESTAMP},
             #{updatedAt,jdbcType=TIMESTAMP},
@@ -40,9 +38,6 @@
             </if>
             <if test="accountId != null">
                 account_id = #{accountId}::uuid,
-            </if>
-            <if test="role != null">
-                role = #{role,jdbcType=VARCHAR},
             </if>
             <if test="invitedBy != null">
                 invited_by = #{invitedBy},

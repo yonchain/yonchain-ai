@@ -103,10 +103,9 @@ public class UserController extends BaseController {
      * @return 当前用户信息
      */
     @GetMapping("/profile")
-    @Operation(summary = "获取当前用户信息")
+    @Operation(summary = "获取当前用户个人信息")
     public UserResponse getProfile() {
         User user = this.getUserFromRequest(getCurrentUserId());
-
         return this.buildDetailsResponse(user);
     }
 
@@ -130,6 +129,19 @@ public class UserController extends BaseController {
         return buildPageResponse(users);
     }
 
+    /**
+     * 获取当前用户菜单
+     *
+     * @return 当前用户菜单列表
+     */
+    @GetMapping("/permissions")
+    @Operation(summary = "获取当前用户菜单权限", description = "获取当前登录用户的权限列表")
+    public ListResponse<String> getUserPermissions() {
+        List<String> permissions = userService.getUserPermissions(getCurrentTenantId(), getCurrentUserId());
+        ListResponse<String> response = new ListResponse<>("permissions");
+        response.setData(permissions);
+        return response;
+    }
 
     /**
      * 创建用户信息
@@ -299,19 +311,23 @@ public class UserController extends BaseController {
 
 
     /**
-     * 获取当前用户菜单
+     * 获取当前登录用户信息
      *
-     * @return 当前用户菜单列表
+     * @return 当前用户信息
      */
-    @GetMapping("/permissions")
-    @Operation(summary = "获取当前用户菜单权限", description = "获取当前登录用户的权限列表")
-    public ListResponse<String> getUserPermissions() {
-        List<String> permissions = userService.getUserPermissions(getCurrentTenantId(), getCurrentUserId());
-        ListResponse<String> response = new ListResponse<>("permissions");
-        response.setData(permissions);
-        return response;
-    }
+    @PutMapping("/profile")
+    @Operation(summary = "更新当前用户个人信息")
+    public ApiResponse<String> updateProfile(@Valid @RequestBody UserUpdateRequest request) {
+        User user = this.getUserFromRequest(this.getCurrentUserId());
 
+        //填充用户信息
+        populateUserFromRequest(user, request);
+
+        // 更新用户
+        userService.updateUser(user);
+
+        return ApiResponse.success(user.getId());
+    }
 
     /**
      * 获取当前用户所属租户列表

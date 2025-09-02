@@ -91,10 +91,10 @@
     <!-- 插入租户记录 -->
     <insert id="insert" parameterType="com.yonchain.ai.sys.entity.TenantEntity">
         INSERT INTO sys_tenant (
-            id,name, encrypt_public_key, plan, status, current,created_at, updated_at
+            id,name, encrypt_public_key, plan, status,created_at, updated_at
         )
         VALUES (
-            #{id}::uuid, #{name}, #{encryptPublicKey}, #{plan}, #{status}, #{customConfig}, #{createdAt}, #{updatedAt}
+            #{id}::uuid, #{name}, #{encryptPublicKey}, #{plan}, #{status}, #{createdAt}, #{updatedAt}
         )
     </insert>
 
@@ -105,8 +105,7 @@
             encrypt_public_key = #{encryptPublicKey},
             plan = #{plan},
             status = #{status},
-            updated_at = CURRENT_TIMESTAMP,
-            current = #{customConfig}
+            updated_at = CURRENT_TIMESTAMP
         WHERE id = #{id}::uuid
     </update>
 

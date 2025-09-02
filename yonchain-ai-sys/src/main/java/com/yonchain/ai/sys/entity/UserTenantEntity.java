@@ -32,11 +32,6 @@ public class UserTenantEntity {
     private String accountId;
 
     /**
-     * 角色
-     */
-    private String role;
-
-    /**
      * 邀请人ID
      */
     private String invitedBy;

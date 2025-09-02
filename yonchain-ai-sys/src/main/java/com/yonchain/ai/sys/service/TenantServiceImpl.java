@@ -165,7 +165,6 @@ public class TenantServiceImpl implements TenantService {
         tenantAccountJoin.setId(UUID.randomUUID().toString());
         tenantAccountJoin.setTenantId(tenant.getId());
         tenantAccountJoin.setAccountId(userId);
-        tenantAccountJoin.setRole(RoleType.OWNER.getValue());
         tenantAccountJoin.setCurrent(false);
         tenantAccountJoin.setCreatedAt(new Date());
         tenantAccountJoin.setUpdatedAt(new Date());
