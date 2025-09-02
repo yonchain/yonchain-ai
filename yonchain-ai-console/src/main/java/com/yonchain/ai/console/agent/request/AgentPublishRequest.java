@@ -2,6 +2,7 @@ package com.yonchain.ai.console.agent.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class AgentPublishRequest {
     @Schema(description = "提示词", required = true)
     private String prompt;
 
-    @NotBlank(message = "模型ID不能为空")
+    @NotNull(message = "模型ID不能为空")
     @Schema(description = "模型ID", required = true)
     private List<String> modelIds;
     
