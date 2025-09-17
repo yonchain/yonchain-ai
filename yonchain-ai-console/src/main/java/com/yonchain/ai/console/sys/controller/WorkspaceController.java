@@ -179,7 +179,20 @@ public class WorkspaceController extends BaseController {
      */
     @Operation(summary = "切换租户")
     @PostMapping("/switch")
-    public ApiResponse<Void> switchTenant(@RequestBody WorkspaceSwitchRequest request) {
+    public ApiResponse<Void> switchTenant(@Valid @RequestBody WorkspaceSwitchRequest request) {
+        // 添加详细调试信息
+        System.out.println("=== switchTenant Debug Info ===");
+        System.out.println("Request object: " + request);
+        System.out.println("Request class: " + request.getClass().getName());
+        System.out.println("TenantId value: '" + request.getTenantId() + "'");
+        System.out.println("TenantId is null: " + (request.getTenantId() == null));
+        System.out.println("TenantId is empty: " + (request.getTenantId() != null && request.getTenantId().isEmpty()));
+        System.out.println("===============================");
+        
+        if (request.getTenantId() == null || request.getTenantId().trim().isEmpty()) {
+            throw new YonchainIllegalStateException("租户ID不能为空，接收到的值: " + request.getTenantId());
+        }
+        
         Tenant tenant = getTenantFromRequest(request.getTenantId());
         tenantService.switchTenant(tenant.getId(), this.getCurrentUserId());
         return ApiResponse.success();
@@ -254,9 +267,9 @@ public class WorkspaceController extends BaseController {
 
         // 更新计划类型（可选字段）
         // 租户的订阅计划类型，如：basic（基础版）、pro（专业版）、enterprise（企业版）等
-        if (StringUtils.isNotBlank(request.getPlan())) {
+       /* if (StringUtils.isNotBlank(request.getPlan())) {
             tenant.setPlan(request.getPlan());
-        }
+        }*/
 
       /*  // 更新租户状态（可选字段）
         // 租户的当前状态，如：normal（正常）、suspended（已暂停）、deleted（已删除）等

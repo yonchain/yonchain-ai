@@ -50,6 +50,7 @@ public class DeepSeekChatConfiguration {
     protected final String baseUrl;
     protected final String model;
     protected final Double temperature;
+    
     protected final DeepSeekChatOptions defaultOptions;
 
     // 实例缓存

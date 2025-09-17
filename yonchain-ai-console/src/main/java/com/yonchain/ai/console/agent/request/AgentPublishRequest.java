@@ -1,9 +1,12 @@
 package com.yonchain.ai.console.agent.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +18,7 @@ import java.util.Map;
  * @since 2024-08-24
  */
 @Data
+@Slf4j
 @Schema(description = "智能体发布请求")
 public class AgentPublishRequest {
 
@@ -22,9 +26,16 @@ public class AgentPublishRequest {
     @Schema(description = "提示词", required = true)
     private String prompt;
 
-    @NotNull(message = "模型ID不能为空")
+    @NotEmpty(message = "模型ID不能为空")
     @Schema(description = "模型ID", required = true)
+    @JsonProperty("modelIds")
     private List<String> modelIds;
+    
+    // 添加setter方法用于调试
+    public void setModelIds(List<String> modelIds) {
+        log.info("设置modelIds: {}", modelIds);
+        this.modelIds = modelIds;
+    }
     
     @Schema(description = "开场白")
     private String welcomeMessage;

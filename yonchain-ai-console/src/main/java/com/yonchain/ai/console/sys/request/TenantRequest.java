@@ -24,11 +24,11 @@ public class TenantRequest {
     @Schema(description = "加密公钥")
     private String encryptPublicKey;*/
 
-    /**
+/*    *//**
      * 计划类型
-     */
+     *//*
     @Schema(description = "计划类型", example = "basic")
-    private String plan;
+    private String plan;*/
 
     /*    *//**
      * 状态

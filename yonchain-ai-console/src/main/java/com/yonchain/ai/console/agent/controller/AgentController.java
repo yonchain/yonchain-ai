@@ -173,6 +173,11 @@ public class AgentController extends BaseController {
     @Operation(summary = "发布智能体", description = "发布新的智能体，包含提示词、知识库、插件、MCP和工作流配置")
     public AppResponse publishAgent(@Parameter(description = "应用ID") @PathVariable String id,
                                     @Valid @RequestBody AgentPublishRequest request) {
+        
+        // 添加调试日志
+        System.out.println("接收到的请求数据:");
+        System.out.println("modelIds: " + request.getModelIds());
+        System.out.println("modelIds size: " + (request.getModelIds() != null ? request.getModelIds().size() : "null"));
 
         // 检查应用是否存在
         Agent app = agentService.getAppById(id);
