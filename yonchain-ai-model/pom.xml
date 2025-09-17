@@ -60,14 +60,7 @@
             <groupId>com.yonchain.ai</groupId>
             <artifactId>yonchain-ai-starter-mybatis</artifactId>
         </dependency>
-        
-<!--        &lt;!&ndash; MyBatis Plus &ndash;&gt;
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>${mybatis-plus.version}</version>
-        </dependency>
-        -->
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
