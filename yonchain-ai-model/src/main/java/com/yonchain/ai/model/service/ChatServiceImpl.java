@@ -325,7 +325,7 @@ public class ChatServiceImpl implements ChatService {
      */
     private Prompt createEnhancedPrompt(List<Message> messages, ChatCompletionRequest request, ModelEntity model) {
         // 基础Prompt
-        ChatOptions chatOptions = ChatOptions.builder().model(model.getModelCode() + "-" + model.getProviderCode()).build();
+        ChatOptions chatOptions = ChatOptions.builder().model(model.getModelCode()).build();
         Prompt prompt = new Prompt(messages, chatOptions);
 
         // 如果有额外的配置参数，可以在这里添加

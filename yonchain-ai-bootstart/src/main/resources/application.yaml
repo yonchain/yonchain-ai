@@ -27,6 +27,7 @@ server:
 yonchain:
   version: 0.1.0
   security:
+
     password-encoder-type: dify@pbkdf2
     enable-password-encoder-prefix: ${DIFY4J_PASSWORD_ENCODER_PREFIX:true}
     oauth2:
@@ -40,6 +41,7 @@ yonchain:
         permit-paths:
           - ${DIFY4J_RESOURCESERVER_PERMIT_PATHS:/api/**}  # 从环境变量读取
           - ${DIFY4J_RESOURCESERVER_PERMIT_PATHS2:/token/check_token}  # 从环境变量读取
+          - /chat/completions
     # dify-secret-key: ${DIFY_SECRET_KEY}  # 从环境变量读取
 
 

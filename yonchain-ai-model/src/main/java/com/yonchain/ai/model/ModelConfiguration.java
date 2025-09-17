@@ -1,5 +1,9 @@
 package com.yonchain.ai.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yonchain.ai.chat.ChatModelFilter;
+import com.yonchain.ai.chat.ChatModelService;
+import com.yonchain.ai.chat.DefaultChatModelSeviceImpl;
 import com.yonchain.ai.model.chat.DelegatingChatModel;
 import com.yonchain.ai.model.factory.ModelFactory;
 import com.yonchain.ai.model.loader.ModelLoader;
@@ -48,6 +52,17 @@ public class ModelConfiguration {
     @Bean
     public ModelFactory modelFactory(ModelRegistry modelRegistry) {
         return new ModelFactory(modelRegistry);
+    }
+
+
+    @Bean
+    public ChatModelService chatModelService(){
+        return new DefaultChatModelSeviceImpl();
+    }
+
+    @Bean
+    public ChatModelFilter chatModelFilter(ChatModelService chatModelService, ObjectMapper objectMapper){
+        return new ChatModelFilter(chatModelService,objectMapper);
     }
 
 }
