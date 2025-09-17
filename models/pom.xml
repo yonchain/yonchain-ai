@@ -9,16 +9,21 @@
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>yonchain-ai-spring-boot-starters</artifactId>
+    <artifactId>models</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>yonchain-ai-starter-mybatis</module>
-        <module>yonchain-ai-starter-swagger</module>
-        <module>yonchain-ai-starter-redis</module>
-        <module>yonchain-ai-security-spring-boot-starter</module>
-        <module>yonchain-ai-model-spring-boot-starter</module>
-        <module>yonchain-ai-sys-spring-boot-starter</module>
+        <module>yonchain-ai-openai</module>
+        <module>yonchain-ai-deepseek</module>
+        <module>yonchain-ai-grok</module>
+        <module>yonchain-ai-ollama</module>
+        <module>yonchain-ai-anthropic</module>
     </modules>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
 </project>

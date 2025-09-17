@@ -5,20 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yonchain.ai</groupId>
-        <artifactId>yonchain-ai-parent</artifactId>
+        <artifactId>models</artifactId>
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>yonchain-ai-models</artifactId>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>yonchain-ai-openai</module>
-        <module>yonchain-ai-deepseek</module>
-        <module>yonchain-ai-grok</module>
-        <module>yonchain-ai-ollama</module>
-        <module>yonchain-ai-anthropic</module>
-    </modules>
+    <artifactId>yonchain-ai-grok</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
