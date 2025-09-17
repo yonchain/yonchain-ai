@@ -1,8 +1,6 @@
 package com.yonchain.ai.autoconfigure.security;
 
 import com.yonchain.ai.security.SecurityConfiguration;
-import com.yonchain.ai.security.oauth2.authorization.dify.DifyCodeAuthenticationConverter;
-import com.yonchain.ai.security.oauth2.authorization.dify.DifyCodeAuthenticationProvider;
 import com.yonchain.ai.security.oauth2.exception.YonchainOAuth2ClientAuthenticationFailureHandler;
 import com.yonchain.ai.security.oauth2.exception.YonchainOAuth2ErrorAuthenticationFailureHandler;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -105,20 +103,9 @@ public class OAuth2AuthorizationServerAutoConfiguration {
             endpoint.accessTokenRequestConverter(securityConfiguration.getDingtalkAuthenticationConverter());
             endpoint.authenticationProvider(securityConfiguration.getDingtalkAuthenticationProvider());
 
-            // 添加Dify认证方式
-            endpoint.authenticationProvider(securityConfiguration.getDifyAuthenticationProvider());
-            endpoint.accessTokenRequestConverter(securityConfiguration.difyAuthenticationConverter());
-
             // 添加自定义错误处理器
             endpoint.errorResponseHandler(new YonchainOAuth2ErrorAuthenticationFailureHandler());
 
-            // 添加自定义code认证方式
-            endpoint.accessTokenRequestConverter(new DifyCodeAuthenticationConverter());
-            endpoint.authenticationProvider(new DifyCodeAuthenticationProvider(
-                    securityConfiguration.getAuthorizationService(),
-                    securityConfiguration.getUserDetailsService(),
-                    securityConfiguration.getDifySecretKey()
-            ));
         });
     }
 

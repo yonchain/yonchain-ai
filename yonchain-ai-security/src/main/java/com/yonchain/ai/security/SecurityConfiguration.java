@@ -8,8 +8,6 @@ import com.yonchain.ai.security.captcha.CaptchaAuthenticationFilter;
 import com.yonchain.ai.security.crypto.YonchainDelegatingPasswordEncoder;
 import com.yonchain.ai.security.crypto.PasswordEncoderType;
 import com.yonchain.ai.security.oauth2.authorization.*;
-import com.yonchain.ai.security.oauth2.authorization.dify.DifyAuthenticationConverter;
-import com.yonchain.ai.security.oauth2.authorization.dify.DifyAuthenticationProvider;
 import com.yonchain.ai.security.oauth2.exception.YonchainAccessDeniedHandler;
 import com.yonchain.ai.security.oauth2.exception.YonchainAuthenticationEntryPoint;
 import com.yonchain.ai.security.oauth2.jwt.OAuth2JWKSource;
@@ -74,11 +72,6 @@ public class SecurityConfiguration {
     protected OAuth2DingtalkAuthenticationProvider dingtalkAuthenticationProvider;
 
     protected OAuth2DingtalkAuthenticationConverter dingtalkAuthenticationConverter;
-
-    //dify 授权模式
-    protected DifyAuthenticationProvider difyAuthenticationProvider;
-
-    protected DifyAuthenticationConverter difyAuthenticationConverter;
 
     protected String passwordEncoderType;
 
@@ -228,11 +221,6 @@ public class SecurityConfiguration {
                 passwordEncoder, idmService);
         //初始化钉钉授权模式认证转换器
         dingtalkAuthenticationConverter = new OAuth2DingtalkAuthenticationConverter();
-
-        //初始化dify授权模式
-        difyAuthenticationProvider = new DifyAuthenticationProvider(userDetailsService, authorizationService, jwtDecoder,difySecretKey);
-        //初始化dify授权模式认证转换器
-        difyAuthenticationConverter = new DifyAuthenticationConverter();
     }
 
     /**
@@ -352,24 +340,6 @@ public class SecurityConfiguration {
      */
     public OAuth2DingtalkAuthenticationConverter getDingtalkAuthenticationConverter() {
         return dingtalkAuthenticationConverter;
-    }
-
-    /**
-     * 获取dify授权模式认证提供者
-     *
-     * @return dify授权模式认证提供者实例
-     */
-    public DifyAuthenticationProvider getDifyAuthenticationProvider() {
-        return difyAuthenticationProvider;
-    }
-
-    /**
-     * 获取dify授权模式认证转换器
-     *
-     * @return dify授权模式认证转换器实例
-     */
-    public DifyAuthenticationConverter difyAuthenticationConverter() {
-        return difyAuthenticationConverter;
     }
 
     /**

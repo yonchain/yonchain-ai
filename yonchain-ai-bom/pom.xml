@@ -104,12 +104,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.yonchain.ai</groupId>
-                <artifactId>yonchain-ai-dify</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- AI模型管理模块 -->
             <dependency>
                 <groupId>com.yonchain.ai</groupId>

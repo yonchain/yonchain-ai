@@ -16,9 +16,6 @@
         <module>yonchain-ai-bom</module>
         <module>yonchain-ai-agent</module>
         <module>yonchain-ai-commons</module>
-        <module>yonchain-ai-dify</module>
-        <module>yonchain-ai-n8n</module>
-        <module>yonchain-ai-coze</module>
         <module>yonchain-ai-security</module>
         <module>yonchain-ai-api</module>
         <module>yonchain-ai-console</module>
