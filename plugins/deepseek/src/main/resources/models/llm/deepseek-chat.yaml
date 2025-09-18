@@ -1,3 +1,54 @@
+# DeepSeek Chat 模型配置
+model:
+  # 模型唯一标识符
+  code: "deepseek-chat"
+  # 模型显示名称
+  name: "DeepSeek Chat"
+  # 模型详细描述
+  description: "DeepSeek的通用对话模型，适用于各种聊天和文本生成任务"
+  # 模型图标
+  icon: "🧠"
+  # 所属提供商代码
+  provider: "deepseek"
+  # 模型类型：chat/completion/embedding/image
+  modelType: "chat"
+  # 模型版本号
+  version: "1.0"
+  # 排序权重，数值越小排序越靠前
+  sortOrder: 1
+  # 是否启用,默认启用
+  enabled: true
+  # 模型支持的功能列表
+  capabilities:
+    - "chat"              # 支持对话聊天
+    - "completion"        # 支持文本补全
+    - "analysis"          # 支持文本分析
+  # 模型配置参数定义
+  configSchemas:
+    # 温度参数，控制输出的随机性，值越高输出越随机
+    - name: temperature
+      type: number
+      title: 温度参数
+      description: 控制输出的随机性，值越高输出越随机
+      defaultValue: 0.7
+      min: 0
+      max: 2
+    # 最大令牌数，生成文本的最大令牌数量
+    - name: max_tokens
+      type: integer
+      title: 最大令牌数
+      description: 生成文本的最大令牌数量
+      defaultValue: 4096
+      min: 1
+      max: 8192
+    # 核采样参数，控制词汇选择的多样性
+    - name: top_p
+      type: number
+      title: 核采样参数
+      description: 核采样参数，控制词汇选择的多样性
+      defaultValue: 0.95
+      min: 0
+      max: 1
 model: deepseek-chat
 label:
   zh_Hans: deepseek-chat
