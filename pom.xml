@@ -27,6 +27,9 @@
         <module>yonchain-ai-spring-boot-autoconfigure</module>
         <module>yonchain-ai-spring-boot-starters</module>
         <module>models</module>
+        <module>yonchain-ai-plugin</module>
+        <module>plugins</module>
+        <module>plugins/deepseek</module>
     </modules>
 
     <properties>

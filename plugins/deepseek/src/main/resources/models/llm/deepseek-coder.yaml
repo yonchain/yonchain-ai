@@ -1,0 +1,65 @@
+model: deepseek-coder
+label:
+  zh_Hans: deepseek-coder
+  en_US: deepseek-coder
+model_type: llm
+features:
+  - code-generation
+  - code-completion
+  - code-explanation
+  - debugging
+model_properties:
+  mode: chat
+  context_size: 65536
+parameter_rules:
+  - name: temperature
+    use_template: temperature
+    type: float
+    default_value: 0.1
+    min: 0.0
+    max: 2.0
+    help:
+      zh_Hans: 控制代码生成的随机性。较低的值使输出更确定性和准确。
+      en_US: Controls randomness in code generation. Lower values make output more deterministic and accurate.
+  - name: max_tokens
+    use_template: max_tokens
+    type: int
+    default_value: 2048
+    min: 1
+    max: 4096
+    help:
+      zh_Hans: 指定生成代码的最大token数量。
+      en_US: Specifies the maximum number of tokens for code generation.
+  - name: top_p
+    use_template: top_p
+    type: float
+    default_value: 0.95
+    min: 0.01
+    max: 1.00
+    help:
+      zh_Hans: 控制生成结果的随机性。对于代码生成，建议使用较高的值。
+      en_US: Controls randomness of generated results. Higher values are recommended for code generation.
+  - name: frequency_penalty
+    use_template: frequency_penalty
+    default_value: 0.1
+    min: -2.0
+    max: 2.0
+    help:
+      zh_Hans: 减少重复代码的生成。
+      en_US: Reduces repetitive code generation.
+  - name: stop_sequences
+    label:
+      zh_Hans: 停止序列
+      en_US: Stop Sequences
+    type: array
+    help:
+      zh_Hans: 遇到这些序列时停止生成
+      en_US: Stop generation when encountering these sequences
+    required: false
+    default_value: []
+pricing:
+  input: "1.33"
+  output: "2.66"
+  unit: "0.000001"
+  currency: RMB
+

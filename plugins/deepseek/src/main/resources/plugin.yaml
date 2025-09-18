@@ -1,0 +1,30 @@
+author: yonchain
+created_at: '2024-09-20T12:13:50'
+description:
+  en_US: Models provided by DeepSeek AI, including deepseek-chat, deepseek-reasoner, and deepseek-coder.
+  zh_Hans: 深度求索提供的模型，包括 deepseek-chat、deepseek-reasoner、deepseek-coder 等。
+icon: icon_s_en.svg
+label:
+  en_US: DeepSeek
+  zh_Hans: 深度求索
+name: deepseek
+plugins:
+  - deepseek.yaml
+resource:
+  memory: 268435456
+  permission:
+    model:
+      enabled: true
+      llm: true
+      moderation: false
+      rerank: true
+      speech2text: false
+      text_embedding: true
+      tts: false
+    tool:
+      enabled: true
+type: model
+version: 0.0.2
+
+
+
