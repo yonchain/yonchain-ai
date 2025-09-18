@@ -141,6 +141,18 @@ public class ModelConfig {
         this.properties.put(key, value);
     }
     
+    /**
+     * 获取完整的模型名称（provider:model）
+     * 
+     * @return 完整的模型名称
+     */
+    public String getFullModelName() {
+        if (provider != null && !provider.trim().isEmpty()) {
+            return ModelNameUtils.buildFullModelName(provider, name);
+        }
+        return name;
+    }
+    
     @Override
     public String toString() {
         return "ModelConfig{" +
@@ -151,3 +163,4 @@ public class ModelConfig {
                 '}';
     }
 }
+

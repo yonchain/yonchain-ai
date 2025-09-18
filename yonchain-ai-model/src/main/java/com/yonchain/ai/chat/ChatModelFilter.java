@@ -3,6 +3,7 @@ package com.yonchain.ai.chat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.filter.BaseModelFilter;
 import com.yonchain.ai.model.ModelService;
+import com.yonchain.ai.model.ModelNameUtils;
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

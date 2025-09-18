@@ -630,3 +630,4 @@ public class ConsulRegistryAutoConfiguration {
 - **便于运维** - 完善的监控和日志系统
 
 这个架构为企业提供了一个稳定、可扩展、易维护的AI模型管理平台，能够很好地支撑各种AI应用场景的需求。
+

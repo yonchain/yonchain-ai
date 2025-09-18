@@ -72,3 +72,4 @@ public enum ModelType {
         return name + "(" + code + ")";
     }
 }
+

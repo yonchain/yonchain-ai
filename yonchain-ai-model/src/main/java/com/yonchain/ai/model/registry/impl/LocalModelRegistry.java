@@ -1,6 +1,7 @@
 package com.yonchain.ai.model.registry.impl;
 
 import com.yonchain.ai.model.ModelMetadata;
+import com.yonchain.ai.model.ModelNameUtils;
 import com.yonchain.ai.model.ModelType;
 import com.yonchain.ai.model.registry.ModelChangeListener;
 import com.yonchain.ai.model.registry.ModelRegistry;
@@ -34,14 +35,16 @@ public class LocalModelRegistry implements ModelRegistry {
             return;
         }
         
-        ModelMetadata old = models.put(metadata.getName(), metadata);
+        // 使用模型ID作为key
+        String modelId = metadata.getModelId();
+        ModelMetadata old = models.put(modelId, metadata);
         
         // 通知监听器
         if (old == null) {
-            logger.info("Registered new model: {}", metadata.getName());
+            logger.info("Registered new model: {} (model ID: {})", metadata.getName(), modelId);
             notifyModelRegistered(metadata);
         } else {
-            logger.info("Updated model: {}", metadata.getName());
+            logger.info("Updated model: {} (model ID: {})", metadata.getName(), modelId);
             notifyModelUpdated(metadata);
         }
     }
@@ -53,9 +56,11 @@ public class LocalModelRegistry implements ModelRegistry {
             return;
         }
         
-        ModelMetadata removed = models.remove(modelName);
+        // 支持完整名称和简单名称的注销
+        String keyToRemove = resolveModelKey(modelName);
+        ModelMetadata removed = models.remove(keyToRemove);
         if (removed != null) {
-            logger.info("Unregistered model: {}", modelName);
+            logger.info("Unregistered model: {} (key: {})", modelName, keyToRemove);
             notifyModelUnregistered(modelName);
         }
     }
@@ -65,7 +70,16 @@ public class LocalModelRegistry implements ModelRegistry {
         if (modelName == null) {
             return Optional.empty();
         }
-        return Optional.ofNullable(models.get(modelName));
+        
+        // 首先尝试直接匹配
+        ModelMetadata metadata = models.get(modelName);
+        if (metadata != null) {
+            return Optional.of(metadata);
+        }
+        
+        // 如果直接匹配失败，尝试解析模型名称
+        String resolvedKey = resolveModelKey(modelName);
+        return Optional.ofNullable(models.get(resolvedKey));
     }
     
     @Override
@@ -86,13 +100,24 @@ public class LocalModelRegistry implements ModelRegistry {
     
     @Override
     public boolean containsModel(String modelName) {
-        return modelName != null && models.containsKey(modelName);
+        if (modelName == null) {
+            return false;
+        }
+        
+        // 首先尝试直接匹配
+        if (models.containsKey(modelName)) {
+            return true;
+        }
+        
+        // 尝试解析模型名称
+        String resolvedKey = resolveModelKey(modelName);
+        return models.containsKey(resolvedKey);
     }
     
     @Override
     public boolean isModelAvailable(String modelName) {
-        ModelMetadata metadata = models.get(modelName);
-        return metadata != null && Boolean.TRUE.equals(metadata.getAvailable());
+        Optional<ModelMetadata> metadataOpt = getModelMetadata(modelName);
+        return metadataOpt.isPresent() && Boolean.TRUE.equals(metadataOpt.get().getAvailable());
     }
     
     @Override
@@ -137,6 +162,36 @@ public class LocalModelRegistry implements ModelRegistry {
     public void clear() {
         logger.info("Clearing all models from registry");
         models.clear();
+    }
+    
+    /**
+     * 解析模型key
+     * 如果输入的模型名称不包含提供商前缀，尝试查找匹配的完整名称
+     * 
+     * @param modelName 模型名称
+     * @return 解析后的模型key
+     */
+    private String resolveModelKey(String modelName) {
+        if (modelName == null) {
+            return null;
+        }
+        
+        // 如果已经包含提供商前缀，直接返回
+        if (ModelNameUtils.hasProviderPrefix(modelName)) {
+            return modelName;
+        }
+        
+        // 如果不包含提供商前缀，查找匹配的完整名称
+        for (String key : models.keySet()) {
+            ModelNameUtils.ModelNameInfo nameInfo = ModelNameUtils.parseModelName(key);
+            if (modelName.equals(nameInfo.getModelName())) {
+                logger.debug("Resolved model name '{}' to full key '{}'", modelName, key);
+                return key;
+            }
+        }
+        
+        // 如果找不到匹配的，返回原始名称
+        return modelName;
     }
     
     private void notifyModelRegistered(ModelMetadata metadata) {

@@ -14,6 +14,7 @@ public class ModelMetadata {
     private String displayName;
     private ModelType type;
     private String provider;
+    private String modelId;  // 模型唯一标识符
     private String description;
     private String version;
     private Integer maxTokens;
@@ -71,6 +72,22 @@ public class ModelMetadata {
     
     public void setProvider(String provider) { 
         this.provider = provider;
+        this.updatedAt = LocalDateTime.now();
+    }
+    
+    public String getModelId() {
+        // 如果modelId为空，则自动生成 provider:name 格式的ID
+        if (modelId == null || modelId.trim().isEmpty()) {
+            if (provider != null && !provider.trim().isEmpty() && name != null && !name.trim().isEmpty()) {
+                return ModelNameUtils.buildFullModelName(provider, name);
+            }
+            return name;
+        }
+        return modelId;
+    }
+    
+    public void setModelId(String modelId) {
+        this.modelId = modelId;
         this.updatedAt = LocalDateTime.now();
     }
     
@@ -164,13 +181,62 @@ public class ModelMetadata {
         return this.supportedFeatures.contains(feature);
     }
     
+    /**
+     * 获取完整的模型名称（provider:model）
+     * 
+     * @return 完整的模型名称
+     * @deprecated 使用 {@link #getModelId()} 替代
+     */
+    @Deprecated
+    public String getFullModelName() {
+        return getModelId();
+    }
+    
+    /**
+     * 从完整的模型名称创建元数据实例
+     * 
+     * @param fullModelName 完整的模型名称（provider:model）
+     * @param type 模型类型
+     * @return 模型元数据实例
+     */
+    public static ModelMetadata fromFullModelName(String fullModelName, ModelType type) {
+        ModelNameUtils.ModelNameInfo nameInfo = ModelNameUtils.parseModelName(fullModelName);
+        ModelMetadata metadata = new ModelMetadata();
+        metadata.setName(nameInfo.getModelName());
+        metadata.setProvider(nameInfo.getProvider());
+        metadata.setType(type);
+        metadata.setModelId(fullModelName); // 设置modelId
+        metadata.setDisplayName(fullModelName);
+        return metadata;
+    }
+    
+    /**
+     * 从模型ID创建元数据实例
+     * 
+     * @param modelId 模型ID（provider:model 或 简单名称）
+     * @param type 模型类型
+     * @return 模型元数据实例
+     */
+    public static ModelMetadata fromModelId(String modelId, ModelType type) {
+        ModelNameUtils.ModelNameInfo nameInfo = ModelNameUtils.parseModelName(modelId);
+        ModelMetadata metadata = new ModelMetadata();
+        metadata.setName(nameInfo.getModelName());
+        metadata.setProvider(nameInfo.getProvider());
+        metadata.setType(type);
+        metadata.setModelId(modelId);
+        metadata.setDisplayName(modelId);
+        return metadata;
+    }
+    
     @Override
     public String toString() {
         return "ModelMetadata{" +
                 "name='" + name + '\'' +
+                ", modelId='" + getModelId() + '\'' +
                 ", type=" + type +
                 ", provider='" + provider + '\'' +
                 ", available=" + available +
                 '}';
     }
 }
+

@@ -29,7 +29,7 @@ yonchain:
   ai:
     models:
       chat:
-        - name: "deepseek:deepseek-chat"
+        - name: "deepseek-chat"
           provider: "deepseek"
           enabled: true
           api_key: sk-3ef709a6aa404b00af299c288264a48f

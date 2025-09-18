@@ -59,22 +59,26 @@ public class ModelInitializer implements ApplicationRunner {
         // 创建模型元数据
         ModelMetadata metadata = new ModelMetadata();
         metadata.setName(config.getName());
-        metadata.setDisplayName(config.getName());
-        metadata.setType(config.getType());
         metadata.setProvider(config.getProvider());
-        metadata.setDescription(generateDescription(config));
-        metadata.setMaxTokens(config.getMaxTokens());
+        metadata.setType(config.getType());
         metadata.setConfig(config);
         metadata.setAvailable(true);
+        
+        // 设置显示名称为模型ID
+        metadata.setDisplayName(config.getFullModelName());
+        
+        // 设置描述和其他属性
+        metadata.setDescription(generateDescription(config));
+        metadata.setMaxTokens(config.getMaxTokens());
         
         // 添加支持的特性
         addSupportedFeatures(metadata, config);
         
-        // 注册到注册中心
+        // 注册到注册中心（内部会使用完整名称作为key）
         modelRegistry.registerModel(metadata);
         
-        logger.info("Registered model: {} (type: {}, provider: {})", 
-            config.getName(), config.getType(), config.getProvider());
+        logger.info("Registered model: {} -> {} (type: {}, provider: {})", 
+            config.getName(), metadata.getModelId(), config.getType(), config.getProvider());
     }
     
     /**
@@ -84,8 +88,12 @@ public class ModelInitializer implements ApplicationRunner {
      * @return 模型描述
      */
     private String generateDescription(ModelConfig config) {
-        return String.format("%s model provided by %s", 
-            config.getType().getName(), config.getProvider());
+        if (config.getProvider() != null) {
+            return String.format("%s model provided by %s", 
+                config.getType().name().toLowerCase(), config.getProvider());
+        } else {
+            return String.format("%s model", config.getType().name().toLowerCase());
+        }
     }
     
     /**
