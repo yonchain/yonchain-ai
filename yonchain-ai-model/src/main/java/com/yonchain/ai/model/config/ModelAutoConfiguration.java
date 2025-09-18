@@ -1,15 +1,15 @@
-package com.yonchain.ai.config;
+package com.yonchain.ai.model.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.chat.ChatModelService;
 import com.yonchain.ai.chat.impl.DefaultChatModelService;
-import com.yonchain.ai.factory.ModelFactory;
-import com.yonchain.ai.factory.impl.DefaultModelFactory;
+import com.yonchain.ai.model.factory.ModelFactory;
+import com.yonchain.ai.model.factory.impl.DefaultModelFactory;
 import com.yonchain.ai.image.ImageModelService;
 import com.yonchain.ai.image.impl.DefaultImageModelService;
-import com.yonchain.ai.provider.ModelProvider;
-import com.yonchain.ai.registry.ModelRegistry;
-import com.yonchain.ai.registry.impl.LocalModelRegistry;
+import com.yonchain.ai.model.provider.ModelProvider;
+import com.yonchain.ai.model.registry.ModelRegistry;
+import com.yonchain.ai.model.registry.impl.LocalModelRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

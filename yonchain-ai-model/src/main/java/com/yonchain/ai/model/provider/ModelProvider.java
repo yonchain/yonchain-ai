@@ -1,4 +1,4 @@
-package com.yonchain.ai.provider;
+package com.yonchain.ai.model.provider;
 
 import com.yonchain.ai.model.ModelConfig;
 import com.yonchain.ai.model.ModelType;

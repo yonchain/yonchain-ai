@@ -1,19 +1,18 @@
-package com.yonchain.ai.config;
+package com.yonchain.ai.model.config;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 聊天模型配置类
+ * 嵌入模型配置类
  */
-public class ChatModelConfig {
+public class EmbeddingModelConfig {
     
     private String name;
     private String provider;
     private String endpoint;
     private String apiKey;
-    private Integer maxTokens = 4096;
-    private Double temperature = 0.7;
+    private Integer dimensions = 1536; // 默认维度
     private Boolean enabled = true;
     private Integer timeout = 30000;
     private Integer retryCount = 3;
@@ -52,20 +51,12 @@ public class ChatModelConfig {
         this.apiKey = apiKey;
     }
     
-    public Integer getMaxTokens() {
-        return maxTokens;
+    public Integer getDimensions() {
+        return dimensions;
     }
     
-    public void setMaxTokens(Integer maxTokens) {
-        this.maxTokens = maxTokens;
-    }
-    
-    public Double getTemperature() {
-        return temperature;
-    }
-    
-    public void setTemperature(Double temperature) {
-        this.temperature = temperature;
+    public void setDimensions(Integer dimensions) {
+        this.dimensions = dimensions;
     }
     
     public Boolean getEnabled() {

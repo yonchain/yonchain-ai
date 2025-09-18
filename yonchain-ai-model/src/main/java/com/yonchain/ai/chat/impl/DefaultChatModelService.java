@@ -1,11 +1,11 @@
 package com.yonchain.ai.chat.impl;
 
 import com.yonchain.ai.chat.ChatModelService;
-import com.yonchain.ai.factory.ModelFactory;
+import com.yonchain.ai.model.factory.ModelFactory;
 import com.yonchain.ai.model.ModelConfig;
 import com.yonchain.ai.model.ModelMetadata;
-import com.yonchain.ai.registry.ModelChangeListener;
-import com.yonchain.ai.registry.ModelRegistry;
+import com.yonchain.ai.model.registry.ModelChangeListener;
+import com.yonchain.ai.model.registry.ModelRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;

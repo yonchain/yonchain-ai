@@ -1,8 +1,8 @@
-package com.yonchain.ai.config;
+package com.yonchain.ai.model.config;
 
 import com.yonchain.ai.model.ModelConfig;
 import com.yonchain.ai.model.ModelMetadata;
-import com.yonchain.ai.registry.ModelRegistry;
+import com.yonchain.ai.model.registry.ModelRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;

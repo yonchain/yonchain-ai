@@ -1,20 +1,22 @@
-package com.yonchain.ai.config;
+package com.yonchain.ai.model.config;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * 嵌入模型配置类
+ * 图像模型配置类
  */
-public class EmbeddingModelConfig {
+public class ImageModelConfig {
     
     private String name;
     private String provider;
     private String endpoint;
     private String apiKey;
-    private Integer dimensions = 1536; // 默认维度
+    private List<String> supportedSizes = Arrays.asList("1024x1024", "512x512", "256x256");
     private Boolean enabled = true;
-    private Integer timeout = 30000;
+    private Integer timeout = 60000; // 图像生成通常需要更长时间
     private Integer retryCount = 3;
     private Map<String, Object> properties = new HashMap<>();
     
@@ -51,12 +53,12 @@ public class EmbeddingModelConfig {
         this.apiKey = apiKey;
     }
     
-    public Integer getDimensions() {
-        return dimensions;
+    public List<String> getSupportedSizes() {
+        return supportedSizes;
     }
     
-    public void setDimensions(Integer dimensions) {
-        this.dimensions = dimensions;
+    public void setSupportedSizes(List<String> supportedSizes) {
+        this.supportedSizes = supportedSizes;
     }
     
     public Boolean getEnabled() {

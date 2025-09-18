@@ -1,8 +1,8 @@
-package com.yonchain.ai.factory;
+package com.yonchain.ai.model.factory;
 
 import com.yonchain.ai.model.ModelConfig;
 import com.yonchain.ai.model.ModelType;
-import com.yonchain.ai.provider.ModelProvider;
+import com.yonchain.ai.model.provider.ModelProvider;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.image.ImageModel;
 // import org.springframework.ai.audio.transcription.AudioTranscriptionModel;

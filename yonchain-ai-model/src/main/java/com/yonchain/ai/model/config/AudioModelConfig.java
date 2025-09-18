@@ -1,4 +1,4 @@
-package com.yonchain.ai.config;
+package com.yonchain.ai.model.config;
 
 import java.util.HashMap;
 import java.util.Map;

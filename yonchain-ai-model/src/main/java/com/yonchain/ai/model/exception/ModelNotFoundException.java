@@ -1,4 +1,4 @@
-package com.yonchain.ai.exception;
+package com.yonchain.ai.model.exception;
 
 /**
  * 模型未找到异常

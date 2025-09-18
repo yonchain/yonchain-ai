@@ -1,9 +1,9 @@
-package com.yonchain.ai.factory.impl;
+package com.yonchain.ai.model.factory.impl;
 
-import com.yonchain.ai.factory.ModelFactory;
+import com.yonchain.ai.model.factory.ModelFactory;
 import com.yonchain.ai.model.ModelConfig;
 import com.yonchain.ai.model.ModelType;
-import com.yonchain.ai.provider.ModelProvider;
+import com.yonchain.ai.model.provider.ModelProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 // import org.springframework.ai.audio.transcription.AudioTranscriptionModel;
@@ -14,8 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * 默认模型工厂实现

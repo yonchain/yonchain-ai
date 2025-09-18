@@ -1,8 +1,8 @@
-package com.yonchain.ai.provider.impl;
+package com.yonchain.ai.model.provider.impl;
 
 import com.yonchain.ai.model.ModelConfig;
 import com.yonchain.ai.model.ModelType;
-import com.yonchain.ai.provider.ModelProvider;
+import com.yonchain.ai.model.provider.ModelProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.messages.AssistantMessage;

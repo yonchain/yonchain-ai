@@ -1,4 +1,4 @@
-package com.yonchain.ai.registry;
+package com.yonchain.ai.model.registry;
 
 import com.yonchain.ai.model.ModelMetadata;
 
