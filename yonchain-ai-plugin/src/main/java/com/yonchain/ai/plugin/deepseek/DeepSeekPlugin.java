@@ -1,10 +1,10 @@
-package com.yonchain.ai.plugin.examples.deepseek;
+package com.yonchain.ai.plugin.deepseek;
 
 import com.yonchain.ai.model.ModelMetadata;
 import com.yonchain.ai.model.ModelType;
 import com.yonchain.ai.model.provider.ModelProvider;
 import com.yonchain.ai.model.registry.ModelRegistry;
-import com.yonchain.ai.plugin.ModelPlugin;
+import com.yonchain.ai.plugin.model.ModelPlugin;
 import com.yonchain.ai.plugin.PluginContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

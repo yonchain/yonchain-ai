@@ -1,9 +1,8 @@
-package com.yonchain.ai.plugin.adapter;
+package com.yonchain.ai.plugin.model;
 
 import com.yonchain.ai.model.ModelMetadata;
 import com.yonchain.ai.model.provider.ModelProvider;
 import com.yonchain.ai.model.registry.ModelRegistry;
-import com.yonchain.ai.plugin.ModelPlugin;
 import com.yonchain.ai.plugin.PluginAdapter;
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import com.yonchain.ai.plugin.entity.PluginInfo;

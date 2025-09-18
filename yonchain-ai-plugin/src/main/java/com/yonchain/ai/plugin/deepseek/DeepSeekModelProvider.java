@@ -1,4 +1,4 @@
-package com.yonchain.ai.plugin.examples.deepseek;
+package com.yonchain.ai.plugin.deepseek;
 
 import com.yonchain.ai.model.ModelConfig;
 import com.yonchain.ai.model.ModelType;

@@ -14,8 +14,8 @@
     <dependencies>
         <!-- Spring Boot Starter Web -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-model</artifactId>
         </dependency>
 
     </dependencies>

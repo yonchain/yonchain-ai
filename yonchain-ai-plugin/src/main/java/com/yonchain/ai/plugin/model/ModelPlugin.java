@@ -1,8 +1,9 @@
-package com.yonchain.ai.plugin;
+package com.yonchain.ai.plugin.model;
 
 import com.yonchain.ai.model.ModelMetadata;
 import com.yonchain.ai.model.provider.ModelProvider;
 import com.yonchain.ai.model.registry.ModelRegistry;
+import com.yonchain.ai.plugin.Plugin;
 
 import java.util.List;
 
