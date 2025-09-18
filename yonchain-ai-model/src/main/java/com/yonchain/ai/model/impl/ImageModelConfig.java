@@ -1,21 +1,22 @@
-package com.yonchain.ai.model.config;
+package com.yonchain.ai.model.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * 聊天模型配置类
+ * 图像模型配置类
  */
-public class ChatModelConfig {
+public class ImageModelConfig {
     
     private String name;
     private String provider;
     private String endpoint;
     private String apiKey;
-    private Integer maxTokens = 4096;
-    private Double temperature = 0.7;
+    private List<String> supportedSizes = Arrays.asList("1024x1024", "512x512", "256x256");
     private Boolean enabled = true;
-    private Integer timeout = 30000;
+    private Integer timeout = 60000; // 图像生成通常需要更长时间
     private Integer retryCount = 3;
     private Map<String, Object> properties = new HashMap<>();
     
@@ -52,20 +53,12 @@ public class ChatModelConfig {
         this.apiKey = apiKey;
     }
     
-    public Integer getMaxTokens() {
-        return maxTokens;
+    public List<String> getSupportedSizes() {
+        return supportedSizes;
     }
     
-    public void setMaxTokens(Integer maxTokens) {
-        this.maxTokens = maxTokens;
-    }
-    
-    public Double getTemperature() {
-        return temperature;
-    }
-    
-    public void setTemperature(Double temperature) {
-        this.temperature = temperature;
+    public void setSupportedSizes(List<String> supportedSizes) {
+        this.supportedSizes = supportedSizes;
     }
     
     public Boolean getEnabled() {

@@ -1,20 +1,19 @@
-package com.yonchain.ai.model.config;
+package com.yonchain.ai.model.impl;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 嵌入模型配置类
+ * 音频模型配置类
  */
-public class EmbeddingModelConfig {
+public class AudioModelConfig {
     
     private String name;
     private String provider;
     private String endpoint;
     private String apiKey;
-    private Integer dimensions = 1536; // 默认维度
     private Boolean enabled = true;
-    private Integer timeout = 30000;
+    private Integer timeout = 60000; // 音频处理通常需要更长时间
     private Integer retryCount = 3;
     private Map<String, Object> properties = new HashMap<>();
     
@@ -49,14 +48,6 @@ public class EmbeddingModelConfig {
     
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
-    }
-    
-    public Integer getDimensions() {
-        return dimensions;
-    }
-    
-    public void setDimensions(Integer dimensions) {
-        this.dimensions = dimensions;
     }
     
     public Boolean getEnabled() {

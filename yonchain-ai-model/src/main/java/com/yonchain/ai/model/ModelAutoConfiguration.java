@@ -1,8 +1,10 @@
-package com.yonchain.ai.model.config;
+package com.yonchain.ai.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.chat.ChatModelService;
 import com.yonchain.ai.chat.impl.DefaultChatModelService;
+import com.yonchain.ai.model.impl.ModelInitializer;
+import com.yonchain.ai.model.impl.ModelProperties;
 import com.yonchain.ai.model.factory.ModelFactory;
 import com.yonchain.ai.model.factory.impl.DefaultModelFactory;
 import com.yonchain.ai.image.ImageModelService;
