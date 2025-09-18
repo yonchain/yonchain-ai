@@ -111,6 +111,13 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- 插件模块 -->
+            <dependency>
+                <groupId>com.yonchain.ai</groupId>
+                <artifactId>yonchain-ai-plugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!--ollama模型模块 -->
             <dependency>
                 <groupId>com.yonchain.ai</groupId>
