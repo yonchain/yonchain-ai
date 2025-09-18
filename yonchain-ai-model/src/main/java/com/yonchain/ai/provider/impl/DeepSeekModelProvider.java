@@ -13,6 +13,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 /**
  * DeepSeek模型提供商实现
@@ -43,14 +44,15 @@ public class DeepSeekModelProvider implements ModelProvider {
             // 由于Spring AI可能还没有官方的DeepSeek实现，这里提供一个示例结构
             
             // 示例代码结构（需要根据实际的Spring AI实现调整）:
-
-            DeepSeekApi deepSeekApi = DeepSeekApi.builder()
-                    .apiKey(config.getApiKey())
-                    .baseUrl(config.getEndpoint())
-                    .build();
+            DeepSeekApi.Builder builder = DeepSeekApi.builder();
+            builder.apiKey(config.getApiKey());
+            if (StringUtils.hasText(config.getEndpoint())) {
+                builder.baseUrl(config.getEndpoint());
+            }
+            DeepSeekApi deepSeekApi = builder.build();
                     
             DeepSeekChatOptions options = DeepSeekChatOptions.builder()
-                    .model(config.getProperty("model", config.getName()))
+                    .model(config.getProperty("model", config.getName().substring(config.getName().indexOf(":") + 1)))
                     .temperature(config.getTemperature())
                     .maxTokens(config.getMaxTokens())
                     .build();
@@ -122,10 +124,10 @@ public class DeepSeekModelProvider implements ModelProvider {
             return false;
         }
         
-        if (config.getEndpoint() == null || config.getEndpoint().trim().isEmpty()) {
+   /*     if (config.getEndpoint() == null || config.getEndpoint().trim().isEmpty()) {
             logger.warn("DeepSeek endpoint is missing for model: {}", config.getName());
             return false;
-        }
+        }*/
         
         return true;
     }
