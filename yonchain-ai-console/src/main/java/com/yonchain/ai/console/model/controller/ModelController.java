@@ -1,3 +1,4 @@
+/*
 package com.yonchain.ai.console.model.controller;
 
 import com.yonchain.ai.api.common.Page;
@@ -29,12 +30,14 @@ import java.util.UUID;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 
+*/
 /**
  * 模型控制器
  *
  * @author chengy
  * @since 1.0.0
- */
+ *//*
+
 @Tag(name = "模型管理", description = "模型相关接口")
 @RestController
 @RequestMapping("/models")
@@ -43,12 +46,14 @@ public class ModelController extends BaseController {
     @Autowired
     private ModelService modelService;
 
-    /**
+    */
+/**
      * 获取模型详情
      *
      * @param id 模型ID
      * @return 模型响应
-     */
+     *//*
+
     @Operation(summary = "获取模型详情", description = "根据ID获取模型详细信息")
     @GetMapping("/{id}")
     public ModelResponse getModelById(
@@ -61,12 +66,14 @@ public class ModelController extends BaseController {
         return responseFactory.createModelResponse(model);
     }
 
-    /**
+    */
+/**
      * 分页查询模型
      *
      * @param request 查询请求
      * @return 分页响应
-     */
+     *//*
+
     @Operation(summary = "分页查询模型", description = "根据条件分页查询模型列表")
     @GetMapping
     public ListResponse<ModelResponse> getModels(
@@ -83,8 +90,11 @@ public class ModelController extends BaseController {
         return responseFactory.createModelListResponse(models);
     }
 
+*/
 /*
-    */
+    *//*
+
+*/
 /**
      * /**
      * 获取模型配置
@@ -92,6 +102,8 @@ public class ModelController extends BaseController {
      * @param modelCode 模型编码
      * @return 模型配置响应
      *//*
+*/
+/*
 
     @Operation(summary = "获取模型配置", description = "获取指定模型的租户级别配置信息")
     @GetMapping("/config")
@@ -107,20 +119,24 @@ public class ModelController extends BaseController {
 
         return responseFactory.createModelConfigResponse(model);
     }
-*/
+*//*
 
-    /**
+
+    */
+/**
      * /**
      * 保存模型配置
      *
      * @param request 模型配置请求
      * @return 保存结果
-     */
+     *//*
+
     @Operation(summary = "保存模型配置", description = "保存指定模型的租户级别配置信息")
     @PutMapping("/config")
     public ApiResponse<Void> saveModelConfig(
             @Parameter(description = "模型配置请求", required = true)
             @Valid @RequestBody ModelConfigRequest request) {
+*/
 /*
         ModelInfo model = modelService.getModelByCode(request.getModelCode());
         if (model == null) {
@@ -130,18 +146,21 @@ public class ModelController extends BaseController {
         model.setEnabled(request.getEnabled());
 
 
-        modelService.saveModelConfig(this.getCurrentTenantId(), model);*/
+        modelService.saveModelConfig(this.getCurrentTenantId(), model);*//*
+
 
         return ApiResponse.success();
     }
 
-    /**
+    */
+/**
      * 设置模型状态
      *
      * @param modelCode 模型编码
      * @param request   请求
      * @return 响应
-     */
+     *//*
+
     @Operation(summary = "设置模型状态", description = "根据ID获取模型详细信息")
     @PutMapping("/{modelCode}/status")
     public ApiResponse updateStatus(
@@ -154,3 +173,4 @@ public class ModelController extends BaseController {
 
 
 }
+*/

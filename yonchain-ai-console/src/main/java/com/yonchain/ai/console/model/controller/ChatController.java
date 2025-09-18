@@ -1,3 +1,4 @@
+/*
 package com.yonchain.ai.console.model.controller;
 
 
@@ -14,11 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 
+*/
 /**
  * 聊天控制器
  *
  * @author Cgy
- */
+ *//*
+
 @RequestMapping
 @RestController
 public class ChatController extends BaseController {
@@ -48,3 +51,4 @@ public class ChatController extends BaseController {
     }
 
 }
+*/

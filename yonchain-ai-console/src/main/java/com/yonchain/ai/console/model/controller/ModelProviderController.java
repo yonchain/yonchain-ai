@@ -12,7 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+ *//*
+
 
 package com.yonchain.ai.console.model.controller;
 
@@ -36,12 +37,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
+*/
 /**
  * 模型提供商控制器
  *
  * @author Cgy
  * @since 1.0.0
- */
+ *//*
+
 @Tag(name = "模型提供商管理", description = "模型提供商相关接口")
 @RestController
 @RequestMapping("/model-providers")
@@ -51,12 +54,14 @@ public class ModelProviderController extends BaseController {
     private ModelService modelService;
 
 
-    /**
+    */
+/**
      * 分页查询模型提供商
      *
      * @param request 查询请求
      * @return 分页响应
-     */
+     *//*
+
     @Operation(summary = "分页查询模型提供商", description = "根据条件分页查询模型提供商列表")
     @GetMapping
     public ListResponse<ModelProviderResponse> getProviders(ModelProviderQueryRequest request) {
@@ -71,12 +76,14 @@ public class ModelProviderController extends BaseController {
         return responseFactory.createModelProviderListResponse(providers);
     }
 
-    /**
+    */
+/**
      * 获取模型提供商配置
      *
      * @param providerCode 模型提供商编码
      * @return 配置信息
-     */
+     *//*
+
     @Operation(summary = "获取模型提供商配置", description = "根据编码获取模型提供商配置信息")
     @GetMapping("/{providerCode}/config")
     public ProviderConfigResponse getProviderConfig(@PathVariable String providerCode) {
@@ -84,12 +91,14 @@ public class ModelProviderController extends BaseController {
         return modelService.getProviderConfig(getCurrentTenantId(), providerCode);
     }
 
-    /**
+    */
+/**
      * 保存模型提供商配置
      *
      * @param request 配置请求
      * @return 保存结果
-     */
+     *//*
+
     @Operation(summary = "保存模型提供商配置", description = "保存模型提供商的配置信息")
     @PostMapping("/config")
     public ApiResponse<Void> saveProviderConfig(
@@ -108,3 +117,4 @@ public class ModelProviderController extends BaseController {
     }
 
 }
+*/

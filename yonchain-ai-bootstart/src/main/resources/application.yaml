@@ -26,6 +26,13 @@ server:
 
 yonchain:
   version: 0.1.0
+  ai:
+    models:
+      chat:
+        - name: "deepseek-chat"
+          provider: "deepseek"
+          enabled: true
+
   security:
 
     password-encoder-type: dify@pbkdf2
