@@ -32,15 +32,7 @@ public class ModelAutoConfiguration {
     
     private static final Logger logger = LoggerFactory.getLogger(ModelAutoConfiguration.class);
     
-    /**
-     * 配置ObjectMapper Bean
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
-    }
-    
+
     /**
      * 配置模型注册中心Bean
      */
