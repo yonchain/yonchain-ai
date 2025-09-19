@@ -1,13 +1,19 @@
 package com.yonchain.ai.plugin.controller;
 
+import com.yonchain.ai.plugin.dto.PluginResponse;
 import com.yonchain.ai.plugin.entity.PluginInfo;
 import com.yonchain.ai.plugin.enums.PluginStatus;
 import com.yonchain.ai.plugin.enums.PluginType;
 import com.yonchain.ai.plugin.manager.PluginManager;
 import com.yonchain.ai.plugin.exception.PluginInstallException;
+import com.yonchain.ai.plugin.service.PluginIconService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
@@ -27,16 +34,18 @@ import java.util.Optional;
  * @author yonchain
  */
 @RestController
-@RequestMapping("/api/plugins")
+@RequestMapping("/plugins")
 public class PluginController {
     
     private static final Logger log = LoggerFactory.getLogger(PluginController.class);
     
     private final PluginManager pluginManager;
+    private final PluginIconService pluginIconService;
     private final String pluginUploadDir;
     
-    public PluginController(PluginManager pluginManager) {
+    public PluginController(PluginManager pluginManager, PluginIconService pluginIconService) {
         this.pluginManager = pluginManager;
+        this.pluginIconService = pluginIconService;
         this.pluginUploadDir = System.getProperty("java.io.tmpdir") + "/yonchain-plugins";
         
         // 确保上传目录存在
@@ -51,10 +60,13 @@ public class PluginController {
      * 获取所有插件信息
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PluginInfo>>> getAllPlugins() {
+    public ResponseEntity<ApiResponse<List<PluginResponse>>> getAllPlugins() {
         try {
             List<PluginInfo> plugins = pluginManager.getAllPlugins();
-            return ResponseEntity.ok(ApiResponse.success(plugins));
+            List<PluginResponse> pluginResponses = plugins.stream()
+                    .map(plugin -> PluginResponse.fromPluginInfo(plugin, pluginIconService))
+                    .collect(java.util.stream.Collectors.toList());
+            return ResponseEntity.ok(ApiResponse.success(pluginResponses));
         } catch (Exception e) {
             log.error("Failed to get all plugins", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -66,11 +78,12 @@ public class PluginController {
      * 根据插件ID获取插件信息
      */
     @GetMapping("/{pluginId}")
-    public ResponseEntity<ApiResponse<PluginInfo>> getPlugin(@PathVariable String pluginId) {
+    public ResponseEntity<ApiResponse<PluginResponse>> getPlugin(@PathVariable String pluginId) {
         try {
             Optional<PluginInfo> plugin = pluginManager.getPlugin(pluginId);
             if (plugin.isPresent()) {
-                return ResponseEntity.ok(ApiResponse.success(plugin.get()));
+                PluginResponse pluginResponse = PluginResponse.fromPluginInfo(plugin.get(), pluginIconService);
+                return ResponseEntity.ok(ApiResponse.success(pluginResponse));
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(ApiResponse.error("Plugin not found: " + pluginId));
@@ -81,34 +94,18 @@ public class PluginController {
                     .body(ApiResponse.error("Failed to get plugin: " + e.getMessage()));
         }
     }
-    
-   /* *//**
-     * 根据插件类型获取插件列表
-     *//*
-    @GetMapping("/type/{type}")
-    public ResponseEntity<ApiResponse<List<PluginInfo>>> getPluginsByType(@PathVariable String type) {
-        try {
-            PluginType pluginType = PluginType.fromCode(type);
-            List<PluginInfo> plugins = pluginManager.getPluginsByType(pluginType);
-            return ResponseEntity.ok(ApiResponse.success(plugins));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.error("Invalid plugin type: " + type));
-        } catch (Exception e) {
-            log.error("Failed to get plugins by type: {}", type, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.error("Failed to get plugins: " + e.getMessage()));
-        }
-    }*/
-    
+
     /**
      * 获取已启用的插件列表
      */
     @GetMapping("/enabled")
-    public ResponseEntity<ApiResponse<List<PluginInfo>>> getEnabledPlugins() {
+    public ResponseEntity<ApiResponse<List<PluginResponse>>> getEnabledPlugins() {
         try {
             List<PluginInfo> plugins = pluginManager.getEnabledPlugins();
-            return ResponseEntity.ok(ApiResponse.success(plugins));
+            List<PluginResponse> pluginResponses = plugins.stream()
+                    .map(plugin -> PluginResponse.fromPluginInfo(plugin, pluginIconService))
+                    .collect(java.util.stream.Collectors.toList());
+            return ResponseEntity.ok(ApiResponse.success(pluginResponses));
         } catch (Exception e) {
             log.error("Failed to get enabled plugins", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -136,7 +133,7 @@ public class PluginController {
             
             // 直接使用输入流安装插件
             try (InputStream inputStream = file.getInputStream()) {
-                pluginManager.installPluginFromInputStream(inputStream, filename);
+                pluginManager.installPlugin(inputStream, filename);
             }
             
             return ResponseEntity.ok(ApiResponse.success("success", "Plugin installed successfully"));
@@ -240,7 +237,7 @@ public class PluginController {
     /**
      * 卸载插件
      */
-    @DeleteMapping("/{pluginId}")
+    @DeleteMapping("/{pluginId}/uninstall")
     public ResponseEntity<ApiResponse<String>> uninstallPlugin(@PathVariable String pluginId) {
         try {
              pluginManager.uninstallPlugin(pluginId);
@@ -391,4 +388,107 @@ public class PluginController {
             return timestamp;
         }
     }
+    
+    /**
+     * 获取插件图标
+     */
+    @GetMapping("/{pluginId}/icon")
+    public ResponseEntity<Resource> getPluginIcon(@PathVariable String pluginId) {
+        try {
+            Optional<PluginInfo> plugin = pluginManager.getPlugin(pluginId);
+            if (!plugin.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            
+            PluginInfo pluginInfo = plugin.get();
+            
+            // 获取图标文件名
+            String iconFileName = null;
+            iconFileName = pluginInfo.getIconPath();
+            
+            if (iconFileName == null || iconFileName.trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            
+            // 检查图标文件是否存在
+            if (!pluginIconService.iconExists(pluginId, iconFileName)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            
+            // 获取图标文件路径
+            Path iconPath = pluginIconService.getIconPhysicalPath(pluginId, iconFileName);
+            if (iconPath == null || !Files.exists(iconPath)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            
+            // 确定MIME类型
+            String contentType = Files.probeContentType(iconPath);
+            if (contentType == null) {
+                // 根据文件扩展名确定类型
+                String fileName = iconPath.getFileName().toString().toLowerCase();
+                if (fileName.endsWith(".svg")) {
+                    contentType = "image/svg+xml";
+                } else if (fileName.endsWith(".png")) {
+                    contentType = "image/png";
+                } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+                    contentType = "image/jpeg";
+                } else if (fileName.endsWith(".gif")) {
+                    contentType = "image/gif";
+                } else {
+                    contentType = "application/octet-stream";
+                }
+            }
+            
+            Resource resource = new FileSystemResource(iconPath);
+            
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + iconPath.getFileName().toString() + "\"")
+                    .body(resource);
+                    
+        } catch (Exception e) {
+            log.error("Failed to get plugin icon: {}", pluginId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    /**
+     * 获取插件图标访问URL
+     */
+    @GetMapping("/{pluginId}/icon-url")
+    public ResponseEntity<ApiResponse<String>> getPluginIconUrl(@PathVariable String pluginId) {
+        try {
+            Optional<PluginInfo> plugin = pluginManager.getPlugin(pluginId);
+            if (!plugin.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("Plugin not found: " + pluginId));
+            }
+            
+            PluginInfo pluginInfo = plugin.get();
+            
+            // 获取图标文件名
+            String iconFileName = null;
+            iconFileName = pluginInfo.getIconPath();
+            
+            if (iconFileName == null || iconFileName.trim().isEmpty()) {
+                return ResponseEntity.ok(ApiResponse.success(null, "No icon available"));
+            }
+            
+            // 检查图标文件是否存在
+            if (!pluginIconService.iconExists(pluginId, iconFileName)) {
+                return ResponseEntity.ok(ApiResponse.success(null, "Icon file not found"));
+            }
+            
+            // 生成访问URL
+            String iconUrl = "/plugins/" + pluginId + "/icon";
+            
+            return ResponseEntity.ok(ApiResponse.success(iconUrl));
+            
+        } catch (Exception e) {
+            log.error("Failed to get plugin icon URL: {}", pluginId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Failed to get plugin icon URL: " + e.getMessage()));
+        }
+    }
+    
 }

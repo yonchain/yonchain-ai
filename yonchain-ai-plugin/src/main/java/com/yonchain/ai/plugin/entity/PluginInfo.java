@@ -110,6 +110,11 @@ public class PluginInfo {
     private String metadata;
     
     /**
+     * 插件图标路径
+     */
+    private String iconPath;
+    
+    /**
      * 插件描述符（运行时使用，不持久化）
      */
     private transient PluginDescriptor descriptor;
@@ -133,17 +138,31 @@ public class PluginInfo {
         pluginInfo.setPluginId(descriptor.getId());
         pluginInfo.setName(descriptor.getName());
         pluginInfo.setVersion(descriptor.getVersion());
-        pluginInfo.setDescription(descriptor.getDescription());
-        pluginInfo.setAuthor(descriptor.getAuthor());
-        pluginInfo.setVendor(descriptor.getVendor());
-        pluginInfo.setType(descriptor.getType());
-        pluginInfo.setPluginPath(descriptor.getPluginPath() != null ? descriptor.getPluginPath().toString() : null);
-        pluginInfo.setDescriptor(descriptor);
         
-        // 提取主类名
-        if (descriptor.getSpi() != null && descriptor.getSpi().hasProviderSource()) {
-            pluginInfo.setMainClass(descriptor.getSpi().getProviderSource());
+        // 处理多语言描述，优先使用中文，其次英文
+        String description = descriptor.getLocalizedDescription("zh_Hans");
+        if (description == null) {
+            description = descriptor.getLocalizedDescription("en_US");
         }
+        pluginInfo.setDescription(description);
+        
+        pluginInfo.setAuthor(descriptor.getAuthor());
+        
+        // 转换插件类型字符串为枚举
+        if (descriptor.getType() != null) {
+            try {
+                PluginType pluginType = PluginType.fromCode(descriptor.getType());
+                pluginInfo.setType(pluginType);
+            } catch (IllegalArgumentException e) {
+                // 如果类型不匹配，默认为MODEL类型
+                pluginInfo.setType(PluginType.MODEL);
+            }
+        } else {
+            pluginInfo.setType(PluginType.MODEL);
+        }
+        
+        pluginInfo.setPluginPath(descriptor.getPluginPath() != null ? descriptor.getPluginPath().toString() : null);
+        pluginInfo.setMainClass(descriptor.getPluginClass());
         
         return pluginInfo;
     }
@@ -302,13 +321,13 @@ public class PluginInfo {
     public void setMetadata(String metadata) {
         this.metadata = metadata;
     }
-    
-    public PluginDescriptor getDescriptor() {
-        return descriptor;
+
+    public String getIconPath() {
+        return iconPath;
     }
     
-    public void setDescriptor(PluginDescriptor descriptor) {
-        this.descriptor = descriptor;
+    public void setIconPath(String iconPath) {
+        this.iconPath = iconPath;
     }
     
     /**

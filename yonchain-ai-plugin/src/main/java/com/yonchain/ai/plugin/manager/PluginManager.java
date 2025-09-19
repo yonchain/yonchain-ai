@@ -9,6 +9,7 @@ import com.yonchain.ai.plugin.parser.PluginParser;
 import com.yonchain.ai.plugin.parser.PluginParseException;
 import com.yonchain.ai.plugin.registry.PluginRegistry;
 import com.yonchain.ai.plugin.exception.PluginInstallException;
+import com.yonchain.ai.plugin.service.PluginIconService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -38,16 +39,19 @@ public class PluginManager {
     private final PluginParser pluginParser;
     private final Map<PluginType, PluginAdapter> adapters;
     private final PluginLifecycleEventPublisher eventPublisher;
+    private final PluginIconService pluginIconService;
     
     public PluginManager(
             PluginRegistry pluginRegistry,
             PluginParser pluginParser,
             List<PluginAdapter> adapters,
-            PluginLifecycleEventPublisher eventPublisher) {
+            PluginLifecycleEventPublisher eventPublisher,
+            PluginIconService pluginIconService) {
         
         this.pluginRegistry = pluginRegistry;
         this.pluginParser = pluginParser;
         this.eventPublisher = eventPublisher;
+        this.pluginIconService = pluginIconService;
         
         // 构建适配器映射
         this.adapters = adapters.stream()
@@ -66,7 +70,7 @@ public class PluginManager {
      * @param pluginFileName 插件文件名（用于日志和临时文件）
      * @throws PluginInstallException 安装异常
      */
-    public void installPluginFromInputStream(InputStream inputStream, String pluginFileName) throws PluginInstallException {
+    public void installPlugin(InputStream inputStream, String pluginFileName) throws PluginInstallException {
         if (inputStream == null) {
             throw new PluginInstallException("Plugin input stream cannot be null");
         }
@@ -102,7 +106,7 @@ public class PluginManager {
             }
             
             // 5. 获取对应的适配器
-            PluginType pluginType = descriptor.getType();
+            PluginType pluginType = PluginType.fromCode(descriptor.getType());
             PluginAdapter adapter = getAdapterForType(pluginType);
             if (adapter == null) {
                 throw new PluginInstallException("No adapter found for plugin type: " + pluginType);
@@ -116,14 +120,27 @@ public class PluginManager {
             pluginRegistry.save(pluginInfo);
             
             try {
-                // 8. 调用适配器安装逻辑
+                // 8. 保存插件图标（如果有的话）
+                if (descriptor.getIconData() != null && descriptor.getIcon() != null) {
+                    String iconPath = pluginIconService.saveIconData(
+                        descriptor.getId(), 
+                        descriptor.getIcon(),
+                        descriptor.getIconData()
+                    );
+                    if (iconPath != null) {
+                        pluginInfo.setIconPath(iconPath);
+                        log.debug("Icon saved for plugin {}: {}", pluginId, iconPath);
+                    }
+                }
+                
+                // 9. 调用适配器安装逻辑
                 adapter.onPluginInstall(descriptor);
                 
-                // 9. 更新状态为已安装但禁用
+                // 10. 更新状态为已安装但禁用
                 pluginInfo.setStatus(PluginStatus.INSTALLED_DISABLED);
                 pluginRegistry.save(pluginInfo);
                 
-                // 10. 发布安装事件
+                // 11. 发布安装事件
                 eventPublisher.publishInstalled(pluginId);
                 
                 log.info("Plugin installed successfully: {}", pluginId);
@@ -172,7 +189,7 @@ public class PluginManager {
         
         try (InputStream inputStream = Files.newInputStream(Paths.get(pluginPath))) {
             String fileName = Paths.get(pluginPath).getFileName().toString();
-            installPluginFromInputStream(inputStream, fileName);
+            installPlugin(inputStream, fileName);
         } catch (IOException e) {
             log.error("Failed to read plugin file: {}", pluginPath, e);
             throw new PluginInstallException("Failed to read plugin file: " + e.getMessage(), e);
@@ -197,7 +214,7 @@ public class PluginManager {
             String fileName = extractFileNameFromUrl(url);
             
             try (InputStream inputStream = new URL(url).openStream()) {
-                installPluginFromInputStream(inputStream, fileName);
+                installPlugin(inputStream, fileName);
             }
             
             log.info("Plugin installed successfully from URL: {}", url);
@@ -399,13 +416,19 @@ public class PluginManager {
             pluginRegistry.save(pluginInfo);
             
             try {
-                // 5. 调用适配器卸载逻辑
+                // 5. 删除插件图标文件
+                boolean iconDeleted = pluginIconService.deleteIcon(pluginId, pluginInfo.getIconPath());
+                if (iconDeleted) {
+                    log.debug("Icon deleted for plugin: {}", pluginId);
+                }
+                
+                // 6. 调用适配器卸载逻辑
                 adapter.onPluginUninstall(pluginId);
                 
-                // 6. 删除插件记录
+                // 7. 删除插件记录
                 pluginRegistry.deleteByPluginId(pluginId);
                 
-                // 7. 发布卸载事件
+                // 8. 发布卸载事件
                 eventPublisher.publishUninstalled(pluginId);
                 
                 log.info("Plugin uninstalled successfully: {}", pluginId);

@@ -1,14 +1,12 @@
 package com.yonchain.ai.plugin.descriptor;
 
-import com.yonchain.ai.plugin.enums.PluginType;
-
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
 /**
  * 插件描述符
- * 包含从plugin.yaml解析出的插件基本信息
+ * 用于描述插件的基本信息（从plugin.yaml解析）
  * 
  * @author yonchain
  */
@@ -30,62 +28,59 @@ public class PluginDescriptor {
     private String version;
     
     /**
-     * 插件描述
-     */
-    private String description;
-    
-    /**
      * 插件作者
      */
     private String author;
     
     /**
-     * 插件供应商
-     */
-    private String vendor;
-    
-    /**
-     * 插件主页
-     */
-    private String homepage;
-    
-    /**
      * 插件类型
      */
-    private PluginType type;
+    private String type;
     
     /**
-     * 依赖的其他插件文件列表
+     * 创建时间
+     */
+    private String createdAt;
+    
+    /**
+     * 描述信息（多语言支持）
+     */
+    private Map<String, String> description;
+    
+    /**
+     * 图标文件名
+     */
+    private String icon;
+    
+    /**
+     * 图标数据（从JAR中提取）
+     */
+    private byte[] iconData;
+    
+    /**
+     * 标签信息（多语言支持）
+     */
+    private Map<String, String> label;
+    
+    /**
+     * 提供商配置文件列表（如deepseek.yaml）
      */
     private List<String> plugins;
     
     /**
-     * 依赖关系
+     * 资源配置
      */
-    private List<Dependency> dependencies;
+    private ResourceConfig resource;
     
     /**
-     * 扩展点配置
-     */
-    private List<Extension> extensions;
-    
-    /**
-     * SPI配置
-     */
-    private SpiConfiguration spi;
-    
-    /**
-     * 插件路径
+     * 插件路径（运行时设置）
      */
     private Path pluginPath;
     
     /**
-     * 其他元数据
+     * 插件主类（新增字段）
      */
-    private Map<String, Object> metadata;
-    
-    public PluginDescriptor() {
-    }
+    private String pluginClass;
     
     // Getters and Setters
     public String getId() {
@@ -112,14 +107,6 @@ public class PluginDescriptor {
         this.version = version;
     }
     
-    public String getDescription() {
-        return description;
-    }
-    
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    
     public String getAuthor() {
         return author;
     }
@@ -128,28 +115,52 @@ public class PluginDescriptor {
         this.author = author;
     }
     
-    public String getVendor() {
-        return vendor;
-    }
-    
-    public void setVendor(String vendor) {
-        this.vendor = vendor;
-    }
-    
-    public String getHomepage() {
-        return homepage;
-    }
-    
-    public void setHomepage(String homepage) {
-        this.homepage = homepage;
-    }
-    
-    public PluginType getType() {
+    public String getType() {
         return type;
     }
     
-    public void setType(PluginType type) {
+    public void setType(String type) {
         this.type = type;
+    }
+    
+    public String getCreatedAt() {
+        return createdAt;
+    }
+    
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+    
+    public Map<String, String> getDescription() {
+        return description;
+    }
+    
+    public void setDescription(Map<String, String> description) {
+        this.description = description;
+    }
+    
+    public String getIcon() {
+        return icon;
+    }
+    
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+    
+    public byte[] getIconData() {
+        return iconData;
+    }
+    
+    public void setIconData(byte[] iconData) {
+        this.iconData = iconData;
+    }
+    
+    public Map<String, String> getLabel() {
+        return label;
+    }
+    
+    public void setLabel(Map<String, String> label) {
+        this.label = label;
     }
     
     public List<String> getPlugins() {
@@ -160,28 +171,12 @@ public class PluginDescriptor {
         this.plugins = plugins;
     }
     
-    public List<Dependency> getDependencies() {
-        return dependencies;
+    public ResourceConfig getResource() {
+        return resource;
     }
     
-    public void setDependencies(List<Dependency> dependencies) {
-        this.dependencies = dependencies;
-    }
-    
-    public List<Extension> getExtensions() {
-        return extensions;
-    }
-    
-    public void setExtensions(List<Extension> extensions) {
-        this.extensions = extensions;
-    }
-    
-    public SpiConfiguration getSpi() {
-        return spi;
-    }
-    
-    public void setSpi(SpiConfiguration spi) {
-        this.spi = spi;
+    public void setResource(ResourceConfig resource) {
+        this.resource = resource;
     }
     
     public Path getPluginPath() {
@@ -192,57 +187,47 @@ public class PluginDescriptor {
         this.pluginPath = pluginPath;
     }
     
-    public Map<String, Object> getMetadata() {
-        return metadata;
+    public String getPluginClass() {
+        return pluginClass;
     }
     
-    public void setMetadata(Map<String, Object> metadata) {
-        this.metadata = metadata;
-    }
-    
-    /**
-     * 检查插件是否有依赖
-     * 
-     * @return 是否有依赖
-     */
-    public boolean hasDependencies() {
-        return dependencies != null && !dependencies.isEmpty();
+    public void setPluginClass(String pluginClass) {
+        this.pluginClass = pluginClass;
     }
     
     /**
-     * 检查插件是否有扩展点
+     * 获取本地化描述
      * 
-     * @return 是否有扩展点
+     * @param locale 语言环境
+     * @return 本地化描述
      */
-    public boolean hasExtensions() {
-        return extensions != null && !extensions.isEmpty();
-    }
-    
-    /**
-     * 检查插件是否有SPI配置
-     * 
-     * @return 是否有SPI配置
-     */
-    public boolean hasSpiConfiguration() {
-        return spi != null;
-    }
-    
-    /**
-     * 获取插件的完整标识符
-     * 格式：{vendor}:{name}:{version}
-     * 
-     * @return 完整标识符
-     */
-    public String getFullId() {
-        StringBuilder sb = new StringBuilder();
-        if (vendor != null && !vendor.trim().isEmpty()) {
-            sb.append(vendor).append(":");
+    public String getLocalizedDescription(String locale) {
+        if (description != null) {
+            return description.get(locale);
         }
-        sb.append(name);
-        if (version != null && !version.trim().isEmpty()) {
-            sb.append(":").append(version);
+        return null;
+    }
+    
+    /**
+     * 获取本地化标签
+     * 
+     * @param locale 语言环境
+     * @return 本地化标签
+     */
+    public String getLocalizedLabel(String locale) {
+        if (label != null) {
+            return label.get(locale);
         }
-        return sb.toString();
+        return null;
+    }
+    
+    /**
+     * 检查是否有提供商配置
+     * 
+     * @return 是否有提供商配置
+     */
+    public boolean hasProviders() {
+        return plugins != null && !plugins.isEmpty();
     }
     
     @Override
@@ -251,89 +236,8 @@ public class PluginDescriptor {
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", version='" + version + '\'' +
-                ", type=" + type +
-                ", author='" + author + '\'' +
-                ", vendor='" + vendor + '\'' +
-                ", pluginPath=" + pluginPath +
+                ", type='" + type + '\'' +
+                ", pluginClass='" + pluginClass + '\'' +
                 '}';
     }
-    
-    // Builder pattern
-    public static Builder builder() {
-        return new Builder();
-    }
-    
-    public static class Builder {
-        private final PluginDescriptor descriptor = new PluginDescriptor();
-        
-        public Builder id(String id) {
-            descriptor.setId(id);
-            return this;
-        }
-        
-        public Builder name(String name) {
-            descriptor.setName(name);
-            return this;
-        }
-        
-        public Builder version(String version) {
-            descriptor.setVersion(version);
-            return this;
-        }
-        
-        public Builder description(String description) {
-            descriptor.setDescription(description);
-            return this;
-        }
-        
-        public Builder author(String author) {
-            descriptor.setAuthor(author);
-            return this;
-        }
-        
-        public Builder vendor(String vendor) {
-            descriptor.setVendor(vendor);
-            return this;
-        }
-        
-        public Builder type(PluginType type) {
-            descriptor.setType(type);
-            return this;
-        }
-        
-        public Builder plugins(List<String> plugins) {
-            descriptor.setPlugins(plugins);
-            return this;
-        }
-        
-        public Builder dependencies(List<Dependency> dependencies) {
-            descriptor.setDependencies(dependencies);
-            return this;
-        }
-        
-        public Builder extensions(List<Extension> extensions) {
-            descriptor.setExtensions(extensions);
-            return this;
-        }
-        
-        public Builder spi(SpiConfiguration spi) {
-            descriptor.setSpi(spi);
-            return this;
-        }
-        
-        public Builder pluginPath(Path pluginPath) {
-            descriptor.setPluginPath(pluginPath);
-            return this;
-        }
-        
-        public Builder metadata(Map<String, Object> metadata) {
-            descriptor.setMetadata(metadata);
-            return this;
-        }
-        
-        public PluginDescriptor build() {
-            return descriptor;
-        }
-    }
 }
-

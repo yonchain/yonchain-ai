@@ -62,10 +62,10 @@ public class ModelPluginAdapter implements PluginAdapter {
         log.info("Installing model plugin: {}", descriptor.getId());
         
         try {
-            // 验证插件是否有必要的SPI配置
+         /*   // 验证插件是否有必要的SPI配置
             if (descriptor.getSpi() == null || !descriptor.getSpi().hasProviderSource()) {
                 throw new IllegalArgumentException("Model plugin must have provider source configuration");
-            }
+            }*/
             
             // 暂时不加载插件实例，等到启用时再加载
             log.info("Model plugin installed successfully: {}", descriptor.getId());
@@ -111,14 +111,9 @@ public class ModelPluginAdapter implements PluginAdapter {
             }
             
             PluginInfo pluginInfo = pluginInfoOpt.get();
-            PluginDescriptor descriptor = pluginInfo.getDescriptor();
             
-            if (descriptor == null) {
-                throw new PluginException("Plugin descriptor not available: " + pluginId);
-            }
-            
-            // 2. 加载插件实例
-            ModelPlugin pluginInstance = loadPluginInstance(descriptor);
+            // 2. 加载插件实例（直接使用PluginInfo，不需要依赖PluginDescriptor）
+            ModelPlugin pluginInstance = loadPluginInstance(pluginInfo);
             if (pluginInstance == null) {
                 throw new PluginException("Failed to load plugin instance: " + pluginId);
             }
@@ -206,13 +201,23 @@ public class ModelPluginAdapter implements PluginAdapter {
     /**
      * 加载插件实例
      * 
-     * @param descriptor 插件描述符
+     * @param pluginInfo 插件信息
      * @return 插件实例
      */
-    private ModelPlugin loadPluginInstance(PluginDescriptor descriptor) {
+    private ModelPlugin loadPluginInstance(PluginInfo pluginInfo) {
         try {
-            String providerSource = descriptor.getSpi().getProviderSource();
-            Class<?> pluginClass = pluginLoader.loadClass(descriptor.getPluginPath(), providerSource);
+            String providerSource = pluginInfo.getMainClass();
+            String pluginPath = pluginInfo.getPluginPath();
+            
+            if (providerSource == null || providerSource.trim().isEmpty()) {
+                throw new IllegalArgumentException("Plugin main class is not specified for plugin: " + pluginInfo.getPluginId());
+            }
+            
+            if (pluginPath == null || pluginPath.trim().isEmpty()) {
+                throw new IllegalArgumentException("Plugin path is not specified for plugin: " + pluginInfo.getPluginId());
+            }
+            
+            Class<?> pluginClass = pluginLoader.loadClass(pluginPath, providerSource);
             
             if (!ModelPlugin.class.isAssignableFrom(pluginClass)) {
                 throw new IllegalArgumentException("Plugin class must implement ModelPlugin interface: " + providerSource);
@@ -231,7 +236,7 @@ public class ModelPluginAdapter implements PluginAdapter {
             return instance;
             
         } catch (Exception e) {
-            log.error("Failed to load plugin instance: {}", descriptor.getId(), e);
+            log.error("Failed to load plugin instance: {}", pluginInfo.getPluginId(), e);
             return null;
         }
     }

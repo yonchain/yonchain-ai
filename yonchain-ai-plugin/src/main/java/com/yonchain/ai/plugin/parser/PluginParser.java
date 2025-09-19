@@ -4,10 +4,10 @@ import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import com.yonchain.ai.plugin.validation.ValidationResult;
 
 import java.nio.file.Path;
-import java.util.List;
 
 /**
  * 插件解析器接口
+ * 负责解析plugin.yaml文件，获取插件基本信息
  * 
  * @author yonchain
  */
@@ -16,11 +16,11 @@ public interface PluginParser {
     /**
      * 解析插件
      * 
-     * @param pluginDir 插件目录
+     * @param pluginPath 插件路径（JAR文件）
      * @return 插件描述符
      * @throws PluginParseException 解析异常
      */
-    PluginDescriptor parsePlugin(Path pluginDir) throws PluginParseException;
+    PluginDescriptor parsePlugin(Path pluginPath) throws PluginParseException;
     
     /**
      * 验证插件
@@ -31,20 +31,11 @@ public interface PluginParser {
     ValidationResult validatePlugin(PluginDescriptor descriptor);
     
     /**
-     * 解析模型定义
+     * 检查插件路径是否有效
      * 
-     * @param modelsDir 模型定义目录
-     * @return 模型定义列表
-     * @throws PluginParseException 解析异常
-     */
-    List<ModelDefinition> parseModelDefinitions(Path modelsDir) throws PluginParseException;
-    
-    /**
-     * 检查插件目录结构是否有效
-     * 
-     * @param pluginDir 插件目录
+     * @param pluginPath 插件路径（JAR文件）
      * @return 是否有效
      */
-    boolean isValidPluginDirectory(Path pluginDir);
+    boolean isValidPluginPath(Path pluginPath);
 }
 
