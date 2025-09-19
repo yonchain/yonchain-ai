@@ -82,7 +82,7 @@ public class UserResponse {
      * 用户角色列表
      */
     @Schema(description = "用户角色列表")
-    private List<Role> roleList;
+    private List<RoleResponse> roleList;
 
     /**
      * 用户头像URL

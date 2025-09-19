@@ -457,7 +457,10 @@ public class UserController extends BaseController {
         PageResponse<UserResponse> response = responseFactory.createUserPageResponse(users);
         response.getData().forEach(user -> {
             //设置角色列表
-            user.setRoleList(userService.getUserRoles(tenantId, user.getId()));
+            user.setRoleList(userService.getUserRoles(tenantId, user.getId())
+                    .stream()
+                    .map(responseFactory::createRoleResponse)
+                    .toList());
         });
         return response;
     }
@@ -472,7 +475,10 @@ public class UserController extends BaseController {
     private UserResponse buildDetailsResponse(User user) {
         UserResponse userResponse = responseFactory.createUserResponse(user);
         // 设置角色列表
-        userResponse.setRoleList(userService.getUserRoles(this.getCurrentTenantId(), user.getId()));
+        userResponse.setRoleList(userService.getUserRoles(this.getCurrentTenantId(), user.getId())
+                .stream()
+                .map(responseFactory::createRoleResponse)
+                .toList());
         //设置头像url
         String avatarUrl = fileService.getSignedFileUrl(user.getAvatar());
         userResponse.setAvatarUrl(avatarUrl);
