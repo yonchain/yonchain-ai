@@ -146,11 +146,6 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.yonchain.ai</groupId>
-                <artifactId>yonchain-ai-model-spring-boot-starter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 

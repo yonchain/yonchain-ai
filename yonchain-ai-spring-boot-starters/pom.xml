@@ -17,7 +17,6 @@
         <module>yonchain-ai-starter-swagger</module>
         <module>yonchain-ai-starter-redis</module>
         <module>yonchain-ai-security-spring-boot-starter</module>
-        <module>yonchain-ai-model-spring-boot-starter</module>
         <module>yonchain-ai-sys-spring-boot-starter</module>
     </modules>
 
