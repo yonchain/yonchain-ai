@@ -71,7 +71,7 @@ public class DeepSeekModelProvider implements ModelProvider {
                     .build();
 
             // 创建聊天模型
-            org.springframework.ai.deepseek.DeepSeekChatModel chatModel = DeepSeekChatModel.builder()
+            DeepSeekChatModel chatModel = DeepSeekChatModel.builder()
                     .deepSeekApi(deepSeekApi)
                     .defaultOptions(options)
                     .build();

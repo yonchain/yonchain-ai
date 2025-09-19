@@ -1,161 +1,48 @@
-# DeepSeek模型提供商配置
-provider: deepseek
+background: '#c0cdff'
+configurate_methods:
+  - predefined-model
+description:
+  en_US: Models provided by deepseek, such as deepseek-reasoner、deepseek-chat、deepseek-coder.
+  zh_Hans: 深度求索提供的模型，例如 deepseek-reasoner、deepseek-chat、deepseek-coder 。
+provider_source: com.yonchain.ai.plugin.deepseek.DeepSeekModelProvider
+help:
+  title:
+    en_US: Get your API Key from deepseek
+    zh_Hans: 从深度求索获取 API Key
+  url:
+    en_US: https://platform.deepseek.com/api_keys
+icon_large:
+  en_US: icon_l_en.svg
+icon_small:
+  en_US: icon_s_en.svg
 label:
+  en_US: deepseek
   zh_Hans: 深度求索
-  en_US: DeepSeek
-icon: deepseek.svg
+models:
+  llm:
+    source: org.springframework.ai.deepseek.DeepSeekChatModel
+    position: models/llm/_position.yaml
+    predefined:
+      - models/llm/*.yaml
+provider: deepseek
+provider_credential_schema:
+  credential_form_schemas:
+    - label:
+        en_US: API Key
+      placeholder:
+        en_US: Enter your API Key
+        zh_Hans: 在此输入您的 API Key
+      required: true
+      type: secret-input
+      variable: api_key
+    - label:
+        en_US: Custom API endpoint URL
+        zh_Hans: 自定义 API endpoint 地址
+      placeholder:
+        en_US: Base URL, e.g. https://api.deepseek.com/v1 or https://api.deepseek.com
+        zh_Hans: Base URL, e.g. https://api.deepseek.com/v1 or https://api.deepseek.com
+      required: false
+      type: text-input
+      variable: endpoint_url
 supported_model_types:
   - llm
-  - chat
-
-# API配置
-api:
-  base_url: https://api.deepseek.com/v1
-  timeout: 30000
-  retry_attempts: 3
-  
-# 认证配置
-auth:
-  type: api_key
-  api_key_header: Authorization
-  api_key_prefix: Bearer
-
-# 模型列表
-models:
-  - model: deepseek-chat
-    label:
-      zh_Hans: DeepSeek 对话模型
-      en_US: DeepSeek Chat Model
-    model_type: llm
-    features:
-      - chat
-      - completion
-    model_properties:
-      mode: chat
-      context_length: 32768
-      max_tokens: 4096
-    parameter_rules:
-      - name: temperature
-        use_template: temperature
-        type: float
-        default: 0.7
-        min: 0.0
-        max: 2.0
-        help:
-          zh_Hans: 控制输出的随机性，值越高越随机
-          en_US: Controls randomness in output, higher values make output more random
-      - name: max_tokens
-        use_template: max_tokens
-        type: int
-        default: 4096
-        min: 1
-        max: 4096
-        help:
-          zh_Hans: 生成文本的最大token数
-          en_US: Maximum number of tokens to generate
-      - name: top_p
-        use_template: top_p
-        type: float
-        default: 0.95
-        min: 0.0
-        max: 1.0
-        help:
-          zh_Hans: 核采样参数，控制token选择范围
-          en_US: Nucleus sampling parameter controlling token selection scope
-    pricing:
-      input: 0.0014
-      output: 0.0028
-      currency: USD
-      unit: 1000_tokens
-
-  - model: deepseek-reasoner
-    label:
-      zh_Hans: DeepSeek 推理模型
-      en_US: DeepSeek Reasoner Model
-    model_type: llm
-    features:
-      - reasoning
-      - analysis
-      - logic
-    model_properties:
-      mode: chat
-      context_length: 32768
-      max_tokens: 8192
-      reasoning_capability: advanced
-    parameter_rules:
-      - name: temperature
-        use_template: temperature
-        type: float
-        default: 0.3
-        min: 0.0
-        max: 1.0
-        help:
-          zh_Hans: 推理模型建议使用较低温度以保持逻辑一致性
-          en_US: Lower temperature recommended for reasoning tasks to maintain logical consistency
-      - name: max_tokens
-        use_template: max_tokens
-        type: int
-        default: 8192
-        min: 1
-        max: 8192
-        help:
-          zh_Hans: 推理任务可能需要更多token来完整表达思路
-          en_US: Reasoning tasks may require more tokens for complete thought expression
-    pricing:
-      input: 0.0028
-      output: 0.0056
-      currency: USD
-      unit: 1000_tokens
-
-  - model: deepseek-coder
-    label:
-      zh_Hans: DeepSeek 代码模型
-      en_US: DeepSeek Coder Model
-    model_type: llm
-    features:
-      - code_generation
-      - code_completion
-      - code_explanation
-      - debugging
-    model_properties:
-      mode: chat
-      context_length: 16384
-      max_tokens: 4096
-      programming_languages:
-        - Python
-        - JavaScript
-        - Java
-        - C++
-        - Go
-        - Rust
-        - TypeScript
-    parameter_rules:
-      - name: temperature
-        use_template: temperature
-        type: float
-        default: 0.1
-        min: 0.0
-        max: 1.0
-        help:
-          zh_Hans: 代码生成建议使用较低温度以确保代码准确性
-          en_US: Lower temperature recommended for code generation to ensure accuracy
-      - name: max_tokens
-        use_template: max_tokens
-        type: int
-        default: 4096
-        min: 1
-        max: 4096
-        help:
-          zh_Hans: 代码生成的最大token数
-          en_US: Maximum tokens for code generation
-      - name: stop
-        type: array
-        default: []
-        help:
-          zh_Hans: 停止生成的标记序列
-          en_US: Stop sequences for generation
-    pricing:
-      input: 0.0014
-      output: 0.0028
-      currency: USD
-      unit: 1000_tokens

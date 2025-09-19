@@ -1,4 +1,8 @@
+id: yonchain.deepseek
+name: deepseek
 author: yonchain
+type: model
+version: 0.0.2
 created_at: '2024-09-20T12:13:50'
 description:
   en_US: Models provided by DeepSeek AI, including deepseek-chat, deepseek-reasoner, and deepseek-coder.
@@ -7,7 +11,7 @@ icon: icon_s_en.svg
 label:
   en_US: DeepSeek
   zh_Hans: 深度求索
-name: deepseek
+plugin_class: com.yonchain.ai.plugin.deepseek.DeepSeekPlugin
 plugins:
   - deepseek.yaml
 resource:
@@ -23,8 +27,6 @@ resource:
       tts: false
     tool:
       enabled: true
-type: model
-version: 0.0.2
 
 
 
