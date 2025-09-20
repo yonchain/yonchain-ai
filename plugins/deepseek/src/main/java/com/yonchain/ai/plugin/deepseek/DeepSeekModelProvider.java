@@ -3,6 +3,7 @@ package com.yonchain.ai.plugin.deepseek;
 import com.yonchain.ai.model.ModelConfig;
 import com.yonchain.ai.model.ModelType;
 import com.yonchain.ai.model.provider.ModelProvider;
+import com.yonchain.ai.model.provider.ProviderMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -203,7 +204,6 @@ public class DeepSeekModelProvider implements ModelProvider {
     public boolean testConnection(ModelConfig config) {
         return false;
     }
-
 
 }
 

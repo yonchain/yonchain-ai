@@ -2,6 +2,7 @@ package com.yonchain.ai.plugin.model;
 
 import com.yonchain.ai.model.ModelMetadata;
 import com.yonchain.ai.model.provider.ModelProvider;
+import com.yonchain.ai.model.provider.ProviderMetadata;
 import com.yonchain.ai.model.registry.ModelRegistry;
 import com.yonchain.ai.plugin.Plugin;
 
@@ -22,7 +23,15 @@ public interface ModelPlugin extends Plugin {
      * @return 模型提供商实例
      */
     ModelProvider getProvider();
-    
+
+    /**
+     * 获取提供商元数据信息
+     * 包含从插件配置文件中读取的信息
+     *
+     * @return 提供商元数据
+     */
+    ProviderMetadata getProviderMetadata();
+
     /**
      * 获取此插件提供的所有模型元数据
      * 
@@ -55,5 +64,6 @@ public interface ModelPlugin extends Plugin {
      * @param registry 模型注册中心
      */
     void unregisterModels(ModelRegistry registry);
+
 }
 

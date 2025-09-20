@@ -28,7 +28,7 @@
         <module>yonchain-ai-spring-boot-starters</module>
         <module>models</module>
         <module>yonchain-ai-plugin</module>
-       <!-- <module>plugins</module>-->
+        <module>plugins</module>
         <module>plugins/deepseek</module>
         <module>plugins/openai</module>
     </modules>

@@ -80,4 +80,5 @@ public interface ModelProvider {
      * @return 连接是否成功
      */
     boolean testConnection(ModelConfig config);
+    
 }

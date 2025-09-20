@@ -5,7 +5,7 @@ import com.yonchain.ai.api.agent.AgentPublishRecord;
 import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.model.ModelInfo;
-import com.yonchain.ai.api.model.ModelProvider;
+import com.yonchain.ai.api.model.ModelProviderInfo;
 import com.yonchain.ai.api.sys.*;
 import com.yonchain.ai.api.tag.Tag;
 import com.yonchain.ai.console.agent.response.AgentPublishRecordResponse;
@@ -143,10 +143,10 @@ public class ResponseFactory {
      *
      * @param provider 模型提供商实体对象，包含模型提供商基本信息，不能为null
      * @return 标准化后的模型提供商响应对象，包含提供商ID、名称、描述、能力等信息
-     * @see ModelProvider
+     * @see ModelProviderInfo
      * @see ModelProviderResponse
      */
-    public ModelProviderResponse createModelProviderResponse(ModelProvider provider) {
+    public ModelProviderResponse createModelProviderResponse(ModelProviderInfo provider) {
         ModelProviderResponse response = new ModelProviderResponse();
         // 设置主键ID
         response.setId(provider.getId());
@@ -182,11 +182,11 @@ public class ResponseFactory {
      *
      * @param providers 模型提供商分页数据对象，包含分页信息和模型提供商数据列表，不能为null
      * @return 标准化后的模型提供商分页响应对象，包含分页元数据和转换后的模型提供商列表
-     * @see ModelProvider
+     * @see ModelProviderInfo
      * @see ModelProviderResponse
      * @see PageResponse
      */
-    public PageResponse<ModelProviderResponse> createModelProviderPageResponse(Page<ModelProvider> providers) {
+    public PageResponse<ModelProviderResponse> createModelProviderPageResponse(Page<ModelProviderInfo> providers) {
         PageResponse<ModelProviderResponse> response = new PageResponse<>();
         // 设置当前页码
         response.setPageNum(providers.getCurrent());
@@ -211,11 +211,11 @@ public class ResponseFactory {
      *
      * @param providers 模型提供商列表，包含模型提供商数据，不能为null
      * @return 标准化后的模型提供商列表响应对象，包含模型提供商数据列表
-     * @see ModelProvider
+     * @see ModelProviderInfo
      * @see ModelProviderResponse
      * @see ListResponse
      */
-    public ListResponse<ModelProviderResponse> createModelProviderListResponse(List<ModelProvider> providers) {
+    public ListResponse<ModelProviderResponse> createModelProviderListResponse(List<ModelProviderInfo> providers) {
         ListResponse<ModelProviderResponse> response = new ListResponse<>();
         response.setData(providers.stream()
                 .map(this::createModelProviderResponse)

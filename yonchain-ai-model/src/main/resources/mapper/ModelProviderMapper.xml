@@ -10,6 +10,8 @@
         <result column="tenant_id" property="tenantId" jdbcType="VARCHAR" />
         <!-- 提供商代码，关联静态配置文件 -->
         <result column="provider_code" property="providerCode" jdbcType="VARCHAR" />
+        <!-- 插件ID -->
+        <result column="plugin_id" property="pluginId" jdbcType="VARCHAR" />
         <!-- API密钥 -->
         <result column="api_key" property="apiKey" jdbcType="VARCHAR" />
         <!-- API基础URL -->
@@ -20,6 +22,24 @@
         <result column="custom_config" property="customConfig" jdbcType="VARCHAR" />
         <!-- 租户是否启用该提供商 -->
         <result column="enabled" property="enabled" jdbcType="BOOLEAN" />
+        <!-- 提供商显示名称 -->
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <!-- 提供商描述 -->
+        <result column="description" property="description" jdbcType="VARCHAR" />
+        <!-- 提供商图标路径 -->
+        <result column="icon" property="icon" jdbcType="VARCHAR" />
+        <!-- 背景颜色 -->
+        <result column="background" property="background" jdbcType="VARCHAR" />
+        <!-- 排序权重 -->
+        <result column="sort_order" property="sortOrder" jdbcType="INTEGER" />
+        <!-- 支持的模型类型列表 -->
+        <result column="supported_model_types" property="supportedModelTypes" jdbcType="VARCHAR" />
+        <!-- 配置方法列表 -->
+        <result column="configurate_methods" property="configurateMethods" jdbcType="VARCHAR" />
+        <!-- 帮助信息 -->
+        <result column="help_info" property="helpInfo" jdbcType="VARCHAR" />
+        <!-- 提供商凭证配置Schema -->
+        <result column="credential_schema" property="credentialSchema" jdbcType="VARCHAR" />
         <!-- 创建时间 -->
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
         <!-- 更新时间 -->
@@ -32,8 +52,10 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, tenant_id, provider_code, api_key, base_url, proxy_url,
-        custom_config, enabled, create_time, update_time, created_by, updated_by
+        id, tenant_id, provider_code, plugin_id, api_key, base_url, proxy_url,
+        custom_config, enabled, name, description, icon, background, sort_order,
+        supported_model_types, configurate_methods, help_info, credential_schema,
+        create_time, update_time, created_by, updated_by
     </sql>
 
     <!-- 根据ID查询模型提供商 -->
@@ -90,6 +112,9 @@
             <if test="params.providerCode != null and params.providerCode != ''">
                 AND provider_code LIKE CONCAT('%', #{params.providerCode}, '%')
             </if>
+            <if test="params.pluginId != null and params.pluginId != ''">
+                AND plugin_id = #{params.pluginId}
+            </if>
             <if test="params.enabled != null">
                 AND enabled = #{params.enabled}
             </if>
@@ -108,6 +133,9 @@
             <if test="queryParam.providerCode != null and queryParam.providerCode != ''">
                 AND provider_code LIKE CONCAT('%', #{queryParam.providerCode}, '%')
             </if>
+            <if test="queryParam.pluginId != null and queryParam.pluginId != ''">
+                AND plugin_id = #{queryParam.pluginId}
+            </if>
             <if test="queryParam.enabled != null">
                 AND enabled = #{queryParam.enabled}
             </if>
@@ -117,12 +145,16 @@
     <!-- 插入模型提供商 -->
     <insert id="insert" parameterType="com.yonchain.ai.tmpl.entity.ModelProviderEntity">
         INSERT INTO model_provider (
-            id, tenant_id, provider_code, api_key, base_url, proxy_url,
-            custom_config, enabled, create_time, update_time, created_by, updated_by
+            id, tenant_id, provider_code, plugin_id, api_key, base_url, proxy_url,
+            custom_config, enabled, name, description, icon, background, sort_order,
+            supported_model_types, configurate_methods, help_info, credential_schema,
+            create_time, update_time, created_by, updated_by
         )
         VALUES (
-                   #{id}, #{tenantId}, #{providerCode}, #{apiKey}, #{baseUrl}, #{proxyUrl},
-                   #{customConfig}, #{enabled}, #{createTime}, #{updateTime}, #{createdBy}, #{updatedBy}
+                   #{id}, #{tenantId}, #{providerCode}, #{pluginId}, #{apiKey}, #{baseUrl}, #{proxyUrl},
+                   #{customConfig}, #{enabled}, #{name}, #{description}, #{icon}, #{background}, #{sortOrder},
+                   #{supportedModelTypes}, #{configurateMethods}, #{helpInfo}, #{credentialSchema},
+                   #{createTime}, #{updateTime}, #{createdBy}, #{updatedBy}
                )
     </insert>
 
@@ -130,11 +162,21 @@
     <update id="update" parameterType="com.yonchain.ai.tmpl.entity.ModelProviderEntity">
         UPDATE model_provider
         SET provider_code = #{providerCode},
+            plugin_id = #{pluginId},
             api_key = #{apiKey},
             base_url = #{baseUrl},
             proxy_url = #{proxyUrl},
             custom_config = #{customConfig},
             enabled = #{enabled},
+            name = #{name},
+            description = #{description},
+            icon = #{icon},
+            background = #{background},
+            sort_order = #{sortOrder},
+            supported_model_types = #{supportedModelTypes},
+            configurate_methods = #{configurateMethods},
+            help_info = #{helpInfo},
+            credential_schema = #{credentialSchema},
             update_time = #{updateTime},
             updated_by = #{updatedBy}
         WHERE id = #{id}

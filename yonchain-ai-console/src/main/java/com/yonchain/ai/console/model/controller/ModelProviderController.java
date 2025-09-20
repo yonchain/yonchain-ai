@@ -16,8 +16,7 @@
 
 package com.yonchain.ai.console.model.controller;
 
-import com.yonchain.ai.api.exception.YonchainIllegalStateException;
-import com.yonchain.ai.api.model.ModelProvider;
+import com.yonchain.ai.api.model.ModelProviderInfo;
 import com.yonchain.ai.api.model.ModelService;
 import com.yonchain.ai.api.model.ProviderConfigResponse;
 import com.yonchain.ai.console.BaseController;
@@ -28,7 +27,6 @@ import com.yonchain.ai.web.response.ApiResponse;
 import com.yonchain.ai.web.response.ListResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +64,7 @@ public class ModelProviderController extends BaseController {
         queryParam.put("name", request.getName());
 
         //分页查询
-        List<ModelProvider> providers = modelService.getProviders(getCurrentTenantId(), queryParam);
+        List<ModelProviderInfo> providers = modelService.getProviders(getCurrentTenantId(), queryParam);
 
         return responseFactory.createModelProviderListResponse(providers);
     }

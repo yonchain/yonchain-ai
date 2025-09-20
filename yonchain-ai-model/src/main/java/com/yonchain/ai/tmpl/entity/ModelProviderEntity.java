@@ -29,6 +29,11 @@ public class ModelProviderEntity {
     private String providerCode;
 
     /**
+     * 插件ID，标识该提供商来自哪个插件
+     */
+    private String pluginId;
+
+    /**
      * API密钥
      */
     private String apiKey;
@@ -52,6 +57,51 @@ public class ModelProviderEntity {
      * 租户是否启用该提供商
      */
     private Boolean enabled;
+
+    /**
+     * 提供商显示名称
+     */
+    private String name;
+
+    /**
+     * 提供商描述
+     */
+    private String description;
+
+    /**
+     * 提供商图标路径
+     */
+    private String icon;
+
+    /**
+     * 背景颜色
+     */
+    private String background;
+
+    /**
+     * 排序权重
+     */
+    private Integer sortOrder;
+
+    /**
+     * 支持的模型类型列表，JSON格式
+     */
+    private String supportedModelTypes;
+
+    /**
+     * 配置方法列表，JSON格式
+     */
+    private String configurateMethods;
+
+    /**
+     * 帮助信息，JSON格式
+     */
+    private String helpInfo;
+
+    /**
+     * 提供商凭证配置Schema，JSON格式
+     */
+    private String credentialSchema;
 
     /**
      * 创建时间

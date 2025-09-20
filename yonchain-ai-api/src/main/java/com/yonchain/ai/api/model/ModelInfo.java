@@ -140,19 +140,19 @@ public interface ModelInfo {
      */
     void setType(String type);
 
-    /**
+/*    *//**
      * 获取模型版本号
      *
      * @return 版本号
-     */
+     *//*
     String getVersion();
 
-    /**
+    *//**
      * 设置模型版本号
      *
      * @param version 版本号
-     */
-    void setVersion(String version);
+     *//*
+    void setVersion(String version);*/
 
     /**
      * 获取排序权重，数值越小排序越靠前

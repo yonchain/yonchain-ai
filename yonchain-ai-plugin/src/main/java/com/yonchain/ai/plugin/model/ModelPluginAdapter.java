@@ -1,8 +1,12 @@
 package com.yonchain.ai.plugin.model;
 
+import com.yonchain.ai.api.model.ModelService;
+import com.yonchain.ai.api.model.ModelProviderInfo;
+import com.yonchain.ai.api.model.DefaultModelProvider;
 import com.yonchain.ai.model.ModelConfig;
 import com.yonchain.ai.model.ModelMetadata;
 import com.yonchain.ai.model.provider.ModelProvider;
+import com.yonchain.ai.model.provider.ProviderMetadata;
 import com.yonchain.ai.model.registry.ModelRegistry;
 import com.yonchain.ai.model.factory.ModelFactory;
 import com.yonchain.ai.plugin.PluginAdapter;
@@ -13,6 +17,7 @@ import com.yonchain.ai.plugin.entity.PluginInfo;
 import com.yonchain.ai.plugin.enums.PluginType;
 import com.yonchain.ai.plugin.loader.PluginClassLoader;
 import com.yonchain.ai.plugin.registry.PluginRegistry;
+import com.yonchain.ai.plugin.service.PluginIconService;
 import com.yonchain.ai.plugin.exception.PluginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +28,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,6 +50,8 @@ public class ModelPluginAdapter implements PluginAdapter {
     private final ModelFactory modelFactory;
     private final PluginClassLoader pluginClassLoader;
     private final ApplicationContext applicationContext;
+    private final ModelService modelService;
+    private final PluginIconService pluginIconService;
     
     // 缓存插件实例和提供商
     private final Map<String, ModelPlugin> pluginInstances = new ConcurrentHashMap<>();
@@ -56,12 +64,16 @@ public class ModelPluginAdapter implements PluginAdapter {
                              ModelRegistry modelRegistry,
                              ModelFactory modelFactory,
                               PluginClassLoader pluginClassLoader,
-                             ApplicationContext applicationContext) {
+                             ApplicationContext applicationContext,
+                             ModelService modelService,
+                             PluginIconService pluginIconService) {
         this.pluginRegistry = pluginRegistry;
         this.modelRegistry = modelRegistry;
         this.modelFactory = modelFactory;
         this.pluginClassLoader = pluginClassLoader;
         this.applicationContext = applicationContext;
+        this.modelService = modelService;
+        this.pluginIconService = pluginIconService;
     }
     
     @Override
@@ -142,21 +154,22 @@ public class ModelPluginAdapter implements PluginAdapter {
             // 5. 注册模型提供商到模型工厂
             modelFactory.registerProvider(modelProvider.getProviderName(), modelProvider);
             
-            // 6. 注册模型到模型注册中心
+            // 6. 保存提供商信息到数据库（用于可视化界面展示和配置）
+            ModelProviderInfo providerInfo = convertToProviderInfo(pluginInstance, modelProvider, pluginId);
+            modelService.saveProviderForUI(pluginId, providerInfo);
+            
+            // 7. 保存模型信息到数据库（用于可视化界面展示和配置）
             List<ModelMetadata> models = pluginInstance.getModels();
             if (models != null && !models.isEmpty()) {
-                for (ModelMetadata model : models) {
-                    // 检查并补充ModelConfig信息
-                    ensureModelConfigComplete(model, pluginId, pluginInstance);
-                    modelRegistry.registerModel(model);
-                    log.debug("Registered model: {} from plugin: {}", model.getModelId(), pluginId);
-                }
+                List<Object> modelObjects = new ArrayList<>(models);
+                modelService.saveModelsForUI(pluginId, modelObjects, modelProvider.getProviderName());
+                log.debug("Saved {} models to database from plugin: {}", models.size(), pluginId);
             }
             
-            // 7. 调用插件的启用回调
+            // 8. 调用插件的启用回调
             pluginInstance.onEnable();
             
-            // 8. 缓存插件实例和提供商
+            // 9. 缓存插件实例和提供商
             pluginInstances.put(pluginId, pluginInstance);
             modelProviders.put(pluginId, modelProvider);
             
@@ -187,14 +200,9 @@ public class ModelPluginAdapter implements PluginAdapter {
             // 2. 获取模型提供商
             ModelProvider modelProvider = pluginInstance.getProvider();
             
-            // 3. 注销模型
-            List<ModelMetadata> models = pluginInstance.getModels();
-            if (models != null && !models.isEmpty()) {
-                for (ModelMetadata model : models) {
-                    modelRegistry.unregisterModel(model.getModelId());
-                    log.debug("Unregistered model: {} from plugin: {}", model.getModelId(), pluginId);
-                }
-            }
+            // 3. 从数据库删除插件相关数据
+            modelService.removePluginData(pluginId);
+            log.debug("Removed plugin data from database: {}", pluginId);
             
             // 4. 调用插件的禁用回调
             pluginInstance.onDisable();
@@ -413,6 +421,14 @@ public class ModelPluginAdapter implements PluginAdapter {
             // 从Spring容器注销模型提供商
             unregisterModelProvider(pluginId);
             
+            // 从数据库清理插件数据
+            try {
+                modelService.removePluginData(pluginId);
+                log.debug("Cleaned up plugin data from database: {}", pluginId);
+            } catch (Exception e) {
+                log.error("Failed to cleanup plugin data from database: {}", pluginId, e);
+            }
+            
             log.debug("Cleaned up all resources for plugin: {}", pluginId);
         } catch (Exception e) {
             log.error("Failed to cleanup resources for plugin: {}", pluginId, e);
@@ -609,6 +625,277 @@ public class ModelPluginAdapter implements PluginAdapter {
                 return "https://api.x.ai/v1";
             default:
                 return null;
+        }
+    }
+    
+    /**
+     * 将运行时ModelProvider转换为界面用的ModelProviderInfo
+     * 
+     * @param modelProvider 运行时模型提供商
+     * @param pluginId 插件ID
+     * @return 界面用的提供商信息
+     */
+    private ModelProviderInfo convertToProviderInfo(ModelPlugin pluginInstance, ModelProvider modelProvider, String pluginId) {
+        ModelProviderInfo providerInfo = new DefaultModelProvider();
+        
+        try {
+            // 从插件获取元数据
+           ProviderMetadata metadata = pluginInstance.getProviderMetadata();
+            
+            if (metadata != null) {
+                // 使用插件元数据
+                providerInfo.setCode(metadata.getProvider());
+                providerInfo.setName(metadata.getLocalizedLabel("zh_Hans"));
+                providerInfo.setDescription(metadata.getLocalizedDescription("zh_Hans"));
+                
+                // 生成图标URL
+                String iconFileName = metadata.getLocalizedIcon("en_US", false); // 使用小图标
+                if (iconFileName != null) {
+                    String iconUrl = generateProviderIconUrl(pluginId, iconFileName);
+                    providerInfo.setIcon(iconUrl);
+                }
+                
+                // 从元数据设置支持的模型类型
+                if (metadata.getSupportedModelTypes() != null) {
+                    providerInfo.setSupportedModelTypes(metadata.getSupportedModelTypes());
+                } else {
+                    providerInfo.setSupportedModelTypes(getSupportedModelTypes(modelProvider));
+                }
+                
+                // 设置配置Schema
+                if (metadata.getProviderCredentialSchema() != null) {
+                    providerInfo.setConfigSchemas(convertCredentialSchemaToConfigItems(metadata.getProviderCredentialSchema()));
+                }
+                
+            } else {
+                // 降级使用硬编码信息
+                log.warn("No metadata available for provider: {}, using fallback values", modelProvider.getProviderName());
+                providerInfo.setCode(modelProvider.getProviderName());
+                providerInfo.setName(getProviderDisplayName(modelProvider.getProviderName()));
+                providerInfo.setDescription(getProviderDescription(modelProvider.getProviderName()));
+                
+                // 生成默认图标URL
+                String defaultIconUrl = generateDefaultProviderIconUrl(pluginId, modelProvider.getProviderName());
+                providerInfo.setIcon(defaultIconUrl);
+                
+                providerInfo.setSupportedModelTypes(getSupportedModelTypes(modelProvider));
+            }
+            
+            // 通用设置
+            providerInfo.setSortOrder(getProviderSortOrder(providerInfo.getCode()));
+            providerInfo.setEnabled(false); // 默认未启用，等待用户配置
+            
+        } catch (Exception e) {
+            log.error("Failed to get provider metadata for: {}, using fallback", modelProvider.getProviderName(), e);
+            // 使用降级方案
+            providerInfo.setCode(modelProvider.getProviderName());
+            providerInfo.setName(getProviderDisplayName(modelProvider.getProviderName()));
+            providerInfo.setDescription(getProviderDescription(modelProvider.getProviderName()));
+            providerInfo.setIcon(getProviderIcon(modelProvider.getProviderName()));
+            providerInfo.setSortOrder(getProviderSortOrder(modelProvider.getProviderName()));
+            providerInfo.setSupportedModelTypes(getSupportedModelTypes(modelProvider));
+            providerInfo.setEnabled(false);
+        }
+        
+        return providerInfo;
+    }
+    
+    /**
+     * 获取提供商显示名称
+     */
+    private String getProviderDisplayName(String providerCode) {
+        switch (providerCode.toLowerCase()) {
+            case "deepseek":
+                return "DeepSeek";
+            case "openai":
+                return "OpenAI";
+            case "anthropic":
+                return "Anthropic";
+            case "grok":
+                return "Grok";
+            default:
+                return providerCode;
+        }
+    }
+    
+    /**
+     * 获取提供商描述
+     */
+    private String getProviderDescription(String providerCode) {
+        switch (providerCode.toLowerCase()) {
+            case "deepseek":
+                return "DeepSeek AI模型提供商";
+            case "openai":
+                return "OpenAI GPT系列模型提供商";
+            case "anthropic":
+                return "Anthropic Claude系列模型提供商";
+            case "grok":
+                return "Grok AI模型提供商";
+            default:
+                return providerCode + " 模型提供商";
+        }
+    }
+    
+    /**
+     * 获取提供商图标
+     */
+    private String getProviderIcon(String providerCode) {
+        // 返回默认图标路径或null，后续可以从插件中获取
+        return null;
+    }
+    
+    /**
+     * 生成提供商图标URL
+     */
+    private String generateProviderIconUrl(String pluginId, String iconFileName) {
+        if (iconFileName == null || iconFileName.trim().isEmpty()) {
+            return null;
+        }
+        
+        try {
+            // 检查插件图标是否存在
+            if (pluginIconService.iconExists(pluginId, iconFileName)) {
+                return "/plugins/" + pluginId + "/icon";
+            }
+        } catch (Exception e) {
+            log.warn("Failed to check provider icon existence for plugin {}: {}", pluginId, iconFileName, e);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * 生成默认提供商图标URL
+     */
+    private String generateDefaultProviderIconUrl(String pluginId, String providerCode) {
+        try {
+            // 获取插件信息
+            Optional<PluginInfo> pluginInfoOpt = pluginRegistry.findByPluginId(pluginId);
+            if (pluginInfoOpt.isPresent()) {
+                PluginInfo pluginInfo = pluginInfoOpt.get();
+                String iconPath = pluginInfo.getIconPath();
+                
+                if (iconPath != null && pluginIconService.iconExists(pluginId, iconPath)) {
+                    return "/plugins/" + pluginId + "/icon";
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Failed to generate default provider icon URL for plugin {}: {}", pluginId, providerCode, e);
+        }
+        
+        return null;
+    }
+    
+    /**
+     * 获取提供商排序权重
+     */
+    private Integer getProviderSortOrder(String providerCode) {
+        switch (providerCode.toLowerCase()) {
+            case "openai":
+                return 1;
+            case "anthropic":
+                return 2;
+            case "deepseek":
+                return 3;
+            case "grok":
+                return 4;
+            default:
+                return 100;
+        }
+    }
+    
+    /**
+     * 获取支持的模型类型
+     */
+    private List<String> getSupportedModelTypes(ModelProvider modelProvider) {
+        List<String> supportedTypes = new ArrayList<>();
+        
+        // 检查提供商支持的模型类型
+        try {
+            if (modelProvider.supports(com.yonchain.ai.model.ModelType.TEXT)) {
+                supportedTypes.add("TEXT");
+            }
+            if (modelProvider.supports(com.yonchain.ai.model.ModelType.IMAGE)) {
+                supportedTypes.add("IMAGE");
+            }
+            if (modelProvider.supports(com.yonchain.ai.model.ModelType.EMBEDDING)) {
+                supportedTypes.add("EMBEDDING");
+            }
+        } catch (Exception e) {
+            log.debug("Failed to check model type support for provider: {}", modelProvider.getProviderName(), e);
+        }
+        
+        return supportedTypes;
+    }
+    
+    /**
+     * 将插件的凭证配置Schema转换为ModelConfigItem列表
+     * 
+     * @param credentialSchema 插件的凭证配置Schema
+     * @return ModelConfigItem列表
+     */
+    private List<com.yonchain.ai.api.model.ModelConfigItem> convertCredentialSchemaToConfigItems(Map<String, Object> credentialSchema) {
+        List<com.yonchain.ai.api.model.ModelConfigItem> configItems = new ArrayList<>();
+        
+        try {
+            // 获取credential_form_schemas
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> formSchemas = (List<Map<String, Object>>) credentialSchema.get("credential_form_schemas");
+            
+            if (formSchemas != null) {
+                for (Map<String, Object> schema : formSchemas) {
+                    com.yonchain.ai.api.model.ModelConfigItem configItem = new com.yonchain.ai.api.model.ModelConfigItem();
+                    
+                    // 设置变量名
+                    String variable = (String) schema.get("variable");
+                    configItem.setName(variable);
+                    
+                    // 设置标签
+                    @SuppressWarnings("unchecked")
+                    Map<String, String> labelMap = (Map<String, String>) schema.get("label");
+                    if (labelMap != null) {
+                        configItem.setTitle(labelMap.getOrDefault("zh_Hans", labelMap.get("en_US")));
+                    }
+                    
+                    // 设置占位符
+                    @SuppressWarnings("unchecked")
+                    Map<String, String> placeholderMap = (Map<String, String>) schema.get("placeholder");
+                    if (placeholderMap != null) {
+                        configItem.setDescription(placeholderMap.getOrDefault("zh_Hans", placeholderMap.get("en_US")));
+                    }
+                    
+                    // 设置类型
+                    String type = (String) schema.get("type");
+                    configItem.setType(convertInputType(type));
+                    
+                    // 设置是否必需
+                    Boolean required = (Boolean) schema.get("required");
+                    configItem.setRequired(required != null ? required : false);
+                    
+                    configItems.add(configItem);
+                }
+            }
+            
+        } catch (Exception e) {
+            log.error("Failed to convert credential schema to config items", e);
+        }
+        
+        return configItems;
+    }
+    
+    /**
+     * 转换输入类型
+     */
+    private String convertInputType(String pluginType) {
+        if (pluginType == null) return "text";
+        
+        switch (pluginType) {
+            case "secret-input":
+                return "password";
+            case "text-input":
+                return "text";
+            default:
+                return "text";
         }
     }
     

@@ -24,7 +24,7 @@ import java.util.List;
  * @author Cgy
  * @since 1.0.0
  */
-public class DefaultModelProvider implements ModelProvider {
+public class DefaultModelProvider implements ModelProviderInfo {
 
     /**
      * 主键ID

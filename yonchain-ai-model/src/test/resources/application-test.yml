@@ -1,0 +1,54 @@
+# 测试环境配置
+yonchain:
+  ai:
+    # 启用示例
+    example:
+      enabled: true
+    
+    # 注册中心配置
+    registry:
+      type: local
+    
+    # 启用Mock提供商
+    providers:
+      mock:
+        enabled: true
+      deepseek:
+        enabled: false  # 测试环境下禁用，避免真实API调用
+    
+    # 模型配置
+    # 注意：这些模型在系统中将注册为 provider:name 格式
+    models:
+      # 聊天模型 (注册为: mock:mock-chat)
+      chat:
+        - name: "mock-chat"
+          provider: "mock"
+          enabled: true
+          timeout: 5000
+          retryCount: 1
+          properties:
+            model: "mock-chat-model"
+            streaming: true
+      
+      # 图像模型 (注册为: mock:mock-image)
+      image:
+        - name: "mock-image"
+          provider: "mock"
+          enabled: true
+          timeout: 10000
+          retryCount: 1
+          properties:
+            model: "mock-image-model"
+
+# Spring Boot测试配置
+spring:
+  application:
+    name: yonchain-ai-model-test
+
+# 日志配置
+logging:
+  level:
+    com.yonchain.ai: DEBUG
+    org.springframework.ai: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

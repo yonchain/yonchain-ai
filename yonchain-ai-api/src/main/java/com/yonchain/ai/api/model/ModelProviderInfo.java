@@ -24,7 +24,7 @@ import java.util.List;
  * @author Cgy
  * @since 1.0.0
  */
-public interface ModelProvider {
+public interface ModelProviderInfo {
 
     /**
      * 获取主键ID

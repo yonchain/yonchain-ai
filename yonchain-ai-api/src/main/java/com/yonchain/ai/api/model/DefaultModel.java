@@ -67,10 +67,10 @@ public class DefaultModel implements ModelInfo {
      */
     private String type;
 
-    /**
+/*    *//**
      * 模型版本号
-     */
-    private String version;
+     *//*
+    private String version;*/
 
     /**
      * 排序权重
@@ -174,7 +174,7 @@ public class DefaultModel implements ModelInfo {
         this.type = type;
     }
 
-    @Override
+/*    @Override
     public String getVersion() {
         return version;
     }
@@ -182,7 +182,7 @@ public class DefaultModel implements ModelInfo {
     @Override
     public void setVersion(String version) {
         this.version = version;
-    }
+    }*/
 
     @Override
     public Integer getSortOrder() {
