@@ -119,6 +119,21 @@ public class DefaultModelFactory implements ModelFactory {
     }
     
     @Override
+    public void unregisterProvider(String providerName) {
+        if (providerName == null) {
+            logger.warn("Cannot unregister provider with null name");
+            return;
+        }
+        
+        ModelProvider removedProvider = providers.remove(providerName);
+        if (removedProvider != null) {
+            logger.info("Unregistered model provider: {}", providerName);
+        } else {
+            logger.warn("Provider not found for unregistration: {}", providerName);
+        }
+    }
+    
+    @Override
     public Set<String> getSupportedProviders() {
         return new HashSet<>(providers.keySet());
     }

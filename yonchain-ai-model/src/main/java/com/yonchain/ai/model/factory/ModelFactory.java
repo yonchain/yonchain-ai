@@ -75,6 +75,13 @@ public interface ModelFactory {
     void registerProvider(String provider, ModelProvider modelProvider);
     
     /**
+     * 注销模型提供商
+     * 
+     * @param provider 提供商名称
+     */
+    void unregisterProvider(String provider);
+    
+    /**
      * 获取所有支持的提供商
      * 
      * @return 提供商列表
