@@ -1,5 +1,6 @@
 package com.yonchain.ai.plugin.deepseek;
 
+import com.yonchain.ai.model.ModelConfig;
 import com.yonchain.ai.model.ModelMetadata;
 import com.yonchain.ai.model.ModelType;
 import com.yonchain.ai.model.provider.ModelProvider;
@@ -332,6 +333,11 @@ public class YamlBasedDeepSeekPlugin implements ModelPlugin {
             metadata.setVersion("1.0");
             metadata.setDescription("DeepSeek " + modelName + " 模型");
             
+            // 创建基础ModelConfig
+            Integer maxTokens = metadata.getMaxTokens() != null ? metadata.getMaxTokens() : 4096;
+            ModelConfig config = createBaseModelConfigFromYaml(modelName, maxTokens, modelConfig);
+            metadata.setConfig(config);
+            
             // 设置支持的特性
             List<String> features = (List<String>) modelConfig.get("features");
             if (features != null) {
@@ -384,6 +390,54 @@ public class YamlBasedDeepSeekPlugin implements ModelPlugin {
      */
     public Map<String, Object> getPluginConfig() {
         return pluginConfig;
+    }
+    
+    /**
+     * 从YAML配置创建基础模型配置
+     * 
+     * @param modelName 模型名称
+     * @param maxTokens 最大Token数
+     * @param yamlConfig YAML配置
+     * @return 基础模型配置
+     */
+    @SuppressWarnings("unchecked")
+    private ModelConfig createBaseModelConfigFromYaml(String modelName, Integer maxTokens, Map<String, Object> yamlConfig) {
+        ModelConfig config = new ModelConfig();
+        config.setName(modelName);
+        config.setProvider(getProviderName());
+        config.setType(ModelType.TEXT);
+        config.setEnabled(true);
+        
+        // 设置基础参数
+        config.setTimeout(30000); // 30秒超时
+        config.setRetryCount(3);
+        config.setMaxTokens(maxTokens);
+        
+        // 从YAML配置读取默认参数
+        Map<String, Object> modelProperties = (Map<String, Object>) yamlConfig.get("model_properties");
+        if (modelProperties != null) {
+            // 温度参数
+            Object temperature = modelProperties.get("temperature");
+            if (temperature instanceof Number) {
+                config.setTemperature(((Number) temperature).doubleValue());
+            } else {
+                config.setTemperature(0.7); // 默认温度
+            }
+            
+            // 其他参数
+            Object topP = modelProperties.get("top_p");
+            if (topP instanceof Number) {
+                config.setProperty("top_p", ((Number) topP).doubleValue());
+            }
+        } else {
+            config.setTemperature(0.7); // 默认温度
+        }
+        
+        // 设置模型特定属性
+        config.setProperty("streaming", true);
+        config.setProperty("function_calling", true);
+        
+        return config;
     }
     
     @Override

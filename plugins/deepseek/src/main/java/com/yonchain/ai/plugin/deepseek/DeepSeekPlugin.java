@@ -1,5 +1,6 @@
 package com.yonchain.ai.plugin.deepseek;
 
+import com.yonchain.ai.model.ModelConfig;
 import com.yonchain.ai.model.ModelMetadata;
 import com.yonchain.ai.model.ModelType;
 import com.yonchain.ai.model.provider.ModelProvider;
@@ -198,14 +199,55 @@ public class DeepSeekPlugin implements ModelPlugin {
         metadata.setType(ModelType.TEXT);
         metadata.setDescription(description);
         metadata.setDisplayName(displayName);
-      //  metadata.see(true);
         metadata.setVersion("1.0");
         
-      /*  // API配置（实际应用中应该从配置文件或环境变量读取）
-        metadata.setApiUrl("https://api.deepseek.com/v1");
-        metadata.setApiKey("${DEEPSEEK_API_KEY}"); // 占位符，实际使用时替换*/
+        // 创建基础ModelConfig
+        ModelConfig config = createBaseModelConfig(modelName);
+        metadata.setConfig(config);
         
         return metadata;
+    }
+    
+    /**
+     * 创建基础模型配置
+     * 
+     * @param modelName 模型名称
+     * @return 基础模型配置
+     */
+    private ModelConfig createBaseModelConfig(String modelName) {
+        ModelConfig config = new ModelConfig();
+        config.setApiKey("sk-3ef709a6aa404b00af299c288264a48f");
+        config.setName(modelName);
+        config.setProvider(PROVIDER_NAME);
+        config.setType(ModelType.TEXT);
+        config.setEnabled(true);
+        
+        // 设置基础参数
+        config.setTimeout(30000); // 30秒超时
+        config.setRetryCount(3);
+        config.setTemperature(0.7); // 默认温度
+        
+        // 根据模型设置最大Token数
+        switch (modelName) {
+            case "deepseek-chat":
+                config.setMaxTokens(32768);
+                break;
+            case "deepseek-coder":
+                config.setMaxTokens(16384);
+                break;
+            case "deepseek-reasoner":
+                config.setMaxTokens(8192);
+                break;
+            default:
+                config.setMaxTokens(4096);
+                break;
+        }
+        
+        // 设置模型特定属性
+        config.setProperty("streaming", true);
+        config.setProperty("function_calling", true);
+        
+        return config;
     }
     
     /**
