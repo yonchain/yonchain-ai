@@ -21,9 +21,9 @@ import java.util.stream.Stream;
  * @author yonchain
  */
 @Component
-public class PluginLoader {
+public class PluginClassLoader {
     
-    private static final Logger log = LoggerFactory.getLogger(PluginLoader.class);
+    private static final Logger log = LoggerFactory.getLogger(PluginClassLoader.class);
     
     // 缓存已加载的类加载器，避免重复加载
     private final Map<String, URLClassLoader> classLoaderCache = new ConcurrentHashMap<>();

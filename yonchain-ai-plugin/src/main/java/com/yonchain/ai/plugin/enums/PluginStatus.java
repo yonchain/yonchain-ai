@@ -20,22 +20,22 @@ public enum PluginStatus {
     /**
      * 已安装但禁用
      */
-    INSTALLED_DISABLED("installed_disabled", "已安装(禁用)"),
+    INSTALLED_DISABLED("installed_disabled", "已安装"),
     
     /**
      * 启用中
      */
-    ENABLING("enabling", "启用中"),
+    ENABLING("enabling", "启动中"),
     
     /**
      * 已安装且启用
      */
-    INSTALLED_ENABLED("installed_enabled", "已安装(启用)"),
+    ENABLED("enabled", "已启动"),
     
     /**
      * 禁用中
      */
-    DISABLING("disabling", "禁用中"),
+    DISABLING("disabling", "停止中"),
     
     /**
      * 卸载中
@@ -50,12 +50,12 @@ public enum PluginStatus {
     /**
      * 启用失败
      */
-    ENABLE_FAILED("enable_failed", "启用失败"),
+    ENABLE_FAILED("enable_failed", "启动失败"),
     
     /**
      * 禁用失败
      */
-    DISABLE_FAILED("disable_failed", "禁用失败"),
+    DISABLE_FAILED("disable_failed", "停止失败"),
     
     /**
      * 卸载失败
@@ -85,7 +85,7 @@ public enum PluginStatus {
      */
     public boolean isFinalState() {
         return this == INSTALLED_DISABLED || 
-               this == INSTALLED_ENABLED || 
+               this == ENABLED || 
                this == NOT_INSTALLED ||
                this == INSTALL_FAILED ||
                this == ENABLE_FAILED ||
@@ -123,7 +123,7 @@ public enum PluginStatus {
      * @return 插件是否可用
      */
     public boolean isAvailable() {
-        return this == INSTALLED_ENABLED;
+        return this == ENABLED;
     }
     
     /**

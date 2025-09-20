@@ -1,20 +1,24 @@
 package com.yonchain.ai.plugin.model;
 
+import com.yonchain.ai.model.ModelConfig;
 import com.yonchain.ai.model.ModelMetadata;
 import com.yonchain.ai.model.provider.ModelProvider;
 import com.yonchain.ai.model.registry.ModelRegistry;
+import com.yonchain.ai.model.factory.ModelFactory;
 import com.yonchain.ai.plugin.PluginAdapter;
 import com.yonchain.ai.plugin.PluginContext;
 import com.yonchain.ai.plugin.DefaultPluginContext;
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import com.yonchain.ai.plugin.entity.PluginInfo;
 import com.yonchain.ai.plugin.enums.PluginType;
-import com.yonchain.ai.plugin.loader.PluginLoader;
+import com.yonchain.ai.plugin.loader.PluginClassLoader;
 import com.yonchain.ai.plugin.registry.PluginRegistry;
 import com.yonchain.ai.plugin.exception.PluginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
@@ -37,7 +41,8 @@ public class ModelPluginAdapter implements PluginAdapter {
     
     private final PluginRegistry pluginRegistry;
     private final ModelRegistry modelRegistry;
-    private final PluginLoader pluginLoader;
+    private final ModelFactory modelFactory;
+    private final PluginClassLoader pluginClassLoader;
     private final ApplicationContext applicationContext;
     
     // 缓存插件实例和提供商
@@ -49,11 +54,13 @@ public class ModelPluginAdapter implements PluginAdapter {
     
     public ModelPluginAdapter(PluginRegistry pluginRegistry, 
                              ModelRegistry modelRegistry,
-                             PluginLoader pluginLoader,
+                             ModelFactory modelFactory,
+                              PluginClassLoader pluginClassLoader,
                              ApplicationContext applicationContext) {
         this.pluginRegistry = pluginRegistry;
         this.modelRegistry = modelRegistry;
-        this.pluginLoader = pluginLoader;
+        this.modelFactory = modelFactory;
+        this.pluginClassLoader = pluginClassLoader;
         this.applicationContext = applicationContext;
     }
     
@@ -132,19 +139,24 @@ public class ModelPluginAdapter implements PluginAdapter {
             // 4. 注册模型提供商到Spring容器
             registerModelProvider(pluginId, modelProvider);
             
-            // 5. 注册模型到模型注册中心
+            // 5. 注册模型提供商到模型工厂
+            modelFactory.registerProvider(modelProvider.getProviderName(), modelProvider);
+            
+            // 6. 注册模型到模型注册中心
             List<ModelMetadata> models = pluginInstance.getModels();
             if (models != null && !models.isEmpty()) {
                 for (ModelMetadata model : models) {
+                    // 检查并补充ModelConfig信息
+                    ensureModelConfigComplete(model, pluginId, pluginInstance);
                     modelRegistry.registerModel(model);
                     log.debug("Registered model: {} from plugin: {}", model.getModelId(), pluginId);
                 }
             }
             
-            // 6. 调用插件的启用回调
+            // 7. 调用插件的启用回调
             pluginInstance.onEnable();
             
-            // 7. 缓存插件实例和提供商
+            // 8. 缓存插件实例和提供商
             pluginInstances.put(pluginId, pluginInstance);
             modelProviders.put(pluginId, modelProvider);
             
@@ -172,7 +184,10 @@ public class ModelPluginAdapter implements PluginAdapter {
                 return;
             }
             
-            // 2. 注销模型
+            // 2. 获取模型提供商
+            ModelProvider modelProvider = pluginInstance.getProvider();
+            
+            // 3. 注销模型
             List<ModelMetadata> models = pluginInstance.getModels();
             if (models != null && !models.isEmpty()) {
                 for (ModelMetadata model : models) {
@@ -181,23 +196,28 @@ public class ModelPluginAdapter implements PluginAdapter {
                 }
             }
             
-            // 3. 调用插件的禁用回调
+            // 4. 调用插件的禁用回调
             pluginInstance.onDisable();
             
-            // 4. 调用插件的销毁方法
+            // 5. 调用插件的销毁方法
             pluginInstance.dispose();
             
-            // 5. 从Spring容器注销模型提供商
+            // 6. 从模型工厂注销模型提供商
+            if (modelProvider != null) {
+                modelFactory.unregisterProvider(modelProvider.getProviderName());
+            }
+            
+            // 7. 从Spring容器注销模型提供商
             unregisterModelProvider(pluginId);
             
-            // 6. 清理插件上下文
+            // 8. 清理插件上下文
             DefaultPluginContext pluginContext = pluginContexts.remove(pluginId);
             if (pluginContext != null) {
                 pluginContext.cleanup();
                 log.debug("Plugin context cleaned up for plugin: {}", pluginId);
             }
             
-            // 7. 清理缓存
+            // 9. 清理缓存
             pluginInstances.remove(pluginId);
             modelProviders.remove(pluginId);
             
@@ -232,7 +252,7 @@ public class ModelPluginAdapter implements PluginAdapter {
                 throw new IllegalArgumentException("Plugin path is not specified for plugin: " + pluginInfo.getPluginId());
             }
             
-            Class<?> pluginClass = pluginLoader.loadClass(pluginPath, providerSource);
+            Class<?> pluginClass = pluginClassLoader.loadClass(pluginPath, providerSource);
             
             if (!ModelPlugin.class.isAssignableFrom(pluginClass)) {
                 throw new IllegalArgumentException("Plugin class must implement ModelPlugin interface: " + providerSource);
@@ -330,12 +350,34 @@ public class ModelPluginAdapter implements PluginAdapter {
                     ((ConfigurableApplicationContext) applicationContext).getBeanFactory();
                 
                 String beanName = "modelProvider_" + pluginId;
+                
+                // 检查是否存在该singleton bean
                 if (beanFactory.containsSingleton(beanName)) {
-                    // Spring没有直接的destroySingleton方法，我们需要通过其他方式清理
-                    // 在这里我们只是移除引用，让GC处理
-                    log.debug("Marked model provider for cleanup: {}", beanName);
-                    // TODO: 考虑使用DefaultListableBeanFactory或其他方式来正确注销bean
+                    // 如果bean factory是DefaultListableBeanFactory，可以移除singleton
+                    if (beanFactory instanceof DefaultListableBeanFactory) {
+                        DefaultListableBeanFactory defaultBeanFactory = 
+                            (DefaultListableBeanFactory) beanFactory;
+                        
+                        // 销毁singleton bean实例
+                        defaultBeanFactory.destroySingleton(beanName);
+                        log.info("Successfully unregistered model provider bean: {}", beanName);
+                    } else {
+                        log.warn("BeanFactory is not DefaultListableBeanFactory, cannot destroy singleton: {}", beanName);
+                    }
                 }
+                
+                // 如果存在bean定义，也要移除
+                if (beanFactory instanceof BeanDefinitionRegistry) {
+                    BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+                    
+                    if (registry.containsBeanDefinition(beanName)) {
+                        registry.removeBeanDefinition(beanName);
+                        log.debug("Removed bean definition: {}", beanName);
+                    }
+                }
+                
+            } else {
+                log.warn("Application context is not configurable, cannot unregister model provider");
             }
         } catch (Exception e) {
             log.error("Failed to unregister model provider for plugin: {}", pluginId, e);
@@ -349,6 +391,9 @@ public class ModelPluginAdapter implements PluginAdapter {
      */
     private void cleanup(String pluginId) {
         try {
+            // 获取模型提供商（在移除前）
+            ModelProvider modelProvider = modelProviders.get(pluginId);
+            
             // 清理插件实例和提供商
             pluginInstances.remove(pluginId);
             modelProviders.remove(pluginId);
@@ -360,7 +405,12 @@ public class ModelPluginAdapter implements PluginAdapter {
                 log.debug("Plugin context cleaned up for plugin: {}", pluginId);
             }
             
-            // 注销模型提供商
+            // 从模型工厂注销模型提供商
+            if (modelProvider != null) {
+                modelFactory.unregisterProvider(modelProvider.getProviderName());
+            }
+            
+            // 从Spring容器注销模型提供商
             unregisterModelProvider(pluginId);
             
             log.debug("Cleaned up all resources for plugin: {}", pluginId);
@@ -396,5 +446,215 @@ public class ModelPluginAdapter implements PluginAdapter {
      */
     public Map<String, ModelPlugin> getEnabledPlugins() {
         return new ConcurrentHashMap<>(pluginInstances);
+    }
+    
+    /**
+     * 确保模型元数据包含完整的ModelConfig
+     * 
+     * @param metadata 模型元数据
+     * @param pluginId 插件ID
+     * @param pluginInstance 插件实例
+     */
+    private void ensureModelConfigComplete(ModelMetadata metadata, String pluginId, ModelPlugin pluginInstance) {
+        if (metadata.getConfig() == null) {
+            log.debug("Creating default ModelConfig for model: {} from plugin: {}", metadata.getModelId(), pluginId);
+            ModelConfig config = createDefaultModelConfig(metadata, pluginId);
+            metadata.setConfig(config);
+        } else {
+            log.debug("Supplementing existing ModelConfig for model: {} from plugin: {}", metadata.getModelId(), pluginId);
+            supplementModelConfig(metadata.getConfig(), pluginId);
+        }
+    }
+    
+    /**
+     * 为插件模型创建默认配置
+     * 
+     * @param metadata 模型元数据
+     * @param pluginId 插件ID
+     * @return 模型配置
+     */
+    private ModelConfig createDefaultModelConfig(ModelMetadata metadata, String pluginId) {
+        ModelConfig config = new ModelConfig();
+        config.setName(metadata.getName());
+        config.setProvider(metadata.getProvider());
+        config.setType(metadata.getType());
+        config.setEnabled(true);
+        
+        // 设置默认超时和重试
+        config.setTimeout(30000); // 30秒
+        config.setRetryCount(3);
+        
+        // 从模型元数据设置最大Token
+        if (metadata.getMaxTokens() != null) {
+            config.setMaxTokens(metadata.getMaxTokens());
+        }
+        
+        // 补充运行时配置
+        supplementModelConfig(config, pluginId);
+        
+        return config;
+    }
+    
+    /**
+     * 补充模型配置的运行时信息
+     * 
+     * @param config 模型配置
+     * @param pluginId 插件ID
+     */
+    private void supplementModelConfig(ModelConfig config, String pluginId) {
+        try {
+            DefaultPluginContext pluginContext = pluginContexts.get(pluginId);
+            if (pluginContext == null) {
+                log.warn("Plugin context not found for plugin: {}, using environment variables", pluginId);
+                supplementFromEnvironment(config);
+                return;
+            }
+            
+            // 从插件上下文获取用户配置
+            String apiKey = pluginContext.getPluginConfig("api_key");
+            String endpoint = pluginContext.getPluginConfig("endpoint_url");
+            
+            if (apiKey != null && !apiKey.trim().isEmpty()) {
+                config.setApiKey(apiKey);
+                log.debug("Set API key from plugin context for model: {}", config.getName());
+            } else {
+                // 从环境变量获取API Key
+                supplementApiKeyFromEnvironment(config);
+            }
+            
+            if (endpoint != null && !endpoint.trim().isEmpty()) {
+                config.setEndpoint(endpoint);
+                log.debug("Set endpoint from plugin context for model: {} -> {}", config.getName(), endpoint);
+            } else {
+                // 设置默认endpoint
+                setDefaultEndpoint(config);
+            }
+            
+            // 获取其他可选配置
+            supplementOptionalConfig(config, pluginContext);
+            
+        } catch (Exception e) {
+            log.error("Failed to supplement model config for plugin: {}, falling back to environment", pluginId, e);
+            supplementFromEnvironment(config);
+        }
+    }
+    
+    /**
+     * 从环境变量补充配置
+     * 
+     * @param config 模型配置
+     */
+    private void supplementFromEnvironment(ModelConfig config) {
+        supplementApiKeyFromEnvironment(config);
+        setDefaultEndpoint(config);
+    }
+    
+    /**
+     * 从环境变量获取API Key
+     * 
+     * @param config 模型配置
+     */
+    private void supplementApiKeyFromEnvironment(ModelConfig config) {
+        String provider = config.getProvider();
+        if (provider == null) {
+            return;
+        }
+        
+        // 根据提供商构建环境变量名
+        String envVarName = provider.toUpperCase() + "_API_KEY";
+        String apiKey = System.getenv(envVarName);
+        
+        if (apiKey != null && !apiKey.trim().isEmpty()) {
+            config.setApiKey(apiKey);
+            log.debug("Set API key from environment variable {} for model: {}", envVarName, config.getName());
+        } else {
+            log.warn("API key not found in environment variable {} for model: {}", envVarName, config.getName());
+        }
+    }
+    
+    /**
+     * 设置默认endpoint
+     * 
+     * @param config 模型配置
+     */
+    private void setDefaultEndpoint(ModelConfig config) {
+        String provider = config.getProvider();
+        if (provider == null) {
+            return;
+        }
+        
+        // 根据提供商设置默认endpoint
+        String defaultEndpoint = getDefaultEndpointForProvider(provider);
+        if (defaultEndpoint != null) {
+            config.setEndpoint(defaultEndpoint);
+            log.debug("Set default endpoint for provider {} -> {}", provider, defaultEndpoint);
+        }
+    }
+    
+    /**
+     * 获取提供商的默认endpoint
+     * 
+     * @param provider 提供商名称
+     * @return 默认endpoint
+     */
+    private String getDefaultEndpointForProvider(String provider) {
+        switch (provider.toLowerCase()) {
+            case "deepseek":
+                return "https://api.deepseek.com/v1";
+            case "openai":
+                return "https://api.openai.com/v1";
+            case "anthropic":
+                return "https://api.anthropic.com/v1";
+            case "grok":
+                return "https://api.x.ai/v1";
+            default:
+                return null;
+        }
+    }
+    
+    /**
+     * 补充可选配置
+     * 
+     * @param config 模型配置
+     * @param pluginContext 插件上下文
+     */
+    private void supplementOptionalConfig(ModelConfig config, DefaultPluginContext pluginContext) {
+        try {
+            // 温度参数
+            String temperatureStr = pluginContext.getPluginConfig("temperature");
+            if (temperatureStr != null) {
+                try {
+                    double temperature = Double.parseDouble(temperatureStr);
+                    config.setTemperature(temperature);
+                } catch (NumberFormatException e) {
+                    log.warn("Invalid temperature value: {} for model: {}", temperatureStr, config.getName());
+                }
+            }
+            
+            // 最大Token数
+            String maxTokensStr = pluginContext.getPluginConfig("max_tokens");
+            if (maxTokensStr != null) {
+                try {
+                    int maxTokens = Integer.parseInt(maxTokensStr);
+                    config.setMaxTokens(maxTokens);
+                } catch (NumberFormatException e) {
+                    log.warn("Invalid max_tokens value: {} for model: {}", maxTokensStr, config.getName());
+                }
+            }
+            
+            // 超时配置
+            String timeoutStr = pluginContext.getPluginConfig("timeout");
+            if (timeoutStr != null) {
+                try {
+                    int timeout = Integer.parseInt(timeoutStr);
+                    config.setTimeout(timeout);
+                } catch (NumberFormatException e) {
+                    log.warn("Invalid timeout value: {} for model: {}", timeoutStr, config.getName());
+                }
+            }
+            
+        } catch (Exception e) {
+            log.debug("No additional optional config found or error reading config for model: {}", config.getName());
+        }
     }
 }

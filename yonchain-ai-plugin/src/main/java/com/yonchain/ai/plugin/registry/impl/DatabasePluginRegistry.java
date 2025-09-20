@@ -3,8 +3,6 @@ package com.yonchain.ai.plugin.registry.impl;
 import com.yonchain.ai.plugin.Plugin;
 import com.yonchain.ai.plugin.entity.PluginEntity;
 import com.yonchain.ai.plugin.entity.PluginInfo;
-import com.yonchain.ai.plugin.enums.PluginStatus;
-import com.yonchain.ai.plugin.enums.PluginType;
 import com.yonchain.ai.plugin.mapper.PluginDependencyMapper;
 import com.yonchain.ai.plugin.mapper.PluginExtensionMapper;
 import com.yonchain.ai.plugin.mapper.PluginMapper;
@@ -105,7 +103,7 @@ public class DatabasePluginRegistry implements PluginRegistry {
     }
     
     @Override
-    public List<PluginInfo> findByType(PluginType type) {
+    public List<PluginInfo> findByType(String type) {
         if (type == null) {
             return new ArrayList<>();
         }
@@ -116,7 +114,7 @@ public class DatabasePluginRegistry implements PluginRegistry {
     }
     
     @Override
-    public List<PluginInfo> findByStatus(PluginStatus status) {
+    public List<PluginInfo> findByStatus(String status) {
         if (status == null) {
             return new ArrayList<>();
         }
@@ -128,12 +126,12 @@ public class DatabasePluginRegistry implements PluginRegistry {
     
     @Override
     public List<PluginInfo> findByEnabled(boolean enabled) {
-        PluginStatus targetStatus = enabled ? PluginStatus.INSTALLED_ENABLED : PluginStatus.INSTALLED_DISABLED;
+        String targetStatus = enabled ? "enabled" : "installed_disabled";
         return findByStatus(targetStatus);
     }
     
     @Override
-    public List<PluginInfo> findByTypeAndStatus(PluginType type, PluginStatus status) {
+    public List<PluginInfo> findByTypeAndStatus(String type, String status) {
         if (type == null || status == null) {
             return new ArrayList<>();
         }
@@ -225,7 +223,7 @@ public class DatabasePluginRegistry implements PluginRegistry {
     }
     
     @Override
-    public long countByType(PluginType type) {
+    public long countByType(String type) {
         if (type == null) {
             return 0;
         }
@@ -233,7 +231,7 @@ public class DatabasePluginRegistry implements PluginRegistry {
     }
     
     @Override
-    public long countByStatus(PluginStatus status) {
+    public long countByStatus(String status) {
         if (status == null) {
             return 0;
         }
@@ -242,7 +240,7 @@ public class DatabasePluginRegistry implements PluginRegistry {
     
     @Override
     public long countByEnabled() {
-        return countByStatus(PluginStatus.INSTALLED_ENABLED);
+        return countByStatus("enabled");
     }
     
     // ========== 扩展方法（非接口方法） ==========
@@ -309,7 +307,7 @@ public class DatabasePluginRegistry implements PluginRegistry {
      * @param status 插件状态
      * @return 插件实体列表
      */
-    public List<PluginEntity> getPluginEntitiesByStatus(PluginStatus status) {
+    public List<PluginEntity> getPluginEntitiesByStatus(String status) {
         return pluginMapper.findByStatus(status);
     }
     
@@ -319,7 +317,7 @@ public class DatabasePluginRegistry implements PluginRegistry {
      * @param type 插件类型
      * @return 插件实体列表
      */
-    public List<PluginEntity> getPluginEntitiesByType(PluginType type) {
+    public List<PluginEntity> getPluginEntitiesByType(String type) {
         return pluginMapper.findByType(type);
     }
     
@@ -330,7 +328,7 @@ public class DatabasePluginRegistry implements PluginRegistry {
      * @param status 新状态
      */
     @Transactional
-    public void updatePluginStatus(String pluginId, PluginStatus status) {
+    public void updatePluginStatus(String pluginId, String status) {
         pluginMapper.updateStatus(pluginId, status);
         log.info("Updated plugin {} status to {}", pluginId, status);
     }
@@ -360,7 +358,7 @@ public class DatabasePluginRegistry implements PluginRegistry {
      * @param status 插件状态
      * @return 插件数量
      */
-    public long countPluginsByStatus(PluginStatus status) {
+    public long countPluginsByStatus(String status) {
         return pluginMapper.countByStatus(status);
     }
     
@@ -449,7 +447,7 @@ public class DatabasePluginRegistry implements PluginRegistry {
         }
         
         // 根据状态设置enabled字段
-        pluginInfo.setEnabled(entity.getStatus() == PluginStatus.INSTALLED_ENABLED);
+        pluginInfo.setEnabled("enabled".equals(entity.getStatus()));
         
         return pluginInfo;
     }

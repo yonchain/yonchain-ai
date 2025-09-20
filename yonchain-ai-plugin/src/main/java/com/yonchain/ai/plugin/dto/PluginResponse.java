@@ -53,12 +53,12 @@ public class PluginResponse {
     /**
      * 插件类型
      */
-    private PluginType type;
+    private String type;
     
     /**
      * 插件状态
      */
-    private PluginStatus status;
+    private String status;
     
     /**
      * 是否启用
@@ -149,11 +149,11 @@ public class PluginResponse {
         return vendor;
     }
     
-    public PluginType getType() {
+    public String getType() {
         return type;
     }
     
-    public PluginStatus getStatus() {
+    public String getStatus() {
         return status;
     }
     
@@ -206,11 +206,11 @@ public class PluginResponse {
         this.vendor = vendor;
     }
     
-    public void setType(PluginType type) {
+    public void setType(String type) {
         this.type = type;
     }
     
-    public void setStatus(PluginStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
     

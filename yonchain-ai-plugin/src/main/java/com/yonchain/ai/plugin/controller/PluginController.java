@@ -11,6 +11,7 @@ import com.yonchain.ai.plugin.service.PluginIconService;
 import com.yonchain.ai.plugin.parser.PluginParser;
 import com.yonchain.ai.plugin.parser.PluginParseException;
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -70,9 +71,9 @@ public class PluginController {
      * 获取所有插件信息
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PluginResponse>>> getAllPlugins() {
+    public ResponseEntity<ApiResponse<List<PluginResponse>>> getPlugins() {
         try {
-            List<PluginInfo> plugins = pluginManager.getAllPlugins();
+            List<PluginInfo> plugins = pluginManager.getPlugins();
             List<PluginResponse> pluginResponses = plugins.stream()
                     .map(plugin -> PluginResponse.fromPluginInfo(plugin, pluginIconService))
                     .collect(java.util.stream.Collectors.toList());
@@ -425,17 +426,17 @@ public class PluginController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> getPluginStats() {
         try {
             Map<String, Object> stats = new HashMap<>();
-            List<PluginInfo> allPlugins = pluginManager.getAllPlugins();
+            List<PluginInfo> allPlugins = pluginManager.getPlugins();
             
             stats.put("total", allPlugins.size());
             stats.put("enabled", allPlugins.stream().mapToLong(p -> p.isAvailable() ? 1 : 0).sum());
-            stats.put("disabled", allPlugins.stream().mapToLong(p -> !p.isAvailable() && p.getStatus() == PluginStatus.INSTALLED_DISABLED ? 1 : 0).sum());
+            stats.put("disabled", allPlugins.stream().mapToLong(p -> !p.isAvailable() && PluginStatus.fromCode(p.getStatus()) == PluginStatus.INSTALLED_DISABLED ? 1 : 0).sum());
             stats.put("failed", allPlugins.stream().mapToLong(p -> p.isFailedState() ? 1 : 0).sum());
             
             // 按类型统计
             Map<String, Long> byType = new HashMap<>();
             for (PluginType type : PluginType.values()) {
-                long count = allPlugins.stream().mapToLong(p -> p.getType() == type ? 1 : 0).sum();
+                long count = allPlugins.stream().mapToLong(p -> StringUtils.isNotBlank(p.getType()) && p.getType().equals(type) ? 1 : 0).sum();
                 byType.put(type.getCode(), count);
             }
             stats.put("byType", byType);

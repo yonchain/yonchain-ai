@@ -131,7 +131,7 @@ CREATE INDEX idx_plugin_svc_name ON plugin_services(service_name);
 -- 插件状态枚举值说明
 -- =====================================================
 -- INSTALLED_DISABLED: 已安装但禁用
--- INSTALLED_ENABLED: 已安装且启用
+-- ENABLED: 已安装且启用
 -- ENABLING: 启用中
 -- DISABLING: 禁用中
 -- UNINSTALLING: 卸载中

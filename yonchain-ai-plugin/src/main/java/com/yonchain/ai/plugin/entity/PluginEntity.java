@@ -1,8 +1,5 @@
 package com.yonchain.ai.plugin.entity;
 
-import com.yonchain.ai.plugin.enums.PluginStatus;
-import com.yonchain.ai.plugin.enums.PluginType;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +17,8 @@ public class PluginEntity {
     private String description;
     private String author;
     private String homepage;
-    private PluginType type;
-    private PluginStatus status;
+    private String type;
+    private String status;
     private String pluginPath;
     private String mainClass;
     private String providerSource;
@@ -42,7 +39,7 @@ public class PluginEntity {
     public PluginEntity() {}
     
     // 带参数构造函数
-    public PluginEntity(String pluginId, String name, String version, PluginType type, PluginStatus status) {
+    public PluginEntity(String pluginId, String name, String version, String type, String status) {
         this.pluginId = pluginId;
         this.name = name;
         this.version = version;
@@ -99,19 +96,19 @@ public class PluginEntity {
         this.homepage = homepage;
     }
     
-    public PluginType getType() {
+    public String getType() {
         return type;
     }
     
-    public void setType(PluginType type) {
+    public void setType(String type) {
         this.type = type;
     }
     
-    public PluginStatus getStatus() {
+    public String getStatus() {
         return status;
     }
     
-    public void setStatus(PluginStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
     

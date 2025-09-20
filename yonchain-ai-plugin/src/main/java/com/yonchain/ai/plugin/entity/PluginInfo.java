@@ -1,8 +1,6 @@
 package com.yonchain.ai.plugin.entity;
 
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
-import com.yonchain.ai.plugin.enums.PluginStatus;
-import com.yonchain.ai.plugin.enums.PluginType;
 
 import java.time.LocalDateTime;
 
@@ -52,12 +50,12 @@ public class PluginInfo {
     /**
      * 插件类型
      */
-    private PluginType type;
+    private String type;
     
     /**
      * 插件状态
      */
-    private PluginStatus status;
+    private String status;
     
     /**
      * 插件路径
@@ -124,7 +122,7 @@ public class PluginInfo {
         this.updateTime = LocalDateTime.now();
         this.enabled = false;
         this.priority = 0;
-        this.status = PluginStatus.NOT_INSTALLED;
+        this.status = "not_installed";
     }
     
     /**
@@ -148,17 +146,11 @@ public class PluginInfo {
         
         pluginInfo.setAuthor(descriptor.getAuthor());
         
-        // 转换插件类型字符串为枚举
+        // 直接设置插件类型字符串
         if (descriptor.getType() != null) {
-            try {
-                PluginType pluginType = PluginType.fromCode(descriptor.getType());
-                pluginInfo.setType(pluginType);
-            } catch (IllegalArgumentException e) {
-                // 如果类型不匹配，默认为MODEL类型
-                pluginInfo.setType(PluginType.MODEL);
-            }
+            pluginInfo.setType(descriptor.getType());
         } else {
-            pluginInfo.setType(PluginType.MODEL);
+            pluginInfo.setType("model"); // 默认为model类型
         }
         
         pluginInfo.setPluginPath(descriptor.getPluginPath() != null ? descriptor.getPluginPath().toString() : null);
@@ -224,19 +216,19 @@ public class PluginInfo {
         this.vendor = vendor;
     }
     
-    public PluginType getType() {
+    public String getType() {
         return type;
     }
     
-    public void setType(PluginType type) {
+    public void setType(String type) {
         this.type = type;
     }
     
-    public PluginStatus getStatus() {
+    public String getStatus() {
         return status;
     }
     
-    public void setStatus(PluginStatus status) {
+    public void setStatus(String status) {
         this.status = status;
         this.updateTime = LocalDateTime.now();
     }
@@ -336,7 +328,7 @@ public class PluginInfo {
      * @return 是否可用
      */
     public boolean isAvailable() {
-        return status != null && status.isAvailable() && Boolean.TRUE.equals(enabled);
+        return "enabled".equals(status) && Boolean.TRUE.equals(enabled);
     }
     
     /**
@@ -345,7 +337,8 @@ public class PluginInfo {
      * @return 是否为失败状态
      */
     public boolean isFailedState() {
-        return status != null && status.isFailedState();
+        return status != null && (status.endsWith("_failed") || "install_failed".equals(status) || 
+                "enable_failed".equals(status) || "disable_failed".equals(status) || "uninstall_failed".equals(status));
     }
     
     /**
@@ -354,7 +347,8 @@ public class PluginInfo {
      * @return 是否正在进行操作
      */
     public boolean isTransitionState() {
-        return status != null && status.isTransitionState();
+        return status != null && ("installing".equals(status) || "enabling".equals(status) || 
+                "disabling".equals(status) || "uninstalling".equals(status));
     }
     
     /**

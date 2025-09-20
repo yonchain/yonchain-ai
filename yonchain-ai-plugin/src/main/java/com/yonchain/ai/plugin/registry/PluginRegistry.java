@@ -1,8 +1,6 @@
 package com.yonchain.ai.plugin.registry;
 
 import com.yonchain.ai.plugin.entity.PluginInfo;
-import com.yonchain.ai.plugin.enums.PluginStatus;
-import com.yonchain.ai.plugin.enums.PluginType;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +42,7 @@ public interface PluginRegistry {
      * @param type 插件类型
      * @return 插件信息列表
      */
-    List<PluginInfo> findByType(PluginType type);
+    List<PluginInfo> findByType(String type);
     
     /**
      * 根据插件状态查找插件信息
@@ -52,7 +50,7 @@ public interface PluginRegistry {
      * @param status 插件状态
      * @return 插件信息列表
      */
-    List<PluginInfo> findByStatus(PluginStatus status);
+    List<PluginInfo> findByStatus(String status);
     
     /**
      * 根据启用状态查找插件信息
@@ -69,7 +67,7 @@ public interface PluginRegistry {
      * @param status 插件状态
      * @return 插件信息列表
      */
-    List<PluginInfo> findByTypeAndStatus(PluginType type, PluginStatus status);
+    List<PluginInfo> findByTypeAndStatus(String type, String status);
     
     /**
      * 查找所有插件信息
@@ -118,7 +116,7 @@ public interface PluginRegistry {
      * @param type 插件类型
      * @return 插件数量
      */
-    long countByType(PluginType type);
+    long countByType(String type);
     
     /**
      * 根据插件状态统计插件数量
@@ -126,7 +124,7 @@ public interface PluginRegistry {
      * @param status 插件状态
      * @return 插件数量
      */
-    long countByStatus(PluginStatus status);
+    long countByStatus(String status);
     
     /**
      * 统计启用的插件数量

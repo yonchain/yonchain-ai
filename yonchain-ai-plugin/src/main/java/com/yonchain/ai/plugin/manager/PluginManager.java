@@ -3,8 +3,6 @@ package com.yonchain.ai.plugin.manager;
 import com.yonchain.ai.plugin.PluginAdapter;
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import com.yonchain.ai.plugin.entity.PluginInfo;
-import com.yonchain.ai.plugin.enums.PluginStatus;
-import com.yonchain.ai.plugin.enums.PluginType;
 import com.yonchain.ai.plugin.parser.PluginParser;
 import com.yonchain.ai.plugin.parser.PluginParseException;
 import com.yonchain.ai.plugin.registry.PluginRegistry;
@@ -40,7 +38,7 @@ public class PluginManager {
 
     private final PluginRegistry pluginRegistry;
     private final PluginParser pluginParser;
-    private final Map<PluginType, PluginAdapter> adapters;
+    private final Map<String, PluginAdapter> adapters;
     private final PluginLifecycleEventPublisher eventPublisher;
     private final PluginIconService pluginIconService;
 
@@ -59,7 +57,7 @@ public class PluginManager {
         // 构建适配器映射
         this.adapters = adapters.stream()
                 .collect(java.util.stream.Collectors.toMap(
-                        PluginAdapter::getSupportedType,
+                        adapter -> adapter.getSupportedType().getCode(),
                         adapter -> adapter
                 ));
 
@@ -115,7 +113,7 @@ public class PluginManager {
             }
 
             // 5. 获取对应的适配器
-            PluginType pluginType = PluginType.fromCode(descriptor.getType());
+            String pluginType = descriptor.getType();
             PluginAdapter adapter = getAdapterForType(pluginType);
             if (adapter == null) {
                 throw new PluginInstallException("No adapter found for plugin type: " + pluginType);
@@ -123,7 +121,7 @@ public class PluginManager {
 
             // 6. 创建插件信息
             PluginInfo pluginInfo = PluginInfo.fromDescriptor(descriptor);
-            pluginInfo.setStatus(PluginStatus.INSTALLING);
+            pluginInfo.setStatus("installing");
 
             // 7. 保存插件信息
             pluginRegistry.save(pluginInfo);
@@ -146,7 +144,7 @@ public class PluginManager {
                 adapter.onPluginInstall(descriptor);
 
                 // 10. 更新状态为已安装但禁用
-                pluginInfo.setStatus(PluginStatus.INSTALLED_DISABLED);
+                pluginInfo.setStatus("installed_disabled");
                 pluginRegistry.save(pluginInfo);
 
                 // 11. 发布安装事件
@@ -158,7 +156,7 @@ public class PluginManager {
                 log.error("Plugin installation failed: {}", pluginId, e);
 
                 // 更新状态为安装失败
-                pluginInfo.setStatus(PluginStatus.INSTALL_FAILED);
+                pluginInfo.setStatus("install_failed");
                 pluginRegistry.save(pluginInfo);
 
                 throw new PluginInstallException("Plugin installation failed: " + e.getMessage(), e);
@@ -279,19 +277,19 @@ public class PluginManager {
                     .orElseThrow(() -> new PluginInstallException("Plugin not found: " + pluginId));
 
             // 2. 检查插件状态
-            if (pluginInfo.getStatus() != PluginStatus.INSTALLED_DISABLED) {
+            if (!"installed_disabled".equals(pluginInfo.getStatus())) {
                 throw new PluginInstallException("Plugin is not in disabled state: " + pluginInfo.getStatus());
             }
 
             // 3. 获取对应的适配器
-            PluginType pluginType = pluginInfo.getType();
+            String pluginType = pluginInfo.getType();
             PluginAdapter adapter = getAdapterForType(pluginType);
             if (adapter == null) {
                 throw new PluginInstallException("No adapter found for plugin type: " + pluginType);
             }
 
             // 4. 更新状态为启用中
-            pluginInfo.setStatus(PluginStatus.ENABLING);
+            pluginInfo.setStatus("enabling");
             pluginRegistry.save(pluginInfo);
 
             try {
@@ -299,7 +297,7 @@ public class PluginManager {
                 adapter.onPluginEnable(pluginId);
 
                 // 6. 更新状态为已启用
-                pluginInfo.setStatus(PluginStatus.INSTALLED_ENABLED);
+                pluginInfo.setStatus("enabled");
                 pluginRegistry.save(pluginInfo);
 
                 // 7. 发布启用事件
@@ -311,7 +309,7 @@ public class PluginManager {
                 log.error("Plugin enable failed: {}", pluginId, e);
 
                 // 启用失败，回滚状态
-                pluginInfo.setStatus(PluginStatus.INSTALLED_DISABLED);
+                pluginInfo.setStatus("installed_disabled");
                 pluginRegistry.save(pluginInfo);
 
                 throw new PluginInstallException("Plugin enable failed: " + e.getMessage(), e);
@@ -344,19 +342,19 @@ public class PluginManager {
                     .orElseThrow(() -> new PluginInstallException("Plugin not found: " + pluginId));
 
             // 2. 检查插件状态
-            if (pluginInfo.getStatus() != PluginStatus.INSTALLED_ENABLED) {
+            if (!"enabled".equals(pluginInfo.getStatus())) {
                 throw new PluginInstallException("Plugin is not in enabled state: " + pluginInfo.getStatus());
             }
 
             // 3. 获取对应的适配器
-            PluginType pluginType = pluginInfo.getType();
+            String pluginType = pluginInfo.getType();
             PluginAdapter adapter = getAdapterForType(pluginType);
             if (adapter == null) {
                 throw new PluginInstallException("No adapter found for plugin type: " + pluginType);
             }
 
             // 4. 更新状态为禁用中
-            pluginInfo.setStatus(PluginStatus.DISABLING);
+            pluginInfo.setStatus("disabling");
             pluginRegistry.save(pluginInfo);
 
             try {
@@ -364,7 +362,7 @@ public class PluginManager {
                 adapter.onPluginDisable(pluginId);
 
                 // 6. 更新状态为已禁用
-                pluginInfo.setStatus(PluginStatus.INSTALLED_DISABLED);
+                pluginInfo.setStatus("installed_disabled");
                 pluginRegistry.save(pluginInfo);
 
                 // 7. 发布禁用事件
@@ -376,7 +374,7 @@ public class PluginManager {
                 log.error("Plugin disable failed: {}", pluginId, e);
 
                 // 禁用失败，回滚状态
-                pluginInfo.setStatus(PluginStatus.INSTALLED_ENABLED);
+                pluginInfo.setStatus("enabled");
                 pluginRegistry.save(pluginInfo);
 
                 throw new PluginInstallException("Plugin disable failed: " + e.getMessage(), e);
@@ -409,19 +407,19 @@ public class PluginManager {
                     .orElseThrow(() -> new PluginInstallException("Plugin not found: " + pluginId));
 
             // 2. 如果插件处于启用状态，先禁用
-            if (pluginInfo.getStatus() == PluginStatus.INSTALLED_ENABLED) {
+            if ("enabled".equals(pluginInfo.getStatus())) {
                 disablePlugin(pluginId);
             }
 
             // 3. 获取对应的适配器
-            PluginType pluginType = pluginInfo.getType();
+            String pluginType = pluginInfo.getType();
             PluginAdapter adapter = getAdapterForType(pluginType);
             if (adapter == null) {
                 throw new PluginInstallException("No adapter found for plugin type: " + pluginType);
             }
 
             // 4. 更新状态为卸载中
-            pluginInfo.setStatus(PluginStatus.UNINSTALLING);
+            pluginInfo.setStatus("uninstalling");
             pluginRegistry.save(pluginInfo);
 
             try {
@@ -446,7 +444,7 @@ public class PluginManager {
                 log.error("Plugin uninstallation failed: {}", pluginId, e);
 
                 // 更新状态为卸载失败
-                pluginInfo.setStatus(PluginStatus.UNINSTALL_FAILED);
+                pluginInfo.setStatus("uninstall_failed");
                 pluginRegistry.save(pluginInfo);
 
                 throw new PluginInstallException("Plugin uninstallation failed: " + e.getMessage(), e);
@@ -463,7 +461,7 @@ public class PluginManager {
     /**
      * 获取所有插件
      */
-    public List<PluginInfo> getAllPlugins() {
+    public List<PluginInfo> getPlugins() {
         return pluginRegistry.findAll();
     }
 
@@ -478,7 +476,7 @@ public class PluginManager {
      * 获取已启用的插件
      */
     public List<PluginInfo> getEnabledPlugins() {
-        return pluginRegistry.findByStatus(PluginStatus.INSTALLED_ENABLED);
+        return pluginRegistry.findByStatus("enabled");
     }
 
     /**
@@ -488,12 +486,12 @@ public class PluginManager {
         log.info("Loading installed plugins...");
 
         try {
-            List<PluginInfo> installedPlugins = pluginRegistry.findByStatus(PluginStatus.INSTALLED_ENABLED);
+            List<PluginInfo> installedPlugins = pluginRegistry.findByStatus("enabled");
 
             for (PluginInfo pluginInfo : installedPlugins) {
                 try {
                     // 重新启用已启用的插件
-                    PluginType pluginType = pluginInfo.getType();
+                    String pluginType = pluginInfo.getType();
                     PluginAdapter adapter = getAdapterForType(pluginType);
 
                     if (adapter != null) {
@@ -529,7 +527,7 @@ public class PluginManager {
     /**
      * 获取插件类型对应的适配器
      */
-    private PluginAdapter getAdapterForType(PluginType pluginType) {
+    private PluginAdapter getAdapterForType(String pluginType) {
         return adapters.get(pluginType);
     }
 }

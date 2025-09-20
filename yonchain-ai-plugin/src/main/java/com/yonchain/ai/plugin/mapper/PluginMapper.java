@@ -1,8 +1,6 @@
 package com.yonchain.ai.plugin.mapper;
 
 import com.yonchain.ai.plugin.entity.PluginEntity;
-import com.yonchain.ai.plugin.enums.PluginStatus;
-import com.yonchain.ai.plugin.enums.PluginType;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -73,7 +71,7 @@ public interface PluginMapper {
      */
     @Update("UPDATE plugin_info SET status = #{status}, updated_at = CURRENT_TIMESTAMP " +
             "WHERE plugin_id = #{pluginId}")
-    int updateStatus(@Param("pluginId") String pluginId, @Param("status") PluginStatus status);
+    int updateStatus(@Param("pluginId") String pluginId, @Param("status") String status);
     
     /**
      * 根据插件ID查询插件记录
@@ -168,7 +166,7 @@ public interface PluginMapper {
         @Result(property = "enabledAt", column = "enabled_at"),
         @Result(property = "disabledAt", column = "disabled_at")
     })
-    List<PluginEntity> selectByType(PluginType type);
+    List<PluginEntity> selectByType(String type);
     
     /**
      * 根据插件状态查询插件记录
@@ -199,7 +197,7 @@ public interface PluginMapper {
         @Result(property = "enabledAt", column = "enabled_at"),
         @Result(property = "disabledAt", column = "disabled_at")
     })
-    List<PluginEntity> selectByStatus(PluginStatus status);
+    List<PluginEntity> selectByStatus(String status);
     
     /**
      * 根据插件名称模糊查询
@@ -276,7 +274,7 @@ public interface PluginMapper {
      * @param type 插件类型
      * @return 插件实体列表
      */
-    default List<PluginEntity> findByType(PluginType type) {
+    default List<PluginEntity> findByType(String type) {
         return selectByType(type);
     }
     
@@ -286,7 +284,7 @@ public interface PluginMapper {
      * @param status 插件状态
      * @return 插件实体列表
      */
-    default List<PluginEntity> findByStatus(PluginStatus status) {
+    default List<PluginEntity> findByStatus(String status) {
         return selectByStatus(status);
     }
     
@@ -315,5 +313,5 @@ public interface PluginMapper {
      * @return 插件数量
      */
     @Select("SELECT COUNT(*) FROM plugin_info WHERE status = #{status}")
-    long countByStatus(PluginStatus status);
+    long countByStatus(String status);
 }
