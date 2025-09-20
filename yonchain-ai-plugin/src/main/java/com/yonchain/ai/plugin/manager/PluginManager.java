@@ -309,7 +309,7 @@ public class PluginManager {
                 log.error("Plugin enable failed: {}", pluginId, e);
 
                 // 启用失败，回滚状态
-                pluginInfo.setStatus("DISABLED");
+                pluginInfo.setStatus("disabled");
                 pluginRegistry.save(pluginInfo);
 
                 throw new PluginInstallException("Plugin enable failed: " + e.getMessage(), e);
@@ -362,7 +362,7 @@ public class PluginManager {
                 adapter.onPluginDisable(pluginId);
 
                 // 6. 更新状态为已禁用
-                pluginInfo.setStatus("DISABLED");
+                pluginInfo.setStatus("disabled");
                 pluginRegistry.save(pluginInfo);
 
                 // 7. 发布禁用事件

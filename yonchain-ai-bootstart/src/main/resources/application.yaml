@@ -34,6 +34,12 @@ yonchain:
      #     enabled: true
       #    api_key: sk-3ef709a6aa404b00af299c288264a48f
 
+  # 插件系统配置
+  plugin:
+    auto-load-enabled: true      # 是否启用插件自动加载，默认true
+    auto-load-delay: 5000        # 自动加载延迟时间（毫秒），默认5000ms
+    work-dir: ${java.io.tmpdir}/yonchain-plugins  # 插件工作目录
+
   security:
 
     password-encoder-type: dify@pbkdf2

@@ -657,4 +657,5 @@ public class ModelPluginAdapter implements PluginAdapter {
             log.debug("No additional optional config found or error reading config for model: {}", config.getName());
         }
     }
+    
 }
