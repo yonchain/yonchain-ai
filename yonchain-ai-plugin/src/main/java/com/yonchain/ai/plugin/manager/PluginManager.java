@@ -144,7 +144,7 @@ public class PluginManager {
                 adapter.onPluginInstall(descriptor);
 
                 // 10. 更新状态为已安装但禁用
-                pluginInfo.setStatus("installed_disabled");
+                pluginInfo.setStatus("disabled");
                 pluginRegistry.save(pluginInfo);
 
                 // 11. 发布安装事件
@@ -277,7 +277,7 @@ public class PluginManager {
                     .orElseThrow(() -> new PluginInstallException("Plugin not found: " + pluginId));
 
             // 2. 检查插件状态
-            if (!"installed_disabled".equals(pluginInfo.getStatus())) {
+            if (!"disabled".equals(pluginInfo.getStatus())) {
                 throw new PluginInstallException("Plugin is not in disabled state: " + pluginInfo.getStatus());
             }
 
@@ -309,7 +309,7 @@ public class PluginManager {
                 log.error("Plugin enable failed: {}", pluginId, e);
 
                 // 启用失败，回滚状态
-                pluginInfo.setStatus("installed_disabled");
+                pluginInfo.setStatus("DISABLED");
                 pluginRegistry.save(pluginInfo);
 
                 throw new PluginInstallException("Plugin enable failed: " + e.getMessage(), e);
@@ -362,7 +362,7 @@ public class PluginManager {
                 adapter.onPluginDisable(pluginId);
 
                 // 6. 更新状态为已禁用
-                pluginInfo.setStatus("installed_disabled");
+                pluginInfo.setStatus("DISABLED");
                 pluginRegistry.save(pluginInfo);
 
                 // 7. 发布禁用事件

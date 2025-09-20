@@ -18,9 +18,9 @@ public enum PluginStatus {
     INSTALLING("installing", "安装中"),
     
     /**
-     * 已安装但禁用
+     * 禁用
      */
-    INSTALLED_DISABLED("installed_disabled", "已安装"),
+    DISABLED("disabled", "已禁用"),
     
     /**
      * 启用中
@@ -84,7 +84,7 @@ public enum PluginStatus {
      * @return 是否为最终状态
      */
     public boolean isFinalState() {
-        return this == INSTALLED_DISABLED || 
+        return this == DISABLED || 
                this == ENABLED || 
                this == NOT_INSTALLED ||
                this == INSTALL_FAILED ||

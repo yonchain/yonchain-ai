@@ -430,7 +430,7 @@ public class PluginController {
             
             stats.put("total", allPlugins.size());
             stats.put("enabled", allPlugins.stream().mapToLong(p -> p.isAvailable() ? 1 : 0).sum());
-            stats.put("disabled", allPlugins.stream().mapToLong(p -> !p.isAvailable() && PluginStatus.fromCode(p.getStatus()) == PluginStatus.INSTALLED_DISABLED ? 1 : 0).sum());
+            stats.put("disabled", allPlugins.stream().mapToLong(p -> !p.isAvailable() && PluginStatus.fromCode(p.getStatus()) == PluginStatus.DISABLED ? 1 : 0).sum());
             stats.put("failed", allPlugins.stream().mapToLong(p -> p.isFailedState() ? 1 : 0).sum());
             
             // 按类型统计

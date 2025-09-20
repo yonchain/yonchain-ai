@@ -126,7 +126,7 @@ public class DatabasePluginRegistry implements PluginRegistry {
     
     @Override
     public List<PluginInfo> findByEnabled(boolean enabled) {
-        String targetStatus = enabled ? "enabled" : "installed_disabled";
+        String targetStatus = enabled ? "enabled" : "DISABLED";
         return findByStatus(targetStatus);
     }
     

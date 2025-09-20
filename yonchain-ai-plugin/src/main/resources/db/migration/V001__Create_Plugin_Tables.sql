@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS plugin_info (
     author VARCHAR(100),
     homepage VARCHAR(500),
     type VARCHAR(20) NOT NULL DEFAULT 'MODEL',
-    status VARCHAR(20) NOT NULL DEFAULT 'INSTALLED_DISABLED',
+    status VARCHAR(20) NOT NULL DEFAULT 'DISABLED',
     plugin_path VARCHAR(1000),
     main_class VARCHAR(500),
     provider_source VARCHAR(500),
@@ -130,7 +130,7 @@ CREATE INDEX idx_plugin_svc_name ON plugin_services(service_name);
 -- =====================================================
 -- 插件状态枚举值说明
 -- =====================================================
--- INSTALLED_DISABLED: 已安装但禁用
+-- DISABLED: 已安装但禁用
 -- ENABLED: 已安装且启用
 -- ENABLING: 启用中
 -- DISABLING: 禁用中
@@ -151,7 +151,7 @@ CREATE INDEX idx_plugin_svc_name ON plugin_services(service_name);
 
 -- 插入示例插件数据（开发测试用）
 -- INSERT INTO plugin_info (plugin_id, name, version, description, author, type, status) 
--- VALUES ('deepseek-plugin', 'DeepSeek AI Plugin', '1.0.0', 'DeepSeek AI模型插件', 'YonChain', 'MODEL', 'INSTALLED_DISABLED');
+-- VALUES ('deepseek-plugin', 'DeepSeek AI Plugin', '1.0.0', 'DeepSeek AI模型插件', 'YonChain', 'MODEL', 'DISABLED');
 
 COMMIT;
 
