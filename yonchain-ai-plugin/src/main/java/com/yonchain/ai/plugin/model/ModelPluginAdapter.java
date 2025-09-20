@@ -4,6 +4,8 @@ import com.yonchain.ai.model.ModelMetadata;
 import com.yonchain.ai.model.provider.ModelProvider;
 import com.yonchain.ai.model.registry.ModelRegistry;
 import com.yonchain.ai.plugin.PluginAdapter;
+import com.yonchain.ai.plugin.PluginContext;
+import com.yonchain.ai.plugin.DefaultPluginContext;
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import com.yonchain.ai.plugin.entity.PluginInfo;
 import com.yonchain.ai.plugin.enums.PluginType;
@@ -41,6 +43,9 @@ public class ModelPluginAdapter implements PluginAdapter {
     // 缓存插件实例和提供商
     private final Map<String, ModelPlugin> pluginInstances = new ConcurrentHashMap<>();
     private final Map<String, ModelProvider> modelProviders = new ConcurrentHashMap<>();
+    
+    // 缓存插件上下文
+    private final Map<String, DefaultPluginContext> pluginContexts = new ConcurrentHashMap<>();
     
     public ModelPluginAdapter(PluginRegistry pluginRegistry, 
                              ModelRegistry modelRegistry,
@@ -179,10 +184,20 @@ public class ModelPluginAdapter implements PluginAdapter {
             // 3. 调用插件的禁用回调
             pluginInstance.onDisable();
             
-            // 4. 从Spring容器注销模型提供商
+            // 4. 调用插件的销毁方法
+            pluginInstance.dispose();
+            
+            // 5. 从Spring容器注销模型提供商
             unregisterModelProvider(pluginId);
             
-            // 5. 清理缓存
+            // 6. 清理插件上下文
+            DefaultPluginContext pluginContext = pluginContexts.remove(pluginId);
+            if (pluginContext != null) {
+                pluginContext.cleanup();
+                log.debug("Plugin context cleaned up for plugin: {}", pluginId);
+            }
+            
+            // 7. 清理缓存
             pluginInstances.remove(pluginId);
             modelProviders.remove(pluginId);
             
@@ -229,9 +244,11 @@ public class ModelPluginAdapter implements PluginAdapter {
             // 创建插件实例
             ModelPlugin instance = modelPluginClass.getDeclaredConstructor().newInstance();
             
+            // 创建插件上下文
+            PluginContext pluginContext = createPluginContext(pluginInfo);
+            
             // 初始化插件
-            // TODO: 创建并传递PluginContext
-            // instance.initialize(pluginContext);
+            instance.initialize(pluginContext);
             
             return instance;
             
@@ -239,6 +256,42 @@ public class ModelPluginAdapter implements PluginAdapter {
             log.error("Failed to load plugin instance: {}", pluginInfo.getPluginId(), e);
             return null;
         }
+    }
+    
+    /**
+     * 创建插件上下文
+     * 
+     * @param pluginInfo 插件信息
+     * @return 插件上下文
+     */
+    private PluginContext createPluginContext(PluginInfo pluginInfo) {
+        String pluginId = pluginInfo.getPluginId();
+        
+        // 检查是否已存在上下文
+        DefaultPluginContext existingContext = pluginContexts.get(pluginId);
+        if (existingContext != null) {
+            log.debug("Reusing existing plugin context for plugin: {}", pluginId);
+            return existingContext;
+        }
+        
+        // 创建插件工作目录路径
+        String baseWorkDir = System.getProperty("yonchain.plugin.work-dir", 
+                                               System.getProperty("java.io.tmpdir") + "/yonchain-plugins");
+        String pluginWorkDirectory = baseWorkDir + "/" + pluginId + "/work";
+        
+        // 创建并缓存插件上下文
+        DefaultPluginContext pluginContext = new DefaultPluginContext(
+            applicationContext,
+            modelRegistry,
+            this, // 传递自身作为模型插件适配器
+            pluginId,
+            pluginWorkDirectory
+        );
+        
+        pluginContexts.put(pluginId, pluginContext);
+        log.debug("Created and cached plugin context for plugin: {}", pluginId);
+        
+        return pluginContext;
     }
     
     /**
@@ -296,10 +349,21 @@ public class ModelPluginAdapter implements PluginAdapter {
      */
     private void cleanup(String pluginId) {
         try {
+            // 清理插件实例和提供商
             pluginInstances.remove(pluginId);
             modelProviders.remove(pluginId);
+            
+            // 清理插件上下文
+            DefaultPluginContext pluginContext = pluginContexts.remove(pluginId);
+            if (pluginContext != null) {
+                pluginContext.cleanup();
+                log.debug("Plugin context cleaned up for plugin: {}", pluginId);
+            }
+            
+            // 注销模型提供商
             unregisterModelProvider(pluginId);
-            log.debug("Cleaned up resources for plugin: {}", pluginId);
+            
+            log.debug("Cleaned up all resources for plugin: {}", pluginId);
         } catch (Exception e) {
             log.error("Failed to cleanup resources for plugin: {}", pluginId, e);
         }

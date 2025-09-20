@@ -1,12 +1,16 @@
 package com.yonchain.ai.plugin.controller;
 
 import com.yonchain.ai.plugin.dto.PluginResponse;
+import com.yonchain.ai.plugin.dto.PluginPreviewResponse;
 import com.yonchain.ai.plugin.entity.PluginInfo;
 import com.yonchain.ai.plugin.enums.PluginStatus;
 import com.yonchain.ai.plugin.enums.PluginType;
 import com.yonchain.ai.plugin.manager.PluginManager;
 import com.yonchain.ai.plugin.exception.PluginInstallException;
 import com.yonchain.ai.plugin.service.PluginIconService;
+import com.yonchain.ai.plugin.parser.PluginParser;
+import com.yonchain.ai.plugin.parser.PluginParseException;
+import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -23,6 +27,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,18 +46,23 @@ public class PluginController {
     
     private final PluginManager pluginManager;
     private final PluginIconService pluginIconService;
+    private final PluginParser pluginParser;
     private final String pluginUploadDir;
+    private final String tempIconDir;
     
-    public PluginController(PluginManager pluginManager, PluginIconService pluginIconService) {
+    public PluginController(PluginManager pluginManager, PluginIconService pluginIconService, PluginParser pluginParser) {
         this.pluginManager = pluginManager;
         this.pluginIconService = pluginIconService;
+        this.pluginParser = pluginParser;
         this.pluginUploadDir = System.getProperty("java.io.tmpdir") + "/yonchain-plugins";
+        this.tempIconDir = System.getProperty("java.io.tmpdir") + "/yonchain-plugins/temp-icons";
         
-        // 确保上传目录存在
+        // 确保上传目录和临时图标目录存在
         try {
             Files.createDirectories(Paths.get(pluginUploadDir));
+            Files.createDirectories(Paths.get(tempIconDir));
         } catch (IOException e) {
-            log.error("Failed to create plugin upload directory: {}", pluginUploadDir, e);
+            log.error("Failed to create plugin directories: {}, {}", pluginUploadDir, tempIconDir, e);
         }
     }
     
@@ -114,6 +124,63 @@ public class PluginController {
     }
     
     /**
+     * 预览插件信息（上传插件文件但不安装，返回插件基本信息）
+     */
+    @PostMapping("/preview")
+    public ResponseEntity<ApiResponse<PluginPreviewResponse>> previewPlugin(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Plugin file cannot be empty"));
+        }
+        
+        // 验证文件格式
+        String filename = file.getOriginalFilename();
+        if (filename == null || !filename.endsWith(".jar")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Invalid plugin file format. Only .jar files are supported."));
+        }
+        
+        try {
+            // 保存临时文件
+            Path tempFile = Files.createTempFile("plugin-preview-", ".jar");
+            try {
+                Files.copy(file.getInputStream(), tempFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                
+                // 解析插件信息
+                PluginDescriptor descriptor = pluginParser.parsePlugin(tempFile);
+                
+                // 处理临时图标
+                String tempIconUrl = null;
+                if (descriptor.getIconData() != null && descriptor.getIcon() != null) {
+                    tempIconUrl = saveTempIcon(descriptor.getId(), descriptor.getIcon(), descriptor.getIconData());
+                }
+                
+                // 创建预览响应
+                PluginPreviewResponse previewResponse = PluginPreviewResponse.fromPluginDescriptor(descriptor, tempIconUrl);
+                
+                return ResponseEntity.ok(ApiResponse.success(previewResponse));
+                
+            } finally {
+                // 清理临时文件
+                try {
+                    Files.deleteIfExists(tempFile);
+                } catch (IOException e) {
+                    log.warn("Failed to delete temp file: {}", tempFile, e);
+                }
+            }
+            
+        } catch (PluginParseException e) {
+            log.error("Failed to parse plugin: {}", filename, e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Plugin format error: " + e.getMessage()));
+        } catch (Exception e) {
+            log.error("Failed to preview plugin: {}", filename, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Failed to preview plugin: " + e.getMessage()));
+        }
+    }
+    
+    /**
      * 安装插件（通过文件上传）
      */
     @PostMapping("/install")
@@ -131,12 +198,50 @@ public class PluginController {
                         .body(ApiResponse.error("Invalid plugin file format. Only .jar files are supported."));
             }
             
-            // 直接使用输入流安装插件
-            try (InputStream inputStream = file.getInputStream()) {
-                pluginManager.installPlugin(inputStream, filename);
+            // 确保上传目录存在
+            Path uploadDir = Paths.get(pluginUploadDir);
+            if (!Files.exists(uploadDir)) {
+                Files.createDirectories(uploadDir);
+                log.info("Created plugin upload directory: {}", uploadDir);
             }
             
-            return ResponseEntity.ok(ApiResponse.success("success", "Plugin installed successfully"));
+            // 生成临时文件路径
+            String tempFileName = "upload_" + System.currentTimeMillis() + "_" + filename;
+            Path tempFilePath = uploadDir.resolve(tempFileName);
+            
+            // 保存上传的文件到本地临时文件
+            try (InputStream inputStream = file.getInputStream()) {
+                long fileSize = Files.copy(inputStream, tempFilePath, StandardCopyOption.REPLACE_EXISTING);
+                log.info("Plugin file saved to: {}, size: {} bytes", tempFilePath, fileSize);
+                
+                // 验证文件是否成功保存
+                if (!Files.exists(tempFilePath)) {
+                    throw new IOException("Failed to save plugin file to: " + tempFilePath);
+                }
+                
+                long savedFileSize = Files.size(tempFilePath);
+                if (savedFileSize == 0) {
+                    throw new IOException("Saved plugin file is empty: " + tempFilePath);
+                }
+                
+                log.debug("File verification passed: {} bytes", savedFileSize);
+            }
+            
+            try {
+                // 使用文件路径安装插件
+                pluginManager.installPluginFromPath(tempFilePath.toString());
+                
+                return ResponseEntity.ok(ApiResponse.success("success", "Plugin installed successfully"));
+                
+            } finally {
+              /*  // 清理临时文件
+                try {
+                    Files.deleteIfExists(tempFilePath);
+                    log.debug("Cleaned up temp file: {}", tempFilePath);
+                } catch (IOException e) {
+                    log.warn("Failed to delete temp file: {}", tempFilePath, e);
+                }*/
+            }
             
         } catch (PluginInstallException e) {
             log.error("Failed to install plugin", e);
@@ -489,6 +594,106 @@ public class PluginController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("Failed to get plugin icon URL: " + e.getMessage()));
         }
+    }
+    
+    /**
+     * 获取临时插件图标
+     */
+    @GetMapping("/temp-icons/{iconId}")
+    public ResponseEntity<Resource> getTempIcon(@PathVariable String iconId) {
+        try {
+            Path tempIconPath = Paths.get(tempIconDir, iconId);
+            if (!Files.exists(tempIconPath)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            
+            // 确定MIME类型
+            String contentType = Files.probeContentType(tempIconPath);
+            if (contentType == null) {
+                // 根据文件扩展名确定类型
+                String fileName = tempIconPath.getFileName().toString().toLowerCase();
+                if (fileName.endsWith(".svg")) {
+                    contentType = "image/svg+xml";
+                } else if (fileName.endsWith(".png")) {
+                    contentType = "image/png";
+                } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+                    contentType = "image/jpeg";
+                } else if (fileName.endsWith(".gif")) {
+                    contentType = "image/gif";
+                } else {
+                    contentType = "application/octet-stream";
+                }
+            }
+            
+            Resource resource = new FileSystemResource(tempIconPath);
+            
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + tempIconPath.getFileName().toString() + "\"")
+                    .body(resource);
+                    
+        } catch (Exception e) {
+            log.error("Failed to get temp icon: {}", iconId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    /**
+     * 保存临时图标文件
+     * 
+     * @param pluginId 插件ID
+     * @param iconFileName 图标文件名
+     * @param iconData 图标数据
+     * @return 临时图标访问URL
+     */
+    private String saveTempIcon(String pluginId, String iconFileName, byte[] iconData) {
+        if (iconData == null || iconData.length == 0 || iconFileName == null) {
+            return null;
+        }
+        
+        try {
+            // 确保临时图标目录存在
+            Path tempIconDirectory = Paths.get(tempIconDir);
+            if (!Files.exists(tempIconDirectory)) {
+                Files.createDirectories(tempIconDirectory);
+                log.debug("Created temp icon directory: {}", tempIconDirectory);
+            }
+            
+            // 生成唯一的临时文件名
+            String fileExtension = getFileExtension(iconFileName);
+            String tempIconId = "temp_" + pluginId + "_" + System.currentTimeMillis() + fileExtension;
+            Path tempIconPath = tempIconDirectory.resolve(tempIconId);
+            
+            // 保存图标数据
+            Files.write(tempIconPath, iconData);
+            log.debug("Saved temp icon: {}", tempIconPath);
+            
+            // 返回临时访问URL
+            return "/plugins/temp-icons/" + tempIconId;
+            
+        } catch (Exception e) {
+            log.error("Failed to save temp icon for plugin {}: {}", pluginId, iconFileName, e);
+            return null;
+        }
+    }
+    
+    /**
+     * 获取文件扩展名（包含点号）
+     * 
+     * @param fileName 文件名
+     * @return 文件扩展名，如果没有扩展名返回空字符串
+     */
+    private String getFileExtension(String fileName) {
+        if (fileName == null || fileName.trim().isEmpty()) {
+            return "";
+        }
+        
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
+            return fileName.substring(lastDotIndex);
+        }
+        
+        return "";
     }
     
 }
