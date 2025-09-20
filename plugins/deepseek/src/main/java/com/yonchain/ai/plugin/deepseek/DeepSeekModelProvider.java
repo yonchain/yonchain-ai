@@ -30,7 +30,7 @@ public class DeepSeekModelProvider implements ModelProvider {
 
     @Override
     public boolean supports(ModelType modelType) {
-        return false;
+       return modelType == ModelType.TEXT || modelType == ModelType.EMBEDDING;
     }
 
 
