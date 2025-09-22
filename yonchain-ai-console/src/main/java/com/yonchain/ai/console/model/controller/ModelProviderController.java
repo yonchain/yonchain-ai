@@ -21,6 +21,7 @@ import com.yonchain.ai.api.model.ModelService;
 import com.yonchain.ai.api.model.ProviderConfigResponse;
 import com.yonchain.ai.console.BaseController;
 import com.yonchain.ai.console.model.request.ProviderConfigRequest;
+import com.yonchain.ai.console.model.request.ProviderConfigSaveRequest;
 import com.yonchain.ai.console.model.request.ModelProviderQueryRequest;
 import com.yonchain.ai.console.model.response.ModelProviderResponse;
 import com.yonchain.ai.web.response.ApiResponse;
@@ -82,12 +83,12 @@ public class ModelProviderController extends BaseController {
         return modelService.getProviderConfig(getCurrentTenantId(), providerCode);
     }
 
-    /**
+ /*   *//**
      * 保存模型提供商配置
      *
      * @param request 配置请求
      * @return 保存结果
-     */
+     *//*
     @Operation(summary = "保存模型提供商配置", description = "保存模型提供商的配置信息")
     @PostMapping("/config")
     public ApiResponse<Void> saveProviderConfig(
@@ -99,6 +100,38 @@ public class ModelProviderController extends BaseController {
         param.put("enabled", request.getEnabled());
         param.put("config", request.getConfig());
 
+        modelService.saveProviderConfig(this.getCurrentTenantId(), request.getProvider(), param);
+
+        return ApiResponse.success();
+    }*/
+
+    /**
+     * 保存模型提供商配置（统一格式）
+     *
+     * @param request 统一格式配置请求
+     * @return 保存结果
+     */
+    @Operation(summary = "保存模型提供商配置（统一格式）", description = "支持统一格式的模型提供商配置保存")
+    @PostMapping("/config")
+    public ApiResponse<Void> saveProviderConfigUnified(
+            @Parameter(description = "统一格式配置请求", required = true)
+            @RequestBody @Valid ProviderConfigSaveRequest request) {
+
+        // 构建配置Map传递给service层
+        Map<String, Object> param = new HashMap<>();
+        param.put("enabled", request.getEnabled());
+        
+        // 优先使用configItems格式，如果没有则使用config格式
+        if (request.getConfigItems() != null && !request.getConfigItems().isEmpty()) {
+            // 将configItems转换为Map格式
+            Map<String, Object> configMap = new HashMap<>();
+            for (ProviderConfigSaveRequest.ConfigItemValue item : request.getConfigItems()) {
+                configMap.put(item.getName(), item.getValue());
+            }
+            param.put("config", configMap);
+        } else if (request.getConfig() != null) {
+            param.put("config", request.getConfig());
+        }
 
         modelService.saveProviderConfig(this.getCurrentTenantId(), request.getProvider(), param);
 

@@ -178,27 +178,19 @@ public class ModelServiceImpl implements ModelService {
                 throw new RuntimeException("Provider not found: " + providerCode);
             }
             
-            // 更新配置信息
-            if (config.containsKey("apiKey")) {
-                providerEntity.setApiKey((String) config.get("apiKey"));
-            }
-            if (config.containsKey("baseUrl")) {
-                providerEntity.setBaseUrl((String) config.get("baseUrl"));
-            }
-            if (config.containsKey("proxyUrl")) {
-                providerEntity.setProxyUrl((String) config.get("proxyUrl"));
-            }
+            // 处理配置数据：提取实际的配置值
+            Map<String, Object> actualConfig = extractConfigValues(config);
+            
+            // 更新特定字段的配置信息
+            updateSpecificConfigFields(providerEntity, actualConfig);
+            
+            // 更新启用状态
             if (config.containsKey("enabled")) {
                 providerEntity.setEnabled((Boolean) config.get("enabled"));
             }
             
-            // 保存自定义配置
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                providerEntity.setCustomConfig(objectMapper.writeValueAsString(config));
-            } catch (Exception e) {
-                log.warn("Failed to serialize custom config for provider: {}", providerCode, e);
-            }
+            // 保存完整的配置到customConfig字段
+            saveCustomConfig(providerEntity, actualConfig, providerCode);
             
             providerEntity.setUpdateTime(LocalDateTime.now());
             providerEntity.setUpdatedBy("system");
@@ -210,6 +202,73 @@ public class ModelServiceImpl implements ModelService {
         } catch (Exception e) {
             log.error("Failed to save provider config for tenant: {} provider: {}", tenantId, providerCode, e);
             throw new RuntimeException("Failed to save provider config: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * 提取配置值：支持多种输入格式
+     * 1. 扁平化格式：{"api_key": "xxx", "endpoint_url": "xxx"}
+     * 2. 嵌套格式：{"config": {"api_key": "xxx", "endpoint_url": "xxx"}}
+     */
+    private Map<String, Object> extractConfigValues(Map<String, Object> config) {
+        Map<String, Object> actualConfig = new HashMap<>();
+        
+        // 如果包含config字段，则从中提取配置值
+        if (config.containsKey("config") && config.get("config") instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> nestedConfig = (Map<String, Object>) config.get("config");
+            actualConfig.putAll(nestedConfig);
+        } else {
+            // 否则直接使用顶级字段（排除enabled等控制字段）
+            for (Map.Entry<String, Object> entry : config.entrySet()) {
+                if (!"enabled".equals(entry.getKey())) {
+                    actualConfig.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        
+        return actualConfig;
+    }
+    
+    /**
+     * 更新特定字段的配置信息
+     */
+    private void updateSpecificConfigFields(ModelProviderEntity providerEntity, Map<String, Object> actualConfig) {
+        // 映射常见的配置字段到实体的特定字段
+        if (actualConfig.containsKey("api_key")) {
+            providerEntity.setApiKey((String) actualConfig.get("api_key"));
+        }
+        if (actualConfig.containsKey("endpoint_url")) {
+            providerEntity.setBaseUrl((String) actualConfig.get("endpoint_url"));
+        }
+        if (actualConfig.containsKey("base_url")) {
+            providerEntity.setBaseUrl((String) actualConfig.get("base_url"));
+        }
+        if (actualConfig.containsKey("proxy_url")) {
+            providerEntity.setProxyUrl((String) actualConfig.get("proxy_url"));
+        }
+        
+        // 兼容旧的字段名
+        if (actualConfig.containsKey("apiKey")) {
+            providerEntity.setApiKey((String) actualConfig.get("apiKey"));
+        }
+        if (actualConfig.containsKey("baseUrl")) {
+            providerEntity.setBaseUrl((String) actualConfig.get("baseUrl"));
+        }
+        if (actualConfig.containsKey("proxyUrl")) {
+            providerEntity.setProxyUrl((String) actualConfig.get("proxyUrl"));
+        }
+    }
+    
+    /**
+     * 保存自定义配置到JSON字段
+     */
+    private void saveCustomConfig(ModelProviderEntity providerEntity, Map<String, Object> actualConfig, String providerCode) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            providerEntity.setCustomConfig(objectMapper.writeValueAsString(actualConfig));
+        } catch (Exception e) {
+            log.warn("Failed to serialize custom config for provider: {}", providerCode, e);
         }
     }
 
@@ -575,12 +634,17 @@ public class ModelServiceImpl implements ModelService {
             }
         }
         
-        // 解析credentialSchema
+        // 解析credentialSchema并填充实际配置值
         if (providerEntity.getCredentialSchema() != null) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
                 List<ModelConfigItem> configItems = objectMapper.readValue(
                         providerEntity.getCredentialSchema(), new TypeReference<List<ModelConfigItem>>() {});
+                
+                // 获取已保存的配置值并填充到configItems中
+                Map<String, Object> savedConfig = getSavedConfigValues(providerEntity);
+                fillConfigItemValues(configItems, savedConfig);
+                
                 response.setConfigItems(configItems);
             } catch (Exception e) {
                 log.warn("Failed to parse credential schema for provider: {}", 
@@ -589,6 +653,60 @@ public class ModelServiceImpl implements ModelService {
         }
         
         return response;
+    }
+    
+    /**
+     * 获取已保存的配置值
+     */
+    private Map<String, Object> getSavedConfigValues(ModelProviderEntity providerEntity) {
+        Map<String, Object> configValues = new HashMap<>();
+        
+        // 从特定字段获取配置值
+        if (providerEntity.getApiKey() != null) {
+            configValues.put("api_key", providerEntity.getApiKey());
+        }
+        if (providerEntity.getBaseUrl() != null) {
+            configValues.put("endpoint_url", providerEntity.getBaseUrl());
+        }
+        if (providerEntity.getProxyUrl() != null) {
+            configValues.put("proxy_url", providerEntity.getProxyUrl());
+        }
+        
+        // 从customConfig JSON字段获取其他配置值
+        if (providerEntity.getCustomConfig() != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> customConfig = objectMapper.readValue(
+                        providerEntity.getCustomConfig(), new TypeReference<Map<String, Object>>() {});
+                
+                // 合并自定义配置，但优先使用特定字段的值
+                for (Map.Entry<String, Object> entry : customConfig.entrySet()) {
+                    if (!configValues.containsKey(entry.getKey())) {
+                        configValues.put(entry.getKey(), entry.getValue());
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to parse custom config for provider: {}", 
+                         providerEntity.getProviderCode(), e);
+            }
+        }
+        
+        return configValues;
+    }
+    
+    /**
+     * 将保存的配置值填充到配置项中
+     */
+    private void fillConfigItemValues(List<ModelConfigItem> configItems, Map<String, Object> savedConfig) {
+        if (configItems == null || savedConfig == null) {
+            return;
+        }
+        
+        for (ModelConfigItem item : configItems) {
+            if (savedConfig.containsKey(item.getName())) {
+                item.setValue(savedConfig.get(item.getName()));
+            }
+        }
     }
     
     /**
