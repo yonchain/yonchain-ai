@@ -3,7 +3,7 @@ package com.yonchain.ai.plugin.parser.impl;
 import com.yonchain.ai.plugin.descriptor.ProviderDescriptor;
 import com.yonchain.ai.plugin.parser.ModelDefinition;
 import com.yonchain.ai.plugin.parser.ModelPluginParser;
-import com.yonchain.ai.plugin.parser.PluginParseException;
+import com.yonchain.ai.plugin.exception.PluginParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

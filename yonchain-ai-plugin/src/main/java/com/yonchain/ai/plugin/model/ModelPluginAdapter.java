@@ -153,16 +153,17 @@ public class ModelPluginAdapter implements PluginAdapter {
             
             // 5. 注册模型提供商到模型工厂
             modelFactory.registerProvider(modelProvider.getProviderName(), modelProvider);
-            
+
+
             // 6. 保存提供商信息到数据库（用于可视化界面展示和配置）
             ModelProviderInfo providerInfo = convertToProviderInfo(pluginInstance, modelProvider, pluginId);
-            modelService.saveProviderForUI(pluginId, providerInfo);
+            modelService.saveProvider(pluginId, providerInfo);
             
             // 7. 保存模型信息到数据库（用于可视化界面展示和配置）
             List<ModelMetadata> models = pluginInstance.getModels();
             if (models != null && !models.isEmpty()) {
                 List<Object> modelObjects = new ArrayList<>(models);
-                modelService.saveModelsForUI(pluginId, modelObjects, modelProvider.getProviderName());
+                modelService.saveModels(pluginId, modelObjects, modelProvider.getProviderName());
                 log.debug("Saved {} models to database from plugin: {}", models.size(), pluginId);
             }
             

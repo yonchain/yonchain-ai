@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 
  * @author yonchain
  */
-public class PluginLifecycleEvent extends ApplicationEvent {
+public class PluginEvent extends ApplicationEvent {
     
     private final String pluginId;
     private final PluginLifecycleType lifecycleType;
@@ -18,11 +18,11 @@ public class PluginLifecycleEvent extends ApplicationEvent {
     private final Throwable throwable;
     private final LocalDateTime timestamp;
     
-    public PluginLifecycleEvent(Object source, String pluginId, PluginLifecycleType lifecycleType, String message) {
+    public PluginEvent(Object source, String pluginId, PluginLifecycleType lifecycleType, String message) {
         this(source, pluginId, lifecycleType, message, null);
     }
     
-    public PluginLifecycleEvent(Object source, String pluginId, PluginLifecycleType lifecycleType, String message, Throwable throwable) {
+    public PluginEvent(Object source, String pluginId, PluginLifecycleType lifecycleType, String message, Throwable throwable) {
         super(source);
         this.pluginId = pluginId;
         this.lifecycleType = lifecycleType;

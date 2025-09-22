@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
  * @author yonchain
  */
 @Component
-public class PluginLifecycleEventPublisher {
+public class PluginEventPublisher {
     
-    private static final Logger log = LoggerFactory.getLogger(PluginLifecycleEventPublisher.class);
+    private static final Logger log = LoggerFactory.getLogger(PluginEventPublisher.class);
     
     private final ApplicationEventPublisher eventPublisher;
     
-    public PluginLifecycleEventPublisher(ApplicationEventPublisher eventPublisher) {
+    public PluginEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
     
@@ -127,7 +127,7 @@ public class PluginLifecycleEventPublisher {
      */
     private void publishEvent(String pluginId, PluginLifecycleType lifecycleType, String message, Throwable throwable) {
         try {
-            PluginLifecycleEvent event = new PluginLifecycleEvent(this, pluginId, lifecycleType, message, throwable);
+            PluginEvent event = new PluginEvent(this, pluginId, lifecycleType, message, throwable);
             eventPublisher.publishEvent(event);
             
             log.debug("Published plugin lifecycle event: {} - {} - {}", pluginId, lifecycleType, message);

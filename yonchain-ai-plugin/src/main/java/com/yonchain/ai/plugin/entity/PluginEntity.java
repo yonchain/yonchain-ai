@@ -30,10 +30,6 @@ public class PluginEntity {
     private LocalDateTime disabledAt;
     private String iconPath;
 
-    // 关联数据
-    private List<PluginDependencyEntity> dependencies = new ArrayList<>();
-    private List<PluginExtensionEntity> extensions = new ArrayList<>();
-    private List<PluginServiceEntity> services = new ArrayList<>();
     
     // 默认构造函数
     public PluginEntity() {}
@@ -184,60 +180,6 @@ public class PluginEntity {
         this.disabledAt = disabledAt;
     }
     
-    public List<PluginDependencyEntity> getDependencies() {
-        return dependencies;
-    }
-    
-    public void setDependencies(List<PluginDependencyEntity> dependencies) {
-        this.dependencies = dependencies;
-    }
-    
-    public List<PluginExtensionEntity> getExtensions() {
-        return extensions;
-    }
-    
-    public void setExtensions(List<PluginExtensionEntity> extensions) {
-        this.extensions = extensions;
-    }
-    
-    public List<PluginServiceEntity> getServices() {
-        return services;
-    }
-    
-    public void setServices(List<PluginServiceEntity> services) {
-        this.services = services;
-    }
-    
-    // 便利方法
-    public void addDependency(PluginDependencyEntity dependency) {
-        dependencies.add(dependency);
-        dependency.setPluginId(this.pluginId);
-    }
-    
-    public void removeDependency(PluginDependencyEntity dependency) {
-        dependencies.remove(dependency);
-        dependency.setPluginId(null);
-    }
-    
-    public void addExtension(PluginExtensionEntity extension) {
-        extensions.add(extension);
-        extension.setPluginId(this.pluginId);
-    }
-    
-    public void removeExtension(PluginExtensionEntity extension) {
-        extensions.remove(extension);
-        extension.setPluginId(null);
-    }
-    
-    public void addService(PluginServiceEntity service) {
-        services.add(service);
-        service.setPluginId(this.pluginId);
-    }
-    
-    public void removeService(PluginServiceEntity service) {
-        services.remove(service);
-        service.setPluginId(null);
-    }
 
     public String getIconPath() {
         return iconPath;

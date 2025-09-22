@@ -9,7 +9,7 @@ import com.yonchain.ai.plugin.manager.PluginManager;
 import com.yonchain.ai.plugin.exception.PluginInstallException;
 import com.yonchain.ai.plugin.service.PluginIconService;
 import com.yonchain.ai.plugin.parser.PluginParser;
-import com.yonchain.ai.plugin.parser.PluginParseException;
+import com.yonchain.ai.plugin.exception.PluginParseException;
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

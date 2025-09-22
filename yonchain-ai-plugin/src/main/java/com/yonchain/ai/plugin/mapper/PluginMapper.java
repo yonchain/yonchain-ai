@@ -19,7 +19,7 @@ public interface PluginMapper {
      * @param plugin 插件实体
      * @return 影响行数
      */
-    @Insert("INSERT INTO plugin_info (plugin_id, name, version, description, author, homepage, " +
+    @Insert("INSERT INTO plugin (plugin_id, name, version, description, author, homepage, " +
             "type, status, plugin_path, main_class, provider_source, provider_interface, " +
             "created_at, updated_at, installed_at, enabled_at, disabled_at,icon_path) " +
             "VALUES (#{pluginId}, #{name}, #{version}, #{description}, #{author}, #{homepage}, " +
@@ -33,7 +33,7 @@ public interface PluginMapper {
      * @param pluginId 插件ID
      * @return 影响行数
      */
-    @Delete("DELETE FROM plugin_info WHERE plugin_id = #{pluginId}")
+    @Delete("DELETE FROM plugin WHERE plugin_id = #{pluginId}")
     int deleteById(String pluginId);
     
     /**
@@ -42,7 +42,7 @@ public interface PluginMapper {
      * @param plugin 插件实体
      * @return 影响行数
      */
-    @Update("UPDATE plugin_info SET " +
+    @Update("UPDATE plugin SET " +
             "name = #{name}, " +
             "version = #{version}, " +
             "description = #{description}, " +
@@ -69,7 +69,7 @@ public interface PluginMapper {
      * @param status 新状态
      * @return 影响行数
      */
-    @Update("UPDATE plugin_info SET status = #{status}, updated_at = CURRENT_TIMESTAMP " +
+    @Update("UPDATE plugin SET status = #{status}, updated_at = CURRENT_TIMESTAMP " +
             "WHERE plugin_id = #{pluginId}")
     int updateStatus(@Param("pluginId") String pluginId, @Param("status") String status);
     
@@ -82,7 +82,7 @@ public interface PluginMapper {
     @Select("SELECT plugin_id, name, version, description, author, homepage, " +
             "type, status, plugin_path, main_class, provider_source, provider_interface, " +
             "created_at, updated_at, installed_at, enabled_at, disabled_at,icon_path " +
-            "FROM plugin_info WHERE plugin_id = #{pluginId}")
+            "FROM plugin WHERE plugin_id = #{pluginId}")
     @Results({
         @Result(property = "pluginId", column = "plugin_id"),
         @Result(property = "name", column = "name"),
@@ -114,7 +114,7 @@ public interface PluginMapper {
     @Select("SELECT plugin_id, name, version, description, author, homepage, " +
             "type, status, plugin_path, main_class, provider_source, provider_interface, " +
             "created_at, updated_at, installed_at, enabled_at, disabled_at,icon_path " +
-            "FROM plugin_info ORDER BY created_at DESC")
+            "FROM plugin ORDER BY created_at DESC")
     @Results({
         @Result(property = "pluginId", column = "plugin_id"),
         @Result(property = "name", column = "name"),
@@ -146,7 +146,7 @@ public interface PluginMapper {
     @Select("SELECT plugin_id, name, version, description, author, homepage, " +
             "type, status, plugin_path, main_class, provider_source, provider_interface, " +
             "created_at, updated_at, installed_at, enabled_at, disabled_at " +
-            "FROM plugin_info WHERE type = #{type} ORDER BY created_at DESC")
+            "FROM plugin WHERE type = #{type} ORDER BY created_at DESC")
     @Results({
         @Result(property = "pluginId", column = "plugin_id"),
         @Result(property = "name", column = "name"),
@@ -177,7 +177,7 @@ public interface PluginMapper {
     @Select("SELECT plugin_id, name, version, description, author, homepage, " +
             "type, status, plugin_path, main_class, provider_source, provider_interface, " +
             "created_at, updated_at, installed_at, enabled_at, disabled_at " +
-            "FROM plugin_info WHERE status = #{status} ORDER BY created_at DESC")
+            "FROM plugin WHERE status = #{status} ORDER BY created_at DESC")
     @Results({
         @Result(property = "pluginId", column = "plugin_id"),
         @Result(property = "name", column = "name"),
@@ -208,7 +208,7 @@ public interface PluginMapper {
     @Select("SELECT plugin_id, name, version, description, author, homepage, " +
             "type, status, plugin_path, main_class, provider_source, provider_interface, " +
             "created_at, updated_at, installed_at, enabled_at, disabled_at " +
-            "FROM plugin_info WHERE name LIKE CONCAT('%', #{name}, '%') ORDER BY created_at DESC")
+            "FROM plugin WHERE name LIKE CONCAT('%', #{name}, '%') ORDER BY created_at DESC")
     @Results({
         @Result(property = "pluginId", column = "plugin_id"),
         @Result(property = "name", column = "name"),
@@ -236,7 +236,7 @@ public interface PluginMapper {
      * @param pluginId 插件ID
      * @return 存在的记录数量
      */
-    @Select("SELECT COUNT(*) FROM plugin_info WHERE plugin_id = #{pluginId}")
+    @Select("SELECT COUNT(*) FROM plugin WHERE plugin_id = #{pluginId}")
     int countById(String pluginId);
     
     /**
@@ -303,7 +303,7 @@ public interface PluginMapper {
      * 
      * @return 插件总数
      */
-    @Select("SELECT COUNT(*) FROM plugin_info")
+    @Select("SELECT COUNT(*) FROM plugin")
     long countAll();
     
     /**
@@ -312,6 +312,6 @@ public interface PluginMapper {
      * @param status 插件状态
      * @return 插件数量
      */
-    @Select("SELECT COUNT(*) FROM plugin_info WHERE status = #{status}")
+    @Select("SELECT COUNT(*) FROM plugin WHERE status = #{status}")
     long countByStatus(String status);
 }

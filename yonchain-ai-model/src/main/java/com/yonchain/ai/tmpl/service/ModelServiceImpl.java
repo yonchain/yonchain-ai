@@ -1,7 +1,11 @@
 package com.yonchain.ai.tmpl.service;
 
+import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.model.*;
 import com.yonchain.ai.model.ModelMetadata;
+import com.yonchain.ai.model.ModelConfig;
+import com.yonchain.ai.model.ModelType;
+import com.yonchain.ai.model.registry.ModelRegistry;
 import com.yonchain.ai.tmpl.entity.ModelEntity;
 import com.yonchain.ai.tmpl.entity.ModelProviderEntity;
 import com.yonchain.ai.tmpl.mapper.ModelMapper;
@@ -30,6 +34,9 @@ public class ModelServiceImpl implements ModelService {
     @Autowired(required = false)
     private ModelProviderMapper modelProviderMapper;
 
+    @Autowired(required = false)
+    private ModelRegistry modelRegistry;
+
 
     @Override
     public ModelInfo getModelById(String id) {
@@ -39,7 +46,7 @@ public class ModelServiceImpl implements ModelService {
             ModelEntity modelEntity = modelMapper.selectById(id);
             if (modelEntity == null) {
                 log.debug("Model not found with id: {}", id);
-                return null;
+        return null;
             }
             
             return convertToModelInfo(modelEntity);
@@ -136,7 +143,7 @@ public class ModelServiceImpl implements ModelService {
             ModelProviderEntity providerEntity = modelProviderMapper.selectByProviderCode(tenantId, providerCode);
             if (providerEntity == null) {
                 log.debug("Provider not found for tenant: {} provider: {}", tenantId, providerCode);
-                return null;
+        return null;
             }
             
             return convertToProviderConfigResponse(providerEntity);
@@ -155,7 +162,7 @@ public class ModelServiceImpl implements ModelService {
             ModelEntity modelEntity = modelMapper.selectByTenantProviderAndModelCode("29d181ca-9562-4cc2-a4f3-be605a728143", provider, modelCode);
             if (modelEntity == null) {
                 log.debug("Model not found for provider: {} modelCode: {}", provider, modelCode);
-                return null;
+        return null;
             }
             
             return convertToModelInfo(modelEntity);
@@ -197,6 +204,9 @@ public class ModelServiceImpl implements ModelService {
             
             modelProviderMapper.update(providerEntity);
             
+            // 8. 配置保存后，直接注册模型到ModelRegistry（API key是必填的）
+            registerModelsToRegistry(tenantId, providerEntity);
+            
             log.info("Successfully saved provider config for tenant: {} provider: {}", tenantId, providerCode);
             
         } catch (Exception e) {
@@ -234,7 +244,7 @@ public class ModelServiceImpl implements ModelService {
      * 更新特定字段的配置信息
      */
     private void updateSpecificConfigFields(ModelProviderEntity providerEntity, Map<String, Object> actualConfig) {
-        // 映射常见的配置字段到实体的特定字段
+       /* // 映射常见的配置字段到实体的特定字段
         if (actualConfig.containsKey("api_key")) {
             providerEntity.setApiKey((String) actualConfig.get("api_key"));
         }
@@ -257,7 +267,7 @@ public class ModelServiceImpl implements ModelService {
         }
         if (actualConfig.containsKey("proxyUrl")) {
             providerEntity.setProxyUrl((String) actualConfig.get("proxyUrl"));
-        }
+        }*/
     }
     
     /**
@@ -332,7 +342,7 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     @Transactional
-    public void saveProviderForUI(String pluginId, ModelProviderInfo modelProviderInfo) {
+    public void saveProvider(String pluginId, ModelProviderInfo modelProviderInfo) {
         log.info("Saving provider for UI: {} from plugin: {}", modelProviderInfo.getCode(), pluginId);
         
         try {
@@ -359,7 +369,7 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     @Transactional
-    public void saveModelsForUI(String pluginId, List<Object> modelMetadataListObj, String providerCode) {
+    public void saveModels(String pluginId, List<Object> modelMetadataListObj, String providerCode) {
         @SuppressWarnings("unchecked")
         List<ModelMetadata> modelMetadataList = (List<ModelMetadata>) (List<?>) modelMetadataListObj;
         log.info("Saving {} models for UI from plugin: {}", 
@@ -372,7 +382,7 @@ public class ModelServiceImpl implements ModelService {
         
         try {
             for (ModelMetadata metadata : modelMetadataList) {
-                saveModelForUI(pluginId, metadata, providerCode);
+                saveModel(pluginId, metadata, providerCode);
             }
             
             log.info("Successfully saved {} models for plugin: {}", modelMetadataList.size(), pluginId);
@@ -389,14 +399,17 @@ public class ModelServiceImpl implements ModelService {
         log.info("Removing plugin data for plugin: {}", pluginId);
         
         try {
-            // 删除模型记录
+            // 1. 从ModelRegistry中注销模型
+            unregisterModelsFromRegistry(pluginId);
+            
+            // 2. 删除模型记录
             List<ModelEntity> models = modelMapper.selectList("29d181ca-9562-4cc2-a4f3-be605a728143", Map.of("plugin_id", pluginId));
             for (ModelEntity model : models) {
                 modelMapper.deleteById(model.getId());
                 log.debug("Deleted model: {} from plugin: {}", model.getModelCode(), pluginId);
             }
             
-            // 删除提供商记录（如果没有其他插件使用）
+            // 3. 删除提供商记录（如果没有其他插件使用）
             List<ModelProviderEntity> providers = modelProviderMapper.selectList("29d181ca-9562-4cc2-a4f3-be605a728143", Map.of("pluginId", pluginId));
             for (ModelProviderEntity provider : providers) {
                 // 检查是否还有其他模型使用这个提供商
@@ -418,7 +431,7 @@ public class ModelServiceImpl implements ModelService {
     /**
      * 保存单个模型到数据库
      */
-    private void saveModelForUI(String pluginId, ModelMetadata metadata, String providerCode) {
+    private void saveModel(String pluginId, ModelMetadata metadata, String providerCode) {
         try {
             // 检查模型是否已存在
             ModelEntity existingModel = modelMapper.selectByTenantProviderAndModelCode("29d181ca-9562-4cc2-a4f3-be605a728143", providerCode, metadata.getModelId());
@@ -480,12 +493,12 @@ public class ModelServiceImpl implements ModelService {
             log.warn("Failed to serialize config schemas for provider: {}", modelProviderInfo.getCode(), e);
         }
         
-        // 设置默认的基础URL
+      /*  // 设置默认的基础URL
         String defaultEndpoint = getDefaultEndpointForProvider(modelProviderInfo.getCode());
         if (defaultEndpoint != null) {
             entity.setBaseUrl(defaultEndpoint);
         }
-        
+        */
         return entity;
     }
 
@@ -497,13 +510,13 @@ public class ModelServiceImpl implements ModelService {
         entity.setUpdatedBy("plugin:" + pluginId);
         entity.setPluginId(pluginId); // 更新插件ID
         
-        // 保持用户已配置的信息不变，只更新基础信息
+      /*  // 保持用户已配置的信息不变，只更新基础信息
         if (entity.getBaseUrl() == null) {
             String defaultEndpoint = getDefaultEndpointForProvider(modelProviderInfo.getCode());
             if (defaultEndpoint != null) {
                 entity.setBaseUrl(defaultEndpoint);
             }
-        }
+        }*/
     }
 
     /**
@@ -513,7 +526,7 @@ public class ModelServiceImpl implements ModelService {
         ModelEntity entity = new ModelEntity();
         entity.setId(IdUtil.generateId());
         entity.setTenantId("29d181ca-9562-4cc2-a4f3-be605a728143");
-        entity.setModelCode(metadata.getModelId());
+        entity.setModelCode(metadata.getName());
         entity.setProviderCode(providerCode);
         entity.setEnabled(false); // 默认未启用，等待用户配置
         entity.setSortOrder(100); // 默认排序权重
@@ -661,7 +674,7 @@ public class ModelServiceImpl implements ModelService {
     private Map<String, Object> getSavedConfigValues(ModelProviderEntity providerEntity) {
         Map<String, Object> configValues = new HashMap<>();
         
-        // 从特定字段获取配置值
+      /*  // 从特定字段获取配置值
         if (providerEntity.getApiKey() != null) {
             configValues.put("api_key", providerEntity.getApiKey());
         }
@@ -670,7 +683,7 @@ public class ModelServiceImpl implements ModelService {
         }
         if (providerEntity.getProxyUrl() != null) {
             configValues.put("proxy_url", providerEntity.getProxyUrl());
-        }
+        }*/
         
         // 从customConfig JSON字段获取其他配置值
         if (providerEntity.getCustomConfig() != null) {
@@ -782,21 +795,240 @@ public class ModelServiceImpl implements ModelService {
         }
     }
 
+
+
     /**
-     * 获取提供商的默认endpoint
+     * 注册该提供商下的所有模型到ModelRegistry
      */
-    private String getDefaultEndpointForProvider(String provider) {
-        switch (provider.toLowerCase()) {
-            case "deepseek":
-                return "https://api.deepseek.com/v1";
-            case "openai":
-                return "https://api.openai.com/v1";
-            case "anthropic":
-                return "https://api.anthropic.com/v1";
-            case "grok":
-                return "https://api.x.ai/v1";
-            default:
-                return null;
+    private void registerModelsToRegistry(String tenantId, ModelProviderEntity providerEntity) {
+        if (modelRegistry == null) {
+            log.warn("ModelRegistry not available, skipping model registration");
+            return;
+        }
+        
+        try {
+            log.info("Registering models to ModelRegistry for provider: {}", providerEntity.getProviderCode());
+            
+            // 1. 获取该提供商下的所有已启用模型
+            List<ModelEntity> modelEntities = modelMapper.selectByTenantAndProviderCode(tenantId, providerEntity.getProviderCode());
+            if (modelEntities == null || modelEntities.isEmpty()) {
+                log.debug("No models found for provider: {}", providerEntity.getProviderCode());
+                return;
+            }
+            
+            // 2. 为每个模型创建完整的ModelMetadata并注册
+            for (ModelEntity modelEntity : modelEntities) {
+                ModelMetadata metadata = createModelMetadataFromEntity(modelEntity, providerEntity);
+                if (metadata != null) {
+                    modelRegistry.registerModel(metadata);
+                    log.debug("Registered model to ModelRegistry: {}", metadata.getModelId());
+                }
+            }
+            
+            log.info("Successfully registered {} models for provider: {}", 
+                     modelEntities.stream().mapToInt(m -> m.getEnabled() ? 1 : 0).sum(), 
+                     providerEntity.getProviderCode());
+            
+        } catch (Exception e) {
+            log.error("Failed to register models to ModelRegistry for provider: {}", 
+                      providerEntity.getProviderCode(), e);
+            // 不抛出异常，因为这不应该影响配置保存的成功
+            throw new YonchainException("同步注册异常",e);
+        }
+    }
+
+    /**
+     * 从数据库实体创建完整的ModelMetadata对象
+     */
+    private ModelMetadata createModelMetadataFromEntity(ModelEntity modelEntity, ModelProviderEntity providerEntity) {
+        try {
+            ModelMetadata metadata = new ModelMetadata();
+            
+            // 设置基本信息
+            metadata.setName(modelEntity.getModelCode());
+            metadata.setProvider(providerEntity.getProviderCode());
+            metadata.setModelId(providerEntity.getProviderCode() + ":" + modelEntity.getModelCode());
+            metadata.setDisplayName(modelEntity.getModelCode());
+            metadata.setAvailable(true);
+            
+            // 从modelConfig JSON解析模型信息
+            if (modelEntity.getModelConfig() != null) {
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    Map<String, Object> modelConfigMap = objectMapper.readValue(
+                            modelEntity.getModelConfig(), new TypeReference<Map<String, Object>>() {});
+                    
+                    metadata.setDescription((String) modelConfigMap.get("description"));
+                    
+                    // 解析模型类型
+                    String typeStr = (String) modelConfigMap.get("type");
+                    if (typeStr != null) {
+                        try {
+                            metadata.setType(ModelType.valueOf(typeStr.toUpperCase()));
+                        } catch (IllegalArgumentException e) {
+                            log.warn("Invalid model type: {} for model: {}, defaulting to TEXT", 
+                                     typeStr, modelEntity.getModelCode());
+                            metadata.setType(ModelType.TEXT);
+                        }
+                    } else {
+                        metadata.setType(ModelType.TEXT); // 默认类型
+                    }
+                    
+                    // 解析最大token数
+                    Object maxTokensObj = modelConfigMap.get("maxTokens");
+                    if (maxTokensObj instanceof Number) {
+                        metadata.setMaxTokens(((Number) maxTokensObj).intValue());
+                    }
+                    
+                    // 解析支持的功能
+                    @SuppressWarnings("unchecked")
+                    List<String> capabilities = (List<String>) modelConfigMap.get("capabilities");
+                    if (capabilities != null) {
+                        capabilities.forEach(metadata::addSupportedFeature);
+                    }
+                    
+                } catch (Exception e) {
+                    log.warn("Failed to parse model config for: {}, using defaults", 
+                             modelEntity.getModelCode(), e);
+                    metadata.setType(ModelType.TEXT);
+                }
+            } else {
+                metadata.setType(ModelType.TEXT);
+            }
+            
+            // 创建运行时配置
+            ModelConfig modelConfig = createModelConfigFromProvider(modelEntity, providerEntity);
+            metadata.setConfig(modelConfig);
+            
+            return metadata;
+            
+        } catch (Exception e) {
+            log.error("Failed to create ModelMetadata for model: {}", modelEntity.getModelCode(), e);
+           throw new YonchainException("注册异常",e);
+        }
+    }
+
+    /**
+     * 从提供商配置创建ModelConfig对象
+     */
+    private ModelConfig createModelConfigFromProvider(ModelEntity modelEntity, ModelProviderEntity providerEntity) {
+        ModelConfig config = new ModelConfig();
+        
+        // 设置基本信息
+        config.setName(modelEntity.getModelCode());
+        config.setProvider(providerEntity.getProviderCode());
+
+        
+        // 从modelConfig JSON解析其他配置
+        if (modelEntity.getModelConfig() != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> modelConfigMap = objectMapper.readValue(
+                        modelEntity.getModelConfig(), new TypeReference<Map<String, Object>>() {});
+                
+                // 解析模型类型
+                String typeStr = (String) modelConfigMap.get("type");
+                if (typeStr != null) {
+                    try {
+                        config.setType(ModelType.valueOf(typeStr.toUpperCase()));
+                    } catch (IllegalArgumentException e) {
+                        config.setType(ModelType.TEXT);
+                    }
+                } else {
+                    config.setType(ModelType.TEXT);
+                }
+                
+                // 解析最大token数
+                Object maxTokensObj = modelConfigMap.get("maxTokens");
+                if (maxTokensObj instanceof Number) {
+                    config.setMaxTokens(((Number) maxTokensObj).intValue());
+                }
+
+
+                objectMapper = new ObjectMapper();
+                modelConfigMap = objectMapper.readValue(
+                        providerEntity.getCustomConfig(), new TypeReference<Map<String, Object>>() {});
+                config.setApiKey((String) modelConfigMap.get("api_key"));
+                config.setEndpoint((String) modelConfigMap.get("bash_url"));
+            } catch (Exception e) {
+                log.warn("Failed to parse model config for: {}, using defaults", 
+                         modelEntity.getModelCode(), e);
+                config.setType(ModelType.TEXT);
+            }
+        } else {
+            config.setType(ModelType.TEXT);
+        }
+        
+        // 从customConfig JSON解析自定义配置
+        if (providerEntity.getCustomConfig() != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> customConfig = objectMapper.readValue(
+                        providerEntity.getCustomConfig(), new TypeReference<Map<String, Object>>() {});
+                
+                // 将自定义配置添加到ModelConfig的properties中
+                for (Map.Entry<String, Object> entry : customConfig.entrySet()) {
+                    config.setProperty(entry.getKey(), entry.getValue());
+                }
+                
+            } catch (Exception e) {
+                log.warn("Failed to parse custom config for provider: {}", 
+                         providerEntity.getProviderCode(), e);
+            }
+        }
+        
+        return config;
+    }
+
+    /**
+     * 从ModelRegistry中注销插件的所有模型
+     */
+    private void unregisterModelsFromRegistry(String pluginId) {
+        if (modelRegistry == null) {
+            log.warn("ModelRegistry not available, skipping model unregistration");
+            return;
+        }
+        
+        try {
+            log.info("Unregistering models from ModelRegistry for plugin: {}", pluginId);
+            
+            // 1. 获取该插件下的所有模型
+            List<ModelEntity> modelEntities = modelMapper.selectList("29d181ca-9562-4cc2-a4f3-be605a728143", Map.of("plugin_id", pluginId));
+            if (modelEntities == null || modelEntities.isEmpty()) {
+                log.debug("No models found for plugin: {}", pluginId);
+                return;
+            }
+            
+            // 2. 获取该插件下的所有提供商，用于构建modelId
+            List<ModelProviderEntity> providerEntities = modelProviderMapper.selectList("29d181ca-9562-4cc2-a4f3-be605a728143", Map.of("pluginId", pluginId));
+            Map<String, String> providerCodeMap = new HashMap<>();
+            for (ModelProviderEntity provider : providerEntities) {
+                providerCodeMap.put(provider.getProviderCode(), provider.getProviderCode());
+            }
+            
+            // 3. 从ModelRegistry中注销每个模型
+            int unregisteredCount = 0;
+            for (ModelEntity modelEntity : modelEntities) {
+                String providerCode = modelEntity.getProviderCode();
+                if (providerCodeMap.containsKey(providerCode)) {
+                    String modelId = providerCode + ":" + modelEntity.getModelCode();
+                    try {
+                        modelRegistry.unregisterModel(modelId);
+                        log.debug("Unregistered model from ModelRegistry: {}", modelId);
+                        unregisteredCount++;
+                    } catch (Exception e) {
+                        log.warn("Failed to unregister model: {} from ModelRegistry", modelId, e);
+                        // 继续处理其他模型，不中断整个流程
+                    }
+                }
+            }
+            
+            log.info("Successfully unregistered {} models from ModelRegistry for plugin: {}", 
+                     unregisteredCount, pluginId);
+            
+        } catch (Exception e) {
+            log.error("Failed to unregister models from ModelRegistry for plugin: {}", pluginId, e);
+            // 不抛出异常，因为这不应该影响数据库删除的成功
         }
     }
 }

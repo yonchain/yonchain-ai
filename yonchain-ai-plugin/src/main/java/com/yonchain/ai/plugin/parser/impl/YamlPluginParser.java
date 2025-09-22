@@ -2,7 +2,7 @@ package com.yonchain.ai.plugin.parser.impl;
 
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import com.yonchain.ai.plugin.descriptor.ResourceConfig;
-import com.yonchain.ai.plugin.parser.PluginParseException;
+import com.yonchain.ai.plugin.exception.PluginParseException;
 import com.yonchain.ai.plugin.parser.PluginParser;
 import com.yonchain.ai.plugin.validation.ValidationResult;
 import org.slf4j.Logger;

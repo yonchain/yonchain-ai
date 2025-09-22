@@ -1,6 +1,7 @@
 package com.yonchain.ai.plugin.parser;
 
 import com.yonchain.ai.plugin.descriptor.ProviderDescriptor;
+import com.yonchain.ai.plugin.exception.PluginParseException;
 
 import java.nio.file.Path;
 import java.util.List;

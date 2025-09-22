@@ -3,10 +3,7 @@ package com.yonchain.ai.plugin.registry.impl;
 import com.yonchain.ai.plugin.Plugin;
 import com.yonchain.ai.plugin.entity.PluginEntity;
 import com.yonchain.ai.plugin.entity.PluginInfo;
-import com.yonchain.ai.plugin.mapper.PluginDependencyMapper;
-import com.yonchain.ai.plugin.mapper.PluginExtensionMapper;
 import com.yonchain.ai.plugin.mapper.PluginMapper;
-import com.yonchain.ai.plugin.mapper.PluginServiceMapper;
 import com.yonchain.ai.plugin.registry.PluginRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,15 +31,6 @@ public class DatabasePluginRegistry implements PluginRegistry {
     
     @Autowired
     private PluginMapper pluginMapper;
-    
-    @Autowired
-    private PluginDependencyMapper dependencyMapper;
-    
-    @Autowired
-    private PluginExtensionMapper extensionMapper;
-    
-    @Autowired
-    private PluginServiceMapper serviceMapper;
     
     @Override
     @Transactional
@@ -167,10 +155,6 @@ public class DatabasePluginRegistry implements PluginRegistry {
         log.info("Deleting plugin: {}", pluginId);
         
         try {
-            // 删除关联数据
-            dependencyMapper.deleteByPluginId(pluginId);
-            extensionMapper.deleteByPluginId(pluginId);
-            serviceMapper.deleteByPluginId(pluginId);
             
             // 删除插件主记录
             int deletedRows = pluginMapper.deletePlugin(pluginId);

@@ -4,7 +4,7 @@ import com.yonchain.ai.plugin.PluginAdapter;
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import com.yonchain.ai.plugin.entity.PluginInfo;
 import com.yonchain.ai.plugin.parser.PluginParser;
-import com.yonchain.ai.plugin.parser.PluginParseException;
+import com.yonchain.ai.plugin.exception.PluginParseException;
 import com.yonchain.ai.plugin.registry.PluginRegistry;
 import com.yonchain.ai.plugin.exception.PluginInstallException;
 import com.yonchain.ai.plugin.service.PluginIconService;
@@ -39,14 +39,14 @@ public class PluginManager {
     private final PluginRegistry pluginRegistry;
     private final PluginParser pluginParser;
     private final Map<String, PluginAdapter> adapters;
-    private final PluginLifecycleEventPublisher eventPublisher;
+    private final PluginEventPublisher eventPublisher;
     private final PluginIconService pluginIconService;
 
     public PluginManager(
             PluginRegistry pluginRegistry,
             PluginParser pluginParser,
             List<PluginAdapter> adapters,
-            PluginLifecycleEventPublisher eventPublisher,
+            PluginEventPublisher eventPublisher,
             PluginIconService pluginIconService) {
 
         this.pluginRegistry = pluginRegistry;

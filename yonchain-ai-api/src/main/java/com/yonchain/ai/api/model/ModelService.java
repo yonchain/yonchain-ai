@@ -115,7 +115,7 @@ public interface ModelService {
      * @param pluginId 插件ID
      * @param modelProvider 模型提供商
      */
-    void saveProviderForUI(String pluginId, ModelProviderInfo modelProvider);
+    void saveProvider(String pluginId, ModelProviderInfo modelProvider);
 
     /**
      * 保存插件的模型信息到数据库（用于可视化界面展示和配置）
@@ -124,7 +124,7 @@ public interface ModelService {
      * @param modelMetadataList 模型元数据列表
      * @param providerCode 提供商代码
      */
-    void saveModelsForUI(String pluginId, List<Object> modelMetadataList, String providerCode);
+    void saveModels(String pluginId, List<Object> modelMetadataList, String providerCode);
 
     /**
      * 删除插件相关的所有数据

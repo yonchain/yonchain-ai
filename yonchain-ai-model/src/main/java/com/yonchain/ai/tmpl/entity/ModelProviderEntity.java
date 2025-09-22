@@ -33,20 +33,20 @@ public class ModelProviderEntity {
      */
     private String pluginId;
 
-    /**
+/*    *//**
      * API密钥
-     */
+     *//*
     private String apiKey;
 
-    /**
+    *//**
      * API基础URL，可覆盖静态配置
-     */
+     *//*
     private String baseUrl;
 
-    /**
+    *//**
      * API代理URL
-     */
-    private String proxyUrl;
+     *//*
+    private String proxyUrl;*/
 
     /**
      * 自定义配置参数，JSON格式

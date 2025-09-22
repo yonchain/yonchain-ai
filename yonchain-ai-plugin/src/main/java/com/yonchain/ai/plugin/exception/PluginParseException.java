@@ -1,4 +1,4 @@
-package com.yonchain.ai.plugin.parser;
+package com.yonchain.ai.plugin.exception;
 
 /**
  * 插件解析异常

@@ -12,12 +12,12 @@
         <result column="provider_code" property="providerCode" jdbcType="VARCHAR" />
         <!-- 插件ID -->
         <result column="plugin_id" property="pluginId" jdbcType="VARCHAR" />
-        <!-- API密钥 -->
+       <!-- &lt;!&ndash; API密钥 &ndash;&gt;
         <result column="api_key" property="apiKey" jdbcType="VARCHAR" />
-        <!-- API基础URL -->
+        &lt;!&ndash; API基础URL &ndash;&gt;
         <result column="base_url" property="baseUrl" jdbcType="VARCHAR" />
-        <!-- API代理URL -->
-        <result column="proxy_url" property="proxyUrl" jdbcType="VARCHAR" />
+        &lt;!&ndash; API代理URL &ndash;&gt;
+        <result column="proxy_url" property="proxyUrl" jdbcType="VARCHAR" />-->
         <!-- 自定义配置参数 -->
         <result column="custom_config" property="customConfig" jdbcType="VARCHAR" />
         <!-- 租户是否启用该提供商 -->
@@ -52,7 +52,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, tenant_id, provider_code, plugin_id, api_key, base_url, proxy_url,
+        id, tenant_id, provider_code, plugin_id,
         custom_config, enabled, name, description, icon, background, sort_order,
         supported_model_types, configurate_methods, help_info, credential_schema,
         create_time, update_time, created_by, updated_by
@@ -145,13 +145,13 @@
     <!-- 插入模型提供商 -->
     <insert id="insert" parameterType="com.yonchain.ai.tmpl.entity.ModelProviderEntity">
         INSERT INTO model_provider (
-            id, tenant_id, provider_code, plugin_id, api_key, base_url, proxy_url,
+            id, tenant_id, provider_code, plugin_id,
             custom_config, enabled, name, description, icon, background, sort_order,
             supported_model_types, configurate_methods, help_info, credential_schema,
             create_time, update_time, created_by, updated_by
         )
         VALUES (
-                   #{id}, #{tenantId}, #{providerCode}, #{pluginId}, #{apiKey}, #{baseUrl}, #{proxyUrl},
+                   #{id}, #{tenantId}, #{providerCode}, #{pluginId},
                    #{customConfig}, #{enabled}, #{name}, #{description}, #{icon}, #{background}, #{sortOrder},
                    #{supportedModelTypes}, #{configurateMethods}, #{helpInfo}, #{credentialSchema},
                    #{createTime}, #{updateTime}, #{createdBy}, #{updatedBy}
@@ -163,9 +163,6 @@
         UPDATE model_provider
         SET provider_code = #{providerCode},
             plugin_id = #{pluginId},
-            api_key = #{apiKey},
-            base_url = #{baseUrl},
-            proxy_url = #{proxyUrl},
             custom_config = #{customConfig},
             enabled = #{enabled},
             name = #{name},
