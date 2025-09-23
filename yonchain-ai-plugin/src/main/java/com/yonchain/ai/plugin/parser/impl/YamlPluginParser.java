@@ -263,7 +263,7 @@ public class YamlPluginParser implements PluginParser {
             if (modelPermData != null) {
                 ResourceConfig.ModelPermission modelPerm = new ResourceConfig.ModelPermission();
                 modelPerm.setEnabled(getBoolean(modelPermData, "enabled", false));
-                modelPerm.setLlm(getBoolean(modelPermData, "llm", false));
+                modelPerm.setChat(getBoolean(modelPermData, "chat", false));
                 modelPerm.setModeration(getBoolean(modelPermData, "moderation", false));
                 modelPerm.setRerank(getBoolean(modelPermData, "rerank", false));
                 modelPerm.setSpeech2text(getBoolean(modelPermData, "speech2text", false));

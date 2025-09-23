@@ -19,7 +19,7 @@ resource:
   permission:
     model:
       enabled: true
-      llm: true
+      chat: true
       moderation: false
       rerank: true
       speech2text: false

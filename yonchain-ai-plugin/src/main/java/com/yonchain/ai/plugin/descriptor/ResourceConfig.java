@@ -75,7 +75,7 @@ public class ResourceConfig {
      */
     public static class ModelPermission {
         private Boolean enabled;
-        private Boolean llm;
+        private Boolean chat;
         private Boolean moderation;
         private Boolean rerank;
         private Boolean speech2text;
@@ -91,12 +91,12 @@ public class ResourceConfig {
             this.enabled = enabled;
         }
         
-        public Boolean getLlm() {
-            return llm;
+        public Boolean getChat() {
+            return chat;
         }
         
-        public void setLlm(Boolean llm) {
-            this.llm = llm;
+        public void setChat(Boolean chat) {
+            this.chat = chat;
         }
         
         public Boolean getModeration() {

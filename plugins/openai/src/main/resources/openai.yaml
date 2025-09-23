@@ -16,7 +16,7 @@ help:
   url:
     en_US: https://platform.openai.com/account/api-keys
 supported_model_types:
-  - llm
+  - chat
   - text-embedding
   - speech2text
   - moderation
@@ -88,7 +88,7 @@ provider_credential_schema:
         zh_Hans: 在此输入您的 API Base, 如：https://api.openai.com
         en_US: Enter your API Base, e.g. https://api.openai.com
 models:
-  llm:
+  chat:
     source: org.springframework.ai.deepseek.DeepSeekChatModel
     predefined:
       - "models/llm/*.yaml"

@@ -19,11 +19,11 @@ label:
   en_US: deepseek
   zh_Hans: 深度求索
 models:
-  llm:
+  chat:
     source: org.springframework.ai.deepseek.DeepSeekChatModel
-    position: models/llm/_position.yaml
+    position: models/chat/_position.yaml
     predefined:
-      - models/llm/*.yaml
+      - models/chat/*.yaml
 provider: deepseek
 provider_credential_schema:
   credential_form_schemas:
@@ -45,4 +45,4 @@ provider_credential_schema:
       type: text-input
       variable: endpoint_url
 supported_model_types:
-  - llm
+  - chat
