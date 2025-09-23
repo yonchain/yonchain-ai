@@ -51,7 +51,7 @@ public interface ModelService {
      * @param queryParam 查询参数
      * @return 提供商列表
      */
-    List<ModelProviderInfo> getProviders(String tenantId, Map<String, Object> queryParam);
+    List<ModelProvider> getProviders(String tenantId, Map<String, Object> queryParam);
 
     /**
      * 获取租户的模型提供商配置
@@ -109,28 +109,5 @@ public interface ModelService {
      */
     void saveModelConfig(String tenantId, ModelInfo modelInfo);
 
-    /**
-     * 保存插件的提供商信息到数据库（用于可视化界面展示和配置）
-     *
-     * @param pluginId 插件ID
-     * @param modelProvider 模型提供商
-     */
-    void saveProvider(String pluginId, ModelProviderInfo modelProvider);
-
-    /**
-     * 保存插件的模型信息到数据库（用于可视化界面展示和配置）
-     *
-     * @param pluginId 插件ID
-     * @param modelMetadataList 模型元数据列表
-     * @param providerCode 提供商代码
-     */
-    void saveModels(String pluginId, List<Object> modelMetadataList, String providerCode);
-
-    /**
-     * 删除插件相关的所有数据
-     *
-     * @param pluginId 插件ID
-     */
-    void removePluginData(String pluginId);
 
 }
