@@ -1,3 +1,4 @@
+/*
 package com.yonchain.ai.image.impl;
 
 import com.yonchain.ai.model.factory.ModelFactory;
@@ -16,10 +17,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+*/
 /**
  * 默认图像模型服务实现
  * 专注于图像模型调用
- */
+ *//*
+
 @Service
 public class DefaultImageModelService implements ImageModelService {
     
@@ -73,12 +76,14 @@ public class DefaultImageModelService implements ImageModelService {
         return modelCache.computeIfAbsent(modelName, this::createModel);
     }
     
-    /**
+    */
+/**
      * 创建图像模型实例
      * 
      * @param modelName 模型名称
      * @return 图像模型实例
-     */
+     *//*
+
     private ImageModel createModel(String modelName) {
         logger.debug("Creating image model: {}", modelName);
         
@@ -110,30 +115,36 @@ public class DefaultImageModelService implements ImageModelService {
         }
     }
     
-    /**
+    */
+/**
      * 获取所有可用的图像模型名称
      * 
      * @return 模型名称集合
-     */
+     *//*
+
     public Set<String> getAvailableModels() {
         return modelCache.keySet();
     }
     
-    /**
+    */
+/**
      * 检查图像模型是否可用
      * 
      * @param modelName 模型名称
      * @return 是否可用
-     */
+     *//*
+
     public boolean isModelAvailable(String modelName) {
         return modelRegistry.isModelAvailable(modelName);
     }
     
-    /**
+    */
+/**
      * 清理模型缓存
      * 
      * @param modelName 模型名称，如果为null则清理所有缓存
-     */
+     *//*
+
     public void clearCache(String modelName) {
         if (modelName == null) {
             logger.info("Clearing all image model cache");
@@ -144,20 +155,24 @@ public class DefaultImageModelService implements ImageModelService {
         }
     }
     
-    /**
+    */
+/**
      * 获取缓存的模型数量
      * 
      * @return 缓存的模型数量
-     */
+     *//*
+
     public int getCachedModelCount() {
         return modelCache.size();
     }
     
-    /**
+    */
+/**
      * 预热指定模型（提前创建并缓存）
      * 
      * @param modelName 模型名称
-     */
+     *//*
+
     public void warmupModel(String modelName) {
         try {
             logger.info("Warming up image model: {}", modelName);
@@ -168,3 +183,4 @@ public class DefaultImageModelService implements ImageModelService {
         }
     }
 }
+*/

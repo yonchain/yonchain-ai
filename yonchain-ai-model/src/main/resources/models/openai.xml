@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<models namespace="openai">
+
+    <!-- 聊天模型 -->
+    <model id="gpt-4" type="chat">
+        <endpoint>https://api.openai.com/v1/chat/completions</endpoint>
+        <auth type="bearer">${openai.apiKey}</auth>
+        <options>
+            <model>gpt-4</model>
+            <temperature>0.7</temperature>
+            <maxTokens>4096</maxTokens>
+        </options>
+    </model>
+    
+    <model id="gpt-3.5-turbo" type="chat">
+        <endpoint>https://api.openai.com/v1/chat/completions</endpoint>
+        <auth type="bearer">${openai.apiKey}</auth>
+        <options>
+            <model>gpt-3.5-turbo</model>
+            <temperature>0.7</temperature>
+            <maxTokens>2048</maxTokens>
+        </options>
+    </model>
+    
+    <!-- 图像生成模型 -->
+    <model id="dall-e-3" type="image">
+        <endpoint>https://api.openai.com/v1/images/generations</endpoint>
+        <auth type="bearer">${openai.apiKey}</auth>
+        <options>
+            <model>dall-e-3</model>
+            <size>1024x1024</size>
+            <quality>standard</quality>
+            <n>1</n>
+        </options>
+    </model>
+    
+    <!-- 嵌入模型 -->
+    <model id="text-embedding-ada-002" type="embedding">
+        <endpoint>https://api.openai.com/v1/embeddings</endpoint>
+        <auth type="bearer">${openai.apiKey}</auth>
+        <options>
+            <model>text-embedding-ada-002</model>
+        </options>
+    </model>
+</models>

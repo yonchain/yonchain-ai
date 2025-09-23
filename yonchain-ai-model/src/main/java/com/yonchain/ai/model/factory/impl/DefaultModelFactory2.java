@@ -1,3 +1,4 @@
+/*
 package com.yonchain.ai.model.factory.impl;
 
 import com.yonchain.ai.model.factory.ModelFactory;
@@ -15,10 +16,12 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+*/
 /**
  * 默认模型工厂实现
  * 负责根据配置创建不同类型的模型实例
- */
+ *//*
+
 @Component
 public class DefaultModelFactory implements ModelFactory {
     
@@ -153,12 +156,14 @@ public class DefaultModelFactory implements ModelFactory {
         return supportedTypes;
     }
     
-    /**
+    */
+/**
      * 获取提供商实例
      * 
      * @param providerName 提供商名称
      * @return 提供商实例
-     */
+     *//*
+
     private ModelProvider getProvider(String providerName) {
         if (providerName == null) {
             throw new IllegalArgumentException("Provider name cannot be null");
@@ -173,12 +178,14 @@ public class DefaultModelFactory implements ModelFactory {
         return provider;
     }
     
-    /**
+    */
+/**
      * 验证模型配置
      * 
      * @param config 模型配置
      * @param expectedType 期望的模型类型
-     */
+     *//*
+
     private void validateConfig(ModelConfig config, ModelType expectedType) {
         if (config == null) {
             throw new IllegalArgumentException("Model config cannot be null");
@@ -207,12 +214,15 @@ public class DefaultModelFactory implements ModelFactory {
         }
     }
     
-    /**
+    */
+/**
      * 获取提供商数量
      * 
      * @return 提供商数量
-     */
+     *//*
+
     public int getProviderCount() {
         return providers.size();
     }
 }
+*/

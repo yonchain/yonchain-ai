@@ -1,4 +1,4 @@
-package com.yonchain.ai.image;
+/*package com.yonchain.ai.image;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.filter.BaseModelFilter;
@@ -14,16 +14,16 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-/**
+*//**
  * 图像模型过滤器
  * 处理图像生成请求 /images/generations
- */
+ *//*
 @Component
-public class ImageModelFilter extends BaseModelFilter<ImageModel> {
+public class ImageModelFilter extends BaseModelFilter<ImageModel> {*/
     
-    private static final Pattern ENDPOINT_PATTERN = Pattern.compile(".*/images/generations$");
+  //  private static final Pattern ENDPOINT_PATTERN = Pattern.compile(".*/images/generations$");
     
-    private final ImageModelService imageModelService;
+  /*  private final ImageModelService imageModelService;
     
     public ImageModelFilter(ImageModelService imageModelService, ObjectMapper objectMapper) {
         super(objectMapper);
@@ -79,12 +79,12 @@ public class ImageModelFilter extends BaseModelFilter<ImageModel> {
         }
     }
     
-    /**
+    *//**
      * 构建图像提示
      * 
      * @param requestParams 请求参数
      * @return 图像提示
-     */
+     *//*
     private ImagePrompt buildImagePrompt(Map<String, Object> requestParams) {
         // 获取提示文本
         Object promptObj = requestParams.get("prompt");
@@ -99,12 +99,12 @@ public class ImageModelFilter extends BaseModelFilter<ImageModel> {
         return new ImagePrompt(promptText);
     }
     
-    /**
+    *//**
      * 转换图像响应为OpenAI格式
      * 
      * @param imageResponse Spring AI图像响应
      * @return OpenAI格式的响应数据
-     */
+     *//*
     private Map<String, Object> convertImageResponse(ImageResponse imageResponse) {
         Map<String, Object> response = new HashMap<>();
         
@@ -135,4 +135,4 @@ public class ImageModelFilter extends BaseModelFilter<ImageModel> {
         
         return response;
     }
-}
+}*/

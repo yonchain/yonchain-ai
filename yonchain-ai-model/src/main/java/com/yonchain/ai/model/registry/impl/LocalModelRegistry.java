@@ -1,3 +1,4 @@
+/*
 package com.yonchain.ai.model.registry.impl;
 
 import com.yonchain.ai.model.ModelMetadata;
@@ -15,10 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+*/
 /**
  * 本地内存模型注册表
  * 适用于单机部署或开发环境
- */
+ *//*
+
 @Component
 @ConditionalOnProperty(name = "yonchain.ai.registry.type", havingValue = "local", matchIfMissing = true)
 public class LocalModelRegistry implements ModelRegistry {
@@ -135,11 +138,13 @@ public class LocalModelRegistry implements ModelRegistry {
         }
     }
     
-    /**
+    */
+/**
      * 移除模型变化监听器
      * 
      * @param listener 监听器
-     */
+     *//*
+
     public void removeModelChangeListener(ModelChangeListener listener) {
         if (listener != null) {
             listeners.remove(listener);
@@ -147,30 +152,36 @@ public class LocalModelRegistry implements ModelRegistry {
         }
     }
     
-    /**
+    */
+/**
      * 获取当前注册的模型数量
      * 
      * @return 模型数量
-     */
+     *//*
+
     public int getModelCount() {
         return models.size();
     }
     
-    /**
+    */
+/**
      * 清空所有模型
-     */
+     *//*
+
     public void clear() {
         logger.info("Clearing all models from registry");
         models.clear();
     }
     
-    /**
+    */
+/**
      * 解析模型key
      * 如果输入的模型名称不包含提供商前缀，尝试查找匹配的完整名称
      * 
      * @param modelName 模型名称
      * @return 解析后的模型key
-     */
+     *//*
+
     private String resolveModelKey(String modelName) {
         if (modelName == null) {
             return null;
@@ -224,3 +235,4 @@ public class LocalModelRegistry implements ModelRegistry {
         });
     }
 }
+*/

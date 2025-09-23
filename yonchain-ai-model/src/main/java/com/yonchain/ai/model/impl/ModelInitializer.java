@@ -75,7 +75,8 @@ public class ModelInitializer implements ApplicationRunner {
         addSupportedFeatures(metadata, config);
         
         // 注册到注册中心（内部会使用完整名称作为key）
-        modelRegistry.registerModel(metadata);
+        //TODO
+        //modelRegistry.registerModel(metadata);
         
         logger.info("Registered model: {} -> {} (type: {}, provider: {})", 
             config.getName(), metadata.getModelId(), config.getType(), config.getProvider());

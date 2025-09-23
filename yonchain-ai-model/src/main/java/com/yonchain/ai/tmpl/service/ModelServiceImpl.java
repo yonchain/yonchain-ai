@@ -820,7 +820,8 @@ public class ModelServiceImpl implements ModelService {
             for (ModelEntity modelEntity : modelEntities) {
                 ModelMetadata metadata = createModelMetadataFromEntity(modelEntity, providerEntity);
                 if (metadata != null) {
-                    modelRegistry.registerModel(metadata);
+                  //TODO
+                    //  modelRegistry.registerModel(metadata);
                     log.debug("Registered model to ModelRegistry: {}", metadata.getModelId());
                 }
             }
@@ -1013,7 +1014,8 @@ public class ModelServiceImpl implements ModelService {
                 if (providerCodeMap.containsKey(providerCode)) {
                     String modelId = providerCode + ":" + modelEntity.getModelCode();
                     try {
-                        modelRegistry.unregisterModel(modelId);
+                        //TODO
+                       // modelRegistry.unregisterModel(modelId);
                         log.debug("Unregistered model from ModelRegistry: {}", modelId);
                         unregisteredCount++;
                     } catch (Exception e) {

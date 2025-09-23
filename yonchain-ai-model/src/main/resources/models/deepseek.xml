@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<models namespace="deepseek">
+    <!-- 聊天模型 -->
+    <model id="deepseek-chat" type="chat">
+        <endpoint>https://api.deepseek.com/v1/chat/completions</endpoint>
+        <auth type="bearer">${deepseek.apiKey}</auth>
+        <options>
+            <model>deepseek-chat</model>
+            <temperature>0.7</temperature>
+            <maxTokens>8192</maxTokens>
+            <topP>0.95</topP>
+        </options>
+    </model>
+    
+    <model id="deepseek-coder" type="chat">
+        <endpoint>https://api.deepseek.com/v1/chat/completions</endpoint>
+        <auth type="bearer">${deepseek.apiKey}</auth>
+        <options>
+            <model>deepseek-coder</model>
+            <temperature>0.1</temperature>
+            <maxTokens>8192</maxTokens>
+            <topP>0.95</topP>
+        </options>
+    </model>
+    
+    <model id="deepseek-math" type="chat">
+        <endpoint>https://api.deepseek.com/v1/chat/completions</endpoint>
+        <auth type="bearer">${deepseek.apiKey}</auth>
+        <options>
+            <model>deepseek-math</model>
+            <temperature>0.0</temperature>
+            <maxTokens>4096</maxTokens>
+            <topP>0.95</topP>
+        </options>
+    </model>
+</models>

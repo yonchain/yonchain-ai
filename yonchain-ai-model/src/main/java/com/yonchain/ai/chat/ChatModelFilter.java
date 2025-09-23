@@ -1,4 +1,4 @@
-package com.yonchain.ai.chat;
+/*package com.yonchain.ai.chat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.filter.BaseModelFilter;
@@ -25,16 +25,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
+*//**
  * 聊天模型过滤器
  * 处理聊天完成请求 /chat/completions
- */
+ *//*
 @Component
-public class ChatModelFilter extends BaseModelFilter<ChatModel> {
+public class ChatModelFilter extends BaseModelFilter<ChatModel> {*/
 
-    private static final Pattern ENDPOINT_PATTERN = Pattern.compile(".*/chat/completions$");
+  //  private static final Pattern ENDPOINT_PATTERN = Pattern.compile(".*/chat/completions$");
 
-    private final ChatModelService chatModelService;
+  /*  private final ChatModelService chatModelService;
 
     public ChatModelFilter(ChatModelService chatModelService, ObjectMapper objectMapper) {
         super(objectMapper);
@@ -50,9 +50,9 @@ public class ChatModelFilter extends BaseModelFilter<ChatModel> {
     @Override
     protected ModelService<ChatModel> getModelService() {
         return chatModelService;
-    }
+    }*/
     
-    @Override
+/*    @Override
     protected void handleModelRequest(HttpServletRequest request, HttpServletResponse response) 
             throws IOException {
         
@@ -87,12 +87,12 @@ public class ChatModelFilter extends BaseModelFilter<ChatModel> {
             logger.error("Error processing chat request", e);
             sendErrorResponse(response, "Failed to process chat request: " + e.getMessage(), 500);
         }
-    }
-
-    /**
+    }*/
+/*
+    *//**
      * Handle stream request using Servlet async processing
      * This approach prevents IllegalStateException: The response object has been recycled
-     */
+     *//*
     private void handleStreamRequest(ChatModel chatModel, Prompt prompt,
                                      HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -167,9 +167,9 @@ public class ChatModelFilter extends BaseModelFilter<ChatModel> {
         });
     }
 
-    /**
+    *//**
      * Handle sync request
-     */
+     *//*
     private void handleSyncRequest(ChatModel chatModel, Prompt prompt, HttpServletResponse response)
             throws IOException {
 
@@ -196,12 +196,12 @@ public class ChatModelFilter extends BaseModelFilter<ChatModel> {
         }
     }
 
-    /**
+    *//**
      * 构建Spring AI提示
      * 
      * @param requestParams 请求参数
      * @return Spring AI提示对象
-     */
+     *//*
     private Prompt buildPrompt(Map<String, Object> requestParams) {
         // 1. 解析消息
         @SuppressWarnings("unchecked")
@@ -251,14 +251,17 @@ public class ChatModelFilter extends BaseModelFilter<ChatModel> {
         
         // 3. 创建提示
         return new Prompt(springAiMessages, chatOptions);
-    }
+    }*/
+/*
 
-    /**
+    */
+/**
      * 转换为Spring AI消息格式
      * 
      * @param messageData 消息数据
      * @return Spring AI消息对象
-     */
+     *//*
+
     private Message convertToSpringAiMessage(Map<String, Object> messageData) {
         String role = (String) messageData.get("role");
         String content = (String) messageData.get("content");
@@ -280,9 +283,11 @@ public class ChatModelFilter extends BaseModelFilter<ChatModel> {
         }
     }
 
-    /**
+    */
+/**
      * Convert ChatResponse to standard format
-     */
+     *//*
+
     private Map<String, Object> convertChatResponse(ChatResponse chatResponse) {
         Map<String, Object> responseMap = new HashMap<>();
         responseMap.put("id", "chatcmpl-" + UUID.randomUUID().toString());
@@ -327,9 +332,11 @@ public class ChatModelFilter extends BaseModelFilter<ChatModel> {
     }
 
 
-    /**
+    */
+/**
      * Complete async context and send error response
-     */
+     *//*
+
     private void completeAsyncWithError(AsyncContext asyncContext, Throwable error) {
         try {
             HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
@@ -346,5 +353,6 @@ public class ChatModelFilter extends BaseModelFilter<ChatModel> {
             }
         }
     }
+*/
 
-}
+//}

@@ -1,3 +1,4 @@
+/*
 package com.yonchain.ai.chat.impl;
 
 import com.yonchain.ai.chat.ChatModelService;
@@ -16,10 +17,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+*/
 /**
  * 默认聊天模型服务实现
  * 专注于模型调用，通过注册中心获取元数据，通过工厂创建模型实例
- */
+ *//*
+
 @Service
 public class DefaultChatModelService implements ChatModelService {
     
@@ -73,12 +76,14 @@ public class DefaultChatModelService implements ChatModelService {
         return modelCache.computeIfAbsent(modelName, this::createModel);
     }
     
-    /**
+    */
+/**
      * 创建模型实例
      * 
      * @param modelName 模型名称
      * @return 聊天模型实例
-     */
+     *//*
+
     private ChatModel createModel(String modelName) {
         logger.debug("Creating chat model: {}", modelName);
         
@@ -110,30 +115,36 @@ public class DefaultChatModelService implements ChatModelService {
         }
     }
     
-    /**
+    */
+/**
      * 获取所有可用的聊天模型名称
      * 
      * @return 模型名称集合
-     */
+     *//*
+
     public Set<String> getAvailableModels() {
         return modelCache.keySet();
     }
     
-    /**
+    */
+/**
      * 检查模型是否可用
      * 
      * @param modelName 模型名称
      * @return 是否可用
-     */
+     *//*
+
     public boolean isModelAvailable(String modelName) {
         return modelRegistry.isModelAvailable(modelName);
     }
     
-    /**
+    */
+/**
      * 清理模型缓存
      * 
      * @param modelName 模型名称，如果为null则清理所有缓存
-     */
+     *//*
+
     public void clearCache(String modelName) {
         if (modelName == null) {
             logger.info("Clearing all chat model cache");
@@ -144,20 +155,24 @@ public class DefaultChatModelService implements ChatModelService {
         }
     }
     
-    /**
+    */
+/**
      * 获取缓存的模型数量
      * 
      * @return 缓存的模型数量
-     */
+     *//*
+
     public int getCachedModelCount() {
         return modelCache.size();
     }
     
-    /**
+    */
+/**
      * 预热指定模型（提前创建并缓存）
      * 
      * @param modelName 模型名称
-     */
+     *//*
+
     public void warmupModel(String modelName) {
         try {
             logger.info("Warming up chat model: {}", modelName);
@@ -168,3 +183,4 @@ public class DefaultChatModelService implements ChatModelService {
         }
     }
 }
+*/

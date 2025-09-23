@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<models namespace="business">
+    <!-- 业务场景模型 -->
+    <model id="customer-service" type="chat">
+        <endpoint>https://api.openai.com/v1/chat/completions</endpoint>
+        <auth type="bearer">${openai.apiKey}</auth>
+        <options>
+            <model>gpt-4</model>
+            <temperature>0.3</temperature>
+            <maxTokens>2048</maxTokens>
+            <systemPrompt>你是一个专业的客服助手，请友好、耐心地回答用户问题。请使用简洁明了的语言，并提供有用的解决方案。</systemPrompt>
+        </options>
+    </model>
+    
+    <model id="code-reviewer" type="chat">
+        <endpoint>https://api.deepseek.com/v1/chat/completions</endpoint>
+        <auth type="bearer">${deepseek.apiKey}</auth>
+        <options>
+            <model>deepseek-coder</model>
+            <temperature>0.1</temperature>
+            <maxTokens>4096</maxTokens>
+            <systemPrompt>你是一个资深的代码审查专家，请仔细分析提交的代码，指出潜在问题并给出改进建议。</systemPrompt>
+        </options>
+    </model>
+    
+    <model id="content-writer" type="chat">
+        <endpoint>https://api.openai.com/v1/chat/completions</endpoint>
+        <auth type="bearer">${openai.apiKey}</auth>
+        <options>
+            <model>gpt-4</model>
+            <temperature>0.8</temperature>
+            <maxTokens>3000</maxTokens>
+            <systemPrompt>你是一个专业的内容创作者，擅长写作各种类型的文章，包括技术文档、营销文案、新闻报道等。</systemPrompt>
+        </options>
+    </model>
+    
+    <model id="data-analyst" type="chat">
+        <endpoint>https://api.openai.com/v1/chat/completions</endpoint>
+        <auth type="bearer">${openai.apiKey}</auth>
+        <options>
+            <model>gpt-4</model>
+            <temperature>0.2</temperature>
+            <maxTokens>2048</maxTokens>
+            <systemPrompt>你是一个数据分析专家，擅长分析数据趋势、制作图表和提供业务洞察。请用专业且易懂的方式解释数据。</systemPrompt>
+        </options>
+    </model>
+</models>

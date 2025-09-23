@@ -151,11 +151,11 @@ public class DeepSeekPlugin implements ModelPlugin {
         }
         
         try {
-            List<ModelMetadata> models = getModels();
+          /*  List<ModelMetadata> models = getModels();
             for (ModelMetadata model : models) {
                 registry.registerModel(model);
                 log.debug("Registered model: {} from DeepSeek plugin", model.getModelId());
-            }
+            }*/
             
             log.info("All DeepSeek models registered successfully");
             
@@ -174,7 +174,7 @@ public class DeepSeekPlugin implements ModelPlugin {
         try {
             List<ModelMetadata> models = getModels();
             for (ModelMetadata model : models) {
-                registry.unregisterModel(model.getModelId());
+              //  registry.unregisterModel(model.getModelId());
                 log.debug("Unregistered model: {} from DeepSeek plugin", model.getModelId());
             }
             

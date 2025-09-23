@@ -46,8 +46,8 @@ public class ModelPluginAdapter implements PluginAdapter {
     private static final Logger log = LoggerFactory.getLogger(ModelPluginAdapter.class);
     
     private final PluginRegistry pluginRegistry;
-    private final ModelRegistry modelRegistry;
-    private final ModelFactory modelFactory;
+/*    private final ModelRegistry modelRegistry;
+    private final ModelFactory modelFactory;*/
     private final PluginClassLoader pluginClassLoader;
     private final ApplicationContext applicationContext;
     private final ModelService modelService;
@@ -61,15 +61,15 @@ public class ModelPluginAdapter implements PluginAdapter {
     private final Map<String, DefaultPluginContext> pluginContexts = new ConcurrentHashMap<>();
     
     public ModelPluginAdapter(PluginRegistry pluginRegistry, 
-                             ModelRegistry modelRegistry,
-                             ModelFactory modelFactory,
+                           //  ModelRegistry modelRegistry,
+                           //  ModelFactory modelFactory,
                               PluginClassLoader pluginClassLoader,
                              ApplicationContext applicationContext,
                              ModelService modelService,
                              PluginIconService pluginIconService) {
         this.pluginRegistry = pluginRegistry;
-        this.modelRegistry = modelRegistry;
-        this.modelFactory = modelFactory;
+     /*   this.modelRegistry = modelRegistry;
+        this.modelFactory = modelFactory;*/
         this.pluginClassLoader = pluginClassLoader;
         this.applicationContext = applicationContext;
         this.modelService = modelService;
@@ -151,8 +151,8 @@ public class ModelPluginAdapter implements PluginAdapter {
             // 4. 注册模型提供商到Spring容器
             registerModelProvider(pluginId, modelProvider);
             
-            // 5. 注册模型提供商到模型工厂
-            modelFactory.registerProvider(modelProvider.getProviderName(), modelProvider);
+            // todo 5. 注册模型提供商到模型工厂
+            //modelFactory.registerProvider(modelProvider.getProviderName(), modelProvider);
 
 
             // 6. 保存提供商信息到数据库（用于可视化界面展示和配置）
@@ -213,7 +213,7 @@ public class ModelPluginAdapter implements PluginAdapter {
             
             // 6. 从模型工厂注销模型提供商
             if (modelProvider != null) {
-                modelFactory.unregisterProvider(modelProvider.getProviderName());
+               //TODO  modelFactory.unregisterProvider(modelProvider.getProviderName());
             }
             
             // 7. 从Spring容器注销模型提供商
@@ -311,7 +311,7 @@ public class ModelPluginAdapter implements PluginAdapter {
         // 创建并缓存插件上下文
         DefaultPluginContext pluginContext = new DefaultPluginContext(
             applicationContext,
-            modelRegistry,
+        //    modelRegistry,
             this, // 传递自身作为模型插件适配器
             pluginId,
             pluginWorkDirectory
@@ -416,7 +416,7 @@ public class ModelPluginAdapter implements PluginAdapter {
             
             // 从模型工厂注销模型提供商
             if (modelProvider != null) {
-                modelFactory.unregisterProvider(modelProvider.getProviderName());
+             //TODO    modelFactory.unregisterProvider(modelProvider.getProviderName());
             }
             
             // 从Spring容器注销模型提供商

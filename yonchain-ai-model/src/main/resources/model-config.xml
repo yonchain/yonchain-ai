@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <!-- 全局配置 -->
+    <settings>
+        <setting name="cache.enabled" value="true"/>
+        <setting name="default.timeout" value="30"/>
+        <setting name="openai.compatibility.enabled" value="true"/>
+        <setting name="enable.metrics" value="true"/>
+    </settings>
+    
+    <!-- 模型配置文件扫描 -->
+    <models>
+        <resource path="classpath:models/openai.xml"/>
+        <resource path="classpath:models/deepseek.xml"/>
+        <resource path="classpath:models/business.xml"/>
+    </models>
+    
+    <!-- 别名配置 -->
+    <aliases>
+        <alias name="default-chat" target="openai:gpt-4"/>
+        <alias name="fast-chat" target="deepseek:deepseek-chat"/>
+        <alias name="best-image" target="openai:dall-e-3"/>
+        <alias name="cheap-chat" target="openai:gpt-3.5-turbo"/>
+        <alias name="code-chat" target="deepseek:deepseek-coder"/>
+    </aliases>
+</configuration>
