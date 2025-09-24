@@ -4,8 +4,8 @@ import com.yonchain.ai.model.core.ModelClient;
 import com.yonchain.ai.model.core.ModelClientFactory;
 import com.yonchain.ai.model.core.ModelClientFactoryBuilder;
 import com.yonchain.ai.model.factory.ModelFactory;
-import com.yonchain.ai.model.factory.impl.DeepSeekNamespaceFactory;
-import com.yonchain.ai.model.factory.impl.OpenAINamespaceFactory;
+import com.yonchain.ai.model.factory.impl.DeepSeekModelFactory;
+import com.yonchain.ai.model.factory.impl.OpenAIModelFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -55,8 +55,8 @@ public class ModelClientAutoConfiguration {
      */
     @Bean
     @ConditionalOnProperty(name = "yonchain.ai.models.openai.enabled", havingValue = "true", matchIfMissing = true)
-    public OpenAINamespaceFactory openAINamespaceFactory() {
-        return new OpenAINamespaceFactory();
+    public OpenAIModelFactory openAINamespaceFactory() {
+        return new OpenAIModelFactory();
     }
     
     /**
@@ -64,7 +64,7 @@ public class ModelClientAutoConfiguration {
      */
     @Bean
     @ConditionalOnProperty(name = "yonchain.ai.models.deepseek.enabled", havingValue = "true", matchIfMissing = true)
-    public DeepSeekNamespaceFactory deepSeekNamespaceFactory() {
-        return new DeepSeekNamespaceFactory();
+    public DeepSeekModelFactory deepSeekNamespaceFactory() {
+        return new DeepSeekModelFactory();
     }
 }

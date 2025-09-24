@@ -4,11 +4,11 @@ import com.yonchain.ai.model.definition.ModelDefinition;
 import com.yonchain.ai.model.factory.ModelFactory;
 import com.yonchain.ai.model.registry.TypeHandlerRegistry;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatModel;
+import org.springframework.ai.deepseek.DeepSeekChatOptions;
+import org.springframework.ai.deepseek.api.DeepSeekApi;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * 使用OpenAI兼容的API接口
  */
 @Component
-public class DeepSeekNamespaceFactory implements ModelFactory {
+public class DeepSeekModelFactory implements ModelFactory {
     
     @Override
     public String namespace() {
@@ -32,8 +32,19 @@ public class DeepSeekNamespaceFactory implements ModelFactory {
     @Override
     public ChatModel createChatModel(ModelDefinition definition, TypeHandlerRegistry typeHandlerRegistry) {
         // DeepSeek使用OpenAI兼容的API
-        OpenAiApi deepSeekApi = createDeepSeekApi(definition);
-        return null;//new OpenAiChatModel(deepSeekApi);
+        DeepSeekApi deepSeekApi = createDeepSeekApi(definition);
+
+        // 创建聊天选项
+        DeepSeekChatOptions.Builder optionsBuilder = DeepSeekChatOptions.builder()
+                .model(definition.getId());
+        DeepSeekChatOptions options = optionsBuilder.build();
+
+        // 创建聊天模型
+        DeepSeekChatModel chatModel = DeepSeekChatModel.builder()
+                .deepSeekApi(deepSeekApi)
+                .defaultOptions(options)
+                .build();
+        return chatModel;
     }
     
     @Override
@@ -44,14 +55,14 @@ public class DeepSeekNamespaceFactory implements ModelFactory {
     @Override
     public EmbeddingModel createEmbeddingModel(ModelDefinition definition, TypeHandlerRegistry typeHandlerRegistry) {
         // DeepSeek使用OpenAI兼容的API
-        OpenAiApi deepSeekApi = createDeepSeekApi(definition);
-        return new OpenAiEmbeddingModel(deepSeekApi);
+        DeepSeekApi deepSeekApi = createDeepSeekApi(definition);
+        return null;//new OpenAiEmbeddingModel(deepSeekApi);
     }
     
     /**
      * 创建DeepSeek API实例（OpenAI兼容）
      */
-    private OpenAiApi createDeepSeekApi(ModelDefinition definition) {
+    private DeepSeekApi createDeepSeekApi(ModelDefinition definition) {
         String baseUrl = definition.getEndpoint();
         String apiKey = definition.getAuthValue();
         
@@ -63,6 +74,9 @@ public class DeepSeekNamespaceFactory implements ModelFactory {
             throw new IllegalArgumentException("DeepSeek API key is required");
         }
         
-        return null;//new OpenAiApi(baseUrl, apiKey);
+        return DeepSeekApi.builder()
+                .apiKey(apiKey)
+                .baseUrl(baseUrl)
+                .build();
     }
 }

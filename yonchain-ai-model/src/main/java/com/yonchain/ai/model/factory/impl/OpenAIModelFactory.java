@@ -6,9 +6,7 @@ import com.yonchain.ai.model.registry.TypeHandlerRegistry;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
-import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +14,7 @@ import org.springframework.stereotype.Component;
  * OpenAI命名空间工厂实现
  */
 @Component
-public class OpenAINamespaceFactory implements ModelFactory {
+public class OpenAIModelFactory implements ModelFactory {
     
     @Override
     public String namespace() {

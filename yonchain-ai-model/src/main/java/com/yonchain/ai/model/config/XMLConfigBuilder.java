@@ -1,5 +1,6 @@
 package com.yonchain.ai.model.config;
 
+import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.model.core.ModelConfiguration;
 import com.yonchain.ai.model.definition.ModelDefinition;
 import com.yonchain.ai.model.util.Resources;
@@ -109,10 +110,16 @@ public class XMLConfigBuilder {
      */
     private void parseModelResource(String resourcePath, ModelConfiguration configuration) {
         try {
-            InputStream resourceStream = Resources.getResourceAsStream(resourcePath);
+            // 处理classpath:前缀
+            String actualPath = resourcePath;
+            if (resourcePath.startsWith("classpath:")) {
+                actualPath = resourcePath.substring("classpath:".length());
+            }
+            
+            InputStream resourceStream = Resources.getResourceAsStream(actualPath);
             if (resourceStream == null) {
                 System.err.println("Warning: Could not find model resource: " + resourcePath);
-                return;
+                throw  new YonchainResourceNotFoundException("Warning: Could not find model resource: " + resourcePath);
             }
             
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -122,15 +129,45 @@ public class XMLConfigBuilder {
             Element root = document.getDocumentElement();
             String namespace = root.getAttribute("namespace");
             
-            NodeList modelNodes = root.getElementsByTagName("model");
-            for (int i = 0; i < modelNodes.getLength(); i++) {
-                Element modelElement = (Element) modelNodes.item(i);
-                ModelDefinition modelDef = parseModelDefinition(modelElement, namespace);
-                configuration.getModelRegistry().registerModel(modelDef);
+            // 使用直接子元素遍历，避免深度搜索
+            NodeList childNodes = root.getChildNodes();
+            int modelCount = 0;
+            int processedCount = 0;
+            
+            System.out.println("DEBUG: Starting to parse resource " + resourcePath + " for namespace: " + namespace);
+            
+            // 先统计model元素数量
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                if (childNodes.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+                    Element element = (Element) childNodes.item(i);
+                    if ("model".equals(element.getTagName())) {
+                        modelCount++;
+                    }
+                }
             }
             
+            System.out.println("DEBUG: Found " + modelCount + " model elements in " + resourcePath);
+            
+            // 处理model元素
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                if (childNodes.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+                    Element element = (Element) childNodes.item(i);
+                    if ("model".equals(element.getTagName())) {
+                        processedCount++;
+                        String modelId = element.getAttribute("id");
+                        System.out.println("DEBUG: Processing model " + processedCount + "/" + modelCount + ": " + namespace + ":" + modelId);
+                        
+                        ModelDefinition modelDef = parseModelDefinition(element, namespace);
+                        configuration.getModelRegistry().registerModel(modelDef);
+                        System.out.println("DEBUG: Successfully registered model: " + namespace + ":" + modelId);
+                    }
+                }
+            }
+            
+            System.out.println("DEBUG: Finished parsing resource " + resourcePath + ", processed " + processedCount + " models");
+            
         } catch (Exception e) {
-            System.err.println("Warning: Failed to parse model resource: " + resourcePath + ", " + e.getMessage());
+            throw  new YonchainResourceNotFoundException("Warning: Failed to parse model resource: " + resourcePath + ", " + e.getMessage());
         }
     }
     
