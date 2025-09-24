@@ -59,7 +59,7 @@ public class OpenAIModelFactory implements ModelFactory {
      * 创建OpenAI API实例
      */
     private OpenAiApi createOpenAiApi(ModelDefinition definition) {
-        String baseUrl = definition.getEndpoint();
+        String baseUrl = definition.getBaseUrl();
         String apiKey = definition.getAuthValue();
         
         if (baseUrl == null) {

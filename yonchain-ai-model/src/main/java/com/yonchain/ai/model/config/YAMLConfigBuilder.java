@@ -24,6 +24,19 @@ public class YAMLConfigBuilder {
      */
     public ModelConfiguration parse() {
         // TODO: 实现YAML解析逻辑
+        // 支持以下字段结构：
+        // models:
+        //   - id: "gpt-4"
+        //     type: "chat"
+        //     baseUrl: "https://api.openai.com"
+        //     completionsPath: "/v1/chat/completions"  # chat类型模型专用
+        //     auth:
+        //       type: "bearer"
+        //       value: "${openai.apiKey}"
+        //     options:
+        //       model: "gpt-4"
+        //       temperature: 0.7
+        
         // 这里先返回一个基础的配置对象
         ModelConfiguration configuration = new ModelConfiguration();
         

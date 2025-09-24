@@ -180,10 +180,19 @@ public class XMLConfigBuilder {
         
         ModelDefinition modelDef = new ModelDefinition(id, namespace, type);
         
-        // 解析endpoint
-        NodeList endpointNodes = modelElement.getElementsByTagName("endpoint");
-        if (endpointNodes.getLength() > 0) {
-            modelDef.setEndpoint(endpointNodes.item(0).getTextContent().trim());
+        // 解析baseUrl
+        NodeList baseUrlNodes = modelElement.getElementsByTagName("baseUrl");
+        if (baseUrlNodes.getLength() > 0) {
+            modelDef.setBaseUrl(baseUrlNodes.item(0).getTextContent().trim());
+        }
+        
+        // 解析completionsPath (仅对chat类型模型)
+        if ("chat".equalsIgnoreCase(type)) {
+            NodeList completionsPathNodes = modelElement.getElementsByTagName("completionsPath");
+            if (completionsPathNodes.getLength() > 0) {
+                modelDef.setCompletionsPath(completionsPathNodes.item(0).getTextContent().trim());
+            }
+            // 如果没有指定completionsPath，使用默认值（已在构造函数中设置）
         }
         
         // 解析auth

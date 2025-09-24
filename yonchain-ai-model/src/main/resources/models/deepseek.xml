@@ -2,7 +2,8 @@
 <models namespace="deepseek">
     <!-- 聊天模型 -->
     <model id="deepseek-chat" type="chat">
-        <endpoint>https://api.deepseek.com/v1/chat/completions</endpoint>
+        <baseUrl>https://api.deepseek.com</baseUrl>
+        <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${deepseek.apiKey}</auth>
         <options>
             <model>deepseek-chat</model>
@@ -13,7 +14,8 @@
     </model>
     
     <model id="deepseek-coder" type="chat">
-        <endpoint>https://api.deepseek.com/v1/chat/completions</endpoint>
+        <baseUrl>https://api.deepseek.com</baseUrl>
+        <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${deepseek.apiKey}</auth>
         <options>
             <model>deepseek-coder</model>
@@ -24,7 +26,8 @@
     </model>
     
     <model id="deepseek-math" type="chat">
-        <endpoint>https://api.deepseek.com/v1/chat/completions</endpoint>
+        <baseUrl>https://api.deepseek.com</baseUrl>
+        <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${deepseek.apiKey}</auth>
         <options>
             <model>deepseek-math</model>

@@ -3,7 +3,8 @@
 
     <!-- 聊天模型 -->
     <model id="gpt-4" type="chat">
-        <endpoint>https://api.openai.com/v1/chat/completions</endpoint>
+        <baseUrl>https://api.openai.com</baseUrl>
+        <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${openai.apiKey}</auth>
         <options>
             <model>gpt-4</model>
@@ -13,7 +14,8 @@
     </model>
     
     <model id="gpt-3.5-turbo" type="chat">
-        <endpoint>https://api.openai.com/v1/chat/completions</endpoint>
+        <baseUrl>https://api.openai.com</baseUrl>
+        <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${openai.apiKey}</auth>
         <options>
             <model>gpt-3.5-turbo</model>
@@ -24,7 +26,7 @@
     
     <!-- 图像生成模型 -->
     <model id="dall-e-3" type="image">
-        <endpoint>https://api.openai.com/v1/images/generations</endpoint>
+        <baseUrl>https://api.openai.com/v1/images/generations</baseUrl>
         <auth type="bearer">${openai.apiKey}</auth>
         <options>
             <model>dall-e-3</model>
@@ -36,7 +38,7 @@
     
     <!-- 嵌入模型 -->
     <model id="text-embedding-ada-002" type="embedding">
-        <endpoint>https://api.openai.com/v1/embeddings</endpoint>
+        <baseUrl>https://api.openai.com/v1/embeddings</baseUrl>
         <auth type="bearer">${openai.apiKey}</auth>
         <options>
             <model>text-embedding-ada-002</model>

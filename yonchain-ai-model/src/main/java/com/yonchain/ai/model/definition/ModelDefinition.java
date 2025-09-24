@@ -13,7 +13,8 @@ public class ModelDefinition {
     private String id;
     private String namespace;
     private String type; // CHAT, IMAGE, EMBEDDING, AUDIO
-    private String endpoint;
+    private String baseUrl;
+    private String completionsPath; // 用于chat类型模型，默认 /v1/chat/completions
     private String authType; // bearer, apikey, basic
     private String authValue;
     private Map<String, Object> options;
@@ -29,6 +30,10 @@ public class ModelDefinition {
         this.id = id;
         this.namespace = namespace;
         this.type = type;
+        // 为chat类型模型设置默认的completionsPath
+        if ("chat".equalsIgnoreCase(type)) {
+            this.completionsPath = "/v1/chat/completions";
+        }
     }
     
     public String getId() {
@@ -55,13 +60,34 @@ public class ModelDefinition {
         this.type = type;
     }
     
-    public String getEndpoint() {
-        return endpoint;
+    public String getBaseUrl() {
+        return baseUrl;
     }
     
-    public void setEndpoint(String endpoint) {
-        this.endpoint = endpoint;
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
     }
+    
+    public String getCompletionsPath() {
+        return completionsPath;
+    }
+    
+    public void setCompletionsPath(String completionsPath) {
+        this.completionsPath = completionsPath;
+    }
+    
+    /**
+     * 获取完整的端点URL
+     * 对于chat类型，拼接baseUrl和completionsPath
+     * 对于其他类型，直接返回baseUrl
+     */
+    public String getFullEndpoint() {
+        if ("chat".equalsIgnoreCase(this.type) && completionsPath != null) {
+            return baseUrl + completionsPath;
+        }
+        return baseUrl;
+    }
+    
     
     public String getAuthType() {
         return authType;
@@ -127,7 +153,8 @@ public class ModelDefinition {
                 "id='" + id + '\'' +
                 ", namespace='" + namespace + '\'' +
                 ", type='" + type + '\'' +
-                ", endpoint='" + endpoint + '\'' +
+                ", baseUrl='" + baseUrl + '\'' +
+                ", completionsPath='" + completionsPath + '\'' +
                 ", authType='" + authType + '\'' +
                 '}';
     }

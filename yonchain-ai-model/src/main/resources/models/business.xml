@@ -2,7 +2,8 @@
 <models namespace="business">
     <!-- 业务场景模型 -->
     <model id="customer-service" type="chat">
-        <endpoint>https://api.openai.com/v1/chat/completions</endpoint>
+        <baseUrl>https://api.openai.com</baseUrl>
+        <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${openai.apiKey}</auth>
         <options>
             <model>gpt-4</model>
@@ -13,7 +14,8 @@
     </model>
     
     <model id="code-reviewer" type="chat">
-        <endpoint>https://api.deepseek.com/v1/chat/completions</endpoint>
+        <baseUrl>https://api.deepseek.com</baseUrl>
+        <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${deepseek.apiKey}</auth>
         <options>
             <model>deepseek-coder</model>
@@ -24,7 +26,8 @@
     </model>
     
     <model id="content-writer" type="chat">
-        <endpoint>https://api.openai.com/v1/chat/completions</endpoint>
+        <baseUrl>https://api.openai.com</baseUrl>
+        <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${openai.apiKey}</auth>
         <options>
             <model>gpt-4</model>
@@ -35,7 +38,8 @@
     </model>
     
     <model id="data-analyst" type="chat">
-        <endpoint>https://api.openai.com/v1/chat/completions</endpoint>
+        <baseUrl>https://api.openai.com</baseUrl>
+        <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${openai.apiKey}</auth>
         <options>
             <model>gpt-4</model>

@@ -63,7 +63,7 @@ public class DeepSeekModelFactory implements ModelFactory {
      * 创建DeepSeek API实例（OpenAI兼容）
      */
     private DeepSeekApi createDeepSeekApi(ModelDefinition definition) {
-        String baseUrl = definition.getEndpoint();
+        String baseUrl = definition.getBaseUrl();
         String apiKey = definition.getAuthValue();
         
         if (baseUrl == null) {
