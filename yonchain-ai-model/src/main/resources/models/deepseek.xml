@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <models namespace="deepseek">
     <!-- 聊天模型 -->
-    <model id="deepseek-chat" type="chat">
+    <model id="deepseek-chat" type="chat" optionsHandler="com.yonchain.ai.model.optionshandler.deepseek.DeepSeekChatOptionsHandler">
         <baseUrl>https://api.deepseek.com</baseUrl>
         <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${deepseek.apiKey}</auth>
@@ -13,7 +13,7 @@
         </options>
     </model>
     
-    <model id="deepseek-coder" type="chat">
+    <model id="deepseek-coder" type="chat" optionsHandler="com.yonchain.ai.model.optionshandler.deepseek.DeepSeekChatOptionsHandler">
         <baseUrl>https://api.deepseek.com</baseUrl>
         <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${deepseek.apiKey}</auth>
@@ -25,7 +25,7 @@
         </options>
     </model>
     
-    <model id="deepseek-math" type="chat">
+    <model id="deepseek-math" type="chat" optionsHandler="com.yonchain.ai.model.optionshandler.deepseek.DeepSeekChatOptionsHandler">
         <baseUrl>https://api.deepseek.com</baseUrl>
         <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${deepseek.apiKey}</auth>

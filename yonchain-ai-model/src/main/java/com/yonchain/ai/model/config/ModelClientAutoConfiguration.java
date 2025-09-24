@@ -43,7 +43,7 @@ public class ModelClientAutoConfiguration {
         // 注册模型工厂
         for (ModelFactory modelFactory : modelFactories) {
             factory.getConfiguration()
-                   .getNamespaceFactoryRegistry()
+                   .getModelFactoryRegistry()
                    .registerFactory(modelFactory);
         }
         

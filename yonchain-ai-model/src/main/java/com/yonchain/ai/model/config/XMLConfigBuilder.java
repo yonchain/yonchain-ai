@@ -23,6 +23,7 @@ import java.util.Map;
 public class XMLConfigBuilder {
     
     private final InputStream inputStream;
+    private ModelConfiguration configuration;
     
     public XMLConfigBuilder(InputStream inputStream) {
         this.inputStream = inputStream;
@@ -35,7 +36,7 @@ public class XMLConfigBuilder {
      */
     public ModelConfiguration parse() {
         try {
-            ModelConfiguration configuration = new ModelConfiguration();
+            this.configuration = new ModelConfiguration();
             
             // 解析主配置文件
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -46,6 +47,12 @@ public class XMLConfigBuilder {
             
             // 解析settings
             parseSettings(root, configuration);
+            
+            // 解析environments
+            parseEnvironments(root, configuration);
+            
+            // 解析typeHandlers
+            parseTypeHandlers(root, configuration);
             
             // 解析models资源文件
             parseModelResources(root, configuration);
@@ -83,6 +90,94 @@ public class XMLConfigBuilder {
         }
         if (configuration.getProperty("default.timeout") == null) {
             configuration.setProperty("default.timeout", "30");
+        }
+    }
+    
+    /**
+     * 解析environments配置
+     */
+    private void parseEnvironments(Element root, ModelConfiguration configuration) {
+        NodeList environmentsNodes = root.getElementsByTagName("environments");
+        if (environmentsNodes.getLength() > 0) {
+            Element environmentsElement = (Element) environmentsNodes.item(0);
+            String defaultEnv = environmentsElement.getAttribute("default");
+            if (defaultEnv == null || defaultEnv.isEmpty()) {
+                defaultEnv = "dev";
+            }
+            
+            NodeList environmentNodes = environmentsElement.getElementsByTagName("environment");
+            Map<String, Map<String, String>> environments = new HashMap<>();
+            
+            for (int i = 0; i < environmentNodes.getLength(); i++) {
+                Element envElement = (Element) environmentNodes.item(i);
+                String envId = envElement.getAttribute("id");
+                
+                Map<String, String> envProperties = new HashMap<>();
+                NodeList propertiesNodes = envElement.getElementsByTagName("properties");
+                if (propertiesNodes.getLength() > 0) {
+                    Element propertiesElement = (Element) propertiesNodes.item(0);
+                    NodeList propertyNodes = propertiesElement.getElementsByTagName("property");
+                    
+                    for (int j = 0; j < propertyNodes.getLength(); j++) {
+                        Element propertyElement = (Element) propertyNodes.item(j);
+                        String name = propertyElement.getAttribute("name");
+                        String value = propertyElement.getAttribute("value");
+                        envProperties.put(name, value);
+                    }
+                }
+                
+                environments.put(envId, envProperties);
+            }
+            
+            // 设置环境配置到ModelConfiguration
+            configuration.setEnvironments(environments);
+            configuration.setDefaultEnvironment(defaultEnv);
+            
+            // 加载默认环境的属性
+            if (environments.containsKey(defaultEnv)) {
+                Map<String, String> defaultEnvProps = environments.get(defaultEnv);
+                for (Map.Entry<String, String> entry : defaultEnvProps.entrySet()) {
+                    configuration.setProperty(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+    }
+    
+    /**
+     * 解析typeHandlers配置
+     * 
+     * 现在optionsHandler直接在模型定义中指定完整类路径，
+     * 这里的typeHandlers配置主要用于预注册一些全局的处理器
+     */
+    private void parseTypeHandlers(Element root, ModelConfiguration configuration) {
+        NodeList typeHandlersNodes = root.getElementsByTagName("typeHandlers");
+        if (typeHandlersNodes.getLength() > 0) {
+            Element typeHandlersElement = (Element) typeHandlersNodes.item(0);
+            NodeList typeHandlerNodes = typeHandlersElement.getElementsByTagName("typeHandler");
+            
+            for (int i = 0; i < typeHandlerNodes.getLength(); i++) {
+                Element typeHandlerElement = (Element) typeHandlerNodes.item(i);
+                String handlerClass = typeHandlerElement.getAttribute("handler");
+                
+                try {
+                    // 预加载并注册OptionsHandler (可选)
+                    Class<?> clazz = Class.forName(handlerClass);
+                    Object handler = clazz.getDeclaredConstructor().newInstance();
+                    
+                    if (handler instanceof com.yonchain.ai.model.optionshandler.OptionsHandler) {
+                        @SuppressWarnings("unchecked")
+                        com.yonchain.ai.model.optionshandler.OptionsHandler<?> optionsHandler = 
+                            (com.yonchain.ai.model.optionshandler.OptionsHandler<?>) handler;
+                        
+                        // 注册到TypeHandlerRegistry (按类名注册)
+                        configuration.getTypeHandlerRegistry().registerHandler(handlerClass, optionsHandler);
+                        
+                        System.out.println("预注册OptionsHandler: " + handlerClass);
+                    }
+                } catch (Exception e) {
+                    System.err.println("Failed to preload OptionsHandler: " + handlerClass + ", error: " + e.getMessage());
+                }
+            }
         }
     }
     
@@ -177,35 +272,41 @@ public class XMLConfigBuilder {
     private ModelDefinition parseModelDefinition(Element modelElement, String namespace) {
         String id = modelElement.getAttribute("id");
         String type = modelElement.getAttribute("type");
-        
+        String optionsHandler = modelElement.getAttribute("optionsHandler");
+
         ModelDefinition modelDef = new ModelDefinition(id, namespace, type);
+        if (optionsHandler != null && !optionsHandler.isEmpty()) {
+            modelDef.setOptionsHandler(optionsHandler);
+        }
         
-        // 解析baseUrl
+        // 解析baseUrl (支持占位符)
         NodeList baseUrlNodes = modelElement.getElementsByTagName("baseUrl");
         if (baseUrlNodes.getLength() > 0) {
-            modelDef.setBaseUrl(baseUrlNodes.item(0).getTextContent().trim());
+            String baseUrl = baseUrlNodes.item(0).getTextContent().trim();
+            modelDef.setBaseUrl(resolvePlaceholders(baseUrl));
         }
         
         // 解析completionsPath (仅对chat类型模型)
         if ("chat".equalsIgnoreCase(type)) {
             NodeList completionsPathNodes = modelElement.getElementsByTagName("completionsPath");
             if (completionsPathNodes.getLength() > 0) {
-                modelDef.setCompletionsPath(completionsPathNodes.item(0).getTextContent().trim());
+                String completionsPath = completionsPathNodes.item(0).getTextContent().trim();
+                modelDef.setCompletionsPath(resolvePlaceholders(completionsPath));
             }
             // 如果没有指定completionsPath，使用默认值（已在构造函数中设置）
         }
         
-        // 解析auth
+        // 解析auth (支持占位符)
         NodeList authNodes = modelElement.getElementsByTagName("auth");
         if (authNodes.getLength() > 0) {
             Element authElement = (Element) authNodes.item(0);
             String authType = authElement.getAttribute("type");
             String authValue = authElement.getTextContent().trim();
             modelDef.setAuthType(authType);
-            modelDef.setAuthValue(authValue);
+            modelDef.setAuthValue(resolvePlaceholders(authValue));
         }
         
-        // 解析options
+        // 解析options (支持占位符)
         NodeList optionsNodes = modelElement.getElementsByTagName("options");
         if (optionsNodes.getLength() > 0) {
             Element optionsElement = (Element) optionsNodes.item(0);
@@ -217,7 +318,7 @@ public class XMLConfigBuilder {
     }
     
     /**
-     * 解析options配置
+     * 解析options配置 (支持占位符)
      */
     private Map<String, Object> parseOptions(Element optionsElement) {
         Map<String, Object> options = new HashMap<>();
@@ -230,8 +331,11 @@ public class XMLConfigBuilder {
                 String key = element.getTagName();
                 String value = element.getTextContent().trim();
                 
+                // 解析占位符
+                String resolvedValue = resolvePlaceholders(value);
+                
                 // 尝试转换为合适的类型
-                Object convertedValue = convertValue(value);
+                Object convertedValue = convertValue(resolvedValue);
                 options.put(key, convertedValue);
             }
         }
@@ -280,5 +384,89 @@ public class XMLConfigBuilder {
                 configuration.setProperty("alias." + name, target);
             }
         }
+    }
+    
+    /**
+     * 解析占位符
+     * 
+     * 支持以下格式的占位符：
+     * - ${property.name} - 从配置属性中获取值
+     * - ${env:ENV_VAR_NAME} - 从环境变量中获取值
+     * - ${deepseek.apiKey} - 从当前环境配置中获取值
+     * 
+     * @param text 包含占位符的文本
+     * @return 解析后的文本
+     */
+    private String resolvePlaceholders(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+        
+        String result = text;
+        
+        // 匹配 ${...} 格式的占位符
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\$\\{([^}]+)\\}");
+        java.util.regex.Matcher matcher = pattern.matcher(text);
+        
+        while (matcher.find()) {
+            String placeholder = matcher.group(0); // 完整的占位符 ${...}
+            String key = matcher.group(1); // 占位符内的键名
+            
+            String value = resolveProperty(key);
+            if (value != null) {
+                result = result.replace(placeholder, value);
+                System.out.println("DEBUG: Resolved placeholder " + placeholder + " -> " + (value.contains("key") ? "***" : value));
+            } else {
+                System.err.println("WARNING: Could not resolve placeholder: " + placeholder);
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * 解析属性值
+     * 
+     * @param key 属性键
+     * @return 属性值，如果未找到返回null
+     */
+    private String resolveProperty(String key) {
+        // 1. 检查环境变量前缀
+        if (key.startsWith("env:")) {
+            String envVar = key.substring(4);
+            String value = System.getenv(envVar);
+            if (value != null) {
+                return value;
+            }
+        }
+        
+        // 2. 从配置属性中查找
+        if (configuration != null) {
+            String value = configuration.getProperty(key);
+            if (value != null) {
+                return value;
+            }
+        }
+        
+        // 3. 从系统属性中查找
+        String systemValue = System.getProperty(key);
+        if (systemValue != null) {
+            return systemValue;
+        }
+        
+        // 4. 从环境变量中查找（将点号转换为下划线）
+        String envKey = key.replace('.', '_').toUpperCase();
+        String envValue = System.getenv(envKey);
+        if (envValue != null) {
+            return envValue;
+        }
+        
+        // 5. 直接查找环境变量（保持原始键名）
+        String directEnvValue = System.getenv(key);
+        if (directEnvValue != null) {
+            return directEnvValue;
+        }
+        
+        return null;
     }
 }

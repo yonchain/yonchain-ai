@@ -1,7 +1,7 @@
 package com.yonchain.ai.model.factory;
 
 import com.yonchain.ai.model.definition.ModelDefinition;
-import com.yonchain.ai.model.registry.TypeHandlerRegistry;
+import com.yonchain.ai.model.registry.OptionsHandlerRegistry;
 import org.springframework.ai.embedding.EmbeddingModel;
 
 /**
@@ -16,5 +16,5 @@ public interface EmbeddingModelFactory {
      * @param typeHandlerRegistry 类型处理器注册中心
      * @return Spring AI EmbeddingModel实例
      */
-    EmbeddingModel createEmbeddingModel(ModelDefinition definition, TypeHandlerRegistry typeHandlerRegistry);
+    EmbeddingModel createEmbeddingModel(ModelDefinition definition, OptionsHandlerRegistry typeHandlerRegistry);
 }

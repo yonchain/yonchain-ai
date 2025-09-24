@@ -17,6 +17,7 @@ public class ModelDefinition {
     private String completionsPath; // 用于chat类型模型，默认 /v1/chat/completions
     private String authType; // bearer, apikey, basic
     private String authValue;
+    private String optionsHandler; // 选项处理器标识，格式：provider:type
     private Map<String, Object> options;
     private Map<String, Object> metadata;
     
@@ -103,6 +104,14 @@ public class ModelDefinition {
     
     public void setAuthValue(String authValue) {
         this.authValue = authValue;
+    }
+    
+    public String getOptionsHandler() {
+        return optionsHandler;
+    }
+    
+    public void setOptionsHandler(String optionsHandler) {
+        this.optionsHandler = optionsHandler;
     }
     
     public Map<String, Object> getOptions() {

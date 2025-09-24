@@ -1,7 +1,7 @@
 package com.yonchain.ai.model.factory;
 
 import com.yonchain.ai.model.definition.ModelDefinition;
-import com.yonchain.ai.model.registry.TypeHandlerRegistry;
+import com.yonchain.ai.model.registry.OptionsHandlerRegistry;
 import org.springframework.ai.image.ImageModel;
 
 /**
@@ -16,5 +16,5 @@ public interface ImageModelFactory {
      * @param typeHandlerRegistry 类型处理器注册中心
      * @return Spring AI ImageModel实例
      */
-    ImageModel createImageModel(ModelDefinition definition, TypeHandlerRegistry typeHandlerRegistry);
+    ImageModel createImageModel(ModelDefinition definition, OptionsHandlerRegistry typeHandlerRegistry);
 }

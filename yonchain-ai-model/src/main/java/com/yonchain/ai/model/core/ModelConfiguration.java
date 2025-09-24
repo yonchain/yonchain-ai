@@ -1,9 +1,10 @@
 package com.yonchain.ai.model.core;
 
 import com.yonchain.ai.model.registry.ModelRegistry;
-import com.yonchain.ai.model.registry.NamespaceFactoryRegistry;
-import com.yonchain.ai.model.registry.TypeHandlerRegistry;
+import com.yonchain.ai.model.registry.ModelFactoryRegistry;
+import com.yonchain.ai.model.registry.OptionsHandlerRegistry;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -19,14 +20,16 @@ public class ModelConfiguration {
     
     private Properties properties;
     private ModelRegistry modelRegistry;
-    private NamespaceFactoryRegistry namespaceFactoryRegistry;
-    private TypeHandlerRegistry typeHandlerRegistry;
+    private ModelFactoryRegistry modelFactoryRegistry;
+    private OptionsHandlerRegistry typeHandlerRegistry;
+    private Map<String, Map<String, String>> environments;
+    private String defaultEnvironment;
     
     public ModelConfiguration() {
         this.properties = new Properties();
         this.modelRegistry = new ModelRegistry();
-        this.namespaceFactoryRegistry = new NamespaceFactoryRegistry();
-        this.typeHandlerRegistry = new TypeHandlerRegistry();
+        this.modelFactoryRegistry = new ModelFactoryRegistry();
+        this.typeHandlerRegistry = new OptionsHandlerRegistry();
     }
     
     // Properties
@@ -60,20 +63,20 @@ public class ModelConfiguration {
     }
     
     // Namespace Factory Registry
-    public NamespaceFactoryRegistry getNamespaceFactoryRegistry() {
-        return namespaceFactoryRegistry;
+    public ModelFactoryRegistry getModelFactoryRegistry() {
+        return modelFactoryRegistry;
     }
     
-    public void setNamespaceFactoryRegistry(NamespaceFactoryRegistry namespaceFactoryRegistry) {
-        this.namespaceFactoryRegistry = namespaceFactoryRegistry;
+    public void setModelFactoryRegistry(ModelFactoryRegistry modelFactoryRegistry) {
+        this.modelFactoryRegistry = modelFactoryRegistry;
     }
     
     // Type Handler Registry
-    public TypeHandlerRegistry getTypeHandlerRegistry() {
+    public OptionsHandlerRegistry getTypeHandlerRegistry() {
         return typeHandlerRegistry;
     }
     
-    public void setTypeHandlerRegistry(TypeHandlerRegistry typeHandlerRegistry) {
+    public void setTypeHandlerRegistry(OptionsHandlerRegistry typeHandlerRegistry) {
         this.typeHandlerRegistry = typeHandlerRegistry;
     }
     
@@ -88,5 +91,26 @@ public class ModelConfiguration {
     
     public boolean isOpenAiCompatibilityEnabled() {
         return Boolean.parseBoolean(getProperty("openai.compatibility.enabled", "true"));
+    }
+    
+    // Environment management
+    public Map<String, Map<String, String>> getEnvironments() {
+        return environments;
+    }
+    
+    public void setEnvironments(Map<String, Map<String, String>> environments) {
+        this.environments = environments;
+    }
+    
+    public String getDefaultEnvironment() {
+        return defaultEnvironment;
+    }
+    
+    public void setDefaultEnvironment(String defaultEnvironment) {
+        this.defaultEnvironment = defaultEnvironment;
+    }
+    
+    public Map<String, String> getEnvironmentProperties(String environmentId) {
+        return environments != null ? environments.get(environmentId) : null;
     }
 }

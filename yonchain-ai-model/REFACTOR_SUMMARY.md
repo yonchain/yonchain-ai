@@ -19,7 +19,7 @@
 ### 2. 接口重命名
 - ✅ `NamespaceModelFactory` → `ModelFactory`
 - ✅ 更新所有实现类：`OpenAINamespaceFactory`、`DeepSeekNamespaceFactory`
-- ✅ 更新注册中心：`NamespaceFactoryRegistry`
+- ✅ 更新注册中心：`ModelFactoryRegistry`
 - ✅ 更新自动配置：`ModelClientAutoConfiguration`
 
 ### 3. ModelDefinition 简化
@@ -76,7 +76,7 @@ yonchain-ai-model/src/main/java/com/yonchain/ai/model/
 ├── factory/impl/
 │   ├── OpenAINamespaceFactory.java            # 更新接口引用
 │   └── DeepSeekNamespaceFactory.java          # 更新接口引用
-├── registry/NamespaceFactoryRegistry.java     # 更新类型引用
+├── registry/ModelFactoryRegistry.java     # 更新类型引用
 ├── config/
 │   ├── ModelClientAutoConfiguration.java     # 更新参数类型
 │   └── XMLConfigBuilder.java                 # 移除 factory 属性解析

@@ -2,7 +2,7 @@ package com.yonchain.ai.model.factory.impl;
 
 import com.yonchain.ai.model.definition.ModelDefinition;
 import com.yonchain.ai.model.factory.ModelFactory;
-import com.yonchain.ai.model.registry.TypeHandlerRegistry;
+import com.yonchain.ai.model.registry.OptionsHandlerRegistry;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
@@ -30,7 +30,7 @@ public class DeepSeekModelFactory implements ModelFactory {
     }
     
     @Override
-    public ChatModel createChatModel(ModelDefinition definition, TypeHandlerRegistry typeHandlerRegistry) {
+    public ChatModel createChatModel(ModelDefinition definition, OptionsHandlerRegistry typeHandlerRegistry) {
         // DeepSeek使用OpenAI兼容的API
         DeepSeekApi deepSeekApi = createDeepSeekApi(definition);
 
@@ -48,12 +48,12 @@ public class DeepSeekModelFactory implements ModelFactory {
     }
     
     @Override
-    public ImageModel createImageModel(ModelDefinition definition, TypeHandlerRegistry typeHandlerRegistry) {
+    public ImageModel createImageModel(ModelDefinition definition, OptionsHandlerRegistry typeHandlerRegistry) {
         throw new UnsupportedOperationException("DeepSeek does not support image generation models");
     }
     
     @Override
-    public EmbeddingModel createEmbeddingModel(ModelDefinition definition, TypeHandlerRegistry typeHandlerRegistry) {
+    public EmbeddingModel createEmbeddingModel(ModelDefinition definition, OptionsHandlerRegistry typeHandlerRegistry) {
         // DeepSeek使用OpenAI兼容的API
         DeepSeekApi deepSeekApi = createDeepSeekApi(definition);
         return null;//new OpenAiEmbeddingModel(deepSeekApi);

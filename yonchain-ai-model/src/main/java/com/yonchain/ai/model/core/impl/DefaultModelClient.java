@@ -120,7 +120,7 @@ public class DefaultModelClient implements ModelClient {
     }
     
     private ModelFactory getModelFactory(String namespace) {
-        return configuration.getNamespaceFactoryRegistry()
+        return configuration.getModelFactoryRegistry()
             .getFactory(namespace)
             .orElseThrow(() -> 
                 new IllegalArgumentException("No factory found for namespace: " + namespace));

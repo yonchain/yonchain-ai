@@ -8,17 +8,17 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 命名空间工厂注册中心
+ * 模型工厂注册中心
  * 
- * 负责管理所有命名空间工厂的注册和查找
+ * 负责管理所有模型工厂的注册和查找
  */
-public class NamespaceFactoryRegistry {
+public class ModelFactoryRegistry {
     
     // namespace -> ModelFactory
     private final Map<String, ModelFactory> factories = new ConcurrentHashMap<>();
     
     /**
-     * 注册命名空间工厂
+     * 注册模型工厂
      * 
      * @param factory 模型工厂
      */
@@ -27,9 +27,9 @@ public class NamespaceFactoryRegistry {
     }
     
     /**
-     * 获取命名空间工厂
+     * 获取模型工厂
      * 
-     * @param namespace 命名空间
+     * @param namespace 模型
      * @return 模型工厂
      */
     public Optional<ModelFactory> getFactory(String namespace) {
@@ -37,9 +37,9 @@ public class NamespaceFactoryRegistry {
     }
     
     /**
-     * 检查命名空间工厂是否存在
+     * 检查模型工厂是否存在
      * 
-     * @param namespace 命名空间
+     * @param namespace 模型
      * @return 是否存在
      */
     public boolean containsFactory(String namespace) {
@@ -47,9 +47,9 @@ public class NamespaceFactoryRegistry {
     }
     
     /**
-     * 移除命名空间工厂
+     * 移除模型工厂
      * 
-     * @param namespace 命名空间
+     * @param namespace 模型
      * @return 被移除的工厂
      */
     public Optional<ModelFactory> removeFactory(String namespace) {
@@ -57,9 +57,9 @@ public class NamespaceFactoryRegistry {
     }
     
     /**
-     * 获取所有注册的命名空间
+     * 获取所有注册的模型
      * 
-     * @return 命名空间集合
+     * @return 模型集合
      */
     public Set<String> getRegisteredNamespaces() {
         return factories.keySet();

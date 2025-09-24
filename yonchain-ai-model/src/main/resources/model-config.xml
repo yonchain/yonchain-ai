@@ -8,6 +8,34 @@
         <setting name="enable.metrics" value="true"/>
     </settings>
     
+    <!-- 环境变量/占位符（可选） -->
+    <environments default="dev">
+        <environment id="dev">
+            <properties>
+                <property name="openai.apiKey" value="${OPENAI_API_KEY}"/>
+                <property name="openai.baseUrl" value="https://api.openai.com"/>
+                <property name="deepseek.apiKey" value="sk-3ef709a6aa404b00af299c288264a48f"/>
+                <property name="deepseek.baseUrl" value="https://api.deepseek.com"/>
+            </properties>
+        </environment>
+        <environment id="prod">
+            <properties>
+                <property name="openai.apiKey" value="${OPENAI_API_KEY_PROD}"/>
+                <property name="openai.baseUrl" value="https://api.openai.com"/>
+                <property name="deepseek.apiKey" value="${DEEPSEEK_API_KEY_PROD}"/>
+                <property name="deepseek.baseUrl" value="https://api.deepseek.com"/>
+            </properties>
+        </environment>
+    </environments>
+    
+    <!-- 类型处理器配置 (可选的预注册，现在optionsHandler直接在模型中指定) -->
+    <typeHandlers>
+        <typeHandler handler="com.yonchain.ai.model.optionshandler.openai.OpenAiChatOptionsHandler"/>
+        <typeHandler handler="com.yonchain.ai.model.optionshandler.openai.OpenAiImageOptionsHandler"/>
+        <typeHandler handler="com.yonchain.ai.model.optionshandler.openai.OpenAiEmbeddingOptionsHandler"/>
+        <typeHandler handler="com.yonchain.ai.model.optionshandler.deepseek.DeepSeekChatOptionsHandler"/>
+    </typeHandlers>
+    
     <!-- 模型配置文件扫描 -->
     <models>
         <resource path="classpath:models/openai.xml"/>

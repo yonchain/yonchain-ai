@@ -39,7 +39,7 @@ yonchain-ai-model/src/main/java/com/yonchain/ai/
 │   │       └── DeepSeekNamespaceFactory.java # DeepSeek命名空间工厂
 │   ├── registry/                             # 注册中心
 │   │   ├── ModelRegistry.java                # 模型注册中心
-│   │   ├── NamespaceFactoryRegistry.java     # 命名空间工厂注册中心
+│   │   ├── ModelFactoryRegistry.java     # 命名空间工厂注册中心
 │   │   └── TypeHandlerRegistry.java          # 类型处理器注册中心
 │   ├── request/                              # 请求类
 │   │   ├── ChatRequest.java                  # 聊天请求
