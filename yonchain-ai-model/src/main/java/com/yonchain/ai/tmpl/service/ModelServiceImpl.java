@@ -2,10 +2,10 @@ package com.yonchain.ai.tmpl.service;
 
 import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.model.*;
-import com.yonchain.ai.model.ModelMetadata;
-import com.yonchain.ai.model.ModelConfig;
-import com.yonchain.ai.model.ModelType;
 import com.yonchain.ai.model.registry.ModelRegistry;
+import com.yonchain.ai.tmpl.ModelConfig;
+import com.yonchain.ai.tmpl.ModelMetadata;
+import com.yonchain.ai.tmpl.ModelType;
 import com.yonchain.ai.tmpl.entity.ModelEntity;
 import com.yonchain.ai.tmpl.entity.ModelProviderEntity;
 import com.yonchain.ai.tmpl.mapper.ModelMapper;

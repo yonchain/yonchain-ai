@@ -2,9 +2,9 @@
 package com.yonchain.ai.model.factory.impl;
 
 import com.yonchain.ai.model.factory.ModelFactory;
-import com.yonchain.ai.model.ModelConfig;
-import com.yonchain.ai.model.ModelType;
-import com.yonchain.ai.model.provider.ModelProvider;
+import com.yonchain.ai.plugin.spi.ModelConfig;
+import com.yonchain.ai.plugin.spi.ModelType;
+import com.yonchain.ai.plugin.spi.ModelProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 // import org.springframework.ai.audio.transcription.AudioTranscriptionModel;

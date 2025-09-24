@@ -1,4 +1,4 @@
-package com.yonchain.ai.model;
+package com.yonchain.ai.tmpl;
 
 import java.util.HashMap;
 import java.util.Map;

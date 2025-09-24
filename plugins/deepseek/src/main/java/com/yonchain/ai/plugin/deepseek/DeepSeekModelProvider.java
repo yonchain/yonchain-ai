@@ -1,9 +1,8 @@
 package com.yonchain.ai.plugin.deepseek;
 
-import com.yonchain.ai.model.ModelConfig;
-import com.yonchain.ai.model.ModelType;
-import com.yonchain.ai.model.provider.ModelProvider;
-import com.yonchain.ai.model.provider.ProviderMetadata;
+import com.yonchain.ai.tmpl.ModelConfig;
+import com.yonchain.ai.tmpl.ModelType;
+import com.yonchain.ai.plugin.spi.ModelProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;

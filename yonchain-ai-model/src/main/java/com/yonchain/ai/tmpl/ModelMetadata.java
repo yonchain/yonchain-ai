@@ -1,4 +1,4 @@
-package com.yonchain.ai.model;
+package com.yonchain.ai.tmpl;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;

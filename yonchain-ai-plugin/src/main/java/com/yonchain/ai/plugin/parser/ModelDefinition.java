@@ -1,6 +1,6 @@
 package com.yonchain.ai.plugin.parser;
 
-import com.yonchain.ai.model.ModelType;
+import com.yonchain.ai.tmpl.ModelType;
 
 import java.util.Map;
 

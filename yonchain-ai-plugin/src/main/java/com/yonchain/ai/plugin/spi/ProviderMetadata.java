@@ -1,4 +1,4 @@
-package com.yonchain.ai.model.provider;
+package com.yonchain.ai.plugin.spi;
 
 import java.util.List;
 import java.util.Map;

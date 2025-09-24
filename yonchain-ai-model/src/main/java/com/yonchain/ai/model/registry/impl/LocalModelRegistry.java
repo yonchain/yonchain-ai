@@ -1,9 +1,9 @@
 /*
 package com.yonchain.ai.model.registry.impl;
 
-import com.yonchain.ai.model.ModelMetadata;
-import com.yonchain.ai.model.ModelNameUtils;
-import com.yonchain.ai.model.ModelType;
+import com.yonchain.ai.plugin.spi.ModelMetadata;
+import com.yonchain.ai.plugin.spi.ModelNameUtils;
+import com.yonchain.ai.plugin.spi.ModelType;
 import com.yonchain.ai.model.registry.ModelChangeListener;
 import com.yonchain.ai.model.registry.ModelRegistry;
 import org.slf4j.Logger;

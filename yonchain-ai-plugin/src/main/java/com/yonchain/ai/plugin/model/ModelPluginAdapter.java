@@ -3,12 +3,7 @@ package com.yonchain.ai.plugin.model;
 import com.yonchain.ai.api.model.ModelService;
 import com.yonchain.ai.api.model.ModelProviderInfo;
 import com.yonchain.ai.api.model.DefaultModelProvider;
-import com.yonchain.ai.model.ModelConfig;
-import com.yonchain.ai.model.ModelMetadata;
-import com.yonchain.ai.model.provider.ModelProvider;
-import com.yonchain.ai.model.provider.ProviderMetadata;
-import com.yonchain.ai.model.registry.ModelRegistry;
-import com.yonchain.ai.model.factory.ModelFactory;
+import com.yonchain.ai.plugin.spi.*;
 import com.yonchain.ai.plugin.PluginAdapter;
 import com.yonchain.ai.plugin.PluginContext;
 import com.yonchain.ai.plugin.DefaultPluginContext;
@@ -19,6 +14,9 @@ import com.yonchain.ai.plugin.loader.PluginClassLoader;
 import com.yonchain.ai.plugin.registry.PluginRegistry;
 import com.yonchain.ai.plugin.service.PluginIconService;
 import com.yonchain.ai.plugin.exception.PluginException;
+import com.yonchain.ai.tmpl.ModelConfig;
+import com.yonchain.ai.tmpl.ModelMetadata;
+import com.yonchain.ai.tmpl.ModelType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -813,13 +811,13 @@ public class ModelPluginAdapter implements PluginAdapter {
         
         // 检查提供商支持的模型类型
         try {
-            if (modelProvider.supports(com.yonchain.ai.model.ModelType.TEXT)) {
+            if (modelProvider.supports(ModelType.TEXT)) {
                 supportedTypes.add("TEXT");
             }
-            if (modelProvider.supports(com.yonchain.ai.model.ModelType.IMAGE)) {
+            if (modelProvider.supports(ModelType.IMAGE)) {
                 supportedTypes.add("IMAGE");
             }
-            if (modelProvider.supports(com.yonchain.ai.model.ModelType.EMBEDDING)) {
+            if (modelProvider.supports(ModelType.EMBEDDING)) {
                 supportedTypes.add("EMBEDDING");
             }
         } catch (Exception e) {

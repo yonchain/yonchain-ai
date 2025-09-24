@@ -1,10 +1,10 @@
 package com.yonchain.ai.plugin.deepseek;
 
-import com.yonchain.ai.model.ModelConfig;
-import com.yonchain.ai.model.ModelMetadata;
-import com.yonchain.ai.model.ModelType;
-import com.yonchain.ai.model.provider.ModelProvider;
-import com.yonchain.ai.model.provider.ProviderMetadata;
+import com.yonchain.ai.tmpl.ModelConfig;
+import com.yonchain.ai.tmpl.ModelMetadata;
+import com.yonchain.ai.tmpl.ModelType;
+import com.yonchain.ai.plugin.spi.ModelProvider;
+import com.yonchain.ai.plugin.spi.ProviderMetadata;
 import com.yonchain.ai.model.registry.ModelRegistry;
 import com.yonchain.ai.plugin.model.ModelPlugin;
 import com.yonchain.ai.plugin.PluginContext;

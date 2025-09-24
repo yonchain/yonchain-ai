@@ -1,4 +1,4 @@
-package com.yonchain.ai.model;
+package com.yonchain.ai.tmpl;
 
 /**
  * 模型类型枚举
