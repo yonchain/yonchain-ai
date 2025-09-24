@@ -6,7 +6,6 @@ import com.yonchain.ai.model.request.ImageRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ai.image.ImageResponse;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.*;
@@ -16,7 +15,6 @@ import java.util.regex.Pattern;
  * 图像模型专用过滤器
  * 处理图像生成请求 /images/generations
  */
-@Component
 public class ImageModelFilter extends BaseModelFilter {
     
     private static final Pattern ENDPOINT_PATTERN = Pattern.compile(".*/images/generations$");

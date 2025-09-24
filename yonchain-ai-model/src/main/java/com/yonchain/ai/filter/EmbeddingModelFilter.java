@@ -6,7 +6,6 @@ import com.yonchain.ai.model.request.EmbeddingRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ai.embedding.EmbeddingResponse;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.*;
@@ -16,7 +15,6 @@ import java.util.regex.Pattern;
  * 嵌入模型专用过滤器
  * 处理嵌入请求 /embeddings
  */
-@Component
 public class EmbeddingModelFilter extends BaseModelFilter {
     
     private static final Pattern ENDPOINT_PATTERN = Pattern.compile(".*/embeddings$");

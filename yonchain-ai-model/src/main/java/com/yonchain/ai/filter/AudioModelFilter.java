@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.model.core.ModelClient;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import java.util.regex.Pattern;
  * 音频模型专用过滤器
  * 处理音频请求 /audio/transcriptions 和 /audio/speech
  */
-@Component
 public class AudioModelFilter extends BaseModelFilter {
     
     private static final Pattern ENDPOINT_PATTERN = Pattern.compile(".*/audio/(transcriptions|speech)$");
