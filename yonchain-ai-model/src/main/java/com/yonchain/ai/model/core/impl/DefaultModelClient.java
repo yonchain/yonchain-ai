@@ -17,6 +17,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageResponse;
+import org.springframework.ai.model.Model;
 import reactor.core.publisher.Flux;
 
 import java.util.Optional;
@@ -28,18 +29,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DefaultModelClient implements ModelClient {
     
     private final ModelConfiguration configuration;
-    private final String defaultNamespace;
     
     // 模型实例缓存
-    private final ConcurrentHashMap<String, Object> modelCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Model<?, ?>> modelCache = new ConcurrentHashMap<>();
     
     public DefaultModelClient(ModelConfiguration configuration) {
-        this(configuration, null);
-    }
-    
-    public DefaultModelClient(ModelConfiguration configuration, String defaultNamespace) {
         this.configuration = configuration;
-        this.defaultNamespace = defaultNamespace;
     }
     
     @Override
@@ -89,6 +84,11 @@ public class DefaultModelClient implements ModelClient {
     }
     
     @Override
+    public ModelConfiguration getConfiguration() {
+        return configuration;
+    }
+    
+    @Override
     public void close() throws Exception {
         // 清理缓存的模型实例
         modelCache.clear();
@@ -134,7 +134,7 @@ public class DefaultModelClient implements ModelClient {
     }
     
     private ModelDefinition resolveModelDefinition(String modelId) {
-        ModelIdParser.ParsedModelId parsed = ModelIdParser.parse(modelId, defaultNamespace);
+        ModelIdParser.ParsedModelId parsed = ModelIdParser.parse(modelId);
         
         Optional<ModelDefinition> definition = configuration.getModelRegistry()
             .getModelDefinition(parsed.getNamespace(), parsed.getModelName());

@@ -1,5 +1,6 @@
 package com.yonchain.ai.model.core;
 
+import com.yonchain.ai.model.core.ModelConfiguration;
 import com.yonchain.ai.model.request.ChatRequest;
 import com.yonchain.ai.model.request.EmbeddingRequest;
 import com.yonchain.ai.model.request.ImageRequest;
@@ -31,6 +32,9 @@ public interface ModelClient extends AutoCloseable {
 
     // Check if model is available
     boolean isModelAvailable(String modelId);
+    
+    // Get model configuration
+    ModelConfiguration getConfiguration();
     
     // Close and cleanup resources
     @Override

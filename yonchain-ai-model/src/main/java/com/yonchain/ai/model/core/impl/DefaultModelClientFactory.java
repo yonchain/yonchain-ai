@@ -21,11 +21,6 @@ public class DefaultModelClientFactory implements ModelClientFactory {
     }
     
     @Override
-    public ModelClient createClient(String namespace) {
-        return new DefaultModelClient(configuration, namespace);
-    }
-    
-    @Override
     public ModelConfiguration getConfiguration() {
         return configuration;
     }

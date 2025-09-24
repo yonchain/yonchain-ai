@@ -7,8 +7,6 @@ public interface ModelClientFactory {
 
     ModelClient createClient();
 
-    ModelClient createClient(String namespace);
-
     ModelConfiguration getConfiguration();
 }
 

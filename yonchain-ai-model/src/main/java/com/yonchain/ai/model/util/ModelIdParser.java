@@ -8,12 +8,39 @@ public class ModelIdParser {
     private static final String SEPARATOR = ":";
     
     /**
-     * 解析模型ID
+     * 解析模型ID（要求必须包含命名空间）
+     * 
+     * @param modelId 模型ID，格式：namespace:modelName
+     * @return 解析结果
+     */
+    public static ParsedModelId parse(String modelId) {
+        if (modelId == null || modelId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Model ID cannot be null or empty");
+        }
+        
+        String trimmedModelId = modelId.trim();
+        
+        if (!trimmedModelId.contains(SEPARATOR)) {
+            throw new IllegalArgumentException("Model ID must contain namespace. Expected format: 'namespace:modelName', got: " + modelId);
+        }
+        
+        String[] parts = trimmedModelId.split(SEPARATOR, 2);
+        if (parts.length != 2 || parts[0].trim().isEmpty() || parts[1].trim().isEmpty()) {
+            throw new IllegalArgumentException("Invalid model ID format. Expected format: 'namespace:modelName', got: " + modelId);
+        }
+        
+        return new ParsedModelId(parts[0].trim(), parts[1].trim());
+    }
+    
+    /**
+     * 解析模型ID（带默认命名空间支持，已废弃）
      * 
      * @param modelId 模型ID，格式：namespace:modelName 或 modelName
      * @param defaultNamespace 默认命名空间
      * @return 解析结果
+     * @deprecated 不建议使用默认命名空间，请使用 {@link #parse(String)} 并确保modelId包含命名空间
      */
+    @Deprecated
     public static ParsedModelId parse(String modelId, String defaultNamespace) {
         if (modelId == null || modelId.trim().isEmpty()) {
             throw new IllegalArgumentException("Model ID cannot be null or empty");
