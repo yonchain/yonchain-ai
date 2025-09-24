@@ -51,8 +51,7 @@ public class XMLConfigBuilder {
             // 解析environments
             parseEnvironments(root, configuration);
             
-            // 解析typeHandlers
-            parseTypeHandlers(root, configuration);
+            // 注意：不再解析全局typeHandlers，只在命名空间文件中配置defaultHandlers
             
             // 解析models资源文件
             parseModelResources(root, configuration);
@@ -143,43 +142,6 @@ public class XMLConfigBuilder {
         }
     }
     
-    /**
-     * 解析typeHandlers配置
-     * 
-     * 现在optionsHandler直接在模型定义中指定完整类路径，
-     * 这里的typeHandlers配置主要用于预注册一些全局的处理器
-     */
-    private void parseTypeHandlers(Element root, ModelConfiguration configuration) {
-        NodeList typeHandlersNodes = root.getElementsByTagName("typeHandlers");
-        if (typeHandlersNodes.getLength() > 0) {
-            Element typeHandlersElement = (Element) typeHandlersNodes.item(0);
-            NodeList typeHandlerNodes = typeHandlersElement.getElementsByTagName("typeHandler");
-            
-            for (int i = 0; i < typeHandlerNodes.getLength(); i++) {
-                Element typeHandlerElement = (Element) typeHandlerNodes.item(i);
-                String handlerClass = typeHandlerElement.getAttribute("handler");
-                
-                try {
-                    // 预加载并注册OptionsHandler (可选)
-                    Class<?> clazz = Class.forName(handlerClass);
-                    Object handler = clazz.getDeclaredConstructor().newInstance();
-                    
-                    if (handler instanceof com.yonchain.ai.model.optionshandler.OptionsHandler) {
-                        @SuppressWarnings("unchecked")
-                        com.yonchain.ai.model.optionshandler.OptionsHandler<?> optionsHandler = 
-                            (com.yonchain.ai.model.optionshandler.OptionsHandler<?>) handler;
-                        
-                        // 注册到TypeHandlerRegistry (按类名注册)
-                        configuration.getTypeHandlerRegistry().registerHandler(handlerClass, optionsHandler);
-                        
-                        System.out.println("预注册OptionsHandler: " + handlerClass);
-                    }
-                } catch (Exception e) {
-                    System.err.println("Failed to preload OptionsHandler: " + handlerClass + ", error: " + e.getMessage());
-                }
-            }
-        }
-    }
     
     /**
      * 解析模型资源文件
@@ -197,6 +159,38 @@ public class XMLConfigBuilder {
                 // 解析每个模型资源文件
                 parseModelResource(path, configuration);
             }
+        }
+    }
+    
+    /**
+     * 解析命名空间级的默认Handler配置
+     */
+    private void parseDefaultHandlers(Element root, String namespace, ModelConfiguration configuration) {
+        NodeList defaultHandlersNodes = root.getElementsByTagName("defaultHandlers");
+        if (defaultHandlersNodes.getLength() > 0) {
+            Element defaultHandlersElement = (Element) defaultHandlersNodes.item(0);
+            NodeList handlerNodes = defaultHandlersElement.getElementsByTagName("handler");
+            
+            System.out.println("DEBUG: 解析命名空间 " + namespace + " 的默认Handler配置，找到 " + handlerNodes.getLength() + " 个Handler");
+            
+            for (int i = 0; i < handlerNodes.getLength(); i++) {
+                Element handlerElement = (Element) handlerNodes.item(i);
+                String type = handlerElement.getAttribute("type");
+                String handlerClass = handlerElement.getAttribute("class");
+                
+                if (type != null && !type.isEmpty() && handlerClass != null && !handlerClass.isEmpty()) {
+                    // 注册到选项处理器注册中心（命名空间级）
+                    configuration.getOptionsHandlerRegistry()
+                                .registerNamespaceHandlerByClass(namespace, type, handlerClass);
+                    
+                    System.out.println("DEBUG: 注册命名空间Handler: " + namespace + ":" + type + " -> " + handlerClass);
+                } else {
+                    System.err.println("WARNING: 无效的Handler配置，缺少type或class属性: " + 
+                                     "type=" + type + ", class=" + handlerClass);
+                }
+            }
+        } else {
+            System.out.println("DEBUG: 命名空间 " + namespace + " 没有配置defaultHandlers");
         }
     }
     
@@ -223,6 +217,9 @@ public class XMLConfigBuilder {
             
             Element root = document.getDocumentElement();
             String namespace = root.getAttribute("namespace");
+            
+            // 解析命名空间级的默认Handler配置
+            parseDefaultHandlers(root, namespace, configuration);
             
             // 使用直接子元素遍历，避免深度搜索
             NodeList childNodes = root.getChildNodes();

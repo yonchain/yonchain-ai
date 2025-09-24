@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <models namespace="openai">
 
+    <!-- 命名空间级默认Handler -->
+    <defaultHandlers>
+        <handler type="chat" class="com.yonchain.ai.model.optionshandler.openai.OpenAiChatOptionsHandler"/>
+        <handler type="image" class="com.yonchain.ai.model.optionshandler.openai.OpenAiImageOptionsHandler"/>
+        <handler type="embedding" class="com.yonchain.ai.model.optionshandler.openai.OpenAiEmbeddingOptionsHandler"/>
+    </defaultHandlers>
+
     <!-- 聊天模型 -->
-    <model id="gpt-4" type="chat" optionsHandler="com.yonchain.ai.model.optionshandler.openai.OpenAiChatOptionsHandler">
+    <model id="gpt-4" type="chat">
         <baseUrl>https://api.openai.com</baseUrl>
         <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${openai.apiKey}</auth>
@@ -19,7 +26,7 @@
         </options>
     </model>
     
-    <model id="gpt-3.5-turbo" type="chat" optionsHandler="com.yonchain.ai.model.optionshandler.openai.OpenAiChatOptionsHandler">
+    <model id="gpt-3.5-turbo" type="chat">
         <baseUrl>https://api.openai.com</baseUrl>
         <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${openai.apiKey}</auth>
@@ -31,7 +38,7 @@
     </model>
     
     <!-- 图像生成模型 -->
-    <model id="dall-e-3" type="image" optionsHandler="com.yonchain.ai.model.optionshandler.openai.OpenAiImageOptionsHandler">
+    <model id="dall-e-3" type="image">
         <baseUrl>https://api.openai.com/v1/images/generations</baseUrl>
         <auth type="bearer">${openai.apiKey}</auth>
         <options>
@@ -46,7 +53,7 @@
     </model>
     
     <!-- 嵌入模型 -->
-    <model id="text-embedding-ada-002" type="embedding" optionsHandler="com.yonchain.ai.model.optionshandler.openai.OpenAiEmbeddingOptionsHandler">
+    <model id="text-embedding-ada-002" type="embedding">
         <baseUrl>https://api.openai.com/v1/embeddings</baseUrl>
         <auth type="bearer">${openai.apiKey}</auth>
         <options>
@@ -57,7 +64,7 @@
     </model>
     
     <!-- 新一代嵌入模型，支持维度设置 -->
-    <model id="text-embedding-3-small" type="embedding" optionsHandler="com.yonchain.ai.model.optionshandler.openai.OpenAiEmbeddingOptionsHandler">
+    <model id="text-embedding-3-small" type="embedding">
         <baseUrl>https://api.openai.com/v1/embeddings</baseUrl>
         <auth type="bearer">${openai.apiKey}</auth>
         <options>

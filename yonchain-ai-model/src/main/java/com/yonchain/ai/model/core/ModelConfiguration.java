@@ -21,7 +21,7 @@ public class ModelConfiguration {
     private Properties properties;
     private ModelRegistry modelRegistry;
     private ModelFactoryRegistry modelFactoryRegistry;
-    private OptionsHandlerRegistry typeHandlerRegistry;
+    private OptionsHandlerRegistry optionsHandlerRegistry;
     private Map<String, Map<String, String>> environments;
     private String defaultEnvironment;
     
@@ -29,7 +29,7 @@ public class ModelConfiguration {
         this.properties = new Properties();
         this.modelRegistry = new ModelRegistry();
         this.modelFactoryRegistry = new ModelFactoryRegistry();
-        this.typeHandlerRegistry = new OptionsHandlerRegistry();
+        this.optionsHandlerRegistry = new OptionsHandlerRegistry();
     }
     
     // Properties
@@ -71,13 +71,22 @@ public class ModelConfiguration {
         this.modelFactoryRegistry = modelFactoryRegistry;
     }
     
-    // Type Handler Registry
+    // Options Handler Registry
+    public OptionsHandlerRegistry getOptionsHandlerRegistry() {
+        return optionsHandlerRegistry;
+    }
+    
+    public void setOptionsHandlerRegistry(OptionsHandlerRegistry optionsHandlerRegistry) {
+        this.optionsHandlerRegistry = optionsHandlerRegistry;
+    }
+    
+    // 保持向后兼容的方法名
     public OptionsHandlerRegistry getTypeHandlerRegistry() {
-        return typeHandlerRegistry;
+        return optionsHandlerRegistry;
     }
     
     public void setTypeHandlerRegistry(OptionsHandlerRegistry typeHandlerRegistry) {
-        this.typeHandlerRegistry = typeHandlerRegistry;
+        this.optionsHandlerRegistry = typeHandlerRegistry;
     }
     
     // Convenience methods

@@ -157,6 +157,9 @@ public class ChatModelFilter extends BaseModelFilter {
 
     /**
      * 转换为ChatRequest
+     * 
+     * 注意：不再在这里构建ChatOptions，而是传递原始参数给ModelClient处理
+     * ModelClient会在运行时根据具体模型使用相应的OptionsHandler构建运行时选项
      */
     private ChatRequest convertToChatRequest(Map<String, Object> requestParams) {
         ChatRequest.Builder builder = ChatRequest.builder();
@@ -189,24 +192,8 @@ public class ChatModelFilter extends BaseModelFilter {
             }
         }
 
-        // 处理options
-        ChatOptions.Builder optionsBuilder = ChatOptions.builder();
-        if (requestParams.containsKey("temperature")) {
-            optionsBuilder.temperature(((Number) requestParams.get("temperature")).doubleValue());
-        }
-        if (requestParams.containsKey("max_tokens")) {
-            optionsBuilder.maxTokens(((Number) requestParams.get("max_tokens")).intValue());
-        }
-        if (requestParams.containsKey("top_p")) {
-            optionsBuilder.topP(((Number) requestParams.get("top_p")).doubleValue());
-        }
-        if (requestParams.containsKey("frequency_penalty")) {
-            optionsBuilder.frequencyPenalty(((Number) requestParams.get("frequency_penalty")).doubleValue());
-        }
-        if (requestParams.containsKey("presence_penalty")) {
-            optionsBuilder.presencePenalty(((Number) requestParams.get("presence_penalty")).doubleValue());
-        }
-        builder.options(optionsBuilder.build());
+        // 传递原始参数，让ModelClient根据具体模型处理选项
+        builder.rawParameters(requestParams);
 
         return builder.build();
     }

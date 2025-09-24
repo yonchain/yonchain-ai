@@ -12,9 +12,8 @@ public interface ImageModelFactory {
     /**
      * 创建图像模型
      * 
-     * @param definition 模型定义
-     * @param typeHandlerRegistry 类型处理器注册中心
+     * @param definition 模型定义（包含所有必要的配置信息）
      * @return Spring AI ImageModel实例
      */
-    ImageModel createImageModel(ModelDefinition definition, OptionsHandlerRegistry typeHandlerRegistry);
+    ImageModel createImageModel(ModelDefinition definition);
 }

@@ -7,6 +7,8 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * 聊天请求类
@@ -15,6 +17,9 @@ public class ChatRequest {
     
     private List<Message> messages;
     private ChatOptions options;
+    
+    // 原始参数，用于延迟处理
+    private Map<String, Object> rawParameters;
     
     public ChatRequest() {
         this.messages = new ArrayList<>();
@@ -43,6 +48,14 @@ public class ChatRequest {
     
     public void setOptions(ChatOptions options) {
         this.options = options;
+    }
+    
+    public Map<String, Object> getRawParameters() {
+        return rawParameters;
+    }
+    
+    public void setRawParameters(Map<String, Object> rawParameters) {
+        this.rawParameters = rawParameters;
     }
     
     /**
@@ -81,6 +94,20 @@ public class ChatRequest {
     }
     
     /**
+     * 转换为Spring AI的Prompt（使用运行时选项）
+     * 
+     * @param runtimeOptions 运行时模型选项
+     * @return Prompt对象
+     */
+    public Prompt toPrompt(ChatOptions runtimeOptions) {
+        if (runtimeOptions != null) {
+            return new Prompt(messages, runtimeOptions);
+        } else {
+            return toPrompt();
+        }
+    }
+    
+    /**
      * 构建器
      * 
      * @return ChatRequest构建器
@@ -109,6 +136,11 @@ public class ChatRequest {
         
         public Builder options(ChatOptions options) {
             request.setOptions(options);
+            return this;
+        }
+        
+        public Builder rawParameters(Map<String, Object> rawParameters) {
+            request.setRawParameters(rawParameters);
             return this;
         }
         

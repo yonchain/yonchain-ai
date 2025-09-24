@@ -12,9 +12,8 @@ public interface ChatModelFactory {
     /**
      * 创建聊天模型
      * 
-     * @param definition 模型定义
-     * @param typeHandlerRegistry 类型处理器注册中心
+     * @param definition 模型定义（包含所有必要的配置信息）
      * @return Spring AI ChatModel实例
      */
-    ChatModel createChatModel(ModelDefinition definition, OptionsHandlerRegistry typeHandlerRegistry);
+    ChatModel createChatModel(ModelDefinition definition);
 }

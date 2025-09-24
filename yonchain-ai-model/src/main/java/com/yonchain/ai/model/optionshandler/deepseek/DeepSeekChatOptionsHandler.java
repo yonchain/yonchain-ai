@@ -18,9 +18,9 @@ public class DeepSeekChatOptionsHandler implements OptionsHandler<OpenAiChatOpti
         var builder = OpenAiChatOptions.builder();
 
         // 设置模型 (必需)
-        if (config.containsKey("model")) {
+/*        if (config.containsKey("model")) {
             builder.model((String) config.get("model"));
-        }
+        }*/
 
         // 设置温度 (0-2.0)
         if (config.containsKey("temperature")) {

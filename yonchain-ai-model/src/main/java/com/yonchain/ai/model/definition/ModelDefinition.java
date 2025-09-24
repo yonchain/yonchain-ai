@@ -1,5 +1,6 @@
 package com.yonchain.ai.model.definition;
 
+import com.yonchain.ai.model.core.ModelConfiguration;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -20,6 +21,9 @@ public class ModelDefinition {
     private String optionsHandler; // 选项处理器标识，格式：provider:type
     private Map<String, Object> options;
     private Map<String, Object> metadata;
+    
+    // 运行时依赖 - 用于Factory内部处理所有配置
+    private transient ModelConfiguration modelConfiguration;
     
     public ModelDefinition() {
         this.options = new HashMap<>();
@@ -154,6 +158,54 @@ public class ModelDefinition {
      */
     public String getFullId() {
         return namespace + ":" + id;
+    }
+    
+    /**
+     * 解析OptionsHandler实例
+     * 
+     * 解析优先级：
+     * 1. 模型级：namespace:modelId
+     * 2. 显式类名：完整类名
+     * 3. 命名空间级：namespace:type
+     * 4. 约定规则：动态创建
+     * 
+     * @param modelConfiguration 模型配置
+     * @return 解析后的OptionsHandler实例，可能为null
+     */
+    @SuppressWarnings("unchecked")
+    public <T> com.yonchain.ai.model.optionshandler.OptionsHandler<T> resolveOptionsHandler(ModelConfiguration modelConfiguration) {
+        if (modelConfiguration == null) {
+            System.out.println("DEBUG: ModelConfiguration is null for " + getFullId());
+            return null;
+        }
+        
+        return modelConfiguration.getOptionsHandlerRegistry().resolveHandler(namespace, id, type, optionsHandler);
+    }
+    
+    /**
+     * 检查是否有可用的OptionsHandler配置
+     * 
+     * @param modelConfiguration 模型配置
+     * @return 是否有可用的Handler
+     */
+    public boolean hasOptionsHandler(ModelConfiguration modelConfiguration) {
+        return resolveOptionsHandler(modelConfiguration) != null;
+    }
+    
+    // ModelConfiguration getter/setter
+    public ModelConfiguration getModelConfiguration() {
+        return modelConfiguration;
+    }
+    
+    public void setModelConfiguration(ModelConfiguration modelConfiguration) {
+        this.modelConfiguration = modelConfiguration;
+    }
+    
+    /**
+     * 便捷方法：使用内部的ModelConfiguration解析Handler
+     */
+    public <T> com.yonchain.ai.model.optionshandler.OptionsHandler<T> resolveOptionsHandler() {
+        return resolveOptionsHandler(this.modelConfiguration);
     }
     
     @Override

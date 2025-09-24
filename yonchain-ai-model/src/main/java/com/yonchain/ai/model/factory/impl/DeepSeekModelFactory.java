@@ -2,7 +2,7 @@ package com.yonchain.ai.model.factory.impl;
 
 import com.yonchain.ai.model.definition.ModelDefinition;
 import com.yonchain.ai.model.factory.ModelFactory;
-import com.yonchain.ai.model.registry.OptionsHandlerRegistry;
+import com.yonchain.ai.model.optionshandler.OptionsHandler;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
@@ -25,14 +25,35 @@ public class DeepSeekModelFactory implements ModelFactory {
     
     @Override
     public boolean supports(String modelType) {
-        return "chat".equalsIgnoreCase(modelType) || 
-               "embedding".equalsIgnoreCase(modelType);
+        // DeepSeek目前只支持聊天模型
+        return "chat".equalsIgnoreCase(modelType);
     }
     
     @Override
-    public ChatModel createChatModel(ModelDefinition definition, OptionsHandlerRegistry typeHandlerRegistry) {
-        // DeepSeek使用OpenAI兼容的API
+    public ChatModel createChatModel(ModelDefinition definition) {
+        // 创建DeepSeek API实例
         DeepSeekApi deepSeekApi = createDeepSeekApi(definition);
+        
+/*        // 使用ModelDefinition内部的OptionsHandler解析选项
+        DeepSeekChatOptions options = null;
+        OptionsHandler<DeepSeekChatOptions> handler = definition.resolveOptionsHandler();
+        
+        if (handler != null) {
+            try {
+                options = handler.buildOptions(definition.getOptions());
+                System.out.println("DEBUG: Successfully built options using handler for " + definition.getFullId());
+            } catch (Exception e) {
+                System.err.println("ERROR: Failed to build options using handler for " + definition.getFullId() + ", error: " + e.getMessage());
+                options = DeepSeekChatOptions.builder()
+                        .model(definition.getId())
+                        .build();
+            }
+        } else {
+            System.out.println("DEBUG: No handler found for " + definition.getFullId() + ", using default options");
+            options = DeepSeekChatOptions.builder()
+                    .model(definition.getId())
+                    .build();
+        }*/
 
         // 创建聊天选项
         DeepSeekChatOptions.Builder optionsBuilder = DeepSeekChatOptions.builder()
@@ -40,23 +61,21 @@ public class DeepSeekModelFactory implements ModelFactory {
         DeepSeekChatOptions options = optionsBuilder.build();
 
         // 创建聊天模型
-        DeepSeekChatModel chatModel = DeepSeekChatModel.builder()
+        return DeepSeekChatModel.builder()
                 .deepSeekApi(deepSeekApi)
                 .defaultOptions(options)
                 .build();
-        return chatModel;
     }
     
     @Override
-    public ImageModel createImageModel(ModelDefinition definition, OptionsHandlerRegistry typeHandlerRegistry) {
+    public ImageModel createImageModel(ModelDefinition definition) {
         throw new UnsupportedOperationException("DeepSeek does not support image generation models");
     }
     
     @Override
-    public EmbeddingModel createEmbeddingModel(ModelDefinition definition, OptionsHandlerRegistry typeHandlerRegistry) {
-        // DeepSeek使用OpenAI兼容的API
-        DeepSeekApi deepSeekApi = createDeepSeekApi(definition);
-        return null;//new OpenAiEmbeddingModel(deepSeekApi);
+    public EmbeddingModel createEmbeddingModel(ModelDefinition definition) {
+        // DeepSeek暂时不支持嵌入模型
+        throw new UnsupportedOperationException("DeepSeek does not support embedding models yet");
     }
     
     /**

@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <models namespace="deepseek">
+    
+    <!-- 命名空间级默认Handler -->
+    <defaultHandlers>
+        <handler type="chat" class="com.yonchain.ai.model.optionshandler.deepseek.DeepSeekChatOptionsHandler"/>
+    </defaultHandlers>
+
     <!-- 聊天模型 -->
-    <model id="deepseek-chat" type="chat" optionsHandler="com.yonchain.ai.model.optionshandler.deepseek.DeepSeekChatOptionsHandler">
+    <model id="deepseek-chat" type="chat">
         <baseUrl>https://api.deepseek.com</baseUrl>
         <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${deepseek.apiKey}</auth>
@@ -13,7 +19,7 @@
         </options>
     </model>
     
-    <model id="deepseek-coder" type="chat" optionsHandler="com.yonchain.ai.model.optionshandler.deepseek.DeepSeekChatOptionsHandler">
+    <model id="deepseek-coder" type="chat">
         <baseUrl>https://api.deepseek.com</baseUrl>
         <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${deepseek.apiKey}</auth>
@@ -25,7 +31,7 @@
         </options>
     </model>
     
-    <model id="deepseek-math" type="chat" optionsHandler="com.yonchain.ai.model.optionshandler.deepseek.DeepSeekChatOptionsHandler">
+    <model id="deepseek-math" type="chat">
         <baseUrl>https://api.deepseek.com</baseUrl>
         <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${deepseek.apiKey}</auth>

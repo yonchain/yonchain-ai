@@ -36,25 +36,24 @@ public class OpenAIModelFactory implements ModelFactory {
     }
     
     @Override
-    public ChatModel createChatModel(ModelDefinition definition, OptionsHandlerRegistry typeHandlerRegistry) {
+    public ChatModel createChatModel(ModelDefinition definition) {
         // 创建OpenAI API实例
         OpenAiApi openAiApi = createOpenAiApi(definition);
         
-        // 使用OptionsHandler构建选项
+        // 使用ModelDefinition内部的OptionsHandlerRegistry解析Handler
         OpenAiChatOptions options = null;
-        String optionsHandlerClass = definition.getOptionsHandler();
-        if (optionsHandlerClass != null && !optionsHandlerClass.isEmpty()) {
+        OptionsHandler<OpenAiChatOptions> handler = definition.resolveOptionsHandler();
+        
+        if (handler != null) {
             try {
-                OptionsHandler<OpenAiChatOptions> handler = OptionsHandlerUtils.createHandler(optionsHandlerClass);
-                if (handler != null) {
-                    options = handler.buildOptions(definition.getOptions());
-                }
+                options = handler.buildOptions(definition.getOptions());
+                System.out.println("DEBUG: Successfully built options using handler for " + definition.getFullId());
             } catch (Exception e) {
-                System.err.println("Failed to create options using handler: " + optionsHandlerClass + ", error: " + e.getMessage());
-                // 使用默认选项
+                System.err.println("ERROR: Failed to build options using handler for " + definition.getFullId() + ", error: " + e.getMessage());
                 options = OpenAiChatOptions.builder().build();
             }
         } else {
+            System.out.println("DEBUG: No handler found for " + definition.getFullId() + ", using default options");
             options = OpenAiChatOptions.builder().build();
         }
         
@@ -63,25 +62,24 @@ public class OpenAIModelFactory implements ModelFactory {
     }
     
     @Override
-    public ImageModel createImageModel(ModelDefinition definition, OptionsHandlerRegistry typeHandlerRegistry) {
+    public ImageModel createImageModel(ModelDefinition definition) {
         // 创建OpenAI API实例
         OpenAiApi openAiApi = createOpenAiApi(definition);
         
-        // 使用OptionsHandler构建选项
+        // 使用ModelDefinition内部的OptionsHandlerRegistry解析Handler
         OpenAiImageOptions options = null;
-        String optionsHandlerClass = definition.getOptionsHandler();
-        if (optionsHandlerClass != null && !optionsHandlerClass.isEmpty()) {
+        OptionsHandler<OpenAiImageOptions> handler = definition.resolveOptionsHandler();
+        
+        if (handler != null) {
             try {
-                OptionsHandler<OpenAiImageOptions> handler = OptionsHandlerUtils.createHandler(optionsHandlerClass);
-                if (handler != null) {
-                    options = handler.buildOptions(definition.getOptions());
-                }
+                options = handler.buildOptions(definition.getOptions());
+                System.out.println("DEBUG: Successfully built options using handler for " + definition.getFullId());
             } catch (Exception e) {
-                System.err.println("Failed to create options using handler: " + optionsHandlerClass + ", error: " + e.getMessage());
-                // 使用默认选项
+                System.err.println("ERROR: Failed to build options using handler for " + definition.getFullId() + ", error: " + e.getMessage());
                 options = OpenAiImageOptions.builder().build();
             }
         } else {
+            System.out.println("DEBUG: No handler found for " + definition.getFullId() + ", using default options");
             options = OpenAiImageOptions.builder().build();
         }
         
@@ -90,25 +88,24 @@ public class OpenAIModelFactory implements ModelFactory {
     }
     
     @Override
-    public EmbeddingModel createEmbeddingModel(ModelDefinition definition, OptionsHandlerRegistry typeHandlerRegistry) {
+    public EmbeddingModel createEmbeddingModel(ModelDefinition definition) {
         // 创建OpenAI API实例
         OpenAiApi openAiApi = createOpenAiApi(definition);
         
-        // 使用OptionsHandler构建选项
+        // 使用ModelDefinition内部的OptionsHandlerRegistry解析Handler
         OpenAiEmbeddingOptions options = null;
-        String optionsHandlerClass = definition.getOptionsHandler();
-        if (optionsHandlerClass != null && !optionsHandlerClass.isEmpty()) {
+        OptionsHandler<OpenAiEmbeddingOptions> handler = definition.resolveOptionsHandler();
+        
+        if (handler != null) {
             try {
-                OptionsHandler<OpenAiEmbeddingOptions> handler = OptionsHandlerUtils.createHandler(optionsHandlerClass);
-                if (handler != null) {
-                    options = handler.buildOptions(definition.getOptions());
-                }
+                options = handler.buildOptions(definition.getOptions());
+                System.out.println("DEBUG: Successfully built options using handler for " + definition.getFullId());
             } catch (Exception e) {
-                System.err.println("Failed to create options using handler: " + optionsHandlerClass + ", error: " + e.getMessage());
-                // 使用默认选项
+                System.err.println("ERROR: Failed to build options using handler for " + definition.getFullId() + ", error: " + e.getMessage());
                 options = OpenAiEmbeddingOptions.builder().build();
             }
         } else {
+            System.out.println("DEBUG: No handler found for " + definition.getFullId() + ", using default options");
             options = OpenAiEmbeddingOptions.builder().build();
         }
         
