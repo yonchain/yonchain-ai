@@ -168,7 +168,7 @@ public class DefaultModelClient implements ModelClient {
             
             // 获取OptionsHandler
             ModelOptionsHandler<T> handler =
-                configuration.getOptionsHandlerRegistry().resolveHandler(
+                configuration.resolveHandler(
                     definition.getNamespace(), 
                     definition.getId(), 
                     definition.getType(), 

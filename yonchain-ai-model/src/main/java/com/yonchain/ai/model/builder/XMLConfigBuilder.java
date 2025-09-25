@@ -3,6 +3,7 @@ package com.yonchain.ai.model.builder;
 import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.model.ModelConfiguration;
 import com.yonchain.ai.model.ModelFactory;
+import com.yonchain.ai.model.ModelEnvironment;
 import com.yonchain.ai.model.definition.ModelDefinition;
 import com.yonchain.ai.model.util.Resources;
 import org.w3c.dom.Document;
@@ -15,6 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * XML配置构建器
@@ -102,17 +104,17 @@ public class XMLConfigBuilder {
             Element environmentsElement = (Element) environmentsNodes.item(0);
             String defaultEnv = environmentsElement.getAttribute("default");
             if (defaultEnv == null || defaultEnv.isEmpty()) {
-                defaultEnv = "dev";
+                defaultEnv = "model";
             }
             
             NodeList environmentNodes = environmentsElement.getElementsByTagName("environment");
-            Map<String, Map<String, String>> environments = new HashMap<>();
+            ModelEnvironment selectedEnvironment = null;
             
             for (int i = 0; i < environmentNodes.getLength(); i++) {
                 Element envElement = (Element) environmentNodes.item(i);
                 String envId = envElement.getAttribute("id");
                 
-                Map<String, String> envProperties = new HashMap<>();
+                Properties envProperties = new Properties();
                 NodeList propertiesNodes = envElement.getElementsByTagName("properties");
                 if (propertiesNodes.getLength() > 0) {
                     Element propertiesElement = (Element) propertiesNodes.item(0);
@@ -122,23 +124,22 @@ public class XMLConfigBuilder {
                         Element propertyElement = (Element) propertyNodes.item(j);
                         String name = propertyElement.getAttribute("name");
                         String value = propertyElement.getAttribute("value");
-                        envProperties.put(name, value);
+                        envProperties.setProperty(name, value);
                     }
                 }
                 
-                environments.put(envId, envProperties);
+                // 如果是默认环境，创建ModelEnvironment并设置到configuration
+                if (defaultEnv.equals(envId)) {
+                    selectedEnvironment = new ModelEnvironment(envId, envProperties);
+                }
             }
             
-            // 设置环境配置到ModelConfiguration
-            configuration.setEnvironments(environments);
-            configuration.setDefaultEnvironment(defaultEnv);
-            
-            // 加载默认环境的属性
-            if (environments.containsKey(defaultEnv)) {
-                Map<String, String> defaultEnvProps = environments.get(defaultEnv);
-                for (Map.Entry<String, String> entry : defaultEnvProps.entrySet()) {
-                    configuration.setProperty(entry.getKey(), entry.getValue());
-                }
+            // 如果找到了默认环境，设置到配置中
+            if (selectedEnvironment != null) {
+                configuration.setEnvironment(selectedEnvironment);
+            } else {
+                // 如果没有找到默认环境，创建一个空的环境
+                configuration.setEnvironment(new ModelEnvironment(defaultEnv));
             }
         }
     }
@@ -181,8 +182,7 @@ public class XMLConfigBuilder {
                 
                 if (type != null && !type.isEmpty() && handlerClass != null && !handlerClass.isEmpty()) {
                     // 注册到选项处理器注册中心（命名空间级）
-                    configuration.getOptionsHandlerRegistry()
-                                .registerNamespaceHandlerByClass(namespace, type, handlerClass);
+                    configuration.registerNamespaceHandlerByClass(namespace, type, handlerClass);
                     
                     System.out.println("DEBUG: 注册命名空间Handler: " + namespace + ":" + type + " -> " + handlerClass);
                 } else {
@@ -268,7 +268,7 @@ public class XMLConfigBuilder {
                         System.out.println("DEBUG: Processing model " + processedCount + "/" + modelCount + ": " + namespace + ":" + modelId);
                         
                         ModelDefinition modelDef = parseModelDefinition(element, namespace);
-                        configuration.getModelRegistry().registerModel(modelDef);
+                        configuration.registerModel(modelDef);
                         System.out.println("DEBUG: Successfully registered model: " + namespace + ":" + modelId);
                     }
                 }
