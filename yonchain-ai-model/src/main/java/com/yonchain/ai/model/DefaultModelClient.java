@@ -2,7 +2,6 @@ package com.yonchain.ai.model;
 
 import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.model.definition.ModelDefinition;
-import com.yonchain.ai.model.factory.ModelFactory;
 import com.yonchain.ai.model.options.ModelOptionsHandler;
 import com.yonchain.ai.model.request.ChatRequest;
 import com.yonchain.ai.model.request.EmbeddingRequest;
@@ -135,16 +134,14 @@ public class DefaultModelClient implements ModelClient {
     private ModelDefinition resolveModelDefinition(String modelId) {
         ModelIdParser.ParsedModelId parsed = ModelIdParser.parse(modelId);
         
-        Optional<ModelDefinition> definition = configuration.getModelRegistry()
-            .getModelDefinition(parsed.getNamespace(), parsed.getModelName());
+        Optional<ModelDefinition> definition = configuration.getModelDefinition(parsed.getNamespace(), parsed.getModelName());
             
         return definition.orElseThrow(() -> 
             new IllegalArgumentException("Model not found: " + modelId));
     }
     
     private ModelFactory getModelFactory(String namespace) {
-        return configuration.getModelFactoryRegistry()
-            .getFactory(namespace)
+        return configuration.getFactory(namespace)
             .orElseThrow(() -> 
                 new IllegalArgumentException("No factory found for namespace: " + namespace));
     }

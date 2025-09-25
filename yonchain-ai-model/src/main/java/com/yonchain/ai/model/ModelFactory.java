@@ -1,4 +1,4 @@
-package com.yonchain.ai.model.factory;
+package com.yonchain.ai.model;
 
 import com.yonchain.ai.model.enums.ModelType;
 import com.yonchain.ai.model.definition.ModelDefinition;

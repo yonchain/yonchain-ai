@@ -1,9 +1,15 @@
 package com.yonchain.ai.model;
 
+import com.yonchain.ai.model.definition.ModelDefinition;
+import com.yonchain.ai.model.enums.ModelType;
+import com.yonchain.ai.model.options.ModelOptionsHandler;
 import com.yonchain.ai.model.options.ModelOptionsHandlerRegistry;
+import org.springframework.ai.model.ModelOptions;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * 模型配置管理中心
@@ -16,76 +22,209 @@ import java.util.Properties;
  */
 public class ModelConfiguration {
     
-    private Properties properties;
     private ModelRegistry modelRegistry;
     private ModelFactoryRegistry modelFactoryRegistry;
     private ModelOptionsHandlerRegistry optionsHandlerRegistry;
-    private Map<String, Map<String, String>> environments;
-    private String defaultEnvironment;
+    private ModelEnvironment environment;
     
     public ModelConfiguration() {
-        this.properties = new Properties();
+        this.environment = new ModelEnvironment("model");
         this.modelRegistry = new ModelRegistry();
         this.modelFactoryRegistry = new ModelFactoryRegistry();
         this.optionsHandlerRegistry = new ModelOptionsHandlerRegistry();
     }
     
-    // Properties
-    public Properties getProperties() {
-        return properties;
+    public ModelConfiguration(ModelEnvironment environment) {
+        this.environment = environment;
+        this.modelRegistry = new ModelRegistry();
+        this.modelFactoryRegistry = new ModelFactoryRegistry();
+        this.optionsHandlerRegistry = new ModelOptionsHandlerRegistry();
     }
     
-    public void setProperties(Properties properties) {
-        this.properties = properties;
+    // ================== 环境配置管理 ==================
+    
+    public ModelEnvironment getEnvironment() {
+        return environment;
     }
+    
+    public void setEnvironment(ModelEnvironment environment) {
+        this.environment = environment;
+    }
+    
+    // ================== 配置属性管理 ==================
     
     public String getProperty(String key) {
-        return properties.getProperty(key);
+        return environment.getProperty(key);
     }
-    
+
     public String getProperty(String key, String defaultValue) {
-        return properties.getProperty(key, defaultValue);
+        return environment.getProperty(key, defaultValue);
     }
-    
+
     public void setProperty(String key, String value) {
-        properties.setProperty(key, value);
+        environment.setProperty(key, value);
     }
     
-    // Model Registry
-    public ModelRegistry getModelRegistry() {
-        return modelRegistry;
+    public Properties getProperties() {
+        return environment.getProperties();
+    }
+
+    public void setProperties(Properties properties) {
+        environment.setProperties(properties);
     }
     
-    public void setModelRegistry(ModelRegistry modelRegistry) {
-        this.modelRegistry = modelRegistry;
+    public boolean getBooleanProperty(String key, boolean defaultValue) {
+        return environment.getBooleanProperty(key, defaultValue);
     }
     
-    // Namespace Factory Registry
-    public ModelFactoryRegistry getModelFactoryRegistry() {
-        return modelFactoryRegistry;
+    public int getIntProperty(String key, int defaultValue) {
+        return environment.getIntProperty(key, defaultValue);
     }
     
-    public void setModelFactoryRegistry(ModelFactoryRegistry modelFactoryRegistry) {
-        this.modelFactoryRegistry = modelFactoryRegistry;
+    public long getLongProperty(String key, long defaultValue) {
+        return environment.getLongProperty(key, defaultValue);
     }
     
-    // Options Handler Registry
-    public ModelOptionsHandlerRegistry getOptionsHandlerRegistry() {
-        return optionsHandlerRegistry;
+    // ================== Model Registry Methods ==================
+    
+    /**
+     * 注册模型定义
+     */
+    public void registerModel(ModelDefinition definition) {
+        modelRegistry.registerModel(definition);
     }
     
-    public void setOptionsHandlerRegistry(ModelOptionsHandlerRegistry optionsHandlerRegistry) {
-        this.optionsHandlerRegistry = optionsHandlerRegistry;
+    /**
+     * 获取模型定义
+     */
+    public Optional<ModelDefinition> getModelDefinition(String namespace, String modelId) {
+        return modelRegistry.getModelDefinition(namespace, modelId);
     }
     
-    // 保持向后兼容的方法名
-    public ModelOptionsHandlerRegistry getTypeHandlerRegistry() {
-        return optionsHandlerRegistry;
+    /**
+     * 获取指定命名空间下的所有模型
+     */
+    public List<ModelDefinition> getModelsByNamespace(String namespace) {
+        return modelRegistry.getModelsByNamespace(namespace);
     }
     
-    public void setTypeHandlerRegistry(ModelOptionsHandlerRegistry optionsHandlerRegistry) {
-        this.optionsHandlerRegistry = optionsHandlerRegistry;
+    /**
+     * 获取指定类型的所有模型
+     */
+    public List<ModelDefinition> getModelsByType(String modelType) {
+        return modelRegistry.getModelsByType(modelType);
     }
+    
+    /**
+     * 获取所有模型定义
+     */
+    public List<ModelDefinition> getAllModels() {
+        return modelRegistry.getAllModels();
+    }
+    
+    // ================== Model Factory Registry Methods ==================
+    
+    /**
+     * 注册模型工厂
+     */
+    public void registerFactory(String namespace, ModelFactory factory) {
+        modelFactoryRegistry.registerFactory(namespace, factory);
+    }
+    
+    /**
+     * 获取模型工厂
+     */
+    public Optional<ModelFactory> getFactory(String namespace) {
+        return modelFactoryRegistry.getFactory(namespace);
+    }
+    
+    /**
+     * 检查模型工厂是否存在
+     */
+    public boolean containsFactory(String namespace) {
+        return modelFactoryRegistry.containsFactory(namespace);
+    }
+    
+    /**
+     * 移除模型工厂
+     */
+    public Optional<ModelFactory> removeFactory(String namespace) {
+        return modelFactoryRegistry.removeFactory(namespace);
+    }
+    
+    /**
+     * 获取所有注册的命名空间
+     */
+    public Set<String> getRegisteredNamespaces() {
+        return modelFactoryRegistry.getRegisteredNamespaces();
+    }
+    
+    /**
+     * 检查指定命名空间是否支持指定类型的模型
+     */
+    public boolean supportsModelType(String namespace, ModelType modelType) {
+        return modelFactoryRegistry.supportsModelType(namespace, modelType);
+    }
+    
+    /**
+     * 检查指定命名空间是否支持指定类型的模型（字符串版本）
+     */
+    public boolean supportsModelType(String namespace, String modelType) {
+        return modelFactoryRegistry.supportsModelType(namespace, modelType);
+    }
+    
+    /**
+     * 获取工厂数量
+     */
+    public int getFactoryCount() {
+        return modelFactoryRegistry.size();
+    }
+    
+    // ================== Options Handler Registry Methods ==================
+    
+    /**
+     * 注册命名空间级Handler
+     */
+    public void registerNamespaceHandler(String namespace, String type, ModelOptionsHandler<?> handler) {
+        optionsHandlerRegistry.registerNamespaceHandler(namespace, type, handler);
+    }
+    
+    /**
+     * 注册模型级Handler
+     */
+    public void registerModelHandler(String namespace, String modelId, ModelOptionsHandler<?> handler) {
+        optionsHandlerRegistry.registerModelHandler(namespace, modelId, handler);
+    }
+    
+    /**
+     * 通过类名注册命名空间级Handler
+     */
+    public void registerNamespaceHandlerByClass(String namespace, String type, String handlerClass) {
+        optionsHandlerRegistry.registerNamespaceHandlerByClass(namespace, type, handlerClass);
+    }
+    
+    /**
+     * 通过类名注册模型级Handler
+     */
+    public void registerModelHandlerByClass(String namespace, String modelId, String handlerClass) {
+        optionsHandlerRegistry.registerModelHandlerByClass(namespace, modelId, handlerClass);
+    }
+    
+    /**
+     * 解析选项处理器
+     */
+    public <T extends ModelOptions> ModelOptionsHandler<T> resolveHandler(String namespace, String modelId, String type, String explicitHandlerClass) {
+        return optionsHandlerRegistry.resolveHandler(namespace, modelId, type, explicitHandlerClass);
+    }
+    
+    /**
+     * 根据键获取选项处理器
+     */
+    public <T extends ModelOptions> Optional<ModelOptionsHandler<T>> getHandler(String key) {
+        return optionsHandlerRegistry.getHandler(key);
+    }
+    
+    // ================== 工具方法 ==================
     
     // Convenience methods
     public boolean isCacheEnabled() {
@@ -100,24 +239,4 @@ public class ModelConfiguration {
         return Boolean.parseBoolean(getProperty("openai.compatibility.enabled", "true"));
     }
     
-    // Environment management
-    public Map<String, Map<String, String>> getEnvironments() {
-        return environments;
-    }
-    
-    public void setEnvironments(Map<String, Map<String, String>> environments) {
-        this.environments = environments;
-    }
-    
-    public String getDefaultEnvironment() {
-        return defaultEnvironment;
-    }
-    
-    public void setDefaultEnvironment(String defaultEnvironment) {
-        this.defaultEnvironment = defaultEnvironment;
-    }
-    
-    public Map<String, String> getEnvironmentProperties(String environmentId) {
-        return environments != null ? environments.get(environmentId) : null;
-    }
 }

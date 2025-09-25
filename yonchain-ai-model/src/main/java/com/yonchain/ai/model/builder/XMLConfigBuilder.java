@@ -2,6 +2,7 @@ package com.yonchain.ai.model.builder;
 
 import com.yonchain.ai.api.exception.YonchainResourceNotFoundException;
 import com.yonchain.ai.model.ModelConfiguration;
+import com.yonchain.ai.model.ModelFactory;
 import com.yonchain.ai.model.definition.ModelDefinition;
 import com.yonchain.ai.model.util.Resources;
 import org.w3c.dom.Document;
@@ -224,9 +225,8 @@ public class XMLConfigBuilder {
                 try {
                     Class<?> clazz = Class.forName(factoryClass);
                     Object factoryInstance = clazz.getDeclaredConstructor().newInstance();
-                    if (factoryInstance instanceof com.yonchain.ai.model.factory.ModelFactory) {
-                        configuration.getModelFactoryRegistry()
-                                   .registerFactory(namespace, (com.yonchain.ai.model.factory.ModelFactory) factoryInstance);
+                    if (factoryInstance instanceof ModelFactory) {
+                        configuration.registerFactory(namespace, (ModelFactory) factoryInstance);
                         System.out.println("DEBUG: Registered factory for namespace " + namespace + ": " + factoryClass);
                     } else {
                         System.err.println("ERROR: Factory class " + factoryClass + " does not implement ModelFactory interface");

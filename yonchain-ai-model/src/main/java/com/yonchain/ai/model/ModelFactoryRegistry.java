@@ -1,6 +1,5 @@
 package com.yonchain.ai.model;
 
-import com.yonchain.ai.model.factory.ModelFactory;
 import com.yonchain.ai.model.enums.ModelType;
 
 import java.util.Optional;

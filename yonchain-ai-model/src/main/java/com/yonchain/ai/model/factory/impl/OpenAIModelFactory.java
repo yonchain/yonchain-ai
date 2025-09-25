@@ -1,7 +1,7 @@
 package com.yonchain.ai.model.factory.impl;
 
+import com.yonchain.ai.model.ModelFactory;
 import com.yonchain.ai.model.definition.ModelDefinition;
-import com.yonchain.ai.model.factory.ModelFactory;
 import com.yonchain.ai.model.enums.ModelType;
 import com.yonchain.ai.model.options.ModelOptionsHandler;
 import org.springframework.ai.chat.model.ChatModel;

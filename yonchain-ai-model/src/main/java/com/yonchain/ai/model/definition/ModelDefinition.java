@@ -182,7 +182,7 @@ public class ModelDefinition {
             return null;
         }
 
-        return modelConfiguration.getOptionsHandlerRegistry().resolveHandler(namespace, id, type, optionsHandler);
+        return modelConfiguration.resolveHandler(namespace, id, type, optionsHandler);
     }
 
     /**
