@@ -1,6 +1,7 @@
 package com.yonchain.ai.model.registry;
 
 import com.yonchain.ai.model.factory.ModelFactory;
+import com.yonchain.ai.model.enums.ModelType;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,10 +21,11 @@ public class ModelFactoryRegistry {
     /**
      * 注册模型工厂
      * 
+     * @param namespace 命名空间名称
      * @param factory 模型工厂
      */
-    public void registerFactory(ModelFactory factory) {
-        factories.put(factory.namespace(), factory);
+    public void registerFactory(String namespace, ModelFactory factory) {
+        factories.put(namespace, factory);
     }
     
     /**
@@ -79,5 +81,33 @@ public class ModelFactoryRegistry {
      */
     public int size() {
         return factories.size();
+    }
+    
+    // 移除了专门的工厂获取方法，统一使用getFactory()方法
+    // 因为现在ModelFactory基类已经包含了所有创建方法
+    
+    /**
+     * 检查指定命名空间是否支持指定类型的模型
+     * 
+     * @param namespace 命名空间
+     * @param modelType 模型类型枚举
+     * @return 是否支持
+     */
+    public boolean supportsModelType(String namespace, ModelType modelType) {
+        return getFactory(namespace)
+                .map(factory -> factory.supports(modelType))
+                .orElse(false);
+    }
+    
+    /**
+     * 检查指定命名空间是否支持指定类型的模型（字符串版本）
+     * 
+     * @param namespace 命名空间
+     * @param modelType 模型类型字符串
+     * @return 是否支持
+     */
+    public boolean supportsModelType(String namespace, String modelType) {
+        ModelType type = ModelType.fromCode(modelType);
+        return type != null && supportsModelType(namespace, type);
     }
 }

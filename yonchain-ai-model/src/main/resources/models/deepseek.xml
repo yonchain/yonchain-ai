@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<models namespace="deepseek">
+<models namespace="deepseek" factory="com.yonchain.ai.model.factory.impl.DeepSeekModelFactory">
     
     <!-- 命名空间级默认Handler -->
     <defaultHandlers>

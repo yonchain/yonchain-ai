@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<models namespace="openai">
+<models namespace="openai" factory="com.yonchain.ai.model.factory.impl.OpenAIModelFactory">
 
     <!-- 命名空间级默认Handler -->
     <defaultHandlers>

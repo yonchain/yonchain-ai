@@ -217,6 +217,24 @@ public class XMLConfigBuilder {
             
             Element root = document.getDocumentElement();
             String namespace = root.getAttribute("namespace");
+            String factoryClass = root.getAttribute("factory");
+            
+            // 如果指定了factory属性，则实例化并注册工厂
+            if (factoryClass != null && !factoryClass.isEmpty()) {
+                try {
+                    Class<?> clazz = Class.forName(factoryClass);
+                    Object factoryInstance = clazz.getDeclaredConstructor().newInstance();
+                    if (factoryInstance instanceof com.yonchain.ai.model.factory.ModelFactory) {
+                        configuration.getModelFactoryRegistry()
+                                   .registerFactory(namespace, (com.yonchain.ai.model.factory.ModelFactory) factoryInstance);
+                        System.out.println("DEBUG: Registered factory for namespace " + namespace + ": " + factoryClass);
+                    } else {
+                        System.err.println("ERROR: Factory class " + factoryClass + " does not implement ModelFactory interface");
+                    }
+                } catch (Exception e) {
+                    System.err.println("ERROR: Failed to instantiate factory " + factoryClass + " for namespace " + namespace + ": " + e.getMessage());
+                }
+            }
             
             // 解析命名空间级的默认Handler配置
             parseDefaultHandlers(root, namespace, configuration);

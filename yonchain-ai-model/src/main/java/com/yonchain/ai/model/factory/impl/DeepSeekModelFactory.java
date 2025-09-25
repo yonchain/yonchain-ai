@@ -2,31 +2,24 @@ package com.yonchain.ai.model.factory.impl;
 
 import com.yonchain.ai.model.definition.ModelDefinition;
 import com.yonchain.ai.model.factory.ModelFactory;
-import com.yonchain.ai.model.optionshandler.OptionsHandler;
+import com.yonchain.ai.model.enums.ModelType;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.ai.deepseek.api.DeepSeekApi;
-import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.image.ImageModel;
 import org.springframework.stereotype.Component;
 
 /**
- * DeepSeek命名空间工厂实现
- * 使用OpenAI兼容的API接口
+ * DeepSeek聊天模型工厂实现
+ * 使用OpenAI兼容的API接口，只支持聊天模型
  */
 @Component
 public class DeepSeekModelFactory implements ModelFactory {
     
     @Override
-    public String namespace() {
-        return "deepseek";
-    }
-    
-    @Override
-    public boolean supports(String modelType) {
-        // DeepSeek目前只支持聊天模型
-        return "chat".equalsIgnoreCase(modelType);
+    public boolean supports(ModelType modelType) {
+        // DeepSeek只支持聊天模型
+        return ModelType.CHAT == modelType;
     }
     
     @Override
@@ -67,16 +60,7 @@ public class DeepSeekModelFactory implements ModelFactory {
                 .build();
     }
     
-    @Override
-    public ImageModel createImageModel(ModelDefinition definition) {
-        throw new UnsupportedOperationException("DeepSeek does not support image generation models");
-    }
-    
-    @Override
-    public EmbeddingModel createEmbeddingModel(ModelDefinition definition) {
-        // DeepSeek暂时不支持嵌入模型
-        throw new UnsupportedOperationException("DeepSeek does not support embedding models yet");
-    }
+    // DeepSeek只支持聊天模型，不需要实现其他类型的创建方法
     
     /**
      * 创建DeepSeek API实例（OpenAI兼容）

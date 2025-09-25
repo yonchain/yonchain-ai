@@ -2,37 +2,29 @@ package com.yonchain.ai.model.factory.impl;
 
 import com.yonchain.ai.model.definition.ModelDefinition;
 import com.yonchain.ai.model.factory.ModelFactory;
+import com.yonchain.ai.model.enums.ModelType;
 import com.yonchain.ai.model.optionshandler.OptionsHandler;
-import com.yonchain.ai.model.registry.OptionsHandlerRegistry;
-import com.yonchain.ai.model.util.OptionsHandlerUtils;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
-import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.stereotype.Component;
 
 /**
- * OpenAI命名空间工厂实现
+ * OpenAI综合模型工厂实现
+ * 支持聊天、图像生成、嵌入等多种模型类型
  */
 @Component
 public class OpenAIModelFactory implements ModelFactory {
     
     @Override
-    public String namespace() {
-        return "openai";
-    }
-    
-    @Override
-    public boolean supports(String modelType) {
-        return "chat".equalsIgnoreCase(modelType) || 
-               "image".equalsIgnoreCase(modelType) || 
-               "embedding".equalsIgnoreCase(modelType);
+    public boolean supports(ModelType modelType) {
+        return ModelType.CHAT == modelType || 
+               ModelType.IMAGE == modelType || 
+               ModelType.EMBEDDING == modelType;
     }
     
     @Override
