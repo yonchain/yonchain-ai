@@ -3,7 +3,7 @@ package com.yonchain.ai.model.factory.impl;
 import com.yonchain.ai.model.definition.ModelDefinition;
 import com.yonchain.ai.model.factory.ModelFactory;
 import com.yonchain.ai.model.enums.ModelType;
-import com.yonchain.ai.model.optionshandler.OptionsHandler;
+import com.yonchain.ai.model.options.ModelOptionsHandler;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.image.ImageModel;
@@ -34,7 +34,7 @@ public class OpenAIModelFactory implements ModelFactory {
         
         // 使用ModelDefinition内部的OptionsHandlerRegistry解析Handler
         OpenAiChatOptions options = null;
-        OptionsHandler<OpenAiChatOptions> handler = definition.resolveOptionsHandler();
+        ModelOptionsHandler<OpenAiChatOptions> handler = definition.resolveOptionsHandler();
         
         if (handler != null) {
             try {
@@ -60,7 +60,7 @@ public class OpenAIModelFactory implements ModelFactory {
         
         // 使用ModelDefinition内部的OptionsHandlerRegistry解析Handler
         OpenAiImageOptions options = null;
-        OptionsHandler<OpenAiImageOptions> handler = definition.resolveOptionsHandler();
+        ModelOptionsHandler<OpenAiImageOptions> handler = definition.resolveOptionsHandler();
         
         if (handler != null) {
             try {
@@ -86,7 +86,7 @@ public class OpenAIModelFactory implements ModelFactory {
         
         // 使用ModelDefinition内部的OptionsHandlerRegistry解析Handler
         OpenAiEmbeddingOptions options = null;
-        OptionsHandler<OpenAiEmbeddingOptions> handler = definition.resolveOptionsHandler();
+        ModelOptionsHandler<OpenAiEmbeddingOptions> handler = definition.resolveOptionsHandler();
         
         if (handler != null) {
             try {

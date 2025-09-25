@@ -1,33 +1,27 @@
-/*package com.yonchain.ai.image;
+package com.yonchain.ai.image;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.filter.BaseModelFilter;
-import com.yonchain.ai.model.ModelService;
+import com.yonchain.ai.model.ModelClient;
+import com.yonchain.ai.model.request.ImageRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-*//**
- * 图像模型过滤器
+/**
+ * 图像模型专用过滤器
  * 处理图像生成请求 /images/generations
- *//*
-@Component
-public class ImageModelFilter extends BaseModelFilter<ImageModel> {*/
+ */
+public class ImageModelFilter extends BaseModelFilter {
     
-  //  private static final Pattern ENDPOINT_PATTERN = Pattern.compile(".*/images/generations$");
+    private static final Pattern ENDPOINT_PATTERN = Pattern.compile(".*/images/generations$");
     
-  /*  private final ImageModelService imageModelService;
-    
-    public ImageModelFilter(ImageModelService imageModelService, ObjectMapper objectMapper) {
-        super(objectMapper);
-        this.imageModelService = imageModelService;
+    public ImageModelFilter(ModelClient modelClient, ObjectMapper objectMapper) {
+        super(modelClient, objectMapper);
     }
     
     @Override
@@ -36,8 +30,8 @@ public class ImageModelFilter extends BaseModelFilter<ImageModel> {*/
     }
     
     @Override
-    protected ModelService<ImageModel> getModelService() {
-        return imageModelService;
+    protected String getModelType() {
+        return "image";
     }
     
     @Override
@@ -45,87 +39,104 @@ public class ImageModelFilter extends BaseModelFilter<ImageModel> {*/
             throws IOException {
         
         try {
-            // 1. 解析图像生成请求
+            // 1. 解析请求
             Map<String, Object> requestParams = parseRequestBody(request);
             String modelName = extractModelName(requestParams);
             
             logger.debug("Processing image generation request for model: {}", modelName);
             
-            // 2. 获取模型实例
-            ImageModel imageModel = imageModelService.getModel(modelName);
-            if (imageModel == null) {
-                sendErrorResponse(response, "Model not found: " + modelName, 404);
-                return;
-            }
+            // 2. 转换为ImageRequest
+            ImageRequest imageRequest = convertToImageRequest(requestParams);
             
-            // 3. 构建图像提示
-            ImagePrompt prompt = buildImagePrompt(requestParams);
+            // 3. 使用ModelClient调用
+            ImageResponse imageResponse = modelClient.generateImage(modelName, imageRequest);
             
-            // 4. 调用模型生成图像
-            ImageResponse imageResponse = imageModel.call(prompt);
-            
-            // 5. 转换响应格式
+            // 4. 转换为OpenAI格式
             Map<String, Object> responseData = convertImageResponse(imageResponse);
             
-            // 6. 发送响应
+            // 5. 发送响应
             sendSuccessResponse(response, responseData);
             
+            logger.debug("Image generation request completed successfully");
+            
         } catch (IllegalArgumentException e) {
-            logger.warn("Invalid request: {}", e.getMessage());
+            logger.warn("Invalid image generation request: {}", e.getMessage());
             sendErrorResponse(response, e.getMessage(), 400);
         } catch (Exception e) {
-            logger.error("Error processing image generation request", e);
+            logger.error("Error in image generation request", e);
             sendErrorResponse(response, "Failed to generate image: " + e.getMessage(), 500);
         }
     }
     
-    *//**
-     * 构建图像提示
-     * 
-     * @param requestParams 请求参数
-     * @return 图像提示
-     *//*
-    private ImagePrompt buildImagePrompt(Map<String, Object> requestParams) {
-        // 获取提示文本
+    /**
+     * 转换为ImageRequest
+     */
+    private ImageRequest convertToImageRequest(Map<String, Object> requestParams) {
         Object promptObj = requestParams.get("prompt");
         if (promptObj == null) {
             throw new IllegalArgumentException("Missing required parameter: prompt");
         }
-        String promptText = promptObj.toString();
         
-        // 构建图像提示选项
-        // 这里可以根据需要添加更多的选项，如尺寸、数量等
+        ImageRequest.Builder builder = ImageRequest.builder()
+            .prompt(promptObj.toString());
         
-        return new ImagePrompt(promptText);
+        // 处理可选参数
+        if (requestParams.containsKey("size")) {
+            builder.size((String) requestParams.get("size"));
+        }
+        if (requestParams.containsKey("quality")) {
+            builder.quality((String) requestParams.get("quality"));
+        }
+        if (requestParams.containsKey("n")) {
+            // 处理生成数量参数
+            Object nObj = requestParams.get("n");
+            if (nObj instanceof Number) {
+                int n = ((Number) nObj).intValue();
+                if (n < 1 || n > 10) {
+                    throw new IllegalArgumentException("Parameter 'n' must be between 1 and 10");
+                }
+                // 注意：ImageRequest.Builder 可能需要添加 n() 方法
+            }
+        }
+        if (requestParams.containsKey("response_format")) {
+            String responseFormat = (String) requestParams.get("response_format");
+            if (!"url".equals(responseFormat) && !"b64_json".equals(responseFormat)) {
+                throw new IllegalArgumentException("Invalid response_format. Must be 'url' or 'b64_json'");
+            }
+            // 注意：ImageRequest.Builder 可能需要添加 responseFormat() 方法
+        }
+        
+        return builder.build();
     }
     
-    *//**
-     * 转换图像响应为OpenAI格式
-     * 
-     * @param imageResponse Spring AI图像响应
-     * @return OpenAI格式的响应数据
-     *//*
+    /**
+     * 转换ImageResponse为OpenAI格式
+     */
     private Map<String, Object> convertImageResponse(ImageResponse imageResponse) {
         Map<String, Object> response = new HashMap<>();
-        
-        // 设置基本信息
         response.put("created", System.currentTimeMillis() / 1000);
         
-        // 转换图像数据
         List<Map<String, Object>> data = new ArrayList<>();
+        
         if (imageResponse.getResult() != null && imageResponse.getResult().getOutput() != null) {
             Map<String, Object> imageData = new HashMap<>();
             
-            // 获取图像URL或base64数据
+            // 获取图像URL
             String imageUrl = imageResponse.getResult().getOutput().getUrl();
             if (imageUrl != null) {
                 imageData.put("url", imageUrl);
             }
             
-            // 如果有base64数据
+            // 如果有base64数据（根据Spring AI的实际API调整）
             // String base64 = imageResponse.getResult().getOutput().getB64Json();
             // if (base64 != null) {
             //     imageData.put("b64_json", base64);
+            // }
+            
+            // 添加修订版本信息（如果有）
+            // String revisedPrompt = imageResponse.getResult().getMetadata().get("revised_prompt");
+            // if (revisedPrompt != null) {
+            //     imageData.put("revised_prompt", revisedPrompt);
             // }
             
             data.add(imageData);
@@ -135,4 +146,4 @@ public class ImageModelFilter extends BaseModelFilter<ImageModel> {*/
         
         return response;
     }
-}*/
+}

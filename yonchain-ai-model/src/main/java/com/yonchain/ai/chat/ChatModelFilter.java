@@ -1,135 +1,126 @@
-/*package com.yonchain.ai.chat;
+package com.yonchain.ai.chat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yonchain.ai.filter.BaseModelFilter;
-import com.yonchain.ai.model.ModelService;
-import com.yonchain.ai.plugin.spi.ModelNameUtils;
+import com.yonchain.ai.model.ModelClient;
+import com.yonchain.ai.model.request.ChatRequest;
 import jakarta.servlet.AsyncContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-*//**
- * 聊天模型过滤器
+/**
+ * 聊天模型专用过滤器
  * 处理聊天完成请求 /chat/completions
- *//*
-@Component
-public class ChatModelFilter extends BaseModelFilter<ChatModel> {*/
+ */
+public class ChatModelFilter extends BaseModelFilter {
 
-  //  private static final Pattern ENDPOINT_PATTERN = Pattern.compile(".*/chat/completions$");
+    private static final Pattern ENDPOINT_PATTERN = Pattern.compile(".*/chat/completions$");
 
-  /*  private final ChatModelService chatModelService;
-
-    public ChatModelFilter(ChatModelService chatModelService, ObjectMapper objectMapper) {
-        super(objectMapper);
-        this.chatModelService = chatModelService;
+    public ChatModelFilter(ModelClient modelClient, ObjectMapper objectMapper) {
+        super(modelClient, objectMapper);
     }
-
 
     @Override
     protected Pattern getEndpointPattern() {
         return ENDPOINT_PATTERN;
     }
-    
+
     @Override
-    protected ModelService<ChatModel> getModelService() {
-        return chatModelService;
-    }*/
-    
-/*    @Override
-    protected void handleModelRequest(HttpServletRequest request, HttpServletResponse response) 
+    protected String getModelType() {
+        return "chat";
+    }
+
+    @Override
+    protected void handleModelRequest(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        
+
+        // 1. 解析请求
+        Map<String, Object> requestParams = parseRequestBody(request);
+        String modelName = extractModelName(requestParams);
+
+        logger.debug("Processing chat request for model: {}", modelName);
+
+        // 2. 转换为ChatRequest
+        ChatRequest chatRequest = convertToChatRequest(requestParams);
+
+        // 3. 使用ModelClient调用
+        if (isStreamRequest(requestParams)) {
+            handleStreamRequest(modelName, chatRequest, request, response);
+        } else {
+            handleSyncRequest(modelName, chatRequest, response);
+        }
+    }
+
+    /**
+     * 处理同步聊天请求
+     */
+    private void handleSyncRequest(String modelName, ChatRequest chatRequest,
+                                   HttpServletResponse response) throws IOException {
+
         try {
-            // 1. 解析聊天请求
-            Map<String, Object> requestParams = parseRequestBody(request);
-            String modelName = extractModelName(requestParams);
-            
-            logger.debug("Processing chat request for model: {}", modelName);
-            
-            // 2. 获取模型实例
-            ChatModel chatModel = chatModelService.getModel(modelName);
-            if (chatModel == null) {
-                sendErrorResponse(response, "Model not found: " + modelName, 404);
-                return;
-            }
-            
-            // 3. 构建Spring AI提示
-            Prompt prompt = buildPrompt(requestParams);
-            
-            // 4. 处理请求 - 流式或同步
-            if (isStreamRequest(requestParams)) {
-                handleStreamRequest(chatModel, prompt, request, response);
-            } else {
-                handleSyncRequest(chatModel, prompt, response);
-            }
-            
-        } catch (IllegalArgumentException e) {
-            logger.warn("Invalid request: {}", e.getMessage());
-            sendErrorResponse(response, e.getMessage(), 400);
+            // 调用ModelClient
+            ChatResponse chatResponse = modelClient.chat(modelName, chatRequest);
+
+            // 转换为OpenAI格式
+            Map<String, Object> responseData = convertChatResponse(chatResponse, false);
+
+            // 发送响应
+            sendSuccessResponse(response, responseData);
+
+            logger.debug("Chat request completed successfully");
+
         } catch (Exception e) {
-            logger.error("Error processing chat request", e);
+            logger.error("Error in sync chat request", e);
             sendErrorResponse(response, "Failed to process chat request: " + e.getMessage(), 500);
         }
-    }*/
-/*
-    *//**
-     * Handle stream request using Servlet async processing
-     * This approach prevents IllegalStateException: The response object has been recycled
-     *//*
-    private void handleStreamRequest(ChatModel chatModel, Prompt prompt,
+    }
+
+    /**
+     * 处理流式聊天请求
+     */
+    private void handleStreamRequest(String modelName, ChatRequest chatRequest,
                                      HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        // Start async context - this keeps the response object alive
+        // 启动异步上下文
         AsyncContext asyncContext = request.startAsync(request, response);
-        asyncContext.setTimeout(300000); // 5 minutes timeout
+        asyncContext.setTimeout(300000); // 5分钟超时
 
-        // Set response headers
+        // 设置SSE响应头
         response.setContentType("text/event-stream");
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Connection", "keep-alive");
         response.setHeader("Access-Control-Allow-Origin", "*");
 
-        // Process stream response asynchronously
+        // 异步处理流式响应
         CompletableFuture.runAsync(() -> {
-            PrintWriter responseWriter = null;
             try {
-                responseWriter = response.getWriter();
-                final PrintWriter writer = responseWriter; // Final reference for lambda
+                PrintWriter writer = response.getWriter();
 
-                // Call Spring AI stream interface
-                chatModel.stream(prompt).subscribe(
+                // 调用ModelClient流式接口
+                Flux<ChatResponse> responseStream = modelClient.chatStream(modelName, chatRequest);
+
+                responseStream.subscribe(
                         chatResponse -> {
                             try {
-                                // Convert response format
-                                Map<String, Object> responseMap = convertChatResponse(chatResponse);
-                                String jsonResponse = objectMapper.writeValueAsString(responseMap);
-
-                                // Write SSE format - using final writer reference
+                                Map<String, Object> responseData = convertChatResponse(chatResponse, true);
+                                String jsonResponse = objectMapper.writeValueAsString(responseData);
                                 writer.write("data: " + jsonResponse + "\n\n");
                                 writer.flush();
-
                             } catch (Exception e) {
                                 logger.error("Error writing stream response", e);
-                                completeAsyncWithError(asyncContext, e);
                             }
                         },
                         error -> {
@@ -158,190 +149,114 @@ public class ChatModelFilter extends BaseModelFilter<ChatModel> {*/
 
             } catch (Exception e) {
                 logger.error("Error in async stream processing", e);
-                completeAsyncWithError(asyncContext, e);
+                completeAsyncWithError(asyncContext,e);
             }
-        }).exceptionally(throwable -> {
-            logger.error("Async processing failed", throwable);
-            completeAsyncWithError(asyncContext, throwable);
-            return null;
         });
     }
 
-    *//**
-     * Handle sync request
-     *//*
-    private void handleSyncRequest(ChatModel chatModel, Prompt prompt, HttpServletResponse response)
-            throws IOException {
-
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
-
-        try {
-            // Call Spring AI
-            ChatResponse chatResponse = chatModel.call(prompt);
-
-            // Convert response format
-            Map<String, Object> responseMap = convertChatResponse(chatResponse);
-
-            // Write response
-            String jsonResponse = objectMapper.writeValueAsString(responseMap);
-            response.getWriter().write(jsonResponse);
-            response.getWriter().flush();
-
-            logger.debug("Chat request completed successfully");
-
-        } catch (Exception e) {
-            logger.error("Error in sync chat request", e);
-            throw e;
-        }
-    }
-
-    *//**
-     * 构建Spring AI提示
+    /**
+     * 转换为ChatRequest
      * 
-     * @param requestParams 请求参数
-     * @return Spring AI提示对象
-     *//*
-    private Prompt buildPrompt(Map<String, Object> requestParams) {
-        // 1. 解析消息
+     * 注意：不再在这里构建ChatOptions，而是传递原始参数给ModelClient处理
+     * ModelClient会在运行时根据具体模型使用相应的OptionsHandler构建运行时选项
+     */
+    private ChatRequest convertToChatRequest(Map<String, Object> requestParams) {
+        ChatRequest.Builder builder = ChatRequest.builder();
+
+        // 处理messages
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> messagesData = (List<Map<String, Object>>) requestParams.get("messages");
-        if (messagesData == null || messagesData.isEmpty()) {
+        List<Map<String, Object>> messages = (List<Map<String, Object>>) requestParams.get("messages");
+        if (messages == null || messages.isEmpty()) {
             throw new IllegalArgumentException("Missing required parameter: messages");
         }
-        
-        List<Message> springAiMessages = messagesData.stream()
-                .map(this::convertToSpringAiMessage)
-                .collect(Collectors.toList());
-        
-        // 2. 构建ChatOptions
-        ChatOptions.Builder optionsBuilder = ChatOptions.builder();
-        
-        // 设置温度参数
-        Object temperature = requestParams.get("temperature");
-        if (temperature instanceof Number) {
-            optionsBuilder.temperature(((Number) temperature).doubleValue());
-        }
-        
-        // 设置最大令牌数
-        Object maxTokens = requestParams.get("max_tokens");
-        if (maxTokens instanceof Number) {
-            optionsBuilder.maxTokens(((Number) maxTokens).intValue());
-        }
-        
-        // 设置top_p
-        Object topP = requestParams.get("top_p");
-        if (topP instanceof Number) {
-            optionsBuilder.topP(((Number) topP).doubleValue());
-        }
-        
-        // 设置频率惩罚
-        Object frequencyPenalty = requestParams.get("frequency_penalty");
-        if (frequencyPenalty instanceof Number) {
-            optionsBuilder.frequencyPenalty(((Number) frequencyPenalty).doubleValue());
-        }
-        
-        // 设置存在惩罚
-        Object presencePenalty = requestParams.get("presence_penalty");
-        if (presencePenalty instanceof Number) {
-            optionsBuilder.presencePenalty(((Number) presencePenalty).doubleValue());
-        }
-        
-        ChatOptions chatOptions = optionsBuilder.build();
-        
-        // 3. 创建提示
-        return new Prompt(springAiMessages, chatOptions);
-    }*/
-/*
 
-    */
-/**
-     * 转换为Spring AI消息格式
-     * 
-     * @param messageData 消息数据
-     * @return Spring AI消息对象
-     *//*
+        for (Map<String, Object> msg : messages) {
+            String role = (String) msg.get("role");
+            String content = (String) msg.get("content");
 
-    private Message convertToSpringAiMessage(Map<String, Object> messageData) {
-        String role = (String) messageData.get("role");
-        String content = (String) messageData.get("content");
-        
-        if (role == null || content == null) {
-            throw new IllegalArgumentException("Message must have both 'role' and 'content' fields");
+            if (role == null || content == null) {
+                continue;
+            }
+
+            switch (role.toLowerCase()) {
+                case "user":
+                    builder.message(new UserMessage(content));
+                    break;
+                case "assistant":
+                    builder.message(new AssistantMessage(content));
+                    break;
+                case "system":
+                    builder.message(new SystemMessage(content));
+                    break;
+            }
         }
-        
-        switch (role.toLowerCase()) {
-            case "user":
-                return new UserMessage(content);
-            case "assistant":
-                return new AssistantMessage(content);
-            case "system":
-                return new SystemMessage(content);
-            default:
-                logger.warn("Unknown message role: {}, treating as user message", role);
-                return new UserMessage(content);
-        }
+
+        // 传递原始参数，让ModelClient根据具体模型处理选项
+        builder.rawParameters(requestParams);
+
+        return builder.build();
     }
 
-    */
-/**
-     * Convert ChatResponse to standard format
-     *//*
+    /**
+     * 转换ChatResponse为OpenAI格式
+     */
+    private Map<String, Object> convertChatResponse(ChatResponse chatResponse, boolean isStream) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", "chatcmpl-" + UUID.randomUUID().toString());
+        response.put("object", isStream ? "chat.completion.chunk" : "chat.completion");
+        response.put("created", System.currentTimeMillis() / 1000);
+        response.put("model", "unknown");
 
-    private Map<String, Object> convertChatResponse(ChatResponse chatResponse) {
-        Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("id", "chatcmpl-" + UUID.randomUUID().toString());
-        responseMap.put("object", "chat.completion");
-        responseMap.put("created", System.currentTimeMillis() / 1000);
-        responseMap.put("model", "unknown"); // Can get model info from chatResponse here
-
-        // Convert choices
         List<Map<String, Object>> choices = new ArrayList<>();
         if (chatResponse.getResult() != null) {
             Map<String, Object> choice = new HashMap<>();
             choice.put("index", 0);
-            choice.put("finish_reason", "stop");
+            choice.put("finish_reason", isStream ? null : "stop");
 
-            Map<String, Object> message = new HashMap<>();
-            message.put("role", "assistant");
-            // Safely get content
             String content = "";
             try {
-                if (chatResponse.getResult() != null && chatResponse.getResult().getOutput() != null) {
+                if (chatResponse.getResult().getOutput() != null) {
                     content = chatResponse.getResult().getOutput().getText();
                 }
             } catch (Exception e) {
                 logger.warn("Failed to get content from chat response", e);
-                content = "Response content unavailable";
+                content = "";
             }
-            message.put("content", content);
-            choice.put("message", message);
+
+            if (isStream) {
+                Map<String, Object> delta = new HashMap<>();
+                delta.put("content", content);
+                choice.put("delta", delta);
+            } else {
+                Map<String, Object> message = new HashMap<>();
+                message.put("role", "assistant");
+                message.put("content", content);
+                choice.put("message", message);
+            }
 
             choices.add(choice);
         }
-        responseMap.put("choices", choices);
+        response.put("choices", choices);
 
-        // Usage info
-        Map<String, Object> usage = new HashMap<>();
-        usage.put("prompt_tokens", 0);
-        usage.put("completion_tokens", 0);
-        usage.put("total_tokens", 0);
-        responseMap.put("usage", usage);
+        if (!isStream) {
+            Map<String, Object> usage = new HashMap<>();
+            usage.put("prompt_tokens", 0);
+            usage.put("completion_tokens", 0);
+            usage.put("total_tokens", 0);
+            response.put("usage", usage);
+        }
 
-        return responseMap;
+        return response;
     }
 
-
-    */
-/**
+    /**
      * Complete async context and send error response
-     *//*
-
+     */
     private void completeAsyncWithError(AsyncContext asyncContext, Throwable error) {
         try {
             HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
             if (!response.isCommitted()) {
-                sendErrorResponse(response, "Stream processing error: " + error.getMessage(), 500);
+                sendErrorResponse(response, error.getMessage(), 500);
             }
         } catch (Exception e) {
             logger.error("Error sending error response", e);
@@ -353,6 +268,4 @@ public class ChatModelFilter extends BaseModelFilter<ChatModel> {*/
             }
         }
     }
-*/
-
-//}
+}

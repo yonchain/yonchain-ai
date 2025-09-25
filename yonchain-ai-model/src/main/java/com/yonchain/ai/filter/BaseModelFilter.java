@@ -1,7 +1,7 @@
 package com.yonchain.ai.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yonchain.ai.model.core.ModelClient;
+import com.yonchain.ai.model.ModelClient;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

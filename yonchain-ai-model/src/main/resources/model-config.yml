@@ -1,0 +1,122 @@
+# YAML格式的模型配置文件示例
+# 展示新的base_url和completions_path字段结构
+
+settings:
+  cache:
+    enabled: true
+  default:
+    timeout: 30
+  openai:
+    compatibility:
+      enabled: true
+  enable:
+    metrics: true
+
+models:
+  # OpenAI 命名空间
+  - namespace: "openai"
+    models:
+      # Chat模型 - 使用baseUrl + completionsPath
+      - id: "gpt-4"
+        type: "chat"
+        baseUrl: "https://api.openai.com"
+        completionsPath: "/v1/chat/completions"  # chat类型默认值
+        auth:
+          type: "bearer"
+          value: "${openai.apiKey}"
+        options:
+          model: "gpt-4"
+          temperature: 0.7
+          maxTokens: 4096
+      
+      - id: "gpt-3.5-turbo"
+        type: "chat"
+        baseUrl: "https://api.openai.com"
+        completionsPath: "/v1/chat/completions"
+        auth:
+          type: "bearer"
+          value: "${openai.apiKey}"
+        options:
+          model: "gpt-3.5-turbo"
+          temperature: 0.7
+          maxTokens: 2048
+      
+      # Image模型 - 只使用baseUrl（包含完整路径）
+      - id: "dall-e-3"
+        type: "image"
+        baseUrl: "https://api.openai.com/v1/images/generations"
+        auth:
+          type: "bearer"
+          value: "${openai.apiKey}"
+        options:
+          model: "dall-e-3"
+          size: "1024x1024"
+          quality: "standard"
+          n: 1
+      
+      # Embedding模型 - 只使用baseUrl
+      - id: "text-embedding-ada-002"
+        type: "embedding"
+        baseUrl: "https://api.openai.com/v1/embeddings"
+        auth:
+          type: "bearer"
+          value: "${openai.apiKey}"
+        options:
+          model: "text-embedding-ada-002"
+
+  # DeepSeek 命名空间
+  - namespace: "deepseek"
+    models:
+      - id: "deepseek-chat"
+        type: "chat"
+        baseUrl: "https://api.deepseek.com"
+        completionsPath: "/v1/chat/completions"
+        auth:
+          type: "bearer"
+          value: "${deepseek.apiKey}"
+        options:
+          model: "deepseek-chat"
+          temperature: 0.7
+          maxTokens: 8192
+          topP: 0.95
+      
+      - id: "deepseek-coder"
+        type: "chat"
+        baseUrl: "https://api.deepseek.com"
+        completionsPath: "/v1/chat/completions"
+        auth:
+          type: "bearer"
+          value: "${deepseek.apiKey}"
+        options:
+          model: "deepseek-coder"
+          temperature: 0.1
+          maxTokens: 8192
+          topP: 0.95
+
+  # 业务场景命名空间
+  - namespace: "business"
+    models:
+      - id: "customer-service"
+        type: "chat"
+        baseUrl: "https://api.openai.com"
+        completionsPath: "/v1/chat/completions"
+        auth:
+          type: "bearer"
+          value: "${openai.apiKey}"
+        options:
+          model: "gpt-4"
+          temperature: 0.3
+          maxTokens: 2048
+          systemPrompt: "你是一个专业的客服助手，请友好、耐心地回答用户问题。"
+
+aliases:
+  - name: "default-chat"
+    target: "openai:gpt-4"
+  - name: "fast-chat"
+    target: "deepseek:deepseek-chat"
+  - name: "best-image"
+    target: "openai:dall-e-3"
+  - name: "cheap-chat"
+    target: "openai:gpt-3.5-turbo"
+  - name: "code-chat"
+    target: "deepseek:deepseek-coder"

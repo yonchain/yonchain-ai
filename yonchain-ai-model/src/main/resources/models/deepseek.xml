@@ -3,7 +3,7 @@
     
     <!-- 命名空间级默认Handler -->
     <defaultHandlers>
-        <handler type="chat" class="com.yonchain.ai.model.optionshandler.deepseek.DeepSeekChatOptionsHandler"/>
+        <handler type="chat" class="com.yonchain.ai.model.options.deepseek.DeepSeekChatOptionsHandler"/>
     </defaultHandlers>
 
     <!-- 聊天模型 -->

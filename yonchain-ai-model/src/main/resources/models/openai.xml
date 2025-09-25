@@ -3,9 +3,9 @@
 
     <!-- 命名空间级默认Handler -->
     <defaultHandlers>
-        <handler type="chat" class="com.yonchain.ai.model.optionshandler.openai.OpenAiChatOptionsHandler"/>
-        <handler type="image" class="com.yonchain.ai.model.optionshandler.openai.OpenAiImageOptionsHandler"/>
-        <handler type="embedding" class="com.yonchain.ai.model.optionshandler.openai.OpenAiEmbeddingOptionsHandler"/>
+        <handler type="chat" class="com.yonchain.ai.model.options.openai.OpenAiChatOptionsHandler"/>
+        <handler type="image" class="com.yonchain.ai.model.options.openai.OpenAiImageOptionsHandler"/>
+        <handler type="embedding" class="com.yonchain.ai.model.options.openai.OpenAiEmbeddingOptionsHandler"/>
     </defaultHandlers>
 
     <!-- 聊天模型 -->

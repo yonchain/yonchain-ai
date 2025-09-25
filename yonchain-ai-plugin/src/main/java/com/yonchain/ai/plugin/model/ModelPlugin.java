@@ -3,7 +3,7 @@ package com.yonchain.ai.plugin.model;
 import com.yonchain.ai.tmpl.ModelMetadata;
 import com.yonchain.ai.plugin.spi.ModelProvider;
 import com.yonchain.ai.plugin.spi.ProviderMetadata;
-import com.yonchain.ai.model.registry.ModelRegistry;
+import com.yonchain.ai.model.ModelRegistry;
 import com.yonchain.ai.plugin.Plugin;
 
 import java.util.List;

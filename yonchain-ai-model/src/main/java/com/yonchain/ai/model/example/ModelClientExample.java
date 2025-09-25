@@ -1,8 +1,8 @@
 package com.yonchain.ai.model.example;
 
-import com.yonchain.ai.model.core.ModelClient;
-import com.yonchain.ai.model.core.ModelClientFactory;
-import com.yonchain.ai.model.core.ModelClientFactoryBuilder;
+import com.yonchain.ai.model.ModelClient;
+import com.yonchain.ai.model.ModelClientFactory;
+import com.yonchain.ai.model.ModelClientFactoryBuilder;
 import com.yonchain.ai.model.request.ChatRequest;
 import com.yonchain.ai.model.request.ImageRequest;
 import com.yonchain.ai.model.request.EmbeddingRequest;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <models namespace="business">
     <!-- 业务场景模型 -->
-    <model id="customer-service" type="chat" optionsHandler="com.yonchain.ai.model.optionshandler.openai.OpenAiChatOptionsHandler">
+    <model id="customer-service" type="chat" optionsHandler="com.yonchain.ai.model.options.openai.OpenAiChatOptionsHandler">
         <baseUrl>https://api.openai.com</baseUrl>
         <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${openai.apiKey}</auth>
@@ -13,7 +13,7 @@
         </options>
     </model>
     
-    <model id="code-reviewer" type="chat" optionsHandler="com.yonchain.ai.model.optionshandler.deepseek.DeepSeekChatOptionsHandler">
+    <model id="code-reviewer" type="chat" optionsHandler="com.yonchain.ai.model.options.deepseek.DeepSeekChatOptionsHandler">
         <baseUrl>https://api.deepseek.com</baseUrl>
         <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${deepseek.apiKey}</auth>
@@ -25,7 +25,7 @@
         </options>
     </model>
     
-    <model id="content-writer" type="chat" optionsHandler="com.yonchain.ai.model.optionshandler.openai.OpenAiChatOptionsHandler">
+    <model id="content-writer" type="chat" optionsHandler="com.yonchain.ai.model.options.openai.OpenAiChatOptionsHandler">
         <baseUrl>https://api.openai.com</baseUrl>
         <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${openai.apiKey}</auth>
@@ -37,7 +37,7 @@
         </options>
     </model>
     
-    <model id="data-analyst" type="chat" optionsHandler="com.yonchain.ai.model.optionshandler.openai.OpenAiChatOptionsHandler">
+    <model id="data-analyst" type="chat" optionsHandler="com.yonchain.ai.model.options.openai.OpenAiChatOptionsHandler">
         <baseUrl>https://api.openai.com</baseUrl>
         <completionsPath>/v1/chat/completions</completionsPath>
         <auth type="bearer">${openai.apiKey}</auth>

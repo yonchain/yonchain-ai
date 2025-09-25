@@ -5,7 +5,7 @@ import com.yonchain.ai.tmpl.ModelMetadata;
 import com.yonchain.ai.tmpl.ModelType;
 import com.yonchain.ai.plugin.spi.ModelProvider;
 import com.yonchain.ai.plugin.spi.ProviderMetadata;
-import com.yonchain.ai.model.registry.ModelRegistry;
+import com.yonchain.ai.model.ModelRegistry;
 import com.yonchain.ai.plugin.model.ModelPlugin;
 import com.yonchain.ai.plugin.PluginContext;
 import org.slf4j.Logger;

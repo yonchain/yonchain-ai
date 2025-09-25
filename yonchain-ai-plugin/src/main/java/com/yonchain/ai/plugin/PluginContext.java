@@ -1,6 +1,6 @@
 package com.yonchain.ai.plugin;
 
-import com.yonchain.ai.model.registry.ModelRegistry;
+import com.yonchain.ai.model.ModelRegistry;
 import org.springframework.context.ApplicationContext;
 
 /**

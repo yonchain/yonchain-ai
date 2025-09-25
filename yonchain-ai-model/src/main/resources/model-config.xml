@@ -30,10 +30,10 @@
     
     <!-- 类型处理器配置 (可选的预注册，现在optionsHandler直接在模型中指定) -->
     <typeHandlers>
-        <typeHandler handler="com.yonchain.ai.model.optionshandler.openai.OpenAiChatOptionsHandler"/>
-        <typeHandler handler="com.yonchain.ai.model.optionshandler.openai.OpenAiImageOptionsHandler"/>
-        <typeHandler handler="com.yonchain.ai.model.optionshandler.openai.OpenAiEmbeddingOptionsHandler"/>
-        <typeHandler handler="com.yonchain.ai.model.optionshandler.deepseek.DeepSeekChatOptionsHandler"/>
+        <typeHandler handler="com.yonchain.ai.model.options.openai.OpenAiChatOptionsHandler"/>
+        <typeHandler handler="com.yonchain.ai.model.options.openai.OpenAiImageOptionsHandler"/>
+        <typeHandler handler="com.yonchain.ai.model.options.openai.OpenAiEmbeddingOptionsHandler"/>
+        <typeHandler handler="com.yonchain.ai.model.options.deepseek.DeepSeekChatOptionsHandler"/>
     </typeHandlers>
     
     <!-- 模型配置文件扫描 -->
