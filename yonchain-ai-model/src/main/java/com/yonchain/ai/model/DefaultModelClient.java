@@ -72,24 +72,8 @@ public class DefaultModelClient implements ModelClient {
     }
     
     @Override
-    public boolean isModelAvailable(String modelId) {
-        try {
-            ModelDefinition definition = resolveModelDefinition(modelId);
-            return definition != null;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-    
-    @Override
     public ModelConfiguration getConfiguration() {
         return configuration;
-    }
-    
-    @Override
-    public void close() throws Exception {
-        // 清理缓存的模型实例
-        modelCache.clear();
     }
     
     private ChatModel getChatModel(String modelId) {

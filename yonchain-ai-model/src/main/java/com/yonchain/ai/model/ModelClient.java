@@ -10,13 +10,13 @@ import reactor.core.publisher.Flux;
 
 /**
  * Core model client entry-point.
- *
+ * <p>
  * Responsibilities:
  * - Resolve model definition by modelId (namespace:id)
  * - Route to model-level factory (if present) or namespace factory
  * - Obtain Spring AI Model and invoke directly
  */
-public interface ModelClient extends AutoCloseable {
+public interface ModelClient {
 
     // Chat
     ChatResponse chat(String modelId, ChatRequest request);
@@ -29,15 +29,9 @@ public interface ModelClient extends AutoCloseable {
     // Embedding
     EmbeddingResponse embedding(String modelId, EmbeddingRequest request);
 
-    // Check if model is available
-    boolean isModelAvailable(String modelId);
-    
     // Get model configuration
     ModelConfiguration getConfiguration();
-    
-    // Close and cleanup resources
-    @Override
-    void close() throws Exception;
+
 }
 
 
