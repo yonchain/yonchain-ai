@@ -48,7 +48,7 @@ public class PluginSystemInitializer implements ApplicationRunner {
             }
             
             // 自动加载已启用的插件
-            //TODO pluginManager.loadInstalledPlugins();
+            pluginManager.loadInstalledPlugins();
             
             log.info("Plugin system initialization completed successfully");
             

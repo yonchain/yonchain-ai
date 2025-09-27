@@ -4,6 +4,7 @@ import com.yonchain.ai.tmpl.ModelMetadata;
 import com.yonchain.ai.plugin.spi.ModelProvider;
 import com.yonchain.ai.plugin.spi.ProviderMetadata;
 import com.yonchain.ai.model.ModelRegistry;
+import com.yonchain.ai.model.ModelConfiguration;
 import com.yonchain.ai.plugin.Plugin;
 
 import java.util.List;
@@ -64,6 +65,26 @@ public interface ModelPlugin extends Plugin {
      * @param registry 模型注册中心
      */
     void unregisterModels(ModelRegistry registry);
+    
+    /**
+     * 注册模型选项处理器到ModelConfiguration
+     * 插件启动时调用此方法注册自己的OptionsHandler
+     * 
+     * @param modelConfiguration 模型配置实例
+     */
+    default void registerOptionsHandlers(ModelConfiguration modelConfiguration) {
+        // 默认实现为空，插件可以选择性实现
+    }
+    
+    /**
+     * 从ModelConfiguration注销模型选项处理器
+     * 插件禁用时调用此方法清理自己的OptionsHandler
+     * 
+     * @param modelConfiguration 模型配置实例
+     */
+    default void unregisterOptionsHandlers(ModelConfiguration modelConfiguration) {
+        // 默认实现为空，插件可以选择性实现
+    }
 
 }
 

@@ -132,5 +132,13 @@ public interface ModelService {
      * @param pluginId 插件ID
      */
     void removePluginData(String pluginId);
+    
+    /**
+     * 重新加载所有已配置的模型到ModelRegistry
+     * 用于应用启动时自动加载已配置的模型
+     */
+    default void reloadAllConfiguredModels() {
+        // 默认空实现，由具体实现类覆盖
+    }
 
 }

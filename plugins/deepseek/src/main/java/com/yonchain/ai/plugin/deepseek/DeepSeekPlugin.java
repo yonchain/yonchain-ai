@@ -6,6 +6,7 @@ import com.yonchain.ai.tmpl.ModelMetadata;
 import com.yonchain.ai.plugin.spi.ModelProvider;
 import com.yonchain.ai.plugin.spi.ProviderMetadata;
 import com.yonchain.ai.model.ModelRegistry;
+import com.yonchain.ai.model.ModelConfiguration;
 import com.yonchain.ai.plugin.model.ModelPlugin;
 import com.yonchain.ai.plugin.PluginContext;
 import org.slf4j.Logger;
@@ -132,6 +133,24 @@ public class DeepSeekPlugin implements ModelPlugin {
     }
     
     @Override
+    public void registerOptionsHandlers(ModelConfiguration modelConfiguration) {
+        registerDeepSeekOptionsHandlers(modelConfiguration);
+    }
+    
+    @Override
+    public void unregisterOptionsHandlers(ModelConfiguration modelConfiguration) {
+        // 注销OptionsHandlers（如果需要的话）
+        try {
+            log.info("Unregistering DeepSeek options handlers...");
+            // 在实际应用中，可能需要从modelConfiguration中移除handlers
+            // 但目前的ModelConfiguration API没有提供移除方法
+            log.info("DeepSeek options handlers unregistered");
+        } catch (Exception e) {
+            log.warn("Error during options handlers unregistration", e);
+        }
+    }
+    
+    @Override
     public void onDisable() {
         log.info("DeepSeek plugin disabled: {}", PLUGIN_ID);
         
@@ -162,6 +181,79 @@ public class DeepSeekPlugin implements ModelPlugin {
         } catch (Exception e) {
             log.error("Failed to register DeepSeek models", e);
             throw new RuntimeException("Failed to register DeepSeek models", e);
+        }
+    }
+    
+    /**
+     * 注册模型选项处理器到ModelConfiguration
+     * 
+     * @param modelConfiguration 模型配置实例
+     */
+    public void registerDeepSeekOptionsHandlers(ModelConfiguration modelConfiguration) {
+        if (modelConfiguration == null) {
+            throw new IllegalArgumentException("ModelConfiguration cannot be null");
+        }
+        
+        try {
+            log.info("Registering DeepSeek options handlers...");
+            
+            // 注册DeepSeek Chat选项处理器
+            DeepSeekChatOptionsHandler chatHandler = new DeepSeekChatOptionsHandler();
+            modelConfiguration.registerNamespaceHandler("deepseek", "chat", chatHandler);
+            log.debug("Registered DeepSeek chat options handler: deepseek:chat");
+            
+            // 可以根据deepseek.yaml配置动态注册
+            registerHandlersFromConfig(modelConfiguration);
+            
+            log.info("All DeepSeek options handlers registered successfully");
+            
+        } catch (Exception e) {
+            log.error("Failed to register DeepSeek options handlers", e);
+            throw new RuntimeException("Failed to register DeepSeek options handlers", e);
+        }
+    }
+    
+    /**
+     * 从YAML配置文件动态注册选项处理器
+     * 
+     * @param modelConfiguration 模型配置实例
+     */
+    private void registerHandlersFromConfig(ModelConfiguration modelConfiguration) {
+        try {
+            Map<String, Object> yamlData = loadYamlConfig();
+            if (yamlData == null) {
+                log.warn("Failed to load YAML config, skipping dynamic handler registration");
+                return;
+            }
+            
+            @SuppressWarnings("unchecked")
+            Map<String, Object> models = (Map<String, Object>) yamlData.get("models");
+            if (models == null) {
+                log.debug("No models configuration found in YAML");
+                return;
+            }
+            
+            // 遍历每种模型类型
+            for (Map.Entry<String, Object> entry : models.entrySet()) {
+                String modelType = entry.getKey(); // chat, image, embedding等
+                @SuppressWarnings("unchecked")
+                Map<String, Object> typeConfig = (Map<String, Object>) entry.getValue();
+                
+                String optionsHandlerClass = (String) typeConfig.get("options_handler");
+                if (optionsHandlerClass != null && !optionsHandlerClass.isEmpty()) {
+                    try {
+                        // 通过类名注册
+                        modelConfiguration.registerNamespaceHandlerByClass("deepseek", modelType, optionsHandlerClass);
+                        log.debug("Dynamically registered options handler: deepseek:{} -> {}", modelType, optionsHandlerClass);
+                    } catch (Exception e) {
+                        log.warn("Failed to register options handler for deepseek:{} with class {}", 
+                                modelType, optionsHandlerClass, e);
+                    }
+                }
+            }
+            
+        } catch (Exception e) {
+            log.warn("Error during dynamic handler registration from config", e);
         }
     }
     

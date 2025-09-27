@@ -1,3 +1,4 @@
+/*
 package com.yonchain.ai.plugin;
 
 import com.yonchain.ai.model.definition.ModelDefinition;
@@ -33,13 +34,15 @@ public class DefaultModelFactory implements PluginModelFactory {
     }
 
 
-    /**
+    */
+/**
      * 根据模型定义创建聊天模型
      *
      * @param definition 模型定义
      * @return ChatModel实例
      * @throws UnsupportedOperationException 如果不支持该类型
-     */
+     *//*
+
     public ChatModel createChatModel(ModelDefinition definition) {
         ModelConfig config = this.buildConfig(definition);
         ModelProvider provider = getProvider(config.getProvider());
@@ -60,24 +63,28 @@ public class DefaultModelFactory implements PluginModelFactory {
         return modelConfig;
     }
 
-    /**
+    */
+/**
      * 根据模型定义创建图像模型
      *
      * @param definition 模型定义
      * @return ImageModel实例
      * @throws UnsupportedOperationException 如果不支持该类型
-     */
+     *//*
+
     public ImageModel createImageModel(ModelDefinition definition) {
         throw new UnsupportedOperationException("Image model not supported by " + this.getClass().getSimpleName());
     }
 
-    /**
+    */
+/**
      * 根据模型定义创建嵌入模型
      *
      * @param definition 模型定义
      * @return EmbeddingModel实例
      * @throws UnsupportedOperationException 如果不支持该类型
-     */
+     *//*
+
     public EmbeddingModel createEmbeddingModel(ModelDefinition definition) {
         throw new UnsupportedOperationException("Embedding model not supported by " + this.getClass().getSimpleName());
     }
@@ -114,12 +121,14 @@ public class DefaultModelFactory implements PluginModelFactory {
     }
 
 
-    /**
+    */
+/**
      * 获取提供商实例
      *
      * @param providerName
      * @return
-     */
+     *//*
+
     private ModelProvider getProvider(String providerName) {
         if (providerName == null) {
             throw new IllegalArgumentException("Provider name cannot be null");
@@ -134,3 +143,4 @@ public class DefaultModelFactory implements PluginModelFactory {
         return provider;
     }
 }
+*/

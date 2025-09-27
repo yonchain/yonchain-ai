@@ -6,11 +6,11 @@ import com.yonchain.ai.api.model.DefaultModelProvider;
 import com.yonchain.ai.model.ModelConfiguration;
 import com.yonchain.ai.model.ModelRegistry;
 import com.yonchain.ai.model.enums.ModelType;
-import com.yonchain.ai.plugin.PluginModelFactory;
 import com.yonchain.ai.plugin.spi.*;
 import com.yonchain.ai.plugin.PluginAdapter;
 import com.yonchain.ai.plugin.PluginContext;
 import com.yonchain.ai.plugin.DefaultPluginContext;
+import com.yonchain.ai.plugin.adapter.ProviderToFactoryAdapter;
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import com.yonchain.ai.plugin.entity.PluginInfo;
 import com.yonchain.ai.plugin.enums.PluginType;
@@ -48,7 +48,6 @@ public class ModelPluginAdapter implements PluginAdapter {
     
     private final PluginRegistry pluginRegistry;
     private final ModelRegistry modelRegistry;
-    private final PluginModelFactory modelFactory;
     private final PluginClassLoader pluginClassLoader;
     private final ApplicationContext applicationContext;
     private final ModelService modelService;
@@ -64,15 +63,13 @@ public class ModelPluginAdapter implements PluginAdapter {
     
     public ModelPluginAdapter(PluginRegistry pluginRegistry, 
                              ModelRegistry modelRegistry,
-                              PluginModelFactory modelFactory,
-                              PluginClassLoader pluginClassLoader,
+                             PluginClassLoader pluginClassLoader,
                              ApplicationContext applicationContext,
                              ModelService modelService,
                              PluginIconService pluginIconService,
-                              ModelConfiguration modelConfiguration) {
+                             ModelConfiguration modelConfiguration) {
         this.pluginRegistry = pluginRegistry;
-       this.modelRegistry = modelRegistry;
-        this.modelFactory = modelFactory;
+        this.modelRegistry = modelRegistry;
         this.pluginClassLoader = pluginClassLoader;
         this.applicationContext = applicationContext;
         this.modelService = modelService;
@@ -155,15 +152,17 @@ public class ModelPluginAdapter implements PluginAdapter {
             // 4. 注册模型提供商到Spring容器
             registerModelProvider(pluginId, modelProvider);
             
-            // todo 5. 注册模型提供商到模型工厂
-            modelFactory.registerProvider(modelProvider.getProviderName(), modelProvider);
-            modelConfiguration.registerFactory(modelProvider.getProviderName(),modelFactory);
+            // 5. 创建适配器，将ModelProvider适配为ModelFactory
+            ProviderToFactoryAdapter factoryAdapter = new ProviderToFactoryAdapter(modelProvider);
+            
+            // 6. 注册适配器到ModelConfiguration（符合ModelFactory标准）
+            modelConfiguration.registerFactory(modelProvider.getProviderName(), factoryAdapter);
 
-            // 6. 保存提供商信息到数据库（用于可视化界面展示和配置）
+            // 7. 保存提供商信息到数据库（用于可视化界面展示和配置）
             ModelProviderInfo providerInfo = convertToProviderInfo(pluginInstance, modelProvider, pluginId);
             modelService.saveProvider(pluginId, providerInfo);
             
-            // 7. 保存模型信息到数据库（用于可视化界面展示和配置）
+            // 8. 保存模型信息到数据库（用于可视化界面展示和配置）
             List<ModelMetadata> models = pluginInstance.getModels();
             if (models != null && !models.isEmpty()) {
                 List<Object> modelObjects = new ArrayList<>(models);
@@ -171,10 +170,13 @@ public class ModelPluginAdapter implements PluginAdapter {
                 log.debug("Saved {} models to database from plugin: {}", models.size(), pluginId);
             }
             
-            // 8. 调用插件的启用回调
+            // 9. 注册OptionsHandlers到ModelConfiguration
+            registerPluginOptionsHandlers(pluginInstance, modelConfiguration);
+            
+            // 10. 调用插件的启用回调
             pluginInstance.onEnable();
             
-            // 9. 缓存插件实例和提供商
+            // 11. 缓存插件实例和提供商
             pluginInstances.put(pluginId, pluginInstance);
             modelProviders.put(pluginId, modelProvider);
             
@@ -209,28 +211,32 @@ public class ModelPluginAdapter implements PluginAdapter {
             modelService.removePluginData(pluginId);
             log.debug("Removed plugin data from database: {}", pluginId);
             
-            // 4. 调用插件的禁用回调
+            // 4. 注销OptionsHandlers
+            unregisterPluginOptionsHandlers(pluginInstance, modelConfiguration);
+            
+            // 5. 调用插件的禁用回调
             pluginInstance.onDisable();
             
-            // 5. 调用插件的销毁方法
+            // 6. 调用插件的销毁方法
             pluginInstance.dispose();
             
-            // 6. 从模型工厂注销模型提供商
+            // 7. 从ModelConfiguration注销模型工厂
             if (modelProvider != null) {
-               //TODO  modelFactory.unregisterProvider(modelProvider.getProviderName());
+                modelConfiguration.removeFactory(modelProvider.getProviderName());
+                log.debug("Removed factory from ModelConfiguration: {}", modelProvider.getProviderName());
             }
             
-            // 7. 从Spring容器注销模型提供商
+            // 8. 从Spring容器注销模型提供商
             unregisterModelProvider(pluginId);
             
-            // 8. 清理插件上下文
+            // 9. 清理插件上下文
             DefaultPluginContext pluginContext = pluginContexts.remove(pluginId);
             if (pluginContext != null) {
                 pluginContext.cleanup();
                 log.debug("Plugin context cleaned up for plugin: {}", pluginId);
             }
             
-            // 9. 清理缓存
+            // 10. 清理缓存
             pluginInstances.remove(pluginId);
             modelProviders.remove(pluginId);
             
@@ -418,9 +424,14 @@ public class ModelPluginAdapter implements PluginAdapter {
                 log.debug("Plugin context cleaned up for plugin: {}", pluginId);
             }
             
-            // 从模型工厂注销模型提供商
+            // 从ModelConfiguration注销模型工厂
             if (modelProvider != null) {
-             //TODO    modelFactory.unregisterProvider(modelProvider.getProviderName());
+                try {
+                    modelConfiguration.removeFactory(modelProvider.getProviderName());
+                    log.debug("Cleaned up factory from ModelConfiguration: {}", modelProvider.getProviderName());
+                } catch (Exception e) {
+                    log.error("Failed to cleanup factory from ModelConfiguration: {}", modelProvider.getProviderName(), e);
+                }
             }
             
             // 从Spring容器注销模型提供商
@@ -901,6 +912,48 @@ public class ModelPluginAdapter implements PluginAdapter {
                 return "text";
             default:
                 return "text";
+        }
+    }
+    
+    /**
+     * 注册插件的OptionsHandlers到ModelConfiguration
+     * 
+     * @param pluginInstance 插件实例
+     * @param modelConfiguration 模型配置
+     */
+    private void registerPluginOptionsHandlers(ModelPlugin pluginInstance, ModelConfiguration modelConfiguration) {
+        try {
+            log.info("Registering OptionsHandlers for plugin: {}", pluginInstance.getId());
+            
+            // 调用插件的registerOptionsHandlers方法
+            pluginInstance.registerOptionsHandlers(modelConfiguration);
+            
+            log.info("Successfully registered OptionsHandlers for plugin: {}", pluginInstance.getId());
+            
+        } catch (Exception e) {
+            log.error("Failed to register OptionsHandlers for plugin: {}", pluginInstance.getId(), e);
+            // 不抛出异常，允许插件继续启动，只是没有OptionsHandler支持
+        }
+    }
+    
+    /**
+     * 从ModelConfiguration注销插件的OptionsHandlers
+     * 
+     * @param pluginInstance 插件实例
+     * @param modelConfiguration 模型配置
+     */
+    private void unregisterPluginOptionsHandlers(ModelPlugin pluginInstance, ModelConfiguration modelConfiguration) {
+        try {
+            log.info("Unregistering OptionsHandlers for plugin: {}", pluginInstance.getId());
+            
+            // 调用插件的unregisterOptionsHandlers方法
+            pluginInstance.unregisterOptionsHandlers(modelConfiguration);
+            
+            log.info("Successfully unregistered OptionsHandlers for plugin: {}", pluginInstance.getId());
+            
+        } catch (Exception e) {
+            log.error("Failed to unregister OptionsHandlers for plugin: {}", pluginInstance.getId(), e);
+            // 不抛出异常，继续禁用流程
         }
     }
     
