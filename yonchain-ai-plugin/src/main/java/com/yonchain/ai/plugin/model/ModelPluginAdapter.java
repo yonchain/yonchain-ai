@@ -3,6 +3,10 @@ package com.yonchain.ai.plugin.model;
 import com.yonchain.ai.api.model.ModelService;
 import com.yonchain.ai.api.model.ModelProviderInfo;
 import com.yonchain.ai.api.model.DefaultModelProvider;
+import com.yonchain.ai.model.ModelConfiguration;
+import com.yonchain.ai.model.ModelRegistry;
+import com.yonchain.ai.model.enums.ModelType;
+import com.yonchain.ai.plugin.PluginModelFactory;
 import com.yonchain.ai.plugin.spi.*;
 import com.yonchain.ai.plugin.PluginAdapter;
 import com.yonchain.ai.plugin.PluginContext;
@@ -16,7 +20,6 @@ import com.yonchain.ai.plugin.service.PluginIconService;
 import com.yonchain.ai.plugin.exception.PluginException;
 import com.yonchain.ai.tmpl.ModelConfig;
 import com.yonchain.ai.tmpl.ModelMetadata;
-import com.yonchain.ai.tmpl.ModelType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -44,12 +47,13 @@ public class ModelPluginAdapter implements PluginAdapter {
     private static final Logger log = LoggerFactory.getLogger(ModelPluginAdapter.class);
     
     private final PluginRegistry pluginRegistry;
-/*    private final ModelRegistry modelRegistry;
-    private final ModelFactory modelFactory;*/
+    private final ModelRegistry modelRegistry;
+    private final PluginModelFactory modelFactory;
     private final PluginClassLoader pluginClassLoader;
     private final ApplicationContext applicationContext;
     private final ModelService modelService;
     private final PluginIconService pluginIconService;
+    private final ModelConfiguration modelConfiguration;
     
     // 缓存插件实例和提供商
     private final Map<String, ModelPlugin> pluginInstances = new ConcurrentHashMap<>();
@@ -59,19 +63,21 @@ public class ModelPluginAdapter implements PluginAdapter {
     private final Map<String, DefaultPluginContext> pluginContexts = new ConcurrentHashMap<>();
     
     public ModelPluginAdapter(PluginRegistry pluginRegistry, 
-                           //  ModelRegistry modelRegistry,
-                           //  ModelFactory modelFactory,
+                             ModelRegistry modelRegistry,
+                              PluginModelFactory modelFactory,
                               PluginClassLoader pluginClassLoader,
                              ApplicationContext applicationContext,
                              ModelService modelService,
-                             PluginIconService pluginIconService) {
+                             PluginIconService pluginIconService,
+                              ModelConfiguration modelConfiguration) {
         this.pluginRegistry = pluginRegistry;
-     /*   this.modelRegistry = modelRegistry;
-        this.modelFactory = modelFactory;*/
+       this.modelRegistry = modelRegistry;
+        this.modelFactory = modelFactory;
         this.pluginClassLoader = pluginClassLoader;
         this.applicationContext = applicationContext;
         this.modelService = modelService;
         this.pluginIconService = pluginIconService;
+        this.modelConfiguration = modelConfiguration;
     }
     
     @Override
@@ -150,8 +156,8 @@ public class ModelPluginAdapter implements PluginAdapter {
             registerModelProvider(pluginId, modelProvider);
             
             // todo 5. 注册模型提供商到模型工厂
-            //modelFactory.registerProvider(modelProvider.getProviderName(), modelProvider);
-
+            modelFactory.registerProvider(modelProvider.getProviderName(), modelProvider);
+            modelConfiguration.registerFactory(modelProvider.getProviderName(),modelFactory);
 
             // 6. 保存提供商信息到数据库（用于可视化界面展示和配置）
             ModelProviderInfo providerInfo = convertToProviderInfo(pluginInstance, modelProvider, pluginId);
@@ -309,7 +315,7 @@ public class ModelPluginAdapter implements PluginAdapter {
         // 创建并缓存插件上下文
         DefaultPluginContext pluginContext = new DefaultPluginContext(
             applicationContext,
-        //    modelRegistry,
+            modelRegistry,
             this, // 传递自身作为模型插件适配器
             pluginId,
             pluginWorkDirectory
@@ -811,7 +817,7 @@ public class ModelPluginAdapter implements PluginAdapter {
         
         // 检查提供商支持的模型类型
         try {
-            if (modelProvider.supports(ModelType.TEXT)) {
+            if (modelProvider.supports(ModelType.CHAT)) {
                 supportedTypes.add("TEXT");
             }
             if (modelProvider.supports(ModelType.IMAGE)) {

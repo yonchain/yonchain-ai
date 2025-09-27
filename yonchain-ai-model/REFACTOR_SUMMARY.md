@@ -90,12 +90,13 @@ yonchain-ai-model/src/main/java/com/yonchain/ai/model/
 ```java
 // 构建工厂
 ModelClientFactory factory = new ModelClientFactoryBuilder()
-    .build("model-config.xml");
+                .build("model-config.xml");
 
 // 创建客户端
-try (ModelClient client = factory.createClient()) {
-    // 调用模型（内部直接使用命名空间工厂）
-    ChatResponse response = client.chat("openai:gpt-4", chatRequest);
+try(
+ModelClient client = factory.createClient()){
+// 调用模型（内部直接使用命名空间工厂）
+ChatResponse response = client.chat("openai:gpt-4", chatRequest);
 }
 ```
 

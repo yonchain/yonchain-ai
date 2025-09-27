@@ -1,3 +1,4 @@
+/*
 package com.yonchain.ai.model.factory.impl;
 
 import com.yonchain.ai.model.ModelFactory;
@@ -9,10 +10,12 @@ import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.ai.deepseek.api.DeepSeekApi;
 import org.springframework.stereotype.Component;
 
+*/
 /**
  * DeepSeek聊天模型工厂实现
  * 使用OpenAI兼容的API接口，只支持聊天模型
- */
+ *//*
+
 @Component
 public class DeepSeekModelFactory implements ModelFactory {
     
@@ -27,6 +30,7 @@ public class DeepSeekModelFactory implements ModelFactory {
         // 创建DeepSeek API实例
         DeepSeekApi deepSeekApi = createDeepSeekApi(definition);
         
+*/
 /*        // 使用ModelDefinition内部的OptionsHandler解析选项
         DeepSeekChatOptions options = null;
         OptionsHandler<DeepSeekChatOptions> handler = definition.resolveOptionsHandler();
@@ -46,7 +50,8 @@ public class DeepSeekModelFactory implements ModelFactory {
             options = DeepSeekChatOptions.builder()
                     .model(definition.getId())
                     .build();
-        }*/
+        }*//*
+
 
         // 创建聊天选项
         DeepSeekChatOptions.Builder optionsBuilder = DeepSeekChatOptions.builder()
@@ -62,9 +67,11 @@ public class DeepSeekModelFactory implements ModelFactory {
     
     // DeepSeek只支持聊天模型，不需要实现其他类型的创建方法
     
-    /**
+    */
+/**
      * 创建DeepSeek API实例（OpenAI兼容）
-     */
+     *//*
+
     private DeepSeekApi createDeepSeekApi(ModelDefinition definition) {
         String baseUrl = definition.getBaseUrl();
         String apiKey = definition.getAuthValue();
@@ -83,3 +90,4 @@ public class DeepSeekModelFactory implements ModelFactory {
                 .build();
     }
 }
+*/

@@ -23,8 +23,8 @@ public class ModelClientExample {
             .build("model-config.xml");
         
         // 创建客户端
-        try (ModelClient client = factory.createClient()) {
-            
+        try {
+            ModelClient client = factory.createClient();
             // 示例1: 调用聊天模型
             chatExample(client);
             
@@ -114,8 +114,8 @@ public class ModelClientExample {
         ModelClientFactory factory = new ModelClientFactoryBuilder()
             .build("model-config.xml");
         
-        try (ModelClient client = factory.createClient()) {
-            
+        try  {
+            ModelClient client = factory.createClient();
             // 使用业务场景配置的模型
             ChatRequest customerServiceRequest = ChatRequest.builder()
                 .message("我的订单什么时候能到？")

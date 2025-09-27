@@ -15,7 +15,7 @@ public class ModelClientAutoConfiguration {
      * 创建ModelClientFactory
      */
     @Bean
-    @Primary
+    //@Primary
     @ConditionalOnMissingBean
     public ModelClientFactory modelClientFactory() {
         return new ModelClientFactoryBuilder()
@@ -26,7 +26,7 @@ public class ModelClientAutoConfiguration {
      * 创建ModelClient
      */
     @Bean
-    @Primary
+    //@Primary
     @ConditionalOnMissingBean
     public ModelClient modelClient(ModelClientFactory factory) {
         // 工厂注册现在通过XML配置文件的factory属性自动完成

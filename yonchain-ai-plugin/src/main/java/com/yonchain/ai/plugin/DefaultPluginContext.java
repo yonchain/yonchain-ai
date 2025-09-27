@@ -20,7 +20,7 @@ public class DefaultPluginContext implements PluginContext {
     private static final Logger log = LoggerFactory.getLogger(DefaultPluginContext.class);
     
     private final ApplicationContext applicationContext;
-   // private final ModelRegistry modelRegistry;
+    private final ModelRegistry modelRegistry;
     private final Object modelPluginAdapter;
     private final String pluginId;
     private final String pluginWorkDirectory;
@@ -38,12 +38,12 @@ public class DefaultPluginContext implements PluginContext {
      * @param pluginWorkDirectory 插件工作目录
      */
     public DefaultPluginContext(ApplicationContext applicationContext,
-                             // ModelRegistry modelRegistry,
+                              ModelRegistry modelRegistry,
                               Object modelPluginAdapter,
                               String pluginId,
                               String pluginWorkDirectory) {
         this.applicationContext = applicationContext;
-       // this.modelRegistry = modelRegistry;
+        this.modelRegistry = modelRegistry;
         this.modelPluginAdapter = modelPluginAdapter;
         this.pluginId = pluginId;
         this.pluginWorkDirectory = pluginWorkDirectory;
@@ -59,7 +59,7 @@ public class DefaultPluginContext implements PluginContext {
     
     @Override
     public ModelRegistry getModelRegistry() {
-        return null;//modelRegistry;
+        return modelRegistry;
     }
     
     @Override

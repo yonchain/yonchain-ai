@@ -1,3 +1,4 @@
+/*
 package com.yonchain.ai.model.factory.impl;
 
 import com.yonchain.ai.model.ModelFactory;
@@ -13,10 +14,12 @@ import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.stereotype.Component;
 
+*/
 /**
  * OpenAI综合模型工厂实现
  * 支持聊天、图像生成、嵌入等多种模型类型
- */
+ *//*
+
 @Component
 public class OpenAIModelFactory implements ModelFactory {
     
@@ -105,9 +108,11 @@ public class OpenAIModelFactory implements ModelFactory {
         return null;//new OpenAiEmbeddingModel(openAiApi, options);
     }
     
-    /**
+    */
+/**
      * 创建OpenAI API实例
-     */
+     *//*
+
     private OpenAiApi createOpenAiApi(ModelDefinition definition) {
         String baseUrl = definition.getBaseUrl();
         String apiKey = definition.getAuthValue();
@@ -123,3 +128,4 @@ public class OpenAIModelFactory implements ModelFactory {
         return null;//new OpenAiApi(baseUrl, apiKey);
     }
 }
+*/

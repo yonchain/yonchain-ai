@@ -136,25 +136,27 @@ yonchain-ai-model/src/main/resources/
 ## 🚀 使用示例
 
 ### MyBatis风格的调用方式：
+
 ```java
 // 1. 构建工厂（类似SqlSessionFactoryBuilder）
 ModelClientFactory factory = new ModelClientFactoryBuilder()
-    .build("model-config.xml");
+                .build("model-config.xml");
 
 // 2. 创建客户端（类似SqlSession）
-try (ModelClient client = factory.createClient()) {
-    
-    // 3. 调用模型（类似Mapper方法调用）
-    ChatResponse response = client.chat("openai:gpt-4", 
+try(
+ModelClient client = factory.createClient()){
+
+// 3. 调用模型（类似Mapper方法调用）
+ChatResponse response = client.chat("openai:gpt-4",
         ChatRequest.builder()
-            .message("Hello, AI!")
-            .build());
-    
-    // 4. 使用别名调用
-    ChatResponse response2 = client.chat("default-chat", request);
-    
-    // 5. 使用业务场景
-    ChatResponse response3 = client.chat("business:customer-service", request);
+                .message("Hello, AI!")
+                .build());
+
+// 4. 使用别名调用
+ChatResponse response2 = client.chat("default-chat", request);
+
+// 5. 使用业务场景
+ChatResponse response3 = client.chat("business:customer-service", request);
 }
 ```
 

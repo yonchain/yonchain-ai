@@ -1,7 +1,8 @@
 package com.yonchain.ai.plugin.spi;
 
+import com.yonchain.ai.model.enums.ModelType;
 import com.yonchain.ai.tmpl.ModelConfig;
-import com.yonchain.ai.tmpl.ModelType;
+/*import com.yonchain.ai.tmpl.ModelType;*/
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.image.ImageModel;
 // import org.springframework.ai.audio.transcription.AudioTranscriptionModel;

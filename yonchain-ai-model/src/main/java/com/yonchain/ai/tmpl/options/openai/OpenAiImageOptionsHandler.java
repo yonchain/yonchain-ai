@@ -1,3 +1,4 @@
+/*
 package com.yonchain.ai.model.options.openai;
 
 
@@ -6,9 +7,11 @@ import org.springframework.ai.openai.OpenAiImageOptions;
 
 import java.util.Map;
 
+*/
 /**
  * OpenAI图像模型选项处理器
- */
+ *//*
+
 public class OpenAiImageOptionsHandler implements ModelOptionsHandler<OpenAiImageOptions> {
 
 
@@ -21,10 +24,12 @@ public class OpenAiImageOptionsHandler implements ModelOptionsHandler<OpenAiImag
             builder.model((String) config.get("model"));
         }
 
-     /*   // 设置图像尺寸
+     */
+/*   // 设置图像尺寸
         if (config.containsKey("size")) {
             builder.size((String) config.get("size"));
-        }*/
+        }*//*
+
 
         // 设置图像质量 (standard, hd)
         if (config.containsKey("quality")) {
@@ -114,3 +119,4 @@ public class OpenAiImageOptionsHandler implements ModelOptionsHandler<OpenAiImag
         return false;
     }
 }
+*/

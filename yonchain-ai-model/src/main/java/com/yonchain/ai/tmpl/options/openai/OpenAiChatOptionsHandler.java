@@ -1,3 +1,4 @@
+/*
 package com.yonchain.ai.model.options.openai;
 
 import com.yonchain.ai.model.options.ModelOptionsHandler;
@@ -5,9 +6,11 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 
 import java.util.Map;
 
+*/
 /**
  * OpenAI聊天模型选项处理器
- */
+ *//*
+
 public class OpenAiChatOptionsHandler implements ModelOptionsHandler<OpenAiChatOptions> {
 
 
@@ -204,3 +207,4 @@ public class OpenAiChatOptionsHandler implements ModelOptionsHandler<OpenAiChatO
     }
 
 }
+*/

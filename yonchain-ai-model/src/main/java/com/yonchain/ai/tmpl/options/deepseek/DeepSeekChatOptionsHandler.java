@@ -1,3 +1,4 @@
+/*
 package com.yonchain.ai.model.options.deepseek;
 
 import com.yonchain.ai.model.options.ChatOptionsHandler;
@@ -5,11 +6,13 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 
 import java.util.Map;
 
+*/
 /**
  * DeepSeek聊天模型选项处理器
  * 
  * DeepSeek使用OpenAI兼容的API，因此使用OpenAiChatOptions
- */
+ *//*
+
 public class DeepSeekChatOptionsHandler implements ChatOptionsHandler<OpenAiChatOptions> {
 
 
@@ -18,9 +21,11 @@ public class DeepSeekChatOptionsHandler implements ChatOptionsHandler<OpenAiChat
         var builder = OpenAiChatOptions.builder();
 
         // 设置模型 (必需)
+*/
 /*        if (config.containsKey("model")) {
             builder.model((String) config.get("model"));
-        }*/
+        }*//*
+
 
         // 设置温度 (0-2.0)
         if (config.containsKey("temperature")) {
@@ -142,12 +147,15 @@ public class DeepSeekChatOptionsHandler implements ChatOptionsHandler<OpenAiChat
         return true;
     }
 
-    /**
+    */
+/**
      * 验证是否为有效的DeepSeek模型
-     */
+     *//*
+
     private boolean isValidDeepSeekModel(String model) {
         return model.equals("deepseek-chat") || 
                model.equals("deepseek-coder") ||
                model.startsWith("deepseek-");
     }
 }
+*/

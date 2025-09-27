@@ -1,5 +1,7 @@
 package com.yonchain.ai.tmpl;
 
+import com.yonchain.ai.model.enums.ModelType;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;

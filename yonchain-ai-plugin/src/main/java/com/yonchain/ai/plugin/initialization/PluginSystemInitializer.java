@@ -1,6 +1,6 @@
 package com.yonchain.ai.plugin.initialization;
 
-import com.yonchain.ai.plugin.manager.PluginManager;
+import com.yonchain.ai.plugin.PluginManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

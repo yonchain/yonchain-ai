@@ -5,7 +5,7 @@ import com.yonchain.ai.plugin.dto.PluginPreviewResponse;
 import com.yonchain.ai.plugin.entity.PluginInfo;
 import com.yonchain.ai.plugin.enums.PluginStatus;
 import com.yonchain.ai.plugin.enums.PluginType;
-import com.yonchain.ai.plugin.manager.PluginManager;
+import com.yonchain.ai.plugin.PluginManager;
 import com.yonchain.ai.plugin.exception.PluginInstallException;
 import com.yonchain.ai.plugin.service.PluginIconService;
 import com.yonchain.ai.plugin.parser.PluginParser;

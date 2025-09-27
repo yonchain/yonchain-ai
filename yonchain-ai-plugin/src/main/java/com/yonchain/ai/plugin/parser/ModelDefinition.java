@@ -1,6 +1,8 @@
 package com.yonchain.ai.plugin.parser;
 
-import com.yonchain.ai.tmpl.ModelType;
+
+
+import com.yonchain.ai.model.enums.ModelType;
 
 import java.util.Map;
 
@@ -139,25 +141,25 @@ public class ModelDefinition {
      */
     public ModelType getSpringAIModelType() {
         if (modelType == null) {
-            return ModelType.TEXT; // 默认值
+            return ModelType.CHAT; // 默认值
         }
         
         switch (modelType.toLowerCase()) {
             case "llm":
             case "chat":
-                return ModelType.TEXT;
+                return ModelType.CHAT;
             case "image":
                 return ModelType.IMAGE;
             case "audio":
                 return ModelType.AUDIO;
-            case "video":
-                return ModelType.VIDEO;
+          /*  case "video":
+                return ModelType.VIDEO;*/
             case "embedding":
                 return ModelType.EMBEDDING;
-            case "multimodal":
-                return ModelType.MULTIMODAL;
+           /* case "multimodal":
+                return ModelType.MULTIMODAL;*/
             default:
-                return ModelType.TEXT;
+                return ModelType.CHAT;
         }
     }
     

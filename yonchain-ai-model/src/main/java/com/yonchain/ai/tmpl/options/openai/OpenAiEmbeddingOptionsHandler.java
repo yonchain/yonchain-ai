@@ -1,3 +1,4 @@
+/*
 package com.yonchain.ai.model.options.openai;
 
 import com.yonchain.ai.model.options.ModelOptionsHandler;
@@ -5,9 +6,11 @@ import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 
 import java.util.Map;
 
+*/
 /**
  * OpenAI嵌入模型选项处理器
- */
+ *//*
+
 public class OpenAiEmbeddingOptionsHandler implements ModelOptionsHandler<OpenAiEmbeddingOptions> {
 
 
@@ -80,3 +83,4 @@ public class OpenAiEmbeddingOptionsHandler implements ModelOptionsHandler<OpenAi
     }
 
 }
+*/

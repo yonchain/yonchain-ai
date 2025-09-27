@@ -1,7 +1,7 @@
 package com.yonchain.ai.plugin.deepseek;
 
+import com.yonchain.ai.model.enums.ModelType;
 import com.yonchain.ai.tmpl.ModelConfig;
-import com.yonchain.ai.tmpl.ModelType;
 import com.yonchain.ai.plugin.spi.ModelProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class DeepSeekModelProvider implements ModelProvider {
 
     @Override
     public boolean supports(ModelType modelType) {
-       return modelType == ModelType.TEXT || modelType == ModelType.EMBEDDING;
+       return modelType == ModelType.CHAT || modelType == ModelType.EMBEDDING;
     }
 
 

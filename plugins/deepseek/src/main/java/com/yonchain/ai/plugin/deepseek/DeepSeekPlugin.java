@@ -1,8 +1,8 @@
 package com.yonchain.ai.plugin.deepseek;
 
+import com.yonchain.ai.model.enums.ModelType;
 import com.yonchain.ai.tmpl.ModelConfig;
 import com.yonchain.ai.tmpl.ModelMetadata;
-import com.yonchain.ai.tmpl.ModelType;
 import com.yonchain.ai.plugin.spi.ModelProvider;
 import com.yonchain.ai.plugin.spi.ProviderMetadata;
 import com.yonchain.ai.model.ModelRegistry;
@@ -340,7 +340,7 @@ public class DeepSeekPlugin implements ModelPlugin {
         ModelMetadata metadata = new ModelMetadata();
         metadata.setName(modelName);
         metadata.setProvider(PROVIDER_NAME);
-        metadata.setType(ModelType.TEXT);
+        metadata.setType(ModelType.CHAT);
         metadata.setDescription(description);
         metadata.setDisplayName(displayName);
         metadata.setVersion("1.0");
@@ -363,7 +363,7 @@ public class DeepSeekPlugin implements ModelPlugin {
         config.setApiKey("sk-3ef709a6aa404b00af299c288264a48f");
         config.setName(modelName);
         config.setProvider(PROVIDER_NAME);
-        config.setType(ModelType.TEXT);
+        config.setType(ModelType.CHAT);
         config.setEnabled(true);
         
         // 设置基础参数
