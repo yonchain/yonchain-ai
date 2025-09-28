@@ -1,10 +1,7 @@
-package com.yonchain.ai.plugin.dto;
+package com.yonchain.ai.plugin.response;
 
 import com.yonchain.ai.plugin.entity.PluginInfo;
-import com.yonchain.ai.plugin.enums.PluginStatus;
-import com.yonchain.ai.plugin.enums.PluginType;
 import com.yonchain.ai.plugin.service.PluginIconService;
-import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
 

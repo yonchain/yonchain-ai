@@ -1,4 +1,4 @@
-package com.yonchain.ai.plugin.manager;
+package com.yonchain.ai.plugin.event;
 
 import com.yonchain.ai.plugin.enums.PluginLifecycleType;
 import org.springframework.context.ApplicationEvent;

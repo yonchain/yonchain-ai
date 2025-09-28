@@ -1,4 +1,4 @@
-package com.yonchain.ai.plugin.dto;
+package com.yonchain.ai.plugin.response;
 
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 

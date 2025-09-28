@@ -1,7 +1,7 @@
 package com.yonchain.ai.plugin.controller;
 
-import com.yonchain.ai.plugin.dto.PluginResponse;
-import com.yonchain.ai.plugin.dto.PluginPreviewResponse;
+import com.yonchain.ai.plugin.response.PluginResponse;
+import com.yonchain.ai.plugin.response.PluginPreviewResponse;
 import com.yonchain.ai.plugin.entity.PluginInfo;
 import com.yonchain.ai.plugin.enums.PluginStatus;
 import com.yonchain.ai.plugin.enums.PluginType;

@@ -2,7 +2,7 @@ package com.yonchain.ai.plugin;
 
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import com.yonchain.ai.plugin.entity.PluginInfo;
-import com.yonchain.ai.plugin.manager.PluginEventPublisher;
+import com.yonchain.ai.plugin.event.PluginEventPublisher;
 import com.yonchain.ai.plugin.parser.PluginParser;
 import com.yonchain.ai.plugin.exception.PluginParseException;
 import com.yonchain.ai.plugin.registry.PluginRegistry;

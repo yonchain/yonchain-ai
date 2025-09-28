@@ -1,8 +1,12 @@
 package com.yonchain.ai.plugin.descriptor;
 
+import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * 插件描述符
@@ -228,6 +232,52 @@ public class PluginDescriptor {
      */
     public boolean hasProviders() {
         return plugins != null && !plugins.isEmpty();
+    }
+    
+    /**
+     * 获取配置文件的输入流
+     * 
+     * @param configFileName 配置文件名
+     * @return 输入流
+     */
+    public InputStream getConfigInputStream(String configFileName) {
+        try {
+            if (pluginPath != null) {
+                JarFile jarFile = new JarFile(pluginPath.toFile());
+                JarEntry entry = jarFile.getJarEntry(configFileName);
+                if (entry != null) {
+                    return jarFile.getInputStream(entry);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to get config input stream for: " + configFileName, e);
+        }
+        throw new RuntimeException("Config file not found: " + configFileName);
+    }
+    
+    /**
+     * 获取模型配置文件列表
+     * 
+     * @return 模型配置文件列表
+     */
+    public List<String> getModelConfigFiles() {
+        List<String> modelConfigFiles = new ArrayList<>();
+        
+        try {
+            if (pluginPath != null) {
+                JarFile jarFile = new JarFile(pluginPath.toFile());
+                jarFile.stream()
+                    .map(JarEntry::getName)
+                    .filter(name -> name.startsWith("models/") && name.endsWith(".yaml"))
+                    .filter(name -> !name.endsWith("_position.yaml")) // 排除位置配置文件
+                    .forEach(modelConfigFiles::add);
+                jarFile.close();
+            }
+        } catch (Exception e) {
+            // 忽略错误，返回空列表
+        }
+        
+        return modelConfigFiles;
     }
     
     @Override

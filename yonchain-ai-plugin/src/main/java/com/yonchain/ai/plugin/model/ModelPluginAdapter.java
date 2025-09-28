@@ -10,11 +10,12 @@ import com.yonchain.ai.plugin.spi.*;
 import com.yonchain.ai.plugin.PluginAdapter;
 import com.yonchain.ai.plugin.PluginContext;
 import com.yonchain.ai.plugin.DefaultPluginContext;
-import com.yonchain.ai.plugin.adapter.ProviderToFactoryAdapter;
+import com.yonchain.ai.plugin.PluginModelFactory;
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import com.yonchain.ai.plugin.entity.PluginInfo;
 import com.yonchain.ai.plugin.enums.PluginType;
 import com.yonchain.ai.plugin.loader.PluginClassLoader;
+import com.yonchain.ai.plugin.loader.EnhancedPluginLoader;
 import com.yonchain.ai.plugin.registry.PluginRegistry;
 import com.yonchain.ai.plugin.service.PluginIconService;
 import com.yonchain.ai.plugin.exception.PluginException;
@@ -49,6 +50,7 @@ public class ModelPluginAdapter implements PluginAdapter {
     private final PluginRegistry pluginRegistry;
     private final ModelRegistry modelRegistry;
     private final PluginClassLoader pluginClassLoader;
+    private final EnhancedPluginLoader enhancedPluginLoader;
     private final ApplicationContext applicationContext;
     private final ModelService modelService;
     private final PluginIconService pluginIconService;
@@ -64,6 +66,7 @@ public class ModelPluginAdapter implements PluginAdapter {
     public ModelPluginAdapter(PluginRegistry pluginRegistry, 
                              ModelRegistry modelRegistry,
                              PluginClassLoader pluginClassLoader,
+                             EnhancedPluginLoader enhancedPluginLoader,
                              ApplicationContext applicationContext,
                              ModelService modelService,
                              PluginIconService pluginIconService,
@@ -71,6 +74,7 @@ public class ModelPluginAdapter implements PluginAdapter {
         this.pluginRegistry = pluginRegistry;
         this.modelRegistry = modelRegistry;
         this.pluginClassLoader = pluginClassLoader;
+        this.enhancedPluginLoader = enhancedPluginLoader;
         this.applicationContext = applicationContext;
         this.modelService = modelService;
         this.pluginIconService = pluginIconService;
@@ -153,7 +157,7 @@ public class ModelPluginAdapter implements PluginAdapter {
             registerModelProvider(pluginId, modelProvider);
             
             // 5. 创建适配器，将ModelProvider适配为ModelFactory
-            ProviderToFactoryAdapter factoryAdapter = new ProviderToFactoryAdapter(modelProvider);
+            PluginModelFactory factoryAdapter = new PluginModelFactory(modelProvider);
             
             // 6. 注册适配器到ModelConfiguration（符合ModelFactory标准）
             modelConfiguration.registerFactory(modelProvider.getProviderName(), factoryAdapter);
@@ -260,28 +264,11 @@ public class ModelPluginAdapter implements PluginAdapter {
      */
     private ModelPlugin loadPluginInstance(PluginInfo pluginInfo) {
         try {
-            String providerSource = pluginInfo.getMainClass();
-            String pluginPath = pluginInfo.getPluginPath();
+            // 创建插件描述符
+            PluginDescriptor descriptor = createPluginDescriptor(pluginInfo);
             
-            if (providerSource == null || providerSource.trim().isEmpty()) {
-                throw new IllegalArgumentException("Plugin main class is not specified for plugin: " + pluginInfo.getPluginId());
-            }
-            
-            if (pluginPath == null || pluginPath.trim().isEmpty()) {
-                throw new IllegalArgumentException("Plugin path is not specified for plugin: " + pluginInfo.getPluginId());
-            }
-            
-            Class<?> pluginClass = pluginClassLoader.loadClass(pluginPath, providerSource);
-            
-            if (!ModelPlugin.class.isAssignableFrom(pluginClass)) {
-                throw new IllegalArgumentException("Plugin class must implement ModelPlugin interface: " + providerSource);
-            }
-            
-            @SuppressWarnings("unchecked")
-            Class<? extends ModelPlugin> modelPluginClass = (Class<? extends ModelPlugin>) pluginClass;
-            
-            // 创建插件实例
-            ModelPlugin instance = modelPluginClass.getDeclaredConstructor().newInstance();
+            // 使用增强的插件加载器
+            ModelPlugin instance = (ModelPlugin) enhancedPluginLoader.loadPlugin(descriptor);
             
             // 创建插件上下文
             PluginContext pluginContext = createPluginContext(pluginInfo);
@@ -295,6 +282,23 @@ public class ModelPluginAdapter implements PluginAdapter {
             log.error("Failed to load plugin instance: {}", pluginInfo.getPluginId(), e);
             return null;
         }
+    }
+    
+    /**
+     * 从插件信息创建插件描述符
+     */
+    private PluginDescriptor createPluginDescriptor(PluginInfo pluginInfo) {
+        PluginDescriptor descriptor = new PluginDescriptor();
+        
+        descriptor.setId(pluginInfo.getPluginId());
+        descriptor.setName(pluginInfo.getName());
+        descriptor.setVersion(pluginInfo.getVersion());
+        descriptor.setAuthor(pluginInfo.getAuthor());
+        descriptor.setType(pluginInfo.getType());
+        descriptor.setPluginClass(pluginInfo.getMainClass());
+        descriptor.setPluginPath(java.nio.file.Paths.get(pluginInfo.getPluginPath()));
+        
+        return descriptor;
     }
     
     /**
