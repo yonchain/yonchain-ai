@@ -5,7 +5,7 @@ import com.yonchain.ai.plugin.config.*;
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import com.yonchain.ai.plugin.loader.PluginClassLoader;
 import com.yonchain.ai.plugin.model.ModelPlugin;
-import com.yonchain.ai.plugin.spi.ModelProvider;
+import com.yonchain.ai.plugin.ModelProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

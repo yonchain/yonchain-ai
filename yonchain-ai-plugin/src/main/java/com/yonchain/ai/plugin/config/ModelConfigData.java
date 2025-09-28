@@ -5,6 +5,7 @@ import java.util.Map;
 
 /**
  * 模型配置数据类
+ * 从deepseek-chat.yaml等模型配置文件解析的纯配置数据
  */
 public class ModelConfigData {
     private String model;
@@ -36,4 +37,12 @@ public class ModelConfigData {
     
     public Map<String, Object> getPricing() { return pricing; }
     public void setPricing(Map<String, Object> pricing) { this.pricing = pricing; }
+    
+    /**
+     * 获取本地化标签
+     */
+    public String getLocalizedLabel(String locale) {
+        if (label == null) return model;
+        return label.getOrDefault(locale, label.getOrDefault("en_US", model));
+    }
 }

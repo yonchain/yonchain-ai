@@ -3,25 +3,26 @@ package com.yonchain.ai.plugin.model;
 import com.yonchain.ai.api.model.ModelService;
 import com.yonchain.ai.api.model.ModelProviderInfo;
 import com.yonchain.ai.api.model.DefaultModelProvider;
+import com.yonchain.ai.api.model.ModelConfigItem;
 import com.yonchain.ai.model.ModelConfiguration;
 import com.yonchain.ai.model.ModelRegistry;
 import com.yonchain.ai.model.enums.ModelType;
-import com.yonchain.ai.plugin.spi.*;
-import com.yonchain.ai.plugin.PluginAdapter;
-import com.yonchain.ai.plugin.PluginContext;
-import com.yonchain.ai.plugin.DefaultPluginContext;
-import com.yonchain.ai.plugin.PluginModelFactory;
+import com.yonchain.ai.plugin.*;
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import com.yonchain.ai.plugin.entity.PluginInfo;
 import com.yonchain.ai.plugin.enums.PluginType;
-import com.yonchain.ai.plugin.loader.PluginClassLoader;
 import com.yonchain.ai.plugin.loader.EnhancedPluginLoader;
 import com.yonchain.ai.plugin.registry.PluginRegistry;
 import com.yonchain.ai.plugin.service.PluginIconService;
 import com.yonchain.ai.plugin.exception.PluginException;
-import com.yonchain.ai.tmpl.ModelConfig;
+import com.yonchain.ai.plugin.spi.ProviderMetadata;
+import com.yonchain.ai.plugin.config.ProviderConfig;
+import com.yonchain.ai.plugin.loader.PluginClassLoader;
 import com.yonchain.ai.tmpl.ModelMetadata;
+
+import java.io.InputStream;
 import org.slf4j.Logger;
+import org.yaml.snakeyaml.Yaml;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -49,8 +50,8 @@ public class ModelPluginAdapter implements PluginAdapter {
     
     private final PluginRegistry pluginRegistry;
     private final ModelRegistry modelRegistry;
-    private final PluginClassLoader pluginClassLoader;
     private final EnhancedPluginLoader enhancedPluginLoader;
+    private final PluginClassLoader pluginClassLoader;
     private final ApplicationContext applicationContext;
     private final ModelService modelService;
     private final PluginIconService pluginIconService;
@@ -65,16 +66,16 @@ public class ModelPluginAdapter implements PluginAdapter {
     
     public ModelPluginAdapter(PluginRegistry pluginRegistry, 
                              ModelRegistry modelRegistry,
-                             PluginClassLoader pluginClassLoader,
                              EnhancedPluginLoader enhancedPluginLoader,
+                             PluginClassLoader pluginClassLoader,
                              ApplicationContext applicationContext,
                              ModelService modelService,
                              PluginIconService pluginIconService,
                              ModelConfiguration modelConfiguration) {
         this.pluginRegistry = pluginRegistry;
         this.modelRegistry = modelRegistry;
-        this.pluginClassLoader = pluginClassLoader;
         this.enhancedPluginLoader = enhancedPluginLoader;
+        this.pluginClassLoader = pluginClassLoader;
         this.applicationContext = applicationContext;
         this.modelService = modelService;
         this.pluginIconService = pluginIconService;
@@ -91,12 +92,9 @@ public class ModelPluginAdapter implements PluginAdapter {
         log.info("Installing model plugin: {}", descriptor.getId());
         
         try {
-         /*   // 验证插件是否有必要的SPI配置
-            if (descriptor.getSpi() == null || !descriptor.getSpi().hasProviderSource()) {
-                throw new IllegalArgumentException("Model plugin must have provider source configuration");
-            }*/
+            // 验证模型插件的配置完整性
+            validateModelPluginConfiguration(descriptor);
             
-            // 暂时不加载插件实例，等到启用时再加载
             log.info("Model plugin installed successfully: {}", descriptor.getId());
             
         } catch (Exception e) {
@@ -484,169 +482,12 @@ public class ModelPluginAdapter implements PluginAdapter {
         return new ConcurrentHashMap<>(pluginInstances);
     }
     
-    /**
-     * 确保模型元数据包含完整的ModelConfig
-     * 
-     * @param metadata 模型元数据
-     * @param pluginId 插件ID
-     * @param pluginInstance 插件实例
-     */
-    private void ensureModelConfigComplete(ModelMetadata metadata, String pluginId, ModelPlugin pluginInstance) {
-        if (metadata.getConfig() == null) {
-            log.debug("Creating default ModelConfig for model: {} from plugin: {}", metadata.getModelId(), pluginId);
-            ModelConfig config = createDefaultModelConfig(metadata, pluginId);
-            metadata.setConfig(config);
-        } else {
-            log.debug("Supplementing existing ModelConfig for model: {} from plugin: {}", metadata.getModelId(), pluginId);
-            supplementModelConfig(metadata.getConfig(), pluginId);
-        }
-    }
     
-    /**
-     * 为插件模型创建默认配置
-     * 
-     * @param metadata 模型元数据
-     * @param pluginId 插件ID
-     * @return 模型配置
-     */
-    private ModelConfig createDefaultModelConfig(ModelMetadata metadata, String pluginId) {
-        ModelConfig config = new ModelConfig();
-        config.setName(metadata.getName());
-        config.setProvider(metadata.getProvider());
-        config.setType(metadata.getType());
-        config.setEnabled(true);
-        
-        // 设置默认超时和重试
-        config.setTimeout(30000); // 30秒
-        config.setRetryCount(3);
-        
-        // 从模型元数据设置最大Token
-        if (metadata.getMaxTokens() != null) {
-            config.setMaxTokens(metadata.getMaxTokens());
-        }
-        
-        // 补充运行时配置
-        supplementModelConfig(config, pluginId);
-        
-        return config;
-    }
     
-    /**
-     * 补充模型配置的运行时信息
-     * 
-     * @param config 模型配置
-     * @param pluginId 插件ID
-     */
-    private void supplementModelConfig(ModelConfig config, String pluginId) {
-        try {
-            DefaultPluginContext pluginContext = pluginContexts.get(pluginId);
-            if (pluginContext == null) {
-                log.warn("Plugin context not found for plugin: {}, using environment variables", pluginId);
-                supplementFromEnvironment(config);
-                return;
-            }
-            
-            // 从插件上下文获取用户配置
-            String apiKey = pluginContext.getPluginConfig("api_key");
-            String endpoint = pluginContext.getPluginConfig("endpoint_url");
-            
-            if (apiKey != null && !apiKey.trim().isEmpty()) {
-                config.setApiKey(apiKey);
-                log.debug("Set API key from plugin context for model: {}", config.getName());
-            } else {
-                // 从环境变量获取API Key
-                supplementApiKeyFromEnvironment(config);
-            }
-            
-            if (endpoint != null && !endpoint.trim().isEmpty()) {
-                config.setEndpoint(endpoint);
-                log.debug("Set endpoint from plugin context for model: {} -> {}", config.getName(), endpoint);
-            } else {
-                // 设置默认endpoint
-                setDefaultEndpoint(config);
-            }
-            
-            // 获取其他可选配置
-            supplementOptionalConfig(config, pluginContext);
-            
-        } catch (Exception e) {
-            log.error("Failed to supplement model config for plugin: {}, falling back to environment", pluginId, e);
-            supplementFromEnvironment(config);
-        }
-    }
     
-    /**
-     * 从环境变量补充配置
-     * 
-     * @param config 模型配置
-     */
-    private void supplementFromEnvironment(ModelConfig config) {
-        supplementApiKeyFromEnvironment(config);
-        setDefaultEndpoint(config);
-    }
     
-    /**
-     * 从环境变量获取API Key
-     * 
-     * @param config 模型配置
-     */
-    private void supplementApiKeyFromEnvironment(ModelConfig config) {
-        String provider = config.getProvider();
-        if (provider == null) {
-            return;
-        }
-        
-        // 根据提供商构建环境变量名
-        String envVarName = provider.toUpperCase() + "_API_KEY";
-        String apiKey = System.getenv(envVarName);
-        
-        if (apiKey != null && !apiKey.trim().isEmpty()) {
-            config.setApiKey(apiKey);
-            log.debug("Set API key from environment variable {} for model: {}", envVarName, config.getName());
-        } else {
-            log.warn("API key not found in environment variable {} for model: {}", envVarName, config.getName());
-        }
-    }
     
-    /**
-     * 设置默认endpoint
-     * 
-     * @param config 模型配置
-     */
-    private void setDefaultEndpoint(ModelConfig config) {
-        String provider = config.getProvider();
-        if (provider == null) {
-            return;
-        }
-        
-        // 根据提供商设置默认endpoint
-        String defaultEndpoint = getDefaultEndpointForProvider(provider);
-        if (defaultEndpoint != null) {
-            config.setEndpoint(defaultEndpoint);
-            log.debug("Set default endpoint for provider {} -> {}", provider, defaultEndpoint);
-        }
-    }
     
-    /**
-     * 获取提供商的默认endpoint
-     * 
-     * @param provider 提供商名称
-     * @return 默认endpoint
-     */
-    private String getDefaultEndpointForProvider(String provider) {
-        switch (provider.toLowerCase()) {
-            case "deepseek":
-                return "https://api.deepseek.com/v1";
-            case "openai":
-                return "https://api.openai.com/v1";
-            case "anthropic":
-                return "https://api.anthropic.com/v1";
-            case "grok":
-                return "https://api.x.ai/v1";
-            default:
-                return null;
-        }
-    }
     
     /**
      * 将运行时ModelProvider转换为界面用的ModelProviderInfo
@@ -669,7 +510,11 @@ public class ModelPluginAdapter implements PluginAdapter {
                 providerInfo.setDescription(metadata.getLocalizedDescription("zh_Hans"));
                 
                 // 生成图标URL
-                String iconFileName = metadata.getLocalizedIcon("en_US", false); // 使用小图标
+                Map<String, String> iconSmall = metadata.getIconSmall();
+                String iconFileName = null;
+                if (iconSmall != null) {
+                    iconFileName = iconSmall.getOrDefault("en_US", iconSmall.values().stream().findFirst().orElse(null));
+                }
                 if (iconFileName != null) {
                     String iconUrl = generateProviderIconUrl(pluginId, iconFileName);
                     providerInfo.setIcon(iconUrl);
@@ -684,7 +529,9 @@ public class ModelPluginAdapter implements PluginAdapter {
                 
                 // 设置配置Schema
                 if (metadata.getProviderCredentialSchema() != null) {
-                    providerInfo.setConfigSchemas(convertCredentialSchemaToConfigItems(metadata.getProviderCredentialSchema()));
+                    List<ModelConfigItem> configSchemas = convertCredentialSchemaToConfigItems(metadata.getProviderCredentialSchema());
+                    providerInfo.setConfigSchemas(configSchemas);
+                    log.debug("Converted {} credential schema items for provider: {}", configSchemas.size(), metadata.getProvider());
                 }
                 
             } else {
@@ -848,76 +695,7 @@ public class ModelPluginAdapter implements PluginAdapter {
         return supportedTypes;
     }
     
-    /**
-     * 将插件的凭证配置Schema转换为ModelConfigItem列表
-     * 
-     * @param credentialSchema 插件的凭证配置Schema
-     * @return ModelConfigItem列表
-     */
-    private List<com.yonchain.ai.api.model.ModelConfigItem> convertCredentialSchemaToConfigItems(Map<String, Object> credentialSchema) {
-        List<com.yonchain.ai.api.model.ModelConfigItem> configItems = new ArrayList<>();
-        
-        try {
-            // 获取credential_form_schemas
-            @SuppressWarnings("unchecked")
-            List<Map<String, Object>> formSchemas = (List<Map<String, Object>>) credentialSchema.get("credential_form_schemas");
-            
-            if (formSchemas != null) {
-                for (Map<String, Object> schema : formSchemas) {
-                    com.yonchain.ai.api.model.ModelConfigItem configItem = new com.yonchain.ai.api.model.ModelConfigItem();
-                    
-                    // 设置变量名
-                    String variable = (String) schema.get("variable");
-                    configItem.setName(variable);
-                    
-                    // 设置标签
-                    @SuppressWarnings("unchecked")
-                    Map<String, String> labelMap = (Map<String, String>) schema.get("label");
-                    if (labelMap != null) {
-                        configItem.setTitle(labelMap.getOrDefault("zh_Hans", labelMap.get("en_US")));
-                    }
-                    
-                    // 设置占位符
-                    @SuppressWarnings("unchecked")
-                    Map<String, String> placeholderMap = (Map<String, String>) schema.get("placeholder");
-                    if (placeholderMap != null) {
-                        configItem.setDescription(placeholderMap.getOrDefault("zh_Hans", placeholderMap.get("en_US")));
-                    }
-                    
-                    // 设置类型
-                    String type = (String) schema.get("type");
-                    configItem.setType(convertInputType(type));
-                    
-                    // 设置是否必需
-                    Boolean required = (Boolean) schema.get("required");
-                    configItem.setRequired(required != null ? required : false);
-                    
-                    configItems.add(configItem);
-                }
-            }
-            
-        } catch (Exception e) {
-            log.error("Failed to convert credential schema to config items", e);
-        }
-        
-        return configItems;
-    }
     
-    /**
-     * 转换输入类型
-     */
-    private String convertInputType(String pluginType) {
-        if (pluginType == null) return "text";
-        
-        switch (pluginType) {
-            case "secret-input":
-                return "password";
-            case "text-input":
-                return "text";
-            default:
-                return "text";
-        }
-    }
     
     /**
      * 注册插件的OptionsHandlers到ModelConfiguration
@@ -929,8 +707,8 @@ public class ModelPluginAdapter implements PluginAdapter {
         try {
             log.info("Registering OptionsHandlers for plugin: {}", pluginInstance.getId());
             
-            // 调用插件的registerOptionsHandlers方法
-            pluginInstance.registerOptionsHandlers(modelConfiguration);
+            // 使用插件感知的方式注册选项处理器
+            registerPluginOptionsHandlersWithClassLoader(pluginInstance, modelConfiguration);
             
             log.info("Successfully registered OptionsHandlers for plugin: {}", pluginInstance.getId());
             
@@ -962,48 +740,379 @@ public class ModelPluginAdapter implements PluginAdapter {
     }
     
     /**
-     * 补充可选配置
+     * 将插件的凭证配置Schema转换为ModelConfigItem列表
      * 
-     * @param config 模型配置
-     * @param pluginContext 插件上下文
+     * @param credentialSchema 插件的凭证配置Schema
+     * @return ModelConfigItem列表
      */
-    private void supplementOptionalConfig(ModelConfig config, DefaultPluginContext pluginContext) {
+    private List<ModelConfigItem> convertCredentialSchemaToConfigItems(Map<String, Object> credentialSchema) {
+        List<ModelConfigItem> configItems = new ArrayList<>();
+        
         try {
-            // 温度参数
-            String temperatureStr = pluginContext.getPluginConfig("temperature");
-            if (temperatureStr != null) {
-                try {
-                    double temperature = Double.parseDouble(temperatureStr);
-                    config.setTemperature(temperature);
-                } catch (NumberFormatException e) {
-                    log.warn("Invalid temperature value: {} for model: {}", temperatureStr, config.getName());
-                }
-            }
+            // 获取credential_form_schemas
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> formSchemas = (List<Map<String, Object>>) credentialSchema.get("credential_form_schemas");
             
-            // 最大Token数
-            String maxTokensStr = pluginContext.getPluginConfig("max_tokens");
-            if (maxTokensStr != null) {
-                try {
-                    int maxTokens = Integer.parseInt(maxTokensStr);
-                    config.setMaxTokens(maxTokens);
-                } catch (NumberFormatException e) {
-                    log.warn("Invalid max_tokens value: {} for model: {}", maxTokensStr, config.getName());
-                }
-            }
-            
-            // 超时配置
-            String timeoutStr = pluginContext.getPluginConfig("timeout");
-            if (timeoutStr != null) {
-                try {
-                    int timeout = Integer.parseInt(timeoutStr);
-                    config.setTimeout(timeout);
-                } catch (NumberFormatException e) {
-                    log.warn("Invalid timeout value: {} for model: {}", timeoutStr, config.getName());
+            if (formSchemas != null) {
+                int order = 1; // 配置项显示顺序
+                
+                for (Map<String, Object> schema : formSchemas) {
+                    ModelConfigItem configItem = new ModelConfigItem();
+                    
+                    // 设置变量名
+                    String variable = (String) schema.get("variable");
+                    configItem.setName(variable);
+                    
+                    // 设置标题（优先中文，然后英文）
+                    @SuppressWarnings("unchecked")
+                    Map<String, String> labelMap = (Map<String, String>) schema.get("label");
+                    if (labelMap != null) {
+                        String title = labelMap.getOrDefault("zh_Hans", labelMap.get("en_US"));
+                        configItem.setTitle(title);
+                    }
+                    
+                    // 设置描述（使用placeholder作为描述，优先中文）
+                    @SuppressWarnings("unchecked")
+                    Map<String, String> placeholderMap = (Map<String, String>) schema.get("placeholder");
+                    if (placeholderMap != null) {
+                        String description = placeholderMap.getOrDefault("zh_Hans", placeholderMap.get("en_US"));
+                        configItem.setDescription(description);
+                    }
+                    
+                    // 设置类型（转换插件类型到标准类型）
+                    String pluginType = (String) schema.get("type");
+                    String standardType = convertInputType(pluginType);
+                    configItem.setType(standardType);
+                    
+                    // 设置是否必需
+                    Boolean required = (Boolean) schema.get("required");
+                    configItem.setRequired(required != null ? required : false);
+                    
+                    // 设置显示顺序
+                    configItem.setOrder(order++);
+                    
+                    // 设置分组（默认为基础配置）
+                    configItem.setGroup("basic");
+                    
+                    // 根据类型设置默认值
+                    if ("password".equals(standardType)) {
+                        configItem.setDefaultValue("");
+                    } else if ("text".equals(standardType)) {
+                        configItem.setDefaultValue("");
+                    }
+                    
+                    configItems.add(configItem);
+                    
+                    log.debug("Converted credential schema item: {} -> {}", variable, standardType);
                 }
             }
             
         } catch (Exception e) {
-            log.debug("No additional optional config found or error reading config for model: {}", config.getName());
+            log.error("Failed to convert credential schema to config items", e);
+        }
+        
+        return configItems;
+    }
+    
+    /**
+     * 转换插件输入类型到标准类型
+     * 
+     * @param pluginType 插件类型
+     * @return 标准类型
+     */
+    private String convertInputType(String pluginType) {
+        if (pluginType == null) {
+            return "text";
+        }
+        
+        switch (pluginType.toLowerCase()) {
+            case "secret-input":
+                return "password";
+            case "text-input":
+                return "text";
+            case "number-input":
+                return "number";
+            case "boolean-input":
+            case "checkbox":
+                return "boolean";
+            case "select":
+            case "radio":
+                return "select";
+            default:
+                return "text";
+        }
+    }
+    
+    /**
+     * 验证模型插件配置的完整性
+     * 
+     * @param descriptor 插件描述符
+     * @throws IllegalArgumentException 配置验证失败时抛出
+     */
+    private void validateModelPluginConfiguration(PluginDescriptor descriptor) {
+        String pluginId = descriptor.getId();
+        
+        // 1. 检查是否有提供商配置文件
+        if (descriptor.getPlugins() == null || descriptor.getPlugins().isEmpty()) {
+            throw new IllegalArgumentException(
+                String.format("Model plugin [%s] must specify provider configuration files (e.g., deepseek.yaml)", pluginId)
+            );
+        }
+        
+        // 2. 验证每个提供商配置文件
+        for (String configFile : descriptor.getPlugins()) {
+            validateProviderConfiguration(descriptor, configFile);
+        }
+        
+        log.info("Model plugin configuration validation passed for: {}", pluginId);
+    }
+    
+    /**
+     * 验证提供商配置文件
+     * 
+     * @param descriptor 插件描述符
+     * @param configFile 配置文件名
+     * @throws IllegalArgumentException 配置验证失败时抛出
+     */
+    private void validateProviderConfiguration(PluginDescriptor descriptor, String configFile) {
+        String pluginId = descriptor.getId();
+        
+        try {
+            // 从JAR中读取提供商配置文件
+            InputStream configStream = descriptor.getConfigInputStream(configFile);
+            if (configStream == null) {
+                throw new IllegalArgumentException(
+                    String.format("Provider configuration file [%s] not found in plugin [%s]", configFile, pluginId)
+                );
+            }
+            
+            // 解析提供商配置
+            ProviderConfig providerConfig = parseProviderConfig(configStream);
+            if (providerConfig == null) {
+                throw new IllegalArgumentException(
+                    String.format("Failed to parse provider configuration file [%s] in plugin [%s]", configFile, pluginId)
+                );
+            }
+            
+            // 验证提供商配置的必要字段
+            validateProviderConfigFields(providerConfig, configFile, pluginId);
+            
+            log.debug("Provider configuration validation passed for: {} in plugin: {}", configFile, pluginId);
+            
+        } catch (Exception e) {
+            log.error("Failed to validate provider configuration [{}] in plugin [{}]", configFile, pluginId, e);
+            throw new IllegalArgumentException(
+                String.format("Provider configuration validation failed for [%s] in plugin [%s]: %s", 
+                    configFile, pluginId, e.getMessage()), e
+            );
+        }
+    }
+    
+    /**
+     * 验证提供商配置字段的完整性
+     * 
+     * @param providerConfig 提供商配置
+     * @param configFile 配置文件名
+     * @param pluginId 插件ID
+     * @throws IllegalArgumentException 字段验证失败时抛出
+     */
+    private void validateProviderConfigFields(ProviderConfig providerConfig, String configFile, String pluginId) {
+        List<String> errors = new ArrayList<>();
+        
+        // 1. 验证provider字段
+        if (providerConfig.getProvider() == null || providerConfig.getProvider().trim().isEmpty()) {
+            errors.add("'provider' field is required");
+        }
+        
+        // 2. 验证provider_source字段
+        if (providerConfig.getProviderSource() == null || providerConfig.getProviderSource().trim().isEmpty()) {
+            errors.add("'provider_source' field is required (e.g., com.yonchain.ai.plugin.deepseek.DeepSeekModelProvider)");
+        }
+        
+        // 3. 验证models配置
+        if (providerConfig.getModels() == null || providerConfig.getModels().isEmpty()) {
+            errors.add("'models' configuration is required");
+        } else {
+            validateModelsConfiguration(providerConfig.getModels(), errors);
+        }
+        
+        // 4. 验证supported_model_types
+        if (providerConfig.getSupportedModelTypes() == null || providerConfig.getSupportedModelTypes().isEmpty()) {
+            errors.add("'supported_model_types' field is required (e.g., ['chat', 'embedding'])");
+        }
+        
+        // 如果有错误，抛出异常
+        if (!errors.isEmpty()) {
+            String errorMessage = String.format(
+                "Provider configuration validation failed for [%s] in plugin [%s]:\n- %s", 
+                configFile, pluginId, String.join("\n- ", errors)
+            );
+            throw new IllegalArgumentException(errorMessage);
+        }
+    }
+    
+    /**
+     * 验证models配置的完整性
+     * 
+     * @param modelsConfig models配置
+     * @param errors 错误列表
+     */
+    @SuppressWarnings("unchecked")
+    private void validateModelsConfiguration(Map<String, Object> modelsConfig, List<String> errors) {
+        for (Map.Entry<String, Object> entry : modelsConfig.entrySet()) {
+            String modelType = entry.getKey();
+            Object modelConfig = entry.getValue();
+            
+            if (!(modelConfig instanceof Map)) {
+                errors.add(String.format("Model type [%s] configuration must be a map", modelType));
+                continue;
+            }
+            
+            Map<String, Object> typeConfig = (Map<String, Object>) modelConfig;
+            
+            // 验证source字段（Spring AI模型实现类）
+            String source = (String) typeConfig.get("source");
+            if (source == null || source.trim().isEmpty()) {
+                errors.add(String.format("Model type [%s] must specify 'source' field (e.g., org.springframework.ai.deepseek.DeepSeekChatModel)", modelType));
+            }
+            
+            // 验证options_handler字段（选项处理器）
+            String optionsHandler = (String) typeConfig.get("options_handler");
+            if (optionsHandler == null || optionsHandler.trim().isEmpty()) {
+                errors.add(String.format("Model type [%s] must specify 'options_handler' field (e.g., com.yonchain.ai.plugin.deepseek.DeepSeekChatOptionsHandler)", modelType));
+            }
+            
+            // 验证predefined字段
+            Object predefined = typeConfig.get("predefined");
+            if (predefined == null) {
+                errors.add(String.format("Model type [%s] must specify 'predefined' field with model configuration files", modelType));
+            }
+        }
+    }
+    
+    /**
+     * 解析提供商配置文件
+     * 
+     * @param inputStream 配置文件输入流
+     * @return 提供商配置对象
+     */
+    private ProviderConfig parseProviderConfig(InputStream inputStream) {
+        try {
+            Yaml yaml = new Yaml();
+            Map<String, Object> configData = yaml.load(inputStream);
+            
+            if (configData == null) {
+                return null;
+            }
+            
+            // 手动构建ProviderConfig对象
+            ProviderConfig config = new ProviderConfig();
+            config.setProvider((String) configData.get("provider"));
+            config.setProviderSource((String) configData.get("provider_source"));
+            config.setBackground((String) configData.get("background"));
+            
+            @SuppressWarnings("unchecked")
+            Map<String, String> label = (Map<String, String>) configData.get("label");
+            config.setLabel(label);
+            
+            @SuppressWarnings("unchecked")
+            Map<String, String> description = (Map<String, String>) configData.get("description");
+            config.setDescription(description);
+            
+            @SuppressWarnings("unchecked")
+            Map<String, String> iconSmall = (Map<String, String>) configData.get("icon_small");
+            config.setIconSmall(iconSmall);
+            
+            @SuppressWarnings("unchecked")
+            Map<String, String> iconLarge = (Map<String, String>) configData.get("icon_large");
+            config.setIconLarge(iconLarge);
+            
+            @SuppressWarnings("unchecked")
+            List<String> supportedModelTypes = (List<String>) configData.get("supported_model_types");
+            config.setSupportedModelTypes(supportedModelTypes);
+            
+            @SuppressWarnings("unchecked")
+            List<String> configurateMethods = (List<String>) configData.get("configurate_methods");
+            config.setConfigurateMethods(configurateMethods);
+            
+            @SuppressWarnings("unchecked")
+            Map<String, Object> models = (Map<String, Object>) configData.get("models");
+            config.setModels(models);
+            
+            @SuppressWarnings("unchecked")
+            Map<String, Object> help = (Map<String, Object>) configData.get("help");
+            config.setHelp(help);
+            
+            @SuppressWarnings("unchecked")
+            Map<String, Object> credentialSchema = (Map<String, Object>) configData.get("provider_credential_schema");
+            config.setProviderCredentialSchema(credentialSchema);
+            
+            return config;
+            
+        } catch (Exception e) {
+            log.error("Failed to parse provider configuration", e);
+            return null;
+        }
+    }
+    
+    /**
+     * 使用插件类加载器注册选项处理器
+     * 
+     * @param pluginInstance 插件实例
+     * @param modelConfiguration 模型配置
+     */
+    private void registerPluginOptionsHandlersWithClassLoader(ModelPlugin pluginInstance, ModelConfiguration modelConfiguration) {
+        String pluginId = pluginInstance.getId();
+        
+        try {
+            // 获取插件的提供商配置
+            ProviderConfig providerConfig = pluginInstance.getProviderConfig();
+            if (providerConfig == null) {
+                log.warn("No provider config found for plugin: {}", pluginId);
+                return;
+            }
+            
+            // 获取选项处理器映射
+            Map<String, String> optionsHandlers = providerConfig.getOptionsHandlers();
+            if (optionsHandlers == null || optionsHandlers.isEmpty()) {
+                log.debug("No options handlers configured for plugin: {}", pluginId);
+                return;
+            }
+            
+            // 获取插件路径（用于类加载器）
+            Optional<PluginInfo> pluginInfoOpt = pluginRegistry.findByPluginId(pluginId);
+            if (!pluginInfoOpt.isPresent()) {
+                log.error("Plugin info not found for: {}", pluginId);
+                return;
+            }
+            
+            String pluginPath = pluginInfoOpt.get().getPluginPath();
+            String providerName = providerConfig.getProvider();
+            
+            // 使用插件类加载器创建并注册选项处理器
+            for (Map.Entry<String, String> entry : optionsHandlers.entrySet()) {
+                String modelType = entry.getKey();
+                String handlerClassName = entry.getValue();
+                
+                try {
+                    // 使用插件类加载器加载处理器类
+                    Class<?> handlerClass = pluginClassLoader.loadClass(pluginPath, handlerClassName);
+                    Object handlerInstance = handlerClass.getDeclaredConstructor().newInstance();
+                    
+                    // 注册到ModelConfiguration
+                    modelConfiguration.registerNamespaceHandler(providerName, modelType, (com.yonchain.ai.model.options.ModelOptionsHandler<?>) handlerInstance);
+                    
+                    log.debug("Successfully registered options handler: {}:{} -> {}", providerName, modelType, handlerClassName);
+                    
+                } catch (Exception e) {
+                    log.error("Failed to register options handler for {}:{} with class {}", 
+                        providerName, modelType, handlerClassName, e);
+                }
+            }
+            
+        } catch (Exception e) {
+            log.error("Failed to register options handlers for plugin: {}", pluginId, e);
+            throw e;
         }
     }
     

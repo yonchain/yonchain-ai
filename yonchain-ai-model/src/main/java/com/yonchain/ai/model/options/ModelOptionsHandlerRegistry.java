@@ -1,5 +1,6 @@
 package com.yonchain.ai.model.options;
 
+import com.yonchain.ai.api.exception.YonchainException;
 import org.springframework.ai.model.ModelOptions;
 
 import java.util.Optional;
@@ -82,6 +83,7 @@ public class ModelOptionsHandlerRegistry {
             registerNamespaceHandler(namespace, type, handler);
         } catch (Exception e) {
             System.err.println("Failed to register namespace handler: " + namespace + ":" + type + " -> " + handlerClass + ", error: " + e.getMessage());
+            throw new YonchainException("Failed to register namespace handler: " + namespace + ":" + type + " -> " + handlerClass + ", error: " + e.getMessage(),e);
         }
     }
     

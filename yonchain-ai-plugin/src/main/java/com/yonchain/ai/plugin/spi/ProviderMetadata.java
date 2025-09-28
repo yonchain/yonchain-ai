@@ -4,32 +4,21 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 提供商元数据
- * 包含从插件配置文件中读取的信息
- * 
- * @author yonchain
+ * 提供商元数据接口
+ * 定义模型提供商的元数据信息
  */
 public class ProviderMetadata {
     
     private String provider;
-    private String providerSource;
     private String background;
     private Map<String, String> label;
     private Map<String, String> description;
-    private Map<String, String> iconLarge;
     private Map<String, String> iconSmall;
+    private Map<String, String> iconLarge;
     private List<String> supportedModelTypes;
     private List<String> configurateMethods;
     private Map<String, Object> help;
     private Map<String, Object> providerCredentialSchema;
-    
-    public ProviderMetadata() {}
-    
-    public ProviderMetadata(String provider) {
-        this.provider = provider;
-    }
-    
-    // Getters and Setters
     
     public String getProvider() {
         return provider;
@@ -37,14 +26,6 @@ public class ProviderMetadata {
     
     public void setProvider(String provider) {
         this.provider = provider;
-    }
-    
-    public String getProviderSource() {
-        return providerSource;
-    }
-    
-    public void setProviderSource(String providerSource) {
-        this.providerSource = providerSource;
     }
     
     public String getBackground() {
@@ -71,20 +52,20 @@ public class ProviderMetadata {
         this.description = description;
     }
     
-    public Map<String, String> getIconLarge() {
-        return iconLarge;
-    }
-    
-    public void setIconLarge(Map<String, String> iconLarge) {
-        this.iconLarge = iconLarge;
-    }
-    
     public Map<String, String> getIconSmall() {
         return iconSmall;
     }
     
     public void setIconSmall(Map<String, String> iconSmall) {
         this.iconSmall = iconSmall;
+    }
+    
+    public Map<String, String> getIconLarge() {
+        return iconLarge;
+    }
+    
+    public void setIconLarge(Map<String, String> iconLarge) {
+        this.iconLarge = iconLarge;
     }
     
     public List<String> getSupportedModelTypes() {
@@ -121,9 +102,6 @@ public class ProviderMetadata {
     
     /**
      * 获取本地化标签
-     * 
-     * @param locale 语言环境，如 "en_US", "zh_Hans"
-     * @return 本地化标签
      */
     public String getLocalizedLabel(String locale) {
         if (label == null) return provider;
@@ -132,28 +110,9 @@ public class ProviderMetadata {
     
     /**
      * 获取本地化描述
-     * 
-     * @param locale 语言环境
-     * @return 本地化描述
      */
     public String getLocalizedDescription(String locale) {
         if (description == null) return null;
         return description.getOrDefault(locale, description.get("en_US"));
     }
-    
-    /**
-     * 获取本地化图标
-     * 
-     * @param locale 语言环境
-     * @param large 是否获取大图标
-     * @return 图标路径
-     */
-    public String getLocalizedIcon(String locale, boolean large) {
-        Map<String, String> iconMap = large ? iconLarge : iconSmall;
-        if (iconMap == null) return null;
-        return iconMap.getOrDefault(locale, iconMap.get("en_US"));
-    }
 }
-
-
-

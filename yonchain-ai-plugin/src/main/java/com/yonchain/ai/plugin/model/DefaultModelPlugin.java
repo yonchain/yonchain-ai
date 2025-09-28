@@ -4,7 +4,7 @@ import com.yonchain.ai.plugin.PluginContext;
 import com.yonchain.ai.plugin.config.ModelConfigData;
 import com.yonchain.ai.plugin.config.PluginConfig;
 import com.yonchain.ai.plugin.config.ProviderConfig;
-import com.yonchain.ai.plugin.spi.ModelProvider;
+import com.yonchain.ai.plugin.ModelProvider;
 import com.yonchain.ai.plugin.spi.ProviderMetadata;
 import com.yonchain.ai.tmpl.ModelMetadata;
 import com.yonchain.ai.model.ModelRegistry;
@@ -127,6 +127,11 @@ public class DefaultModelPlugin implements ModelPlugin {
     @Override
     public ProviderMetadata getProviderMetadata() {
         return providerMetadata;
+    }
+    
+    @Override
+    public ProviderConfig getProviderConfig() {
+        return providerConfig;
     }
     
     @Override

@@ -1,7 +1,7 @@
 package com.yonchain.ai.plugin.parser.impl;
 
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
-import com.yonchain.ai.plugin.descriptor.ResourceConfig;
+// import com.yonchain.ai.plugin.descriptor.ResourceConfig; // 已删除，简化处理
 import com.yonchain.ai.plugin.exception.PluginParseException;
 import com.yonchain.ai.plugin.parser.PluginParser;
 import com.yonchain.ai.plugin.validation.ValidationResult;
@@ -226,8 +226,8 @@ public class YamlPluginParser implements PluginParser {
             // 资源配置
             Map<String, Object> resourceData = (Map<String, Object>) yamlData.get("resource");
             if (resourceData != null) {
-                ResourceConfig resourceConfig = parseResourceConfig(resourceData);
-                descriptor.setResource(resourceConfig);
+                // 简化处理：直接保存原始配置数据
+                descriptor.setResource(resourceData);
             }
             
             return descriptor;
@@ -237,54 +237,7 @@ public class YamlPluginParser implements PluginParser {
         }
     }
     
-    /**
-     * 解析资源配置
-     * 
-     * @param resourceData 资源数据
-     * @return 资源配置
-     */
-    @SuppressWarnings("unchecked")
-    private ResourceConfig parseResourceConfig(Map<String, Object> resourceData) {
-        ResourceConfig resourceConfig = new ResourceConfig();
-        
-        // 解析内存配置
-        Object memoryObj = resourceData.get("memory");
-        if (memoryObj instanceof Number) {
-            resourceConfig.setMemory(((Number) memoryObj).longValue());
-        }
-        
-        // 解析权限配置
-        Map<String, Object> permissionData = (Map<String, Object>) resourceData.get("permission");
-        if (permissionData != null) {
-            ResourceConfig.PermissionConfig permissionConfig = new ResourceConfig.PermissionConfig();
-            
-            // 解析模型权限
-            Map<String, Object> modelPermData = (Map<String, Object>) permissionData.get("model");
-            if (modelPermData != null) {
-                ResourceConfig.ModelPermission modelPerm = new ResourceConfig.ModelPermission();
-                modelPerm.setEnabled(getBoolean(modelPermData, "enabled", false));
-                modelPerm.setChat(getBoolean(modelPermData, "chat", false));
-                modelPerm.setModeration(getBoolean(modelPermData, "moderation", false));
-                modelPerm.setRerank(getBoolean(modelPermData, "rerank", false));
-                modelPerm.setSpeech2text(getBoolean(modelPermData, "speech2text", false));
-                modelPerm.setTextEmbedding(getBoolean(modelPermData, "text_embedding", false));
-                modelPerm.setTts(getBoolean(modelPermData, "tts", false));
-                permissionConfig.setModel(modelPerm);
-            }
-            
-            // 解析工具权限
-            Map<String, Object> toolPermData = (Map<String, Object>) permissionData.get("tool");
-            if (toolPermData != null) {
-                ResourceConfig.ToolPermission toolPerm = new ResourceConfig.ToolPermission();
-                toolPerm.setEnabled(getBoolean(toolPermData, "enabled", false));
-                permissionConfig.setTool(toolPerm);
-            }
-            
-            resourceConfig.setPermission(permissionConfig);
-        }
-        
-        return resourceConfig;
-    }
+    // parseResourceConfig方法已删除 - 在新的配置驱动系统中，直接使用原始Map数据
     
     
     
@@ -324,13 +277,7 @@ public class YamlPluginParser implements PluginParser {
      * @param defaultValue 默认值
      * @return 布尔值
      */
-    private boolean getBoolean(Map<String, Object> data, String key, boolean defaultValue) {
-        Object value = data.get(key);
-        if (value instanceof Boolean) {
-            return (Boolean) value;
-        }
-        return defaultValue;
-    }
+    // getBoolean方法已删除 - 在简化的配置系统中不再需要
     
     /**
      * 从JAR文件中提取图标数据

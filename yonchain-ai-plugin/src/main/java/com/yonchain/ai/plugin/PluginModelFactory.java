@@ -4,7 +4,6 @@ import com.yonchain.ai.model.ModelFactory;
 import com.yonchain.ai.model.definition.ModelDefinition;
 import com.yonchain.ai.model.enums.ModelType;
 import com.yonchain.ai.model.options.ModelOptionsHandler;
-import com.yonchain.ai.plugin.spi.ModelProvider;
 import com.yonchain.ai.tmpl.ModelConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

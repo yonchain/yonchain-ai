@@ -5,6 +5,7 @@ import java.util.Map;
 
 /**
  * 插件配置数据类
+ * 从plugin.yaml解析的纯配置数据
  */
 public class PluginConfig {
     private String id;
@@ -17,6 +18,7 @@ public class PluginConfig {
     private Map<String, String> description;
     private Map<String, String> label;
     private List<String> plugins;
+    private Map<String, Object> resource;
     
     // getters and setters
     public String getId() { return id; }
@@ -48,6 +50,9 @@ public class PluginConfig {
     
     public List<String> getPlugins() { return plugins; }
     public void setPlugins(List<String> plugins) { this.plugins = plugins; }
+    
+    public Map<String, Object> getResource() { return resource; }
+    public void setResource(Map<String, Object> resource) { this.resource = resource; }
     
     /**
      * 获取本地化描述

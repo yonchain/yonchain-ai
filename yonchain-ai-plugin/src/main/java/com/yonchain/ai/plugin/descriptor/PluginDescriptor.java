@@ -1,8 +1,13 @@
 package com.yonchain.ai.plugin.descriptor;
 
+import com.yonchain.ai.plugin.config.ProviderConfig;
+import com.yonchain.ai.plugin.config.ModelConfigData;
+import com.yonchain.ai.plugin.config.PluginConfig;
+
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
@@ -72,9 +77,9 @@ public class PluginDescriptor {
     private List<String> plugins;
     
     /**
-     * 资源配置
+     * 资源配置（简化版）
      */
-    private ResourceConfig resource;
+    private Map<String, Object> resource;
     
     /**
      * 插件路径（运行时设置）
@@ -85,6 +90,16 @@ public class PluginDescriptor {
      * 插件主类（新增字段）
      */
     private String pluginClass;
+    
+    /**
+     * 提供商配置（整合配置信息）
+     */
+    private ProviderConfig providerConfig;
+    
+    /**
+     * 模型配置列表
+     */
+    private List<ModelConfigData> modelConfigs;
     
     // Getters and Setters
     public String getId() {
@@ -175,11 +190,11 @@ public class PluginDescriptor {
         this.plugins = plugins;
     }
     
-    public ResourceConfig getResource() {
+    public Map<String, Object> getResource() {
         return resource;
     }
     
-    public void setResource(ResourceConfig resource) {
+    public void setResource(Map<String, Object> resource) {
         this.resource = resource;
     }
     
@@ -197,6 +212,22 @@ public class PluginDescriptor {
     
     public void setPluginClass(String pluginClass) {
         this.pluginClass = pluginClass;
+    }
+    
+    public ProviderConfig getProviderConfig() {
+        return providerConfig;
+    }
+    
+    public void setProviderConfig(ProviderConfig providerConfig) {
+        this.providerConfig = providerConfig;
+    }
+    
+    public List<ModelConfigData> getModelConfigs() {
+        return modelConfigs;
+    }
+    
+    public void setModelConfigs(List<ModelConfigData> modelConfigs) {
+        this.modelConfigs = modelConfigs;
     }
     
     /**
@@ -246,7 +277,11 @@ public class PluginDescriptor {
                 JarFile jarFile = new JarFile(pluginPath.toFile());
                 JarEntry entry = jarFile.getJarEntry(configFileName);
                 if (entry != null) {
-                    return jarFile.getInputStream(entry);
+                    InputStream inputStream = jarFile.getInputStream(entry);
+                    // 注意：调用者需要负责关闭返回的InputStream，JarFile会在InputStream关闭时自动关闭
+                    return inputStream;
+                } else {
+                    jarFile.close();
                 }
             }
         } catch (Exception e) {
@@ -280,6 +315,130 @@ public class PluginDescriptor {
         return modelConfigFiles;
     }
     
+    // ==================== 便利方法 ====================
+    
+    /**
+     * 获取提供商名称
+     */
+    public String getProvider() {
+        return providerConfig != null ? providerConfig.getProvider() : null;
+    }
+    
+    /**
+     * 获取提供商源类
+     */
+    public String getProviderSource() {
+        return providerConfig != null ? providerConfig.getProviderSource() : null;
+    }
+    
+    /**
+     * 获取背景色
+     */
+    public String getBackground() {
+        return providerConfig != null ? providerConfig.getBackground() : null;
+    }
+    
+    /**
+     * 获取提供商标签
+     */
+    public Map<String, String> getProviderLabel() {
+        return providerConfig != null ? providerConfig.getLabel() : null;
+    }
+    
+    /**
+     * 获取提供商描述
+     */
+    public Map<String, String> getProviderDescription() {
+        return providerConfig != null ? providerConfig.getDescription() : null;
+    }
+    
+    /**
+     * 获取小图标
+     */
+    public Map<String, String> getIconSmall() {
+        return providerConfig != null ? providerConfig.getIconSmall() : null;
+    }
+    
+    /**
+     * 获取大图标
+     */
+    public Map<String, String> getIconLarge() {
+        return providerConfig != null ? providerConfig.getIconLarge() : null;
+    }
+    
+    /**
+     * 获取支持的模型类型
+     */
+    public List<String> getSupportedModelTypes() {
+        return providerConfig != null ? providerConfig.getSupportedModelTypes() : null;
+    }
+    
+    /**
+     * 获取配置方法
+     */
+    public List<String> getConfigurateMethods() {
+        return providerConfig != null ? providerConfig.getConfigurateMethods() : null;
+    }
+    
+    /**
+     * 获取选项处理器映射
+     */
+    public Map<String, String> getOptionsHandlers() {
+        return providerConfig != null ? providerConfig.getOptionsHandlers() : new HashMap<>();
+    }
+    
+    /**
+     * 获取帮助信息
+     */
+    public Map<String, Object> getHelp() {
+        return providerConfig != null ? providerConfig.getHelp() : null;
+    }
+    
+    /**
+     * 获取提供商凭证架构
+     */
+    public Map<String, Object> getProviderCredentialSchema() {
+        return providerConfig != null ? providerConfig.getProviderCredentialSchema() : null;
+    }
+    
+    /**
+     * 从PluginConfig复制基础信息
+     */
+    public void copyFrom(PluginConfig pluginConfig) {
+        if (pluginConfig != null) {
+            this.id = pluginConfig.getId();
+            this.name = pluginConfig.getName();
+            this.version = pluginConfig.getVersion();
+            this.author = pluginConfig.getAuthor();
+            this.type = pluginConfig.getType();
+            this.pluginClass = pluginConfig.getPluginClass();
+            this.icon = pluginConfig.getIcon();
+            this.description = pluginConfig.getDescription();
+            this.label = pluginConfig.getLabel();
+            this.plugins = pluginConfig.getPlugins();
+            this.resource = pluginConfig.getResource();
+        }
+    }
+    
+    /**
+     * 从配置创建描述符
+     */
+    public static PluginDescriptor from(PluginConfig pluginConfig, ProviderConfig providerConfig) {
+        PluginDescriptor descriptor = new PluginDescriptor();
+        descriptor.copyFrom(pluginConfig);
+        descriptor.setProviderConfig(providerConfig);
+        return descriptor;
+    }
+    
+    /**
+     * 从配置创建描述符（包含模型配置）
+     */
+    public static PluginDescriptor from(PluginConfig pluginConfig, ProviderConfig providerConfig, List<ModelConfigData> modelConfigs) {
+        PluginDescriptor descriptor = from(pluginConfig, providerConfig);
+        descriptor.setModelConfigs(modelConfigs);
+        return descriptor;
+    }
+    
     @Override
     public String toString() {
         return "PluginDescriptor{" +
@@ -287,6 +446,7 @@ public class PluginDescriptor {
                 ", name='" + name + '\'' +
                 ", version='" + version + '\'' +
                 ", type='" + type + '\'' +
+                ", provider='" + getProvider() + '\'' +
                 ", pluginClass='" + pluginClass + '\'' +
                 '}';
     }

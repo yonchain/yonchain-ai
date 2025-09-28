@@ -6,6 +6,7 @@ import java.util.Map;
 
 /**
  * 提供商配置数据类
+ * 从deepseek.yaml等提供商配置文件解析的纯配置数据
  */
 public class ProviderConfig {
     private String provider;
@@ -78,5 +79,21 @@ public class ProviderConfig {
         }
         
         return handlers;
+    }
+    
+    /**
+     * 获取本地化标签
+     */
+    public String getLocalizedLabel(String locale) {
+        if (label == null) return provider;
+        return label.getOrDefault(locale, label.getOrDefault("en_US", provider));
+    }
+    
+    /**
+     * 获取本地化描述
+     */
+    public String getLocalizedDescription(String locale) {
+        if (description == null) return null;
+        return description.getOrDefault(locale, description.get("en_US"));
     }
 }

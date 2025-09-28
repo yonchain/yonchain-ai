@@ -23,7 +23,6 @@ public class ConfigDrivenParser {
     public PluginConfig parsePluginConfig(InputStream inputStream) {
         try {
             Yaml yaml = new Yaml();
-            @SuppressWarnings("unchecked")
             Map<String, Object> data = yaml.load(inputStream);
             
             PluginConfig config = new PluginConfig();
@@ -70,7 +69,6 @@ public class ConfigDrivenParser {
     public ProviderConfig parseProviderConfig(InputStream inputStream) {
         try {
             Yaml yaml = new Yaml();
-            @SuppressWarnings("unchecked")
             Map<String, Object> data = yaml.load(inputStream);
             
             ProviderConfig config = new ProviderConfig();
@@ -154,7 +152,6 @@ public class ConfigDrivenParser {
     public ModelConfigData parseModelConfig(InputStream inputStream) {
         try {
             Yaml yaml = new Yaml();
-            @SuppressWarnings("unchecked")
             Map<String, Object> data = yaml.load(inputStream);
             
             ModelConfigData config = new ModelConfigData();

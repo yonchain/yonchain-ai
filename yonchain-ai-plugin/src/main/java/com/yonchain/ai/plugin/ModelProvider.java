@@ -1,4 +1,4 @@
-package com.yonchain.ai.plugin.spi;
+package com.yonchain.ai.plugin;
 
 import com.yonchain.ai.model.enums.ModelType;
 import com.yonchain.ai.tmpl.ModelConfig;
