@@ -11,7 +11,7 @@ icon: icon_s_en.svg
 label:
   en_US: DeepSeek
   zh_Hans: 深度求索
-plugin_class: com.yonchain.ai.plugin.deepseek.DeepSeekPlugin
+#plugin_class: com.yonchain.ai.plugin.deepseek.DeepSeekPlugin
 plugins:
   - deepseek.yaml
 resource:

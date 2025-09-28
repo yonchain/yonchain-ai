@@ -21,7 +21,6 @@ label:
 models:
   chat:
     source: org.springframework.ai.deepseek.DeepSeekChatModel
-    options_handler: com.yonchain.ai.plugin.deepseek.DeepSeekChatOptionsHandler
     position: models/chat/_position.yaml
     predefined:
       - models/chat/*.yaml
