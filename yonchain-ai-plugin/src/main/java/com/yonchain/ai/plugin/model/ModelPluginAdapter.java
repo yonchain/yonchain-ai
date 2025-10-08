@@ -9,7 +9,7 @@ import com.yonchain.ai.model.ModelRegistry;
 import com.yonchain.ai.model.enums.ModelType;
 import com.yonchain.ai.plugin.*;
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
-import com.yonchain.ai.plugin.entity.PluginInfo;
+import com.yonchain.ai.api.plugin.dto.PluginInfo;
 import com.yonchain.ai.plugin.enums.PluginType;
 import com.yonchain.ai.plugin.loader.EnhancedPluginLoader;
 import com.yonchain.ai.plugin.registry.PluginRegistry;

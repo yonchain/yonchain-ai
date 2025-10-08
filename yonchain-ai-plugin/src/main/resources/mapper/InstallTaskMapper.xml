@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yonchain.ai.plugin.mapper.InstallTaskMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="InstallTaskResultMap" type="com.yonchain.ai.plugin.entity.InstallTask">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="tenant_id" property="tenantId" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="total_plugins" property="totalPlugins" jdbcType="BIGINT"/>
+        <result column="completed_plugins" property="completedPlugins" jdbcType="BIGINT"/>
+        <result column="plugins" property="plugins" jdbcType="LONGVARCHAR"/>
+        <result column="error_message" property="errorMessage" jdbcType="LONGVARCHAR"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 基础SQL片段 -->
+    <sql id="Base_Column_List">
+        id, tenant_id, status, total_plugins, completed_plugins, plugins, error_message, created_at, updated_at
+    </sql>
+
+
+    <!-- 动态查询条件 -->
+    <select id="findByConditions" resultMap="InstallTaskResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM plugin_install_task
+        <where>
+            <if test="tenantId != null and tenantId != ''">
+                AND tenant_id = #{tenantId,jdbcType=VARCHAR}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status,jdbcType=VARCHAR}
+            </if>
+            <if test="startTime != null">
+                AND created_at >= #{startTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endTime != null">
+                AND created_at &lt;= #{endTime,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        <if test="limit != null and limit > 0">
+            LIMIT #{limit}
+        </if>
+        <if test="offset != null and offset >= 0">
+            OFFSET #{offset}
+        </if>
+    </select>
+
+    <!-- 批量插入安装任务 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO plugin_install_task (
+            id, tenant_id, status, total_plugins, completed_plugins, 
+            plugins, error_message, created_at, updated_at
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.id,jdbcType=VARCHAR}, 
+                #{item.tenantId,jdbcType=VARCHAR}, 
+                #{item.status,jdbcType=VARCHAR}, 
+                #{item.totalPlugins,jdbcType=BIGINT}, 
+                #{item.completedPlugins,jdbcType=BIGINT}, 
+                #{item.plugins,jdbcType=LONGVARCHAR}, 
+                #{item.errorMessage,jdbcType=LONGVARCHAR}, 
+                #{item.createdAt,jdbcType=TIMESTAMP}, 
+                #{item.updatedAt,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 批量更新状态 -->
+    <update id="batchUpdateStatus">
+        UPDATE plugin_install_task 
+        SET status = #{status,jdbcType=VARCHAR}, 
+            updated_at = #{updatedAt,jdbcType=TIMESTAMP}
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id,jdbcType=VARCHAR}
+        </foreach>
+    </update>
+
+</mapper>

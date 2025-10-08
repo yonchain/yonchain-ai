@@ -1,7 +1,8 @@
 package com.yonchain.ai.plugin;
 
 import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
-import com.yonchain.ai.plugin.entity.PluginInfo;
+import com.yonchain.ai.api.plugin.dto.PluginInfo;
+import com.yonchain.ai.plugin.util.PluginInfoConverter;
 import com.yonchain.ai.plugin.event.PluginEventPublisher;
 import com.yonchain.ai.plugin.parser.PluginParser;
 import com.yonchain.ai.plugin.exception.PluginParseException;
@@ -120,7 +121,7 @@ public class PluginManager {
             }
 
             // 6. 创建插件信息
-            PluginInfo pluginInfo = PluginInfo.fromDescriptor(descriptor);
+            PluginInfo pluginInfo = PluginInfoConverter.fromDescriptor(descriptor);
             pluginInfo.setStatus("installing");
 
             // 7. 保存插件信息

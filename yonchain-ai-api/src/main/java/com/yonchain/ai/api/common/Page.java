@@ -24,6 +24,16 @@ public class Page<T> {
     private long size;
     private long current;
 
+    public Page() {
+    }
+
+    public Page(List<T> records, long total, int pageNum, int pageSize) {
+        this.records = records;
+        this.total = total;
+        this.current = pageNum;
+        this.size = pageSize;
+    }
+
 
     public List<T> getRecords() {
         return records;

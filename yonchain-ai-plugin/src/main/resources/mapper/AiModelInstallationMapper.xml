@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yonchain.ai.plugin.mapper.AiModelInstallationMapper">
+
+    <resultMap id="BaseResultMap" type="com.yonchain.ai.plugin.entity.AiModelInstallation">
+        <id column="id" property="id"/>
+        <result column="tenant_id" property="tenantId"/>
+        <result column="provider" property="provider"/>
+        <result column="plugin_unique_identifier" property="pluginUniqueIdentifier"/>
+        <result column="plugin_id" property="pluginId"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, tenant_id, provider, plugin_unique_identifier, plugin_id, created_at, updated_at
+    </sql>
+
+
+
+</mapper>

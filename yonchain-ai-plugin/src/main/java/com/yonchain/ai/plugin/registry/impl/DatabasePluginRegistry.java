@@ -2,7 +2,7 @@ package com.yonchain.ai.plugin.registry.impl;
 
 import com.yonchain.ai.plugin.Plugin;
 import com.yonchain.ai.plugin.entity.PluginEntity;
-import com.yonchain.ai.plugin.entity.PluginInfo;
+import com.yonchain.ai.api.plugin.dto.PluginInfo;
 import com.yonchain.ai.plugin.mapper.PluginMapper;
 import com.yonchain.ai.plugin.registry.PluginRegistry;
 import org.slf4j.Logger;

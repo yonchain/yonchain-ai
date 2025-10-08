@@ -12,10 +12,14 @@
     <artifactId>yonchain-ai-plugin</artifactId>
 
     <dependencies>
-        <!-- Spring Boot Starter Web -->
         <dependency>
             <groupId>com.yonchain.ai</groupId>
             <artifactId>yonchain-ai-model</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-api</artifactId>
         </dependency>
 
     </dependencies>

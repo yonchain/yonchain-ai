@@ -1,6 +1,6 @@
 package com.yonchain.ai.plugin.registry;
 
-import com.yonchain.ai.plugin.entity.PluginInfo;
+import com.yonchain.ai.api.plugin.dto.PluginInfo;
 
 import java.util.List;
 import java.util.Optional;

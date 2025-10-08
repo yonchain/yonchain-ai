@@ -6,6 +6,7 @@ import com.yonchain.ai.api.common.Page;
 import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.model.ModelInfo;
 import com.yonchain.ai.api.model.ModelProviderInfo;
+import com.yonchain.ai.api.plugin.dto.PluginInfo;
 import com.yonchain.ai.api.sys.*;
 import com.yonchain.ai.api.tag.Tag;
 import com.yonchain.ai.console.agent.response.AgentPublishRecordResponse;
@@ -15,6 +16,8 @@ import com.yonchain.ai.console.file.response.FileResponse;
 import com.yonchain.ai.console.model.response.ModelConfigResponse;
 import com.yonchain.ai.console.model.response.ModelProviderResponse;
 import com.yonchain.ai.console.model.response.ModelResponse;
+import com.yonchain.ai.console.plugin.response.PluginPreviewResponse;
+import com.yonchain.ai.console.plugin.response.PluginResponse;
 import com.yonchain.ai.console.sys.response.*;
 import com.yonchain.ai.console.tag.response.TagResponse;
 import com.yonchain.ai.web.response.ListResponse;
@@ -879,4 +882,186 @@ public class ResponseFactory {
 
         return response;
     }
+
+    // ==================== 插件相关响应创建方法 ====================
+
+    /**
+     * 创建插件响应对象
+     * <p>
+     * 将PluginInfo实体对象转换为标准化的API响应格式
+     * 包含插件的基本信息和租户安装状态
+     * </p>
+     *
+     * @param pluginInfo 插件实体对象，包含插件基本信息，不能为null
+     * @param tenantInstallation 租户安装信息，可为null
+     * @return 标准化后的插件响应对象，包含插件ID、名称、版本、安装状态等信息
+     * @see PluginInfo
+     * @see PluginResponse
+     */
+    public PluginResponse createPluginResponse(PluginInfo pluginInfo, Map<String, Object> tenantInstallation) {
+        PluginResponse response = new PluginResponse();
+        
+        // 设置基础插件信息
+        response.setPluginId(pluginInfo.getPluginId());
+        response.setName(pluginInfo.getName());
+        response.setVersion(pluginInfo.getVersion());
+        response.setDescription(pluginInfo.getDescription());
+        response.setAuthor(pluginInfo.getAuthor());
+        response.setType(pluginInfo.getType());
+        response.setStatus(pluginInfo.getStatus());
+        response.setEnabled(pluginInfo.getEnabled());
+        response.setAvailable(pluginInfo.getAvailable());
+        response.setIconUrl(pluginInfo.getIconUrl());
+        response.setCreatedAt(pluginInfo.getCreatedAt());
+        response.setUpdatedAt(pluginInfo.getUpdatedAt());
+        // 处理扩展信息（从String转换为List）
+        String extensions = pluginInfo.getExtensions();
+        if (extensions != null && !extensions.trim().isEmpty()) {
+            response.setExtensions(List.of(extensions.split(",")));
+        } else {
+            response.setExtensions(null);
+        }
+        
+        // 设置服务信息（PluginInfo中没有services字段，设为null）
+        response.setServices(null);
+        
+        // 处理依赖信息（从String转换为List）
+        String dependencies = pluginInfo.getDependencies();
+        if (dependencies != null && !dependencies.trim().isEmpty()) {
+            response.setDependencies(List.of(dependencies.split(",")));
+        } else {
+            response.setDependencies(null);
+        }
+        
+        // 设置租户安装状态
+        if (tenantInstallation != null) {
+            response.setInstalledByTenant(true);
+            response.setInstallationType((String) tenantInstallation.get("installationType"));
+            response.setInstalledProvider((String) tenantInstallation.get("installedProvider"));
+            response.setInstalledToolName((String) tenantInstallation.get("installedToolName"));
+            
+            Object installedAtObj = tenantInstallation.get("installedAt");
+            if (installedAtObj instanceof java.time.LocalDateTime) {
+                response.setInstalledAt((java.time.LocalDateTime) installedAtObj);
+            }
+        } else {
+            response.setInstalledByTenant(false);
+            response.setInstallationType(null);
+            response.setInstalledProvider(null);
+            response.setInstalledToolName(null);
+            response.setInstalledAt(null);
+        }
+        
+        return response;
+    }
+
+    /**
+     * 创建插件列表响应对象
+     * <p>
+     * 将插件列表转换为标准化的API列表响应格式
+     * 包含插件数据列表但不包含分页信息
+     * </p>
+     *
+     * @param pluginInfos 插件列表，包含插件数据，不能为null
+     * @return 标准化后的插件列表响应对象，包含插件数据列表
+     * @see PluginInfo
+     * @see PluginResponse
+     * @see ListResponse
+     */
+    public ListResponse<PluginResponse> createPluginListResponse(List<PluginInfo> pluginInfos) {
+        ListResponse<PluginResponse> response = new ListResponse<>();
+        response.setData(pluginInfos.stream()
+                .map(pluginInfo -> createPluginResponse(pluginInfo, null))
+                .filter(Objects::nonNull)
+                .toList());
+        return response;
+    }
+
+    /**
+     * 创建插件列表响应对象（带租户安装状态）
+     * <p>
+     * 将插件列表转换为标准化的API列表响应格式
+     * 包含插件数据列表和租户安装状态信息
+     * </p>
+     *
+     * @param pluginInfos 插件列表，包含插件数据，不能为null
+     * @param tenantId 租户ID，用于查询安装状态，可为null
+     * @param pluginService 插件服务，用于查询租户安装信息，可为null
+     * @return 标准化后的插件列表响应对象，包含插件数据列表和安装状态
+     * @see PluginInfo
+     * @see PluginResponse
+     * @see ListResponse
+     */
+    public ListResponse<PluginResponse> createPluginListResponse(List<PluginInfo> pluginInfos, String tenantId, 
+            com.yonchain.ai.api.plugin.PluginService pluginService) {
+        ListResponse<PluginResponse> response = new ListResponse<>();
+        response.setData(pluginInfos.stream()
+                .map(pluginInfo -> {
+                    Map<String, Object> tenantInstallation = null;
+                    if (tenantId != null && pluginService != null) {
+                        tenantInstallation = pluginService.getTenantPluginInstallation(tenantId, pluginInfo.getPluginId());
+                    }
+                    return createPluginResponse(pluginInfo, tenantInstallation);
+                })
+                .filter(Objects::nonNull)
+                .toList());
+        return response;
+    }
+
+    /**
+     * 创建插件分页响应对象（带租户安装状态）
+     * <p>
+     * 将插件分页数据转换为标准化的API分页响应格式
+     * 包含插件数据列表、分页信息和租户安装状态信息
+     * </p>
+     *
+     * @param pluginPage 插件分页数据，包含插件列表和分页信息，不能为null
+     * @param tenantId 租户ID，用于查询安装状态，可为null
+     * @param pluginService 插件服务，用于查询租户安装信息，可为null
+     * @return 标准化后的插件分页响应对象，包含插件数据列表、分页信息和安装状态
+     * @see PluginInfo
+     * @see PluginResponse
+     * @see PageResponse
+     */
+    public PageResponse<PluginResponse> createPluginPageResponse(Page<PluginInfo> pluginPage, String tenantId, 
+            com.yonchain.ai.api.plugin.PluginService pluginService) {
+        PageResponse<PluginResponse> response = new PageResponse<>();
+        
+        // 转换插件数据
+        List<PluginResponse> pluginResponses = pluginPage.getRecords().stream()
+                .map(pluginInfo -> {
+                    Map<String, Object> tenantInstallation = null;
+                    if (tenantId != null && pluginService != null) {
+                        tenantInstallation = pluginService.getTenantPluginInstallation(tenantId, pluginInfo.getPluginId());
+                    }
+                    return createPluginResponse(pluginInfo, tenantInstallation);
+                })
+                .filter(Objects::nonNull)
+                .toList();
+        
+        // 设置响应数据
+        response.setData(pluginResponses);
+        response.setTotal(pluginPage.getTotal());
+        response.setPageNum(pluginPage.getCurrent());
+        response.setPageSize(pluginPage.getSize());
+        
+        return response;
+    }
+
+    /**
+     * 创建插件预览响应对象
+     * <p>
+     * 将插件描述符Map转换为标准化的插件预览响应格式
+     * 用于插件预览功能，不包含安装状态信息
+     * </p>
+     *
+     * @param descriptorMap 插件描述符Map，包含插件基本信息，不能为null
+     * @param tempIconUrl 临时图标URL，可为null
+     * @return 标准化后的插件预览响应对象，包含插件基本信息
+     * @see PluginPreviewResponse
+     */
+    public PluginPreviewResponse createPluginPreviewResponse(Map<String, Object> descriptorMap, String tempIconUrl) {
+        return PluginPreviewResponse.fromDescriptorMap(descriptorMap, tempIconUrl);
+    }
+
 }

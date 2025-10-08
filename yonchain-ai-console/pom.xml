@@ -55,6 +55,12 @@
             <artifactId>yonchain-ai-starter-redis</artifactId>
         </dependency>
 
+        <!-- 插件模块依赖 -->
+        <dependency>
+            <groupId>com.yonchain.ai</groupId>
+            <artifactId>yonchain-ai-plugin</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
