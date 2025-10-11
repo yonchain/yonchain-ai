@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yonchain.ai.tmpl.mapper.ModelMapper">
+<mapper namespace="com.yonchain.ai.business.mapper.ModelMapper">
 
     <!-- 基础结果映射 -->
-    <resultMap id="BaseResultMap" type="com.yonchain.ai.tmpl.entity.ModelEntity">
+    <resultMap id="BaseResultMap" type="com.yonchain.ai.business.entity.ModelEntity">
         <!-- 主键ID -->
         <id column="id" property="id" jdbcType="VARCHAR" />
         <!-- 租户ID -->
@@ -101,7 +101,7 @@
     </select>
 
     <!-- 插入模型 -->
-    <insert id="insert" parameterType="com.yonchain.ai.tmpl.entity.ModelEntity">
+    <insert id="insert" parameterType="com.yonchain.ai.business.entity.ModelEntity">
         INSERT INTO model (
             id, tenant_id, model_code, provider_code, model_config, default_params,
             enabled, sort_order, create_time, update_time, created_by, updated_by
@@ -113,7 +113,7 @@
     </insert>
 
     <!-- 更新模型 -->
-    <update id="update" parameterType="com.yonchain.ai.tmpl.entity.ModelEntity">
+    <update id="update" parameterType="com.yonchain.ai.business.entity.ModelEntity">
         UPDATE model
         SET model_code = #{modelCode},
             provider_code = #{providerCode},

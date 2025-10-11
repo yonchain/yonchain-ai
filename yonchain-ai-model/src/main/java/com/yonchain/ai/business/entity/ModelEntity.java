@@ -1,4 +1,4 @@
-package com.yonchain.ai.tmpl.entity;
+package com.yonchain.ai.business.entity;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

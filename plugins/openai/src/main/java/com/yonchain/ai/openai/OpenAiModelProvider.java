@@ -2,7 +2,7 @@ package com.yonchain.ai.openai;
 
 import com.yonchain.ai.model.enums.ModelType;
 import com.yonchain.ai.plugin.ModelProvider;
-import com.yonchain.ai.tmpl.ModelConfig;
+import com.yonchain.ai.business.ModelConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;

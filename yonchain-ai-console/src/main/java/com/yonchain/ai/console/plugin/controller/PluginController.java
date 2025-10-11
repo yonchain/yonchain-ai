@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 
  * 插件管理REST控制器
  * 统一的插件管理接口，支持租户感知
  * 

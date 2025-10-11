@@ -1,6 +1,6 @@
 package com.yonchain.ai.plugin.model;
 
-import com.yonchain.ai.tmpl.ModelMetadata;
+import com.yonchain.ai.business.ModelMetadata;
 import com.yonchain.ai.plugin.ModelProvider;
 import com.yonchain.ai.plugin.spi.ProviderMetadata;
 import com.yonchain.ai.plugin.config.ProviderConfig;

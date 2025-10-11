@@ -1,16 +1,16 @@
-package com.yonchain.ai.tmpl.service;
+package com.yonchain.ai.business.service;
 
 import com.yonchain.ai.api.exception.YonchainException;
 import com.yonchain.ai.api.model.*;
 import com.yonchain.ai.model.ModelClient;
 import com.yonchain.ai.model.definition.ModelDefinition;
 import com.yonchain.ai.model.enums.ModelType;
-import com.yonchain.ai.tmpl.ModelConfig;
-import com.yonchain.ai.tmpl.ModelMetadata;
-import com.yonchain.ai.tmpl.entity.ModelEntity;
-import com.yonchain.ai.tmpl.entity.ModelProviderEntity;
-import com.yonchain.ai.tmpl.mapper.ModelMapper;
-import com.yonchain.ai.tmpl.mapper.ModelProviderMapper;
+import com.yonchain.ai.business.ModelConfig;
+import com.yonchain.ai.business.ModelMetadata;
+import com.yonchain.ai.business.entity.ModelEntity;
+import com.yonchain.ai.business.entity.ModelProviderEntity;
+import com.yonchain.ai.business.mapper.ModelMapper;
+import com.yonchain.ai.business.mapper.ModelProviderMapper;
 import com.yonchain.ai.util.IdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

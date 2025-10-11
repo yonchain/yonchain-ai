@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yonchain.ai.tmpl.mapper.ModelProviderMapper">
+<mapper namespace="com.yonchain.ai.business.mapper.ModelProviderMapper">
 
     <!-- 基础结果映射 -->
-    <resultMap id="BaseResultMap" type="com.yonchain.ai.tmpl.entity.ModelProviderEntity">
+    <resultMap id="BaseResultMap" type="com.yonchain.ai.business.entity.ModelProviderEntity">
         <!-- 主键ID -->
         <id column="id" property="id" jdbcType="VARCHAR" />
         <!-- 租户ID -->
@@ -143,7 +143,7 @@
     </select>
 
     <!-- 插入模型提供商 -->
-    <insert id="insert" parameterType="com.yonchain.ai.tmpl.entity.ModelProviderEntity">
+    <insert id="insert" parameterType="com.yonchain.ai.business.entity.ModelProviderEntity">
         INSERT INTO model_provider (
             id, tenant_id, provider_code, plugin_id,
             custom_config, enabled, name, description, icon, background, sort_order,
@@ -159,7 +159,7 @@
     </insert>
 
     <!-- 更新模型提供商 -->
-    <update id="update" parameterType="com.yonchain.ai.tmpl.entity.ModelProviderEntity">
+    <update id="update" parameterType="com.yonchain.ai.business.entity.ModelProviderEntity">
         UPDATE model_provider
         SET provider_code = #{providerCode},
             plugin_id = #{pluginId},

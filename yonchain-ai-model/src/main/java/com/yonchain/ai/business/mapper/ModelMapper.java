@@ -1,7 +1,7 @@
-package com.yonchain.ai.tmpl.mapper;
+package com.yonchain.ai.business.mapper;
 
 
-import com.yonchain.ai.tmpl.entity.ModelEntity;
+import com.yonchain.ai.business.entity.ModelEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

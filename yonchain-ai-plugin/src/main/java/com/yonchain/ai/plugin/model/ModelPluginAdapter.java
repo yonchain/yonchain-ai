@@ -20,7 +20,7 @@ import com.yonchain.ai.plugin.config.PluginConfig;
 import com.yonchain.ai.plugin.config.ModelConfigData;
 import com.yonchain.ai.plugin.config.ConfigDrivenParser;
 import com.yonchain.ai.plugin.loader.PluginClassLoader;
-import com.yonchain.ai.tmpl.ModelMetadata;
+import com.yonchain.ai.business.ModelMetadata;
 
 import java.io.InputStream;
 import org.slf4j.Logger;

@@ -6,12 +6,12 @@ import com.yonchain.ai.plugin.config.PluginConfig;
 import com.yonchain.ai.plugin.config.ProviderConfig;
 import com.yonchain.ai.plugin.ModelProvider;
 import com.yonchain.ai.plugin.spi.ProviderMetadata;
-import com.yonchain.ai.tmpl.ModelMetadata;
+import com.yonchain.ai.business.ModelMetadata;
 import com.yonchain.ai.model.ModelRegistry;
 import com.yonchain.ai.model.ModelConfiguration;
 import com.yonchain.ai.model.definition.ModelDefinition;
 import com.yonchain.ai.model.enums.ModelType;
-import com.yonchain.ai.tmpl.ModelConfig;
+import com.yonchain.ai.business.ModelConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

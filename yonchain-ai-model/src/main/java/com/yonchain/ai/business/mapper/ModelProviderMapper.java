@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.yonchain.ai.tmpl.mapper;
+package com.yonchain.ai.business.mapper;
 
-import com.yonchain.ai.tmpl.entity.ModelProviderEntity;
+import com.yonchain.ai.business.entity.ModelProviderEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 

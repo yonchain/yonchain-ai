@@ -1,4 +1,4 @@
-package com.yonchain.ai.tmpl;
+package com.yonchain.ai.business;
 
 import com.yonchain.ai.model.enums.ModelType;
 

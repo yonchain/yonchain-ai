@@ -1,4 +1,4 @@
-package com.yonchain.ai.tmpl.service;
+package com.yonchain.ai.business.service;
 
 import com.yonchain.ai.api.model.ModelService;
 import org.slf4j.Logger;
