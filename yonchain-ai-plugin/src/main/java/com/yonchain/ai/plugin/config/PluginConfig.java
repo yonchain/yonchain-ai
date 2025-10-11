@@ -13,7 +13,6 @@ public class PluginConfig {
     private String version;
     private String author;
     private String type;
-    private String pluginClass;
     private String icon;
     private Map<String, String> description;
     private Map<String, String> label;
@@ -36,8 +35,6 @@ public class PluginConfig {
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
     
-    public String getPluginClass() { return pluginClass; }
-    public void setPluginClass(String pluginClass) { this.pluginClass = pluginClass; }
     
     public String getIcon() { return icon; }
     public void setIcon(String icon) { this.icon = icon; }
@@ -70,10 +67,4 @@ public class PluginConfig {
         return label.getOrDefault(locale, label.getOrDefault("en_US", name));
     }
     
-    /**
-     * 检查是否有插件类
-     */
-    public boolean hasPluginClass() {
-        return pluginClass != null && !pluginClass.trim().isEmpty();
-    }
 }

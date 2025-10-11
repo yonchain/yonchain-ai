@@ -4,6 +4,7 @@ label:
 description:
   en_US: Models provided by OpenAI, such as GPT-3.5-Turbo and GPT-4.
   zh_Hans: OpenAI 提供的模型，例如 GPT-3.5-Turbo 和 GPT-4。
+provider_source: com.yonchain.ai.openai.OpenAiModelProvider
 icon_small:
   en_US: icon_s_en.svg
 icon_large:
@@ -89,7 +90,8 @@ provider_credential_schema:
         en_US: Enter your API Base, e.g. https://api.openai.com
 models:
   chat:
-    source: org.springframework.ai.deepseek.DeepSeekChatModel
+    source: org.springframework.ai.openai.OpenAiChatModel
+    options_handler: org.springframework.ai.openai.OpenAiChatOptionsHandler
     predefined:
       - "models/llm/*.yaml"
     position: "models/llm/_position.yaml"

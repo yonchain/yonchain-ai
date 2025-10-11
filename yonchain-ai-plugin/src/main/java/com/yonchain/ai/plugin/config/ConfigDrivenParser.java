@@ -31,7 +31,6 @@ public class ConfigDrivenParser {
             config.setVersion((String) data.get("version"));
             config.setAuthor((String) data.get("author"));
             config.setType((String) data.get("type"));
-            config.setPluginClass((String) data.get("plugin_class"));
             config.setIcon((String) data.get("icon"));
             
             // 解析描述信息

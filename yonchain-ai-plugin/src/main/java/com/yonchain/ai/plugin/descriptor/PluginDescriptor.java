@@ -411,7 +411,7 @@ public class PluginDescriptor {
             this.version = pluginConfig.getVersion();
             this.author = pluginConfig.getAuthor();
             this.type = pluginConfig.getType();
-            this.pluginClass = pluginConfig.getPluginClass();
+      //      this.pluginClass = pluginConfig.getPluginClass();
             this.icon = pluginConfig.getIcon();
             this.description = pluginConfig.getDescription();
             this.label = pluginConfig.getLabel();
