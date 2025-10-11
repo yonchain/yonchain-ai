@@ -1,6 +1,6 @@
 package com.yonchain.ai.plugin.parser;
 
-import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
+import com.yonchain.ai.plugin.config.PluginConfig;
 import com.yonchain.ai.plugin.exception.PluginParseException;
 import com.yonchain.ai.plugin.validation.ValidationResult;
 
@@ -18,19 +18,19 @@ public interface PluginParser {
      * 解析插件
      * 
      * @param pluginPath 插件路径（JAR文件）
-     * @return 插件描述符
+     * @return 插件配置
      * @throws PluginParseException 解析异常
      */
-    PluginDescriptor parsePlugin(Path pluginPath) throws PluginParseException;
+    PluginConfig parsePlugin(Path pluginPath) throws PluginParseException;
     
     /**
      * 验证插件
      * 
-     * @param descriptor 插件描述符
+     * @param pluginConfig 插件配置
      * @return 验证结果
      */
-    ValidationResult validatePlugin(PluginDescriptor descriptor);
-    
+    ValidationResult validatePlugin(PluginConfig pluginConfig);
+
     /**
      * 检查插件路径是否有效
      * 

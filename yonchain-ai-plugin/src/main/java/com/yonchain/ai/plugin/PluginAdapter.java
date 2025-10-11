@@ -1,6 +1,6 @@
 package com.yonchain.ai.plugin;
 
-import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
+import com.yonchain.ai.plugin.config.PluginConfig;
 import com.yonchain.ai.plugin.enums.PluginType;
 import com.yonchain.ai.plugin.exception.PluginException;
 
@@ -22,9 +22,9 @@ public interface PluginAdapter {
     /**
      * 插件安装时的回调
      * 
-     * @param descriptor 插件描述符
+     * @param pluginConfig 插件配置
      */
-    void onPluginInstall(PluginDescriptor descriptor);
+    void onPluginInstall(PluginConfig pluginConfig);
     
     /**
      * 插件卸载时的回调

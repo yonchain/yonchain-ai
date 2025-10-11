@@ -3,7 +3,7 @@ package com.yonchain.ai.plugin.service.impl;
 import com.yonchain.ai.api.plugin.PluginService;
 import com.yonchain.ai.api.plugin.dto.PluginInfo;
 import com.yonchain.ai.plugin.PluginManager;
-import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
+import com.yonchain.ai.plugin.config.PluginConfig;
 import com.yonchain.ai.plugin.exception.PluginInstallException;
 import com.yonchain.ai.plugin.exception.PluginParseException;
 import com.yonchain.ai.plugin.entity.PluginInstallation;
@@ -153,16 +153,16 @@ public class PluginServiceImpl implements PluginService {
                 Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
 
                 // 解析插件信息
-                PluginDescriptor descriptor = pluginParser.parsePlugin(tempFile);
+                PluginConfig pluginConfig = pluginParser.parsePlugin(tempFile);
 
                 // 处理临时图标
                 String tempIconUrl = null;
-                if (descriptor.getIconData() != null && descriptor.getIcon() != null) {
-                    tempIconUrl = saveTempIcon(descriptor.getId(), descriptor.getIcon(), descriptor.getIconData());
+                if (pluginConfig.getIconData() != null && pluginConfig.getIcon() != null) {
+                    tempIconUrl = saveTempIcon(pluginConfig.getId(), pluginConfig.getIcon(), pluginConfig.getIconData());
                 }
 
                 // 转换为Map返回
-                return convertPluginDescriptorToMap(descriptor, tempIconUrl);
+                return convertPluginConfigToMap(pluginConfig, tempIconUrl);
 
             } finally {
                 // 清理临时文件
@@ -322,9 +322,9 @@ public class PluginServiceImpl implements PluginService {
             tempFilePath = saveInputStreamToTempFile(inputStream, fileName);
             
             // 2. 解析插件获取插件信息（在安装前）
-            PluginDescriptor descriptor = pluginParser.parsePlugin(tempFilePath);
-            String pluginId = descriptor.getId();
-            String pluginType = descriptor.getType();
+            PluginConfig pluginConfig = pluginParser.parsePlugin(tempFilePath);
+            String pluginId = pluginConfig.getId();
+            String pluginType = pluginConfig.getType();
             
             // 3. 检查插件是否已经安装
             Optional<com.yonchain.ai.api.plugin.dto.PluginInfo> existingPlugin = pluginManager.getPlugin(pluginId);
@@ -337,7 +337,7 @@ public class PluginServiceImpl implements PluginService {
             }
             
             // 5. 根据插件类型创建租户安装记录
-            createTenantInstallationRecord(tenantId, pluginId, pluginType, descriptor);
+            createTenantInstallationRecord(tenantId, pluginId, pluginType, pluginConfig);
             
             log.info("Successfully installed plugin {} for tenant: {}", pluginId, tenantId);
             return "Plugin installed successfully for tenant: " + tenantId;
@@ -374,12 +374,12 @@ public class PluginServiceImpl implements PluginService {
             installPluginByPath(pluginPath);
             
             // 2. 解析插件获取插件信息
-            PluginDescriptor descriptor = pluginParser.parsePlugin(Paths.get(pluginPath));
-            String pluginId = descriptor.getId();
-            String pluginType = descriptor.getType();
+            PluginConfig pluginConfig = pluginParser.parsePlugin(Paths.get(pluginPath));
+            String pluginId = pluginConfig.getId();
+            String pluginType = pluginConfig.getType();
             
             // 3. 根据插件类型创建租户安装记录
-            createTenantInstallationRecord(tenantId, pluginId, pluginType, descriptor);
+            createTenantInstallationRecord(tenantId, pluginId, pluginType, pluginConfig);
             
             log.info("Successfully installed plugin {} from path for tenant: {}", pluginId, tenantId);
             return "Plugin installed successfully from path for tenant: " + tenantId;
@@ -409,12 +409,12 @@ public class PluginServiceImpl implements PluginService {
             // 2. 从URL下载并解析插件（这里需要重新下载解析，因为原方法没有返回插件信息）
             // TODO: 优化这里的实现，避免重复下载
             String fileName = extractFileNameFromUrl(url);
-            PluginDescriptor descriptor = downloadAndParsePlugin(url, fileName);
-            String pluginId = descriptor.getId();
-            String pluginType = descriptor.getType();
+            PluginConfig pluginConfig = downloadAndParsePlugin(url, fileName);
+            String pluginId = pluginConfig.getId();
+            String pluginType = pluginConfig.getType();
             
             // 3. 根据插件类型创建租户安装记录
-            createTenantInstallationRecord(tenantId, pluginId, pluginType, descriptor);
+            createTenantInstallationRecord(tenantId, pluginId, pluginType, pluginConfig);
             
             log.info("Successfully installed plugin {} from URL for tenant: {}", pluginId, tenantId);
             return "Plugin installed successfully from URL for tenant: " + tenantId;
@@ -670,19 +670,19 @@ public class PluginServiceImpl implements PluginService {
     }
 
     /**
-     * 将内部PluginDescriptor转换为Map
+     * 将PluginConfig转换为Map
      */
-    private Map<String, Object> convertPluginDescriptorToMap(PluginDescriptor descriptor, String tempIconUrl) {
+    private Map<String, Object> convertPluginConfigToMap(PluginConfig pluginConfig, String tempIconUrl) {
         Map<String, Object> map = new HashMap<>();
-        map.put("pluginId", descriptor.getId());
-        map.put("name", descriptor.getName());
-        map.put("version", descriptor.getVersion());
-        map.put("description", descriptor.getLocalizedDescription("zh_Hans"));
-        map.put("author", descriptor.getAuthor());
-        map.put("type", descriptor.getType());
-        map.put("mainClass", descriptor.getPluginClass());
+        map.put("pluginId", pluginConfig.getId());
+        map.put("name", pluginConfig.getName());
+        map.put("version", pluginConfig.getVersion());
+        map.put("description", pluginConfig.getLocalizedDescription("zh_Hans"));
+        map.put("author", pluginConfig.getAuthor());
+        map.put("type", pluginConfig.getType());
+        map.put("mainClass", null); // PluginConfig 不再有 pluginClass 字段
         map.put("iconUrl", tempIconUrl);
-        map.put("dependencies", descriptor.getPlugins()); // 使用 plugins 字段作为 dependencies
+        map.put("dependencies", pluginConfig.getPlugins()); // 使用 plugins 字段作为 dependencies
         map.put("extensions", null); // extensions 字段暂时为空
         map.put("services", null); // services 字段暂时为空
         map.put("createdAt", LocalDateTime.now());
@@ -770,14 +770,14 @@ public class PluginServiceImpl implements PluginService {
     /**
      * 根据插件类型创建租户安装记录
      */
-    private void createTenantInstallationRecord(String tenantId, String pluginId, String pluginType, PluginDescriptor descriptor) {
+    private void createTenantInstallationRecord(String tenantId, String pluginId, String pluginType, PluginConfig pluginConfig) {
         try {
             log.info("Creating tenant installation record for tenant: {}, plugin: {}, type: {}", tenantId, pluginId, pluginType);
             
             // 1. 首先插入到统一的plugin_installation表
             String runtimeType = determineRuntimeType(pluginType);
-            String pluginUniqueIdentifier = generatePluginUniqueIdentifier(descriptor);
-            String meta = generatePluginMeta(descriptor, pluginType);
+            String pluginUniqueIdentifier = generatePluginUniqueIdentifier(pluginConfig);
+            String meta = generatePluginMeta(pluginConfig, pluginType);
             
             pluginInstallationService.installPlugin(tenantId, pluginId, runtimeType, pluginUniqueIdentifier, meta);
             log.info("Created unified plugin installation record for tenant: {}, plugin: {}", tenantId, pluginId);
@@ -785,14 +785,14 @@ public class PluginServiceImpl implements PluginService {
             // 2. 然后根据插件类型插入到专用表（保持兼容性）
             if ("ai_model".equalsIgnoreCase(pluginType) || "model".equalsIgnoreCase(pluginType)) {
                 // AI模型插件安装
-                String provider = extractProviderFromDescriptor(descriptor);
+                String provider = extractProviderFromPluginConfig(pluginConfig);
                 if (provider != null) {
                     aiModelInstallationService.installAiModelPlugin(tenantId, provider, pluginId);
                     log.info("Created AI model installation record for tenant: {}, provider: {}", tenantId, provider);
                 }
             } else if ("tool".equalsIgnoreCase(pluginType)) {
                 // 工具插件安装
-                String toolName = extractToolNameFromDescriptor(descriptor);
+                String toolName = extractToolNameFromPluginConfig(pluginConfig);
                 if (toolName != null) {
                     toolInstallationService.installToolPlugin(tenantId, toolName, pluginId);
                     log.info("Created tool installation record for tenant: {}, tool: {}", tenantId, toolName);
@@ -808,41 +808,41 @@ public class PluginServiceImpl implements PluginService {
     }
 
     /**
-     * 从插件描述符中提取提供商名称
+     * 从插件配置中提取提供商名称
      */
-    private String extractProviderFromDescriptor(PluginDescriptor descriptor) {
+    private String extractProviderFromPluginConfig(PluginConfig pluginConfig) {
         // 优先从providerConfig中获取provider
-        String provider = descriptor.getProvider();
+        String provider = pluginConfig.getProvider();
         if (provider != null && !provider.trim().isEmpty()) {
             return provider;
         }
         
         // 从resource中获取provider信息
-        if (descriptor.getResource() != null) {
-            Object providerObj = descriptor.getResource().get("provider");
+        if (pluginConfig.getResource() != null) {
+            Object providerObj = pluginConfig.getResource().get("provider");
             if (providerObj != null) {
                 return providerObj.toString();
             }
         }
         
         // 如果没有明确的provider，使用插件ID作为provider
-        return descriptor.getId();
+        return pluginConfig.getId();
     }
 
     /**
-     * 从插件描述符中提取工具名称
+     * 从插件配置中提取工具名称
      */
-    private String extractToolNameFromDescriptor(PluginDescriptor descriptor) {
+    private String extractToolNameFromPluginConfig(PluginConfig pluginConfig) {
         // 从resource中获取toolName信息
-        if (descriptor.getResource() != null) {
-            Object toolNameObj = descriptor.getResource().get("toolName");
+        if (pluginConfig.getResource() != null) {
+            Object toolNameObj = pluginConfig.getResource().get("toolName");
             if (toolNameObj != null) {
                 return toolNameObj.toString();
             }
         }
         
         // 如果没有明确的toolName，使用插件名称
-        return descriptor.getName();
+        return pluginConfig.getName();
     }
 
     /**
@@ -867,7 +867,7 @@ public class PluginServiceImpl implements PluginService {
     /**
      * 下载并解析插件
      */
-    private PluginDescriptor downloadAndParsePlugin(String url, String fileName) throws Exception {
+    private PluginConfig downloadAndParsePlugin(String url, String fileName) throws Exception {
         // TODO: 实现从URL下载并解析插件的逻辑
         // 这里需要重新下载插件文件并解析，或者优化现有的安装流程
         throw new UnsupportedOperationException("Download and parse plugin from URL not yet implemented");
@@ -889,32 +889,32 @@ public class PluginServiceImpl implements PluginService {
     /**
      * 生成插件唯一标识符
      */
-    private String generatePluginUniqueIdentifier(PluginDescriptor descriptor) {
+    private String generatePluginUniqueIdentifier(PluginConfig pluginConfig) {
         // 使用插件ID + 版本作为唯一标识符
-        return descriptor.getId() + ":" + descriptor.getVersion();
+        return pluginConfig.getId() + ":" + pluginConfig.getVersion();
     }
 
     /**
      * 生成插件元数据
      */
-    private String generatePluginMeta(PluginDescriptor descriptor, String pluginType) {
+    private String generatePluginMeta(PluginConfig pluginConfig, String pluginType) {
         try {
             Map<String, Object> meta = new HashMap<>();
             meta.put("pluginType", pluginType);
-            meta.put("pluginName", descriptor.getName());
-            meta.put("pluginVersion", descriptor.getVersion());
-            meta.put("pluginAuthor", descriptor.getAuthor());
+            meta.put("pluginName", pluginConfig.getName());
+            meta.put("pluginVersion", pluginConfig.getVersion());
+            meta.put("pluginAuthor", pluginConfig.getAuthor());
             
             if ("ai_model".equalsIgnoreCase(pluginType) || "model".equalsIgnoreCase(pluginType)) {
-                meta.put("provider", extractProviderFromDescriptor(descriptor));
+                meta.put("provider", extractProviderFromPluginConfig(pluginConfig));
             } else if ("tool".equalsIgnoreCase(pluginType)) {
-                meta.put("toolName", extractToolNameFromDescriptor(descriptor));
+                meta.put("toolName", extractToolNameFromPluginConfig(pluginConfig));
             }
             
             // 转换为JSON字符串
             return new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(meta);
         } catch (Exception e) {
-            log.warn("Failed to generate plugin meta for plugin: {}", descriptor.getId(), e);
+            log.warn("Failed to generate plugin meta for plugin: {}", pluginConfig.getId(), e);
             return null;
         }
     }

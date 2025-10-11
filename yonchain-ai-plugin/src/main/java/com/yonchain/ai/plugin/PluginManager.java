@@ -1,6 +1,6 @@
 package com.yonchain.ai.plugin;
 
-import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
+import com.yonchain.ai.plugin.config.PluginConfig;
 import com.yonchain.ai.api.plugin.dto.PluginInfo;
 import com.yonchain.ai.plugin.util.PluginInfoConverter;
 import com.yonchain.ai.plugin.event.PluginEventPublisher;
@@ -97,9 +97,9 @@ public class PluginManager {
             Files.copy(inputStream, tempFilePath, StandardCopyOption.REPLACE_EXISTING);
             log.debug("Plugin saved to temporary file: {}", tempFilePath);
 
-            // 2. 解析插件描述符
-            PluginDescriptor descriptor = pluginParser.parsePlugin(tempFilePath);
-            String pluginId = descriptor.getId();
+            // 2. 解析插件配置
+            PluginConfig pluginConfig = pluginParser.parsePlugin(tempFilePath);
+            String pluginId = pluginConfig.getId();
 
             // 3. 检查插件是否已安装
             Optional<PluginInfo> existingPlugin = pluginRegistry.findByPluginId(pluginId);
@@ -108,20 +108,20 @@ public class PluginManager {
             }
 
             // 4. 验证插件
-            ValidationResult validation = pluginParser.validatePlugin(descriptor);
+            ValidationResult validation = pluginParser.validatePlugin(pluginConfig);
             if (!validation.isValid()) {
                 throw new PluginInstallException("Plugin validation failed: " + validation.getErrorMessage());
             }
 
             // 5. 获取对应的适配器
-            String pluginType = descriptor.getType();
+            String pluginType = pluginConfig.getType();
             PluginAdapter adapter = getAdapterForType(pluginType);
             if (adapter == null) {
                 throw new PluginInstallException("No adapter found for plugin type: " + pluginType);
             }
 
             // 6. 创建插件信息
-            PluginInfo pluginInfo = PluginInfoConverter.fromDescriptor(descriptor);
+            PluginInfo pluginInfo = PluginInfoConverter.fromPluginConfig(pluginConfig);
             pluginInfo.setStatus("installing");
 
             // 7. 保存插件信息
@@ -129,11 +129,11 @@ public class PluginManager {
 
             try {
                 // 8. 保存插件图标（如果有的话）
-                if (descriptor.getIconData() != null && descriptor.getIcon() != null) {
+                if (pluginConfig.getIconData() != null && pluginConfig.getIcon() != null) {
                     String iconPath = pluginIconService.saveIconData(
-                            descriptor.getId(),
-                            descriptor.getIcon(),
-                            descriptor.getIconData()
+                            pluginConfig.getId(),
+                            pluginConfig.getIcon(),
+                            pluginConfig.getIconData()
                     );
                     if (iconPath != null) {
                         pluginInfo.setIconPath(iconPath);
@@ -142,7 +142,7 @@ public class PluginManager {
                 }
 
                 // 9. 调用适配器安装逻辑
-                adapter.onPluginInstall(descriptor);
+                adapter.onPluginInstall(pluginConfig);
 
                 // 10. 更新状态为已安装但禁用
                 pluginInfo.setStatus("disabled");

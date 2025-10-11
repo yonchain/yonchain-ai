@@ -8,7 +8,6 @@ import com.yonchain.ai.model.ModelConfiguration;
 import com.yonchain.ai.model.ModelRegistry;
 import com.yonchain.ai.model.enums.ModelType;
 import com.yonchain.ai.plugin.*;
-import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
 import com.yonchain.ai.api.plugin.dto.PluginInfo;
 import com.yonchain.ai.plugin.enums.PluginType;
 import com.yonchain.ai.plugin.generator.ConfigDrivenPluginGenerator;
@@ -94,17 +93,17 @@ public class ModelPluginAdapter implements PluginAdapter {
     }
     
     @Override
-    public void onPluginInstall(PluginDescriptor descriptor) {
-        log.info("Installing model plugin: {}", descriptor.getId());
+    public void onPluginInstall(PluginConfig pluginConfig) {
+        log.info("Installing model plugin: {}", pluginConfig.getId());
         
         try {
             // 验证模型插件的配置完整性
-            validateModelPluginConfiguration(descriptor);
+            validateModelPluginConfiguration(pluginConfig);
             
-            log.info("Model plugin installed successfully: {}", descriptor.getId());
+            log.info("Model plugin installed successfully: {}", pluginConfig.getId());
             
         } catch (Exception e) {
-            log.error("Failed to install model plugin: {}", descriptor.getId(), e);
+            log.error("Failed to install model plugin: {}", pluginConfig.getId(), e);
             throw new RuntimeException("Failed to install model plugin: " + e.getMessage(), e);
         }
     }
@@ -271,17 +270,14 @@ public class ModelPluginAdapter implements PluginAdapter {
             String pluginId = pluginInfo.getPluginId();
             String pluginPath = pluginInfo.getPluginPath();
             
-            // 创建插件描述符（用于配置文件访问）
-            PluginDescriptor descriptor = createPluginDescriptor(pluginInfo);
-            
-            // 1. 解析插件配置
-            PluginConfig pluginConfig = parsePluginConfig(descriptor);
+            // 1. 创建并解析插件配置
+            PluginConfig pluginConfig = createPluginConfig(pluginInfo);
             
             // 2. 解析提供商配置
-            ProviderConfig providerConfig = parseProviderConfig(descriptor, pluginConfig);
+            ProviderConfig providerConfig = parseProviderConfig(pluginConfig);
             
             // 3. 解析模型配置
-            List<ModelConfigData> modelConfigs = parseModelConfigs(descriptor);
+            List<ModelConfigData> modelConfigs = parseModelConfigs(pluginConfig);
             
             // 4. 使用配置驱动的插件生成器
             ModelPlugin instance = pluginGenerator.generateModelPlugin(
@@ -301,22 +297,6 @@ public class ModelPluginAdapter implements PluginAdapter {
         }
     }
     
-    /**
-     * 从插件信息创建插件描述符
-     */
-    private PluginDescriptor createPluginDescriptor(PluginInfo pluginInfo) {
-        PluginDescriptor descriptor = new PluginDescriptor();
-        
-        descriptor.setId(pluginInfo.getPluginId());
-        descriptor.setName(pluginInfo.getName());
-        descriptor.setVersion(pluginInfo.getVersion());
-        descriptor.setAuthor(pluginInfo.getAuthor());
-        descriptor.setType(pluginInfo.getType());
-        descriptor.setPluginClass(pluginInfo.getMainClass());
-        descriptor.setPluginPath(java.nio.file.Paths.get(pluginInfo.getPluginPath()));
-        
-        return descriptor;
-    }
     
     /**
      * 创建插件上下文
@@ -868,19 +848,19 @@ public class ModelPluginAdapter implements PluginAdapter {
      * @param descriptor 插件描述符
      * @throws IllegalArgumentException 配置验证失败时抛出
      */
-    private void validateModelPluginConfiguration(PluginDescriptor descriptor) {
-        String pluginId = descriptor.getId();
+    private void validateModelPluginConfiguration(PluginConfig pluginConfig) {
+        String pluginId = pluginConfig.getId();
         
         // 1. 检查是否有提供商配置文件
-        if (descriptor.getPlugins() == null || descriptor.getPlugins().isEmpty()) {
+        if (pluginConfig.getPlugins() == null || pluginConfig.getPlugins().isEmpty()) {
             throw new IllegalArgumentException(
                 String.format("Model plugin [%s] must specify provider configuration files (e.g., deepseek.yaml)", pluginId)
             );
         }
         
         // 2. 验证每个提供商配置文件
-        for (String configFile : descriptor.getPlugins()) {
-            validateProviderConfiguration(descriptor, configFile);
+        for (String configFile : pluginConfig.getPlugins()) {
+            validateProviderConfiguration(pluginConfig, configFile);
         }
         
         log.info("Model plugin configuration validation passed for: {}", pluginId);
@@ -893,12 +873,12 @@ public class ModelPluginAdapter implements PluginAdapter {
      * @param configFile 配置文件名
      * @throws IllegalArgumentException 配置验证失败时抛出
      */
-    private void validateProviderConfiguration(PluginDescriptor descriptor, String configFile) {
-        String pluginId = descriptor.getId();
+    private void validateProviderConfiguration(PluginConfig pluginConfig, String configFile) {
+        String pluginId = pluginConfig.getId();
         
         try {
             // 从JAR中读取提供商配置文件
-            InputStream configStream = descriptor.getConfigInputStream(configFile);
+            InputStream configStream = pluginConfig.getConfigInputStream(configFile);
             if (configStream == null) {
                 throw new IllegalArgumentException(
                     String.format("Provider configuration file [%s] not found in plugin [%s]", configFile, pluginId)
@@ -1138,21 +1118,42 @@ public class ModelPluginAdapter implements PluginAdapter {
     // === 配置解析辅助方法 ===
     
     /**
-     * 解析插件配置
+     * 创建并解析插件配置
      */
-    private PluginConfig parsePluginConfig(PluginDescriptor descriptor) {
-        try (InputStream inputStream = descriptor.getConfigInputStream("plugin.yaml")) {
-            return configParser.parsePluginConfig(inputStream);
+    private PluginConfig createPluginConfig(PluginInfo pluginInfo) {
+        try {
+            // 创建基础的 PluginConfig
+            PluginConfig pluginConfig = new PluginConfig();
+            pluginConfig.setId(pluginInfo.getPluginId());
+            pluginConfig.setPluginPath(java.nio.file.Paths.get(pluginInfo.getPluginPath()));
+            
+            // 解析 plugin.yaml 文件
+            try (InputStream inputStream = pluginConfig.getConfigInputStream("plugin.yaml")) {
+                PluginConfig parsedConfig = configParser.parsePluginConfig(inputStream);
+                
+                // 合并解析的配置
+                pluginConfig.setName(parsedConfig.getName());
+                pluginConfig.setVersion(parsedConfig.getVersion());
+                pluginConfig.setAuthor(parsedConfig.getAuthor());
+                pluginConfig.setType(parsedConfig.getType());
+                pluginConfig.setIcon(parsedConfig.getIcon());
+                pluginConfig.setDescription(parsedConfig.getDescription());
+                pluginConfig.setLabel(parsedConfig.getLabel());
+                pluginConfig.setPlugins(parsedConfig.getPlugins());
+                pluginConfig.setResource(parsedConfig.getResource());
+                
+                return pluginConfig;
+            }
         } catch (Exception e) {
-            log.error("Failed to parse plugin config for: {}", descriptor.getId(), e);
-            throw new RuntimeException("Failed to parse plugin config", e);
+            log.error("Failed to create plugin config for: {}", pluginInfo.getPluginId(), e);
+            throw new RuntimeException("Failed to create plugin config", e);
         }
     }
     
     /**
      * 解析提供商配置
      */
-    private ProviderConfig parseProviderConfig(PluginDescriptor descriptor, PluginConfig pluginConfig) {
+    private ProviderConfig parseProviderConfig(PluginConfig pluginConfig) {
         try {
             // 从plugin.yaml中获取提供商配置文件名
             String providerConfigFile = "deepseek.yaml"; // 默认值
@@ -1161,12 +1162,14 @@ public class ModelPluginAdapter implements PluginAdapter {
                 providerConfigFile = pluginConfig.getPlugins().get(0);
             }
             
-            try (InputStream inputStream = descriptor.getConfigInputStream(providerConfigFile)) {
-                return configParser.parseProviderConfig(inputStream);
+            try (InputStream inputStream = pluginConfig.getConfigInputStream(providerConfigFile)) {
+                ProviderConfig providerConfig = configParser.parseProviderConfig(inputStream);
+                pluginConfig.setProviderConfig(providerConfig);
+                return providerConfig;
             }
             
         } catch (Exception e) {
-            log.error("Failed to parse provider config for: {}", descriptor.getId(), e);
+            log.error("Failed to parse provider config for: {}", pluginConfig.getId(), e);
             throw new RuntimeException("Failed to parse provider config", e);
         }
     }
@@ -1174,15 +1177,15 @@ public class ModelPluginAdapter implements PluginAdapter {
     /**
      * 解析模型配置
      */
-    private List<ModelConfigData> parseModelConfigs(PluginDescriptor descriptor) {
+    private List<ModelConfigData> parseModelConfigs(PluginConfig pluginConfig) {
         List<ModelConfigData> modelConfigs = new ArrayList<>();
         
         try {
             // 获取模型配置文件列表
-            List<String> modelConfigFiles = descriptor.getModelConfigFiles();
+            List<String> modelConfigFiles = pluginConfig.getModelConfigFiles();
             
             for (String configFile : modelConfigFiles) {
-                try (InputStream inputStream = descriptor.getConfigInputStream(configFile)) {
+                try (InputStream inputStream = pluginConfig.getConfigInputStream(configFile)) {
                     ModelConfigData modelConfig = configParser.parseModelConfig(inputStream);
                     modelConfigs.add(modelConfig);
                 } catch (Exception e) {
@@ -1190,8 +1193,10 @@ public class ModelPluginAdapter implements PluginAdapter {
                 }
             }
             
+            pluginConfig.setModelConfigs(modelConfigs);
+            
         } catch (Exception e) {
-            log.error("Failed to parse model configs for: {}", descriptor.getId(), e);
+            log.error("Failed to parse model configs for: {}", pluginConfig.getId(), e);
         }
         
         return modelConfigs;

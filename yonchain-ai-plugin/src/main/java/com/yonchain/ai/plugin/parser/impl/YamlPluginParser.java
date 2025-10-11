@@ -1,6 +1,6 @@
 package com.yonchain.ai.plugin.parser.impl;
 
-import com.yonchain.ai.plugin.descriptor.PluginDescriptor;
+import com.yonchain.ai.plugin.config.PluginConfig;
 // import com.yonchain.ai.plugin.descriptor.ResourceConfig; // 已删除，简化处理
 import com.yonchain.ai.plugin.exception.PluginParseException;
 import com.yonchain.ai.plugin.parser.PluginParser;
@@ -35,7 +35,63 @@ public class YamlPluginParser implements PluginParser {
     private final Yaml yaml = new Yaml();
     
     @Override
-    public PluginDescriptor parsePlugin(Path pluginPath) throws PluginParseException {
+    public PluginConfig parsePlugin(Path pluginPath) throws PluginParseException {
+        if (!isValidPluginPath(pluginPath)) {
+            throw new PluginParseException("Invalid plugin path: " + pluginPath);
+        }
+        
+        try {
+            // 只支持JAR文件格式
+            if (Files.isRegularFile(pluginPath) && pluginPath.toString().endsWith(".jar")) {
+                return parsePluginFromJar(pluginPath);
+            } else {
+                throw new PluginParseException("Only JAR plugin format is supported: " + pluginPath);
+            }
+            
+        } catch (IOException e) {
+            throw new PluginParseException("Failed to parse plugin: " + pluginPath, e);
+        }
+    }
+
+
+    @Override
+    public ValidationResult validatePlugin(PluginConfig descriptor) {
+        ValidationResult result = new ValidationResult();
+
+        // 验证基本信息
+        if (descriptor.getId() == null || descriptor.getId().trim().isEmpty()) {
+            result.addError("Plugin ID cannot be null or empty");
+        }
+
+        if (descriptor.getName() == null || descriptor.getName().trim().isEmpty()) {
+            result.addError("Plugin name cannot be null or empty");
+        }
+
+        if (descriptor.getVersion() == null || descriptor.getVersion().trim().isEmpty()) {
+            result.addError("Plugin version cannot be null or empty");
+        }
+
+        if (descriptor.getType() == null || descriptor.getType().trim().isEmpty()) {
+            result.addError("Plugin type cannot be null or empty");
+        }
+
+        if (descriptor.getAuthor() == null || descriptor.getAuthor().trim().isEmpty()) {
+            result.addWarning("Plugin author is not specified");
+        }
+
+        // 验证提供商配置文件
+        if ("model".equals(descriptor.getType())) {
+            if (descriptor.getPlugins() == null || descriptor.getPlugins().isEmpty()) {
+                result.addError("Model plugin must specify provider configuration files");
+            }
+        }
+
+        return result;
+    }
+
+
+
+    /*
         if (!isValidPluginPath(pluginPath)) {
             throw new PluginParseException("Invalid plugin path: " + pluginPath);
         }
@@ -54,95 +110,65 @@ public class YamlPluginParser implements PluginParser {
     }
     
     @Override
-    public ValidationResult validatePlugin(PluginDescriptor descriptor) {
+    public ValidationResult validatePlugin(PluginConfig pluginConfig) {
         ValidationResult result = new ValidationResult();
         
         // 验证基本信息
-        if (descriptor.getId() == null || descriptor.getId().trim().isEmpty()) {
+        if (pluginConfig.getId() == null || pluginConfig.getId().trim().isEmpty()) {
             result.addError("Plugin ID cannot be null or empty");
         }
         
-        if (descriptor.getName() == null || descriptor.getName().trim().isEmpty()) {
+        if (pluginConfig.getName() == null || pluginConfig.getName().trim().isEmpty()) {
             result.addError("Plugin name cannot be null or empty");
         }
         
-        if (descriptor.getVersion() == null || descriptor.getVersion().trim().isEmpty()) {
+        if (pluginConfig.getVersion() == null || pluginConfig.getVersion().trim().isEmpty()) {
             result.addError("Plugin version cannot be null or empty");
         }
         
-        if (descriptor.getType() == null || descriptor.getType().trim().isEmpty()) {
+        if (pluginConfig.getType() == null || pluginConfig.getType().trim().isEmpty()) {
             result.addError("Plugin type cannot be null or empty");
         }
         
-        if (descriptor.getAuthor() == null || descriptor.getAuthor().trim().isEmpty()) {
+        if (pluginConfig.getAuthor() == null || pluginConfig.getAuthor().trim().isEmpty()) {
             result.addWarning("Plugin author is not specified");
         }
         
         // 验证提供商配置文件
-        if ("model".equals(descriptor.getType())) {
-            if (descriptor.getPlugins() == null || descriptor.getPlugins().isEmpty()) {
+        if ("model".equals(pluginConfig.getType())) {
+            if (pluginConfig.getPlugins() == null || pluginConfig.getPlugins().isEmpty()) {
                 result.addError("Model plugin must specify provider configuration files");
             }
         }
         
         return result;
     }
-    
-    
-    @Override
-    public boolean isValidPluginPath(Path pluginPath) {
-        if (!Files.exists(pluginPath)) {
-            return false;
-        }
-        
-        // 只检查JAR文件
-        if (Files.isRegularFile(pluginPath) && pluginPath.toString().endsWith(".jar")) {
-            return isValidPluginJar(pluginPath);
-        }
-        
-            return false;
-        }
-        
-    
-    /**
-     * 检查JAR文件是否是有效的插件JAR
-     * 
-     * @param jarPath JAR文件路径
-     * @return 是否有效
-     */
-    private boolean isValidPluginJar(Path jarPath) {
-        try (JarFile jarFile = new JarFile(jarPath.toFile())) {
-            // 检查JAR中是否包含plugin.yaml或plugin.xml
-            return jarFile.getEntry(PLUGIN_YAML) != null || 
-                   jarFile.getEntry(PLUGIN_XML) != null;
-        } catch (IOException e) {
-            log.debug("Failed to check JAR file: {}", jarPath, e);
-            return false;
-        }
-    }
-    
+
     /**
      * 从JAR文件解析插件
      * 
      * @param jarPath JAR文件路径
-     * @return 插件描述符
+     * @return 插件配置
      * @throws IOException IO异常
      * @throws PluginParseException 解析异常
      */
-    private PluginDescriptor parsePluginFromJar(Path jarPath) throws IOException, PluginParseException {
+    private PluginConfig parsePluginFromJar(Path jarPath) throws IOException, PluginParseException {
         try (JarFile jarFile = new JarFile(jarPath.toFile())) {
             // 优先尝试解析plugin.yaml
             JarEntry yamlEntry = jarFile.getJarEntry(PLUGIN_YAML);
             if (yamlEntry != null) {
-                PluginDescriptor descriptor;
+                PluginConfig pluginConfig;
                 try (InputStream inputStream = jarFile.getInputStream(yamlEntry)) {
-                    descriptor = parsePluginYamlFromStream(inputStream, jarPath);
+                    pluginConfig = parsePluginYamlFromStream(inputStream, jarPath);
                 }
                 
-                // 提取图标数据
-                extractIconFromJar(jarFile, descriptor);
+                // 设置插件路径
+                pluginConfig.setPluginPath(jarPath);
                 
-                return descriptor;
+                // 提取图标数据
+                extractIconFromJar(jarFile, pluginConfig);
+                
+                return pluginConfig;
             }
             
             // 如果没有YAML文件，尝试XML文件（兼容性）
@@ -156,16 +182,15 @@ public class YamlPluginParser implements PluginParser {
         }
     }
     
-    
     /**
      * 从输入流解析plugin.yaml
      * 
      * @param inputStream 输入流
      * @param pluginPath 插件路径（用于错误信息）
-     * @return 插件描述符
+     * @return 插件配置
      * @throws PluginParseException 解析异常
      */
-    private PluginDescriptor parsePluginYamlFromStream(InputStream inputStream, Path pluginPath) throws PluginParseException {
+    private PluginConfig parsePluginYamlFromStream(InputStream inputStream, Path pluginPath) throws PluginParseException {
         try {
             Map<String, Object> yamlData = yaml.load(inputStream);
             
@@ -173,73 +198,64 @@ public class YamlPluginParser implements PluginParser {
                 throw new PluginParseException("Empty or invalid YAML file in plugin: " + pluginPath);
             }
             
-            return buildPluginDescriptor(yamlData, pluginPath);
+            return buildPluginConfig(yamlData, pluginPath);
             
         } catch (Exception e) {
             throw new PluginParseException("Failed to parse plugin YAML in: " + pluginPath, e);
         }
     }
     
-    
     /**
-     * 构建插件描述符
+     * 构建插件配置
      * 
      * @param yamlData YAML数据
      * @param pluginPath 插件路径（JAR文件）
-     * @return 插件描述符
+     * @return 插件配置
      * @throws PluginParseException 解析异常
      */
     @SuppressWarnings("unchecked")
-    private PluginDescriptor buildPluginDescriptor(Map<String, Object> yamlData, Path pluginPath) throws PluginParseException {
+    private PluginConfig buildPluginConfig(Map<String, Object> yamlData, Path pluginPath) throws PluginParseException {
         try {
-            PluginDescriptor descriptor = new PluginDescriptor();
+            PluginConfig pluginConfig = new PluginConfig();
             
             // 基本信息
-            descriptor.setId(getString(yamlData, "id"));
-            descriptor.setName(getString(yamlData, "name"));
-            descriptor.setVersion(getString(yamlData, "version"));
-            descriptor.setAuthor(getString(yamlData, "author"));
-            descriptor.setType(getString(yamlData, "type"));
-            descriptor.setCreatedAt(getString(yamlData, "created_at"));
-            descriptor.setIcon(getString(yamlData, "icon"));
-            descriptor.setPluginClass(getString(yamlData, "plugin_class"));
-            descriptor.setPluginPath(pluginPath);
+            pluginConfig.setId(getString(yamlData, "id"));
+            pluginConfig.setName(getString(yamlData, "name"));
+            pluginConfig.setVersion(getString(yamlData, "version"));
+            pluginConfig.setAuthor(getString(yamlData, "author"));
+            pluginConfig.setType(getString(yamlData, "type"));
+            pluginConfig.setIcon(getString(yamlData, "icon"));
             
             // 描述信息（多语言支持）
             Object descObj = yamlData.get("description");
             if (descObj instanceof Map) {
-                descriptor.setDescription((Map<String, String>) descObj);
+                pluginConfig.setDescription((Map<String, String>) descObj);
             }
             
             // 标签信息（多语言支持）
             Object labelObj = yamlData.get("label");
             if (labelObj instanceof Map) {
-                descriptor.setLabel((Map<String, String>) labelObj);
+                pluginConfig.setLabel((Map<String, String>) labelObj);
             }
             
             // 提供商配置文件列表（如deepseek.yaml）
             List<String> pluginFiles = getStringList(yamlData, "plugins");
             if (pluginFiles != null) {
-                descriptor.setPlugins(pluginFiles);
+                pluginConfig.setPlugins(pluginFiles);
             }
             
             // 资源配置
             Map<String, Object> resourceData = (Map<String, Object>) yamlData.get("resource");
             if (resourceData != null) {
-                // 简化处理：直接保存原始配置数据
-                descriptor.setResource(resourceData);
+                pluginConfig.setResource(resourceData);
             }
             
-            return descriptor;
+            return pluginConfig;
             
         } catch (Exception e) {
-            throw new PluginParseException("Failed to build plugin descriptor", e);
+            throw new PluginParseException("Failed to build plugin config", e);
         }
     }
-    
-    // parseResourceConfig方法已删除 - 在新的配置驱动系统中，直接使用原始Map数据
-    
-    
     
     /**
      * 从YAML数据中获取字符串值
@@ -269,26 +285,30 @@ public class YamlPluginParser implements PluginParser {
         return null;
     }
     
-    /**
-     * 从YAML数据中获取布尔值
-     * 
-     * @param data YAML数据
-     * @param key 键
-     * @param defaultValue 默认值
-     * @return 布尔值
-     */
-    // getBoolean方法已删除 - 在简化的配置系统中不再需要
+    @Override
+    public boolean isValidPluginPath(Path pluginPath) {
+        if (!Files.exists(pluginPath)) {
+            return false;
+        }
+        
+        // 只检查JAR文件
+        if (Files.isRegularFile(pluginPath) && pluginPath.toString().endsWith(".jar")) {
+            return isValidPluginJar(pluginPath);
+        }
+        
+        return false;
+    }
     
     /**
      * 从JAR文件中提取图标数据
      * 
      * @param jarFile JAR文件
-     * @param descriptor 插件描述符
+     * @param pluginConfig 插件配置
      */
-    private void extractIconFromJar(JarFile jarFile, PluginDescriptor descriptor) {
-        String iconFileName = descriptor.getIcon();
+    private void extractIconFromJar(JarFile jarFile, PluginConfig pluginConfig) {
+        String iconFileName = pluginConfig.getIcon();
         if (iconFileName == null || iconFileName.trim().isEmpty()) {
-            log.debug("No icon specified for plugin: {}", descriptor.getId());
+            log.debug("No icon specified for plugin: {}", pluginConfig.getId());
             return;
         }
         
@@ -296,7 +316,7 @@ public class YamlPluginParser implements PluginParser {
             // 在JAR文件中查找图标文件
             String iconPath = findIconInJar(jarFile, iconFileName);
             if (iconPath == null) {
-                log.warn("Icon file not found in JAR for plugin {}: {}", descriptor.getId(), iconFileName);
+                log.warn("Icon file not found in JAR for plugin {}: {}", pluginConfig.getId(), iconFileName);
                 return;
             }
             
@@ -305,15 +325,15 @@ public class YamlPluginParser implements PluginParser {
             if (iconEntry != null) {
                 try (InputStream iconStream = jarFile.getInputStream(iconEntry)) {
                     byte[] iconData = iconStream.readAllBytes();
-                    descriptor.setIconData(iconData);
-                    log.debug("Icon data extracted for plugin {}: {} bytes", descriptor.getId(), iconData.length);
+                    pluginConfig.setIconData(iconData);
+                    log.debug("Icon data extracted for plugin {}: {} bytes", pluginConfig.getId(), iconData.length);
                 } catch (IOException e) {
-                    log.warn("Failed to read icon data for plugin {}: {}", descriptor.getId(), e.getMessage());
+                    log.warn("Failed to read icon data for plugin {}: {}", pluginConfig.getId(), e.getMessage());
                 }
             }
             
         } catch (Exception e) {
-            log.warn("Failed to extract icon for plugin {}: {}", descriptor.getId(), e.getMessage());
+            log.warn("Failed to extract icon for plugin {}: {}", pluginConfig.getId(), e.getMessage());
         }
     }
     
@@ -344,5 +364,22 @@ public class YamlPluginParser implements PluginParser {
                 .filter(name -> name.endsWith("/" + iconFileName) || name.equals(iconFileName))
                 .findFirst()
                 .orElse(null);
+    }
+    
+    /**
+     * 检查JAR文件是否是有效的插件JAR
+     * 
+     * @param jarPath JAR文件路径
+     * @return 是否有效
+     */
+    private boolean isValidPluginJar(Path jarPath) {
+        try (JarFile jarFile = new JarFile(jarPath.toFile())) {
+            // 检查JAR中是否包含plugin.yaml或plugin.xml
+            return jarFile.getEntry(PLUGIN_YAML) != null || 
+                   jarFile.getEntry(PLUGIN_XML) != null;
+        } catch (IOException e) {
+            log.debug("Failed to check JAR file: {}", jarPath, e);
+            return false;
+        }
     }
 }
