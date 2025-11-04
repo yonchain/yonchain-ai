@@ -47,7 +47,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.yonchain.ai.Dify4jApplication</mainClass>
+                    <mainClass>com.yonchain.ai.YonchainApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>
