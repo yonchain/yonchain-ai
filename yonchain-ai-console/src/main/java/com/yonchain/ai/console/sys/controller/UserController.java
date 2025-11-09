@@ -26,6 +26,7 @@ import com.yonchain.ai.api.sys.*;
 import com.yonchain.ai.api.sys.enums.RoleType;
 import com.yonchain.ai.api.security.SecurityService;
 import com.yonchain.ai.console.BaseController;
+import com.yonchain.ai.console.file.entity.FileEntity;
 import com.yonchain.ai.console.file.service.FileService;
 import com.yonchain.ai.console.sys.request.UserCreateRequest;
 import com.yonchain.ai.console.sys.request.UserPasswordRestRequest;
@@ -42,6 +43,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -480,8 +482,15 @@ public class UserController extends BaseController {
                 .map(responseFactory::createRoleResponse)
                 .toList());
         //设置头像url
-        String avatarUrl = fileService.getSignedFileUrl(user.getAvatar());
-        userResponse.setAvatarUrl(avatarUrl);
+        String fileId = user.getAvatar();
+        if (StringUtils.isNotBlank(fileId)){
+            FileEntity file = fileService.getFileById(fileId);
+            if (file == null){
+                throw new YonchainIllegalStateException("不存在该文件");
+            }
+            String avatarUrl = fileService.getSignedFileUrl(file.getId());
+            userResponse.setAvatarUrl(avatarUrl);
+        }
         return userResponse;
     }
 

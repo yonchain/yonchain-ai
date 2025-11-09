@@ -95,15 +95,15 @@ models:
     predefined:
       - "models/llm/*.yaml"
     position: "models/llm/_position.yaml"
-  text_embedding:
-    predefined:
-      - "models/text_embedding/*.yaml"
-  tts:
-    predefined:
-      - "models/tts/*.yaml"
-  speech2text:
-    predefined:
-      - "models/speech2text/*.yaml"
-  moderation:
-    predefined:
-      - "models/moderation/*.yaml"
+  #text_embedding:
+    #predefined:
+    #  - "models/text_embedding/*.yaml"
+  #tts:
+   # predefined:
+   #   - "models/tts/*.yaml"
+  #speech2text:
+   # predefined:
+   #   - "models/speech2text/*.yaml"
+  #moderation:
+   # predefined:
+   #   - "models/moderation/*.yaml"

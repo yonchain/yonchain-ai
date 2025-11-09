@@ -20,7 +20,7 @@ public class OpenAiModelProvider implements ModelProvider {
     
     private static final Logger log = LoggerFactory.getLogger(OpenAiModelProvider.class);
     
-    private static final String PROVIDER_NAME = "deepseek";
+    private static final String PROVIDER_NAME = "openai";
     
     @Override
     public String getProviderName() {
@@ -39,7 +39,7 @@ public class OpenAiModelProvider implements ModelProvider {
             // 从环境变量或配置中获取API Key
             String apiKey = modelConfig.getApiKey();
             if (apiKey == null) {
-                apiKey = System.getProperty("deepseek.api.key");
+                apiKey = System.getProperty("openai.api.key");
             }
 
             if (apiKey == null) {
@@ -51,7 +51,7 @@ public class OpenAiModelProvider implements ModelProvider {
             // 获取自定义的base URL（如果有）
             String baseUrl = System.getenv("DEEPSEEK_BASE_URL");
             if (baseUrl == null) {
-                baseUrl = System.getProperty("deepseek.base.url");
+                baseUrl = System.getProperty("openai.base.url");
                 if (baseUrl == null) {
                     baseUrl = "https://api.deepseek.com/v1"; // 默认URL
                 }
